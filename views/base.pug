@@ -1,0 +1,22 @@
+doctype html 
+html
+    head
+        block head
+            title Natours | #{title}
+            link(rel='stylesheet' href='/css/style.css')
+            link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+            link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
+            meta(charset='UTF-8')
+            meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    body
+        include _header
+        block content
+        include _footer
+
+        //script(src='https://unpkg.com/axios/dist/axios.min.js' crossorigin='anonymous' referrerpolicy='no-referrer')
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js' integrity='sha512-odNmoc1XJy5x1TMVMdC7EMs3IVdItLPlCeL5vSUPN2llYKMJ2eByTTAIiiuqLg+GdNr9hF6z81p27DArRFKT7A==' crossorigin='anonymous' referrerpolicy='no-referrer') 
+        script(src='https://js.stripe.com/v3/')
+        script(src='/js/stripe.js' type='module')
+        script(src='/js/mapbox.js' crossorigin="anonymous" referrerpolicy="no-referrer")
+        script(src='/js/login.js', type='module')
+        script(src='/js/updateSettings.js', type='module')
