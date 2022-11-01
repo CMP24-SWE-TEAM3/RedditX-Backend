@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const compression = require("compression");
+const globalErrorHandler = require("./controllers/error-controller");
 
 const app = express();
 
@@ -88,12 +89,13 @@ app.use("/api", limiter); // limit only api requests
 app.use(express.json({ limit: "10kb" }));
 
 // ROUTES
-// app.use('/api/v1/users', userRouter);
+// app.use('/api/reviews', reviewRouter);
+// app.use('/api/me', userRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404)); // Here will assume that this is an error and skip all middlewares forward to the error handler middleware we defined
 });
 
 // Error handler middleware
-//app.use(globalErrorHandler);
+app.use(globalErrorHandler);
 module.exports = app;
