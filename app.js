@@ -19,8 +19,8 @@ app.use(function (req, res, next) {
 });
 app.use(cors(/* { credentials: true, origin: 'http://localhost:8000' } */));
 app.options("*", cors());
-/*app.set('view engine', 'pug');
-app.set('views', `${__dirname}/views`);*/
+app.set('view engine', 'pug');
+app.set('views', `${__dirname}/views`);
 
 // MIDDLEWARES
 
@@ -79,11 +79,11 @@ app.use((req, res, next) => {
 // Limit requests from sam IP address
 const limiter = rateLimit({
   max: 1000,
-  windowMs: 60 * 60 * 1000, // Ms: milliseconds, this will allow the same IP address to perform only 100 request per hour
+  windowMs: 60 * 60 * 1000, // Ms: milliseconds, this will allow the same IP address to perform only 1000 request per hour
   message:
     "Too many requests from this IP address, please try again in an hour!",
 });
-app.use("/api", limiter); // limit only api requests
+app.use("/", limiter); // limit only api requests
 
 // Body parser, reading date from body into req.body
 app.use(express.json({ limit: "10kb" }));
