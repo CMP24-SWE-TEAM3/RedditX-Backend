@@ -1,6 +1,6 @@
 const AppError = require("../utils/app-error");
 const catchAsync = require("../utils/catch-async");
-//const Community = require('./../models/communityModel');
+const Community = require("./../models/community-model");
 //const Moderator = require('./../models/moderatorModel');
 const factory = require("./handler-factory");
 const makeRandomString = require("./../utils/randomString");
