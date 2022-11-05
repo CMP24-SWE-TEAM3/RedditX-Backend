@@ -71,6 +71,7 @@ const communitySchema = mongoose.Schema({
   communityID: {
     type: String,
     required: [true, "A community must have an id!"],
+    unique: [true, "A community must have an unique id!"],
   },
   communityRules: [
     {
@@ -92,19 +93,6 @@ const communitySchema = mongoose.Schema({
   },
   banner: String,
   icon: String,
-  name: {
-    type: String,
-    required: [true, "A community must have a name!"],
-    trim: true, // Remove all the white space in the beginning or end of the field
-    maxLength: [
-      150,
-      "A community name must have less than or equal to 150 characters",
-    ],
-    minLength: [
-      1,
-      "A community name must have more than or equal to 1 character",
-    ],
-  },
   membersCnt: {
     type: Number,
     default: 1,
