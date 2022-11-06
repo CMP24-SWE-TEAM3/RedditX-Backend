@@ -22,6 +22,7 @@ const handleJWTError = () =>
 const handleTokenExpiredError = () =>
   new AppError("Token is expired! Please log in again!", 401);
 const sendErrorDev = (req, res, err) => {
+<<<<<<< HEAD
     return res.status(err.statusCode).json({
       status: err.status,
       error: err,
@@ -41,6 +42,27 @@ const sendErrorProd = (req, res, err) => {
       status: "error",
       message: "Something went very wrong!",
     });
+=======
+  return res.status(err.statusCode).json({
+    status: err.status,
+    error: err,
+    message: err.message,
+    stack: err.stack,
+  });
+};
+const sendErrorProd = (req, res, err) => {
+  if (err.isOperational) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+    });
+  }
+  console.error("ERROR 💥", err);
+  return res.status(500).json({
+    status: "error",
+    message: "Something went very wrong!",
+  });
+>>>>>>> 9138acf332a1d982b557bf16535327e67ef9450a
 };
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
