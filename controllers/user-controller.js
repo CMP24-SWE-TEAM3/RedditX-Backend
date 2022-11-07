@@ -1,6 +1,6 @@
 const AppError = require("../utils/app-error");
 const catchAsync = require("../utils/catch-async");
-//const User = require('./../models/user-model');
+const User = require('./../models/user-model');
 const Post = require("./../models/post-model");
 //const Comment = require('./../models/comment-model');
 const factory = require("./handler-factory");
