@@ -42,10 +42,12 @@ const userSchema = new mongoose.Schema({
     /*********************************************************************************
      * the attributes
      **********************************************************************************/
-    username: {
+    userID: {
         type: String,
-        required: true,
-        unique: true,
+        minLength: [5, 'the minimum length is 5 characters'],
+        maxLength: [20, 'the maximum length is 40'],
+        required: [true, 'this name isn\'t unique'],
+        unique: [true, 'the user must have an id'],
     },
     inboxCount: Number,
     canCreateSubreddit: Boolean,
@@ -55,10 +57,7 @@ const userSchema = new mongoose.Schema({
         default: false,
         select: false,
     },
-    avatar: {
-        type: String,
-        required: true,
-    },
+    avatar: String,
     email: {
         type: String,
         required: [true, 'Please provide your email'],
@@ -75,25 +74,16 @@ const userSchema = new mongoose.Schema({
     /*the ER diagram has an attribute that is called karma but it is equal to sum of post karma 
     and comment karma */
     karma: Number,
-    phoneNumber: {
-        type: String,
-        validate: {
-            validator: function () {
-                const regex = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
-                return regex.match(input_str);
-            }
-        }
-    },
     birthDate: {
-        required: true,
-        type: Date,
+        required: [true, 'you must specify the birthdate of the user'],
+        type: String,
     },
     phoneNumber: {
         type: String,
         validate: [validator.isMobilePhone, 'please provide a valid phone number'],
     },
     createdAt: {
-        type: Date,
+        type: String,
         required: [true, 'missing the date of creation of the user'],
     },
     isPasswordSet: {
@@ -119,14 +109,15 @@ const userSchema = new mongoose.Schema({
     },
     displayName: {
         type: String,
-        required: true,
+        // required: true,
+        default: this.userID,
     },
     passWordResetExpires: {
-        type: Date,
+        type: String,
         select: false,
     },
     passwordChangedAt: {
-        type: Date,
+        type: String,
         select: false,
         default: this.createdAt,
     },
@@ -148,28 +139,34 @@ const userSchema = new mongoose.Schema({
     /***************************************
      * recursive relations
      ***************************************/
-    friendRequest: [
+    friendRequestToMe: [
         {
-            type: mongoose.Schema.ObjectId,
-            ref: 'User'
+            type: String,/*mongoose.Schema.ObjectId,*/
+            /*ref: 'User'*/
+        }
+    ],
+    friendRequestFromMe: [
+        {
+            type: String,
+            /*ref : 'User' */
         }
     ],
     friend: [
         {
-            type: mongoose.Schema.ObjectId,
-            ref: 'User',
+            type: String, /*mongoose.Schema.ObjectId,*/
+            /*ref: 'User',*/
         }
     ],
     blocks: [
         {
-            type: mongoose.Schema.ObjectId,
-            ref: 'User',
+            type: String,/*mongoose.Schema.ObjectId,*/
+            /*ref: 'User',*/
         }
     ],
     follows: [
         {
-            type: mongoose.Schema.ObjectId,
-            ref: 'User',
+            type: String,/* mongoose.Schema.ObjectId,*/
+            /*ref: 'User',*/
         }
     ],
     /***************************************
@@ -178,7 +175,7 @@ const userSchema = new mongoose.Schema({
     member: [
         {
             communityId: {
-                type: mongoose.Schema.ObjectId,
+                type: String/*mongoose.Schema.ObjectId,*/
                 // ref:'Community',  /* this will be un commented when the community schema will be ready*/
             },
             isMuted: Boolean,
@@ -188,7 +185,7 @@ const userSchema = new mongoose.Schema({
     moderators: [
         {
             communityId: {
-                type: mongoose.Schema.ObjectId,
+                type: String,/*mongoose.Schema.ObjectId,*/
                 // ref:'Community',   /* this will be un commented when the community schema will be ready*/
             },
             role: {
@@ -213,14 +210,14 @@ const userSchema = new mongoose.Schema({
      ***************************************/
     hasPost: [
         {
-            type: mongoose.Schema.ObjectId,
-            ref: 'Post',
+            type: String,/*mongoose.Schema.ObjectId,*/
+            /*ref: 'Post',*/
         }
     ],
     followPost: [
         {
-            type: mongoose.Schema.ObjectId,
-            ref: 'Post',
+            type: String,/*mongoose.Schema.ObjectId,*/
+            /*ref: 'Post',*/
         }
     ],
     /***************************************
@@ -228,8 +225,8 @@ const userSchema = new mongoose.Schema({
      ***************************************/
     notifications: [
         {
-            type: mongoose.Schema.ObjectId,
-            ref: 'Notification'
+            type: String,/*mongoose.Schema.ObjectId,*/
+            /*ref: 'Notification'*/
         }
     ]
 });
