@@ -220,6 +220,18 @@ const userSchema = new mongoose.Schema({
             /*ref: 'Post',*/
         }
     ],
+    savedPosts: [
+        {
+            type: String,/*mongoose.Schema.ObjectId,*/
+            /*ref: 'Post',*/
+        }
+    ],
+    mentionedInPosts: [
+        {
+            type: String,/*mongoose.Schema.ObjectId,*/
+            /*ref: 'Post',*/
+        }
+    ],
     /***************************************
      * notifications relations
      ***************************************/
@@ -227,6 +239,21 @@ const userSchema = new mongoose.Schema({
         {
             type: String,/*mongoose.Schema.ObjectId,*/
             /*ref: 'Notification'*/
+        }
+    ],
+    /***************************************
+     * comment relations
+     ***************************************/
+    votedComments: [
+        {
+            type: String,/*mongoose.Schema.ObjectId,*/
+            /*ref: 'Comment'*/
+        }
+    ],
+    mentionedInComments: [
+        {
+            type: String,/*mongoose.Schema.ObjectId,*/
+            /*ref: 'Comment'*/
         }
     ]
 });
