@@ -38,7 +38,7 @@ const userPrefsSchema = new mongoose.Schema({
 });
 
 
-const tourSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     /*********************************************************************************
      * the attributes
      **********************************************************************************/
@@ -232,4 +232,9 @@ const tourSchema = new mongoose.Schema({
             ref: 'Notification'
         }
     ]
-})
+});
+
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
