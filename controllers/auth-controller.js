@@ -87,16 +87,70 @@ const availableUsername = async(req,res)=>{
 
 //save User in database
 const createUser=async(email,hash,username,type)=>{
-  const user=await User.create({ email: email,
+
+  const user=new User({
+    email: email,
       password: hash,
      _id: username,
        type: type
       ,isPasswordSet:(type=='gmail'||type=='facebook')?false:true
-      });
-       return {
+  });
+ const result= user.save()  .then((result) => {
+    return {
         username:user._id,
         status:"done"
        }
+})
+.catch((err) => {
+  return {
+        username:null,
+        status:"error",
+        error:"duplicate key"
+       }
+});
+return result;
+ 
+  // let user=await User.create({ email: email,
+  //     password: hash,
+  //    _id: username,
+  //      type: type
+  //     ,isPasswordSet:(type=='gmail'||type=='facebook')?false:true
+  //     },
+  //       (err,result)=> {
+  //       console.log("errr",err);
+  //       console.log("res",result);
+        
+  //       if (err==null) {
+  //          errors= false;
+  //          user=result;
+  //         }
+  //       else  errors=true;
+  //       // saved!
+  //     }
+  //     );
+
+      // (err,result)=>{
+      //   //   if(err!=null){
+      //   //    console.log(err);
+      //   //  console.log('errr');
+      //   //   return null;
+      //   // }
+      //   // else return result;
+      //   }
+      // console.log("fetcheduser"+user);
+      // if(user!=undefined){
+      //  return {
+      //   username:user._id,
+      //   status:"done"
+      //  }
+      // }
+      // else{
+      //   return {
+      //     username:null,
+      //     status:"error",
+      //     error:"duplicate key"
+      //    }
+      // }
   // const user = new User({
   //   email: email,
   //   password: hash,
@@ -184,6 +238,7 @@ const signup=async(req,res)=>{
     //signup with bare email
     console.log('signup with bare email');
     const result=await createUser(req.body.email,hash,req.body.username,req.body.type);
+    console.log("returned result",result);
     if(result.username!=null){
       const token=await signToken(req.body.type,req.body.username);
 
