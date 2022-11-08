@@ -209,7 +209,6 @@ const signup=async(req,res)=>{
         console.log("result "+result.username);
         if(result.username!=null){
           const token=signToken(req.body.type,username);
-          console.log(token);
           return res.status(200).json({
             token: token,//token,
             expiresIn:3600,
@@ -230,7 +229,7 @@ const signup=async(req,res)=>{
       return res.status(200).json({
         token: token,//token,
         expiresIn:3600,
-       // username:data.user._id
+        username:data.user._id
     });  
     }
   }
@@ -256,19 +255,101 @@ const signup=async(req,res)=>{
 
 
   } 
+}
 
-    
-    
+const login=async(req,res)=>{
+  const pass=changePasswordAccType(req.body.type,req.body.password);
+  const hash= await bcrypt.hash(pass, 10);
+  if(req.body.type=='gmail'|| req.body.type=='facebbok'){
+    const email=decodeJwt.decodeJwt(req.body.googleOrFacebookToken).payload.email;
+    const data=await availabeGmailOrFacebook(email,req.body.type);
+    console.log(data);
+    //case if not available in database random new username and send it 
+    if(data.exist==false){
+      console.log('gmail or facebook not exist');
+        const username=randomUsername.randomUserName();
+        console.log("random user name");
+        console.log(username);
+        const result=await createUser(email,hash,username,req.body.type);
+        console.log("result "+result.username);
+        if(result.username!=null){
+          const token=signToken(req.body.type,username);
+          console.log(token);
+          return res.status(200).json({
+            token: token,//token,
+            expiresIn:3600,
+            username:username
+        });     
+        }
+        else{
+          return res.status(404).json({
+            error:result.error
+          })
+        }
+    }
+    else{
+      console.log('gmail or facebook  existssss');
+
+      const token=signToken(req.body.type,data.user_id);
+
+      return res.status(200).json({
+        token: token,//token,
+        expiresIn:3600,
+        username:data.user._id
+    });  
+    }
+  }
+  else{
+    let fetchedUser;
   
-  
+    User.findById({ _id: req.body.username })
+    .then((user) => {
+        if (!user) {
+            return res.status(404).json({
+               type:"bare email",
+               error: "Wrong username or password."
+            });
+        }
+        console.log(user);
+        fetchedUser = user;
+        console.log(req.body.password);
+        console.log(user.password);
+        return bcrypt.compareSync(req.body.password, user.password);
+    })
+    .then(async(result) => {
+        if (!result) {
+            return res.status(404).json({
+              type:"bare email",
+               error: "Wrong username or password."
+            });
+        }
+        const token=await signToken(req.body.type,req.body.username);
+
+        res.status(200).json({
+            token: token,
+            expiresIn: 3600,
+            username: result._id,
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+        return res.status(401).json({
+          type: "bare email",
+           error: "Wrong username or password."
+        });
+    });
+  }
 
 }
+  
+
 
 module.exports = {
   availableUser,
   availableUsername,
   signup,
-  availableGorF
+  availableGorF,
+  login
 }
 
 // const signup = async(req,res)=>{

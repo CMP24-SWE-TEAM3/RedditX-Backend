@@ -184,7 +184,7 @@ const userSchema = new mongoose.Schema({
         validate: [validator.isStrongPassword, "provide a strong password"],
         minLength: [8, "the minimum length of password is 8"],
         maxLength: [200, "the max length of the password is 200"],
-        select: false,
+        
         /*we didn't put required field due to google and facebook signing in*/
     },
     passwordConfirm: {
