@@ -1,5 +1,13 @@
 const mongoose = require("mongoose");
-const commentSchema=mongoose.Schema({
+const Schema = mongoose.Schema;
+const commentSchema=new Schema({
+    _id: {
+        type: String,
+        minLength: [5, "the minimum length is 5 characters"],
+        maxLength: [20, "the maximum length is 20"],
+        required: [true, "this name isn't unique"],
+        unique: [true, "the comment must have an id"],
+    },
 	authorId: String,
 	authorUsername: String,
 	isRoot: {
@@ -8,17 +16,17 @@ const commentSchema=mongoose.Schema({
 	    default: true
   	},
 	replyingTo:{
-		type: commentSchema
+		type: String
 	}
 	,
 	replies:[
         {
-		type: commentSchema
+		type: String
         }
 	],
 	text: String,
-	voteCount: {
-		type:number,
+	votesCount: {
+		type:Number ,
 		default:1
 	},
 	creationDate:{
@@ -35,7 +43,7 @@ const commentSchema=mongoose.Schema({
 	
 	},
 	spamCount: {
-		type: number,
+		type: Number,
 default: 0
 	},
 	isCollapsed: Boolean,
