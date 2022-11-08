@@ -21,7 +21,7 @@ router.post(
   communityController.uploadCommunityBanner
 );
 
-router.get("/", authCheck, communityController.getCommunity);
+router.get("/", communityController.getCommunities);
 
 router.post("/", authCheck, communityController.createCommunity);
 router.post(

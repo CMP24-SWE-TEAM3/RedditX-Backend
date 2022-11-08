@@ -70,7 +70,10 @@ const postSchema = mongoose.Schema({
   flairText: String,
   flairTextColor: String,
   flairBackGround: String,
-  createdAt: String,
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
   followers: [
     {
       type: String,

@@ -18,6 +18,8 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 });
 
 exports.uploadUserPhoto = catchAsync(async (req, res, next) => {
+  if (!req.body.action)
+    return next(new AppError("No attachment or action is provided!", 500));
   let avatar = "default.jpg";
   if (req.body.action === "upload") {
     avatar = req.file.filename;
@@ -34,6 +36,8 @@ exports.uploadUserPhoto = catchAsync(async (req, res, next) => {
 });
 
 exports.block = catchAsync(async (req, res, next) => {
+  if (!req.body.userID)
+    return next(new AppError("No linkID is provided!", 400));
   const toUser = await User.findById(req.body.userID);
   const myUser = await User.findById(req.username);
   if (!toUser || !myUser)
@@ -67,6 +71,8 @@ exports.block = catchAsync(async (req, res, next) => {
 });
 
 exports.spam = catchAsync(async (req, res, next) => {
+  if (!req.body.linkID)
+    return next(new AppError("No linkID is provided!", 400));
   if (req.body.linkID[1] === "3") {
     // Spam a post
     const post = await Post.findById(req.body.linkID.slice(3));

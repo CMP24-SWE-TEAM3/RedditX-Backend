@@ -12,6 +12,7 @@ const commentSchema = new mongoose.Schema({
   authorId: {
     type: String,
     ref: "User",
+    required: [true, "Comment must have an authorId!"],
   },
   isRoot: {
     type: Boolean,

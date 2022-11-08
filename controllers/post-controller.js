@@ -41,6 +41,8 @@ exports.submit = catchAsync(async (req, res, next) => {
 });
 
 exports.save = catchAsync(async (req, res, next) => {
+  if (!req.body.linkID)
+    return next(new AppError("No linkID is provided!", 400));
   const user = await User.findById(req.username);
   if (user.savedPosts.find((el) => el.toString() === req.body.linkID.slice(3)))
     return res.status(200).json({
@@ -56,6 +58,8 @@ exports.save = catchAsync(async (req, res, next) => {
 });
 
 exports.unsave = catchAsync(async (req, res, next) => {
+  if (!req.body.linkID)
+    return next(new AppError("No linkID is provided!", 400));
   const user = await User.findById(req.username);
   user.savedPosts.splice(
     user.savedPosts.findIndex((el) => el === req.body.linkID.slice(3)),
