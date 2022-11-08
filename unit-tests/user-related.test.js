@@ -9,6 +9,8 @@ beforeAll(async () => {
   dbConnect();
 });
 
+jest.setTimeout(1000000);
+
 describe("POST /api/block-user", () => {
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2Njc5NDQ5OTcsImV4cCI6MTY2Nzk0ODU5N30.JdaVN9dccn_0wOWiSfWB8IJEVm7h-KXZikphw_27Wv0";
@@ -144,6 +146,17 @@ describe("POST /api/me/upload-user-photo", () => {
         .set("Authorization", token)
         .attach("attachment", `${__dirname}/1.jpg`);
       expect(res.statusCode).toBe(500);
+    });
+  });
+  describe("when token is invalid", () => {
+    test("should respond with a 401 status code", async () => {
+      token = "lkjkl";
+      const res = await request(app)
+        .post("/api/me/upload-user-photo")
+        .set("Authorization", token)
+        .field("action", "upload")
+        .attach("attachment", `${__dirname}/1.jpg`);
+      expect(res.statusCode).toBe(401);
     });
   });
 });

@@ -9,6 +9,8 @@ beforeAll(async () => {
   dbConnect();
 });
 
+jest.setTimeout(1000000);
+
 describe("POST /r/t5_imagePro235/api/upload-sr-icon", () => {
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2Njc5NDQ5OTcsImV4cCI6MTY2Nzk0ODU5N30.JdaVN9dccn_0wOWiSfWB8IJEVm7h-KXZikphw_27Wv0";
