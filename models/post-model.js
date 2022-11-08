@@ -1,4 +1,3 @@
-// starter project
 const mongoose = require("mongoose");
 
 // postID here is the _id from mongoDB, so if you want to send the post in response,
@@ -95,6 +94,15 @@ const postSchema = mongoose.Schema({
       type: String,
     },
   ],
+  commentsNum: Number,
+});
+
+postSchema.virtual("hotnessFactor").get(function () {
+  return this.createdAt * 2 + this.votesCount + this.commentsNum;
+});
+
+postSchema.virtual("bestFactor").get(function () {
+  return this.createdAt * 1 + this.votesCount + this.commentsNum;
 });
 
 const Post = mongoose.model("Post", postSchema);

@@ -68,10 +68,8 @@ const moderatorSchema = mongoose.Schema({
 });
 
 const communitySchema = mongoose.Schema({
-  communityID: {
+  _id: {
     type: String,
-    required: [true, "A community must have an id!"],
-    unique: [true, "A community must have an unique id!"],
   },
   communityRules: [
     {

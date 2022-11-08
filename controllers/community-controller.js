@@ -1,6 +1,7 @@
 const AppError = require("../utils/app-error");
 const catchAsync = require("../utils/catch-async");
 const Community = require("./../models/community-model");
+const User = require("./../models/user-model");
 const sharp = require("sharp");
 
 exports.resizeCommunityIcon = catchAsync(async (req, res, next) => {
@@ -70,5 +71,23 @@ exports.uploadCommunityBanner = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Banner is updated successfully",
+  });
+});
+
+exports.getCommunity = catchAsync(async (req, res, next) => {
+  const community = await Community.findById(req.body.id); // Note that front passes for ex: t5_imagePro
+  if (!community)
+    return next(new AppError("This subreddit doesn't exist!", 404));
+  res.status(200).json({
+    status: "success",
+    message: community,
+  });
+});
+
+exports.createCommunity = catchAsync(async (req, res, next) => {
+  const community = await Community.create(req.body); // Note that front passes for ex: t5_imagePro
+  res.status(200).json({
+    status: "success",
+    message: community,
   });
 });

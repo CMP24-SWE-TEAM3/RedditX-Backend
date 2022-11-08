@@ -21,4 +21,8 @@ router.post(
   communityController.uploadCommunityBanner
 );
 
+router.get("/", communityController.getCommunity);
+
+router.post("/", communityController.createCommunity);
+
 module.exports = router;
