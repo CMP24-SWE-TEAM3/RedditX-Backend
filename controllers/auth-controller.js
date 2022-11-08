@@ -1,115 +1,111 @@
 const { promisify } = require("util"); // built in nofe module
 //const catchAsync = require("./../utils/catchAsync");
 const jwt = require("jsonwebtoken");
-const User=require('../models/user-model');
+const User = require("../models/user-model");
 const catchAsync = require("../utils/catch-async");
-const bcrypt = require('bcrypt');
-const decodeJwt=require('./google-facebook-oAuth');
-const randomUsername=require('../utils/random-username');
+const bcrypt = require("bcryptjs");
+const decodeJwt = require("./google-facebook-oAuth");
+const randomUsername = require("../utils/random-username");
 //const crypto = require("crypto");
 
-
-
 //check whether user name is in database or not (function)
-const availableUser=async(username)=>{
-
-
-   const user=await User.findById(username );
-   if(user) {
-        return {
-          "state":false,
-          "user":user
-        }
-      }   
-   else {
-        return {
-          "state":true,
-          "user":null
-        }
-      }
+const availableUser = async (username) => {
+  const user = await User.findById(username);
+  if (user) {
+    return {
+      state: false,
+      user: user,
+    };
+  } else {
+    return {
+      state: true,
+      user: null,
+    };
+  }
 };
 
-const availabeGmailOrFacebook=async(email,type)=>{
-    const user = await User.findOne({email:email,type:type});
-    if(user) {
-      return {
-        "exist":true,
-        "user":user
-      }
-    }   
-  else {
-      return {
-        "exist":false,
-        "user":null
-      }
-    }
-}
+const availabeGmailOrFacebook = async (email, type) => {
+  const user = await User.findOne({ email: email, type: type });
+  if (user) {
+    return {
+      exist: true,
+      user: user,
+    };
+  } else {
+    return {
+      exist: false,
+      user: null,
+    };
+  }
+};
 
 //available-gmailorfacebook (route)
-const availableGorF=async(req,res)=>{
-  const data= await availabeGmailOrFacebook(req.body.email,req.body.type);
-  if(data.exist==false){
-  return res.status(200).json({
-    response:"Avaliable" 
-  });}
-  else{
+const availableGorF = async (req, res) => {
+  const data = await availabeGmailOrFacebook(req.body.email, req.body.type);
+  if (data.exist == false) {
+    return res.status(200).json({
+      response: "Avaliable",
+    });
+  } else {
     return res.status(404).json({
-      response:"Not Avaliable" 
+      response: "Not Avaliable",
     });
   }
-}
+};
 
 //change password according to type of signup
-const changePasswordAccType=(type,password)=>{
-  return (type=='facebook'||type=='gmail')?'1':password; 
-
-}
+const changePasswordAccType = (type, password) => {
+  return type == "facebook" || type == "gmail" ? "1" : password;
+};
 //signing token
-const signToken =(emailType,username)=>{ 
-  
-  return jwt.sign({ emailType: emailType, username: username },
-  "mozaisSoHotButNabilisTheHottest", { expiresIn: "1h" }
-)};
+const signToken = (emailType, username) => {
+  return jwt.sign(
+    { emailType: emailType, username: username },
+    "mozaisSoHotButNabilisTheHottest",
+    { expiresIn: "1h" }
+  );
+};
 
 //route (available-username)
-const availableUsername = async(req,res)=>{
- const data= await availableUser(req.params.username);
-  if(data.state==false){
-  return res.status(200).json({
-    response:"Avaliable" 
-  });}
-  else{
-    return res.status(404).json({
-      response:"Not Avaliable" 
+const availableUsername = async (req, res) => {
+  const data = await availableUser(req.params.username);
+  if (data.state == false) {
+    return res.status(200).json({
+      response: "Avaliable",
     });
-  } 
-}
+  } else {
+    return res.status(404).json({
+      response: "Not Avaliable",
+    });
+  }
+};
 
 //save User in database
-const createUser=async(email,hash,username,type)=>{
-
-  const user=new User({
+const createUser = async (email, hash, username, type) => {
+  const user = new User({
     email: email,
-      password: hash,
-     _id: username,
-       type: type
-      ,isPasswordSet:(type=='gmail'||type=='facebook')?false:true
+    password: hash,
+    _id: username,
+    type: type,
+    isPasswordSet: type == "gmail" || type == "facebook" ? false : true,
   });
- const result= user.save()  .then((result) => {
-    return {
-        username:user._id,
-        status:"done"
-       }
-})
-.catch((err) => {
-  return {
-        username:null,
-        status:"error",
-        error:"duplicate key"
-       }
-});
-return result;
- 
+  const result = user
+    .save()
+    .then((result) => {
+      return {
+        username: user._id,
+        status: "done",
+      };
+    })
+    .catch((err) => {
+      return {
+        username: null,
+        status: "error",
+        error: err,
+      };
+    });
+  return result;
+
   // let user=await User.create({ email: email,
   //     password: hash,
   //    _id: username,
@@ -119,7 +115,7 @@ return result;
   //       (err,result)=> {
   //       console.log("errr",err);
   //       console.log("res",result);
-        
+
   //       if (err==null) {
   //          errors= false;
   //          user=result;
@@ -129,28 +125,28 @@ return result;
   //     }
   //     );
 
-      // (err,result)=>{
-      //   //   if(err!=null){
-      //   //    console.log(err);
-      //   //  console.log('errr');
-      //   //   return null;
-      //   // }
-      //   // else return result;
-      //   }
-      // console.log("fetcheduser"+user);
-      // if(user!=undefined){
-      //  return {
-      //   username:user._id,
-      //   status:"done"
-      //  }
-      // }
-      // else{
-      //   return {
-      //     username:null,
-      //     status:"error",
-      //     error:"duplicate key"
-      //    }
-      // }
+  // (err,result)=>{
+  //   //   if(err!=null){
+  //   //    console.log(err);
+  //   //  console.log('errr');
+  //   //   return null;
+  //   // }
+  //   // else return result;
+  //   }
+  // console.log("fetcheduser"+user);
+  // if(user!=undefined){
+  //  return {
+  //   username:user._id,
+  //   status:"done"
+  //  }
+  // }
+  // else{
+  //   return {
+  //     username:null,
+  //     status:"error",
+  //     error:"duplicate key"
+  //    }
+  // }
   // const user = new User({
   //   email: email,
   //   password: hash,
@@ -167,8 +163,8 @@ return result;
   //     }
   //   })
   //   .catch((err) => {
-        
-  //       return{ 
+
+  //       return{
   //         username:null,
   //         error: err,
   //       }
@@ -181,176 +177,145 @@ return result;
   //   if (err) return handleError(err);
   //   // saved!
   // });
-    // then((result)=>{
-    //   console.log(result);
-    //   return {
-    //     username:user._id,
-    //     status:"done"
-    //   }
-    // })
-}
+  // then((result)=>{
+  //   console.log(result);
+  //   return {
+  //     username:user._id,
+  //     status:"done"
+  //   }
+  // })
+};
 
 //route (signup)
-const signup=async(req,res)=>{
-  
-  const pass=changePasswordAccType(req.body.type,req.body.password);
-  const hash= await bcrypt.hash(pass, 10);
-  if(req.body.type=='gmail'|| req.body.type=='facebook'){
-    const email=decodeJwt.decodeJwt(req.body.googleOrFacebookToken).payload.email;
-    const data=await availabeGmailOrFacebook(email,req.body.type);
-    console.log(data);
-    //case if not available in database random new username and send it 
-    if(data.exist==false){
-      console.log('gmail or facebook not exist');
-        const username=randomUsername.randomUserName();
-        console.log("random user name");
-        console.log(username);
-        const result=await createUser(email,hash,username,req.body.type);
-        console.log("result "+result.username);
-        if(result.username!=null){
-          const token=signToken(req.body.type,username);
-          return res.status(200).json({
-            token: token,//token,
-            expiresIn:3600,
-            username:username
-        });     
-        }
-        else{
-          return res.status(404).json({
-            error:result.error
-          })
-        }
-    }
-    else{
-      console.log('gmail or facebook  existssss');
-
-      const token=signToken(req.body.type,data.user_id);
-
-      return res.status(200).json({
-        token: token,//token,
-        expiresIn:3600,
-        username:data.user._id
-    });  
-    }
-  }
-  else{
-    //signup with bare email
-    console.log('signup with bare email');
-    const result=await createUser(req.body.email,hash,req.body.username,req.body.type);
-    console.log("returned result",result);
-    if(result.username!=null){
-      const token=await signToken(req.body.type,req.body.username);
-
-      return res.status(200).json({
-        token: token,//token,
-        expiresIn:3600,
-        username:req.body.username
-    });     
-    }
-    else{
-      return res.status(404).json({
-        error:result.error
-      })
-    }
-
-
-  } 
-}
-
-const login=async(req,res)=>{
-  const pass=changePasswordAccType(req.body.type,req.body.password);
-  const hash= await bcrypt.hash(pass, 10);
-  if(req.body.type=='gmail'|| req.body.type=='facebook'){
-    const email=decodeJwt.decodeJwt(req.body.googleOrFacebookToken).payload.email;
-    const data=await availabeGmailOrFacebook(email,req.body.type);
-    console.log(data);
-    //case if not available in database random new username and send it 
-    if(data.exist==false){
-      console.log('gmail or facebook not exist');
-        const username=randomUsername.randomUserName();
-        console.log("random user name");
-        console.log(username);
-        const result=await createUser(email,hash,username,req.body.type);
-        console.log("result "+result.username);
-        if(result.username!=null){
-          const token=signToken(req.body.type,username);
-          console.log(token);
-          return res.status(200).json({
-            token: token,//token,
-            expiresIn:3600,
-            username:username
-        });     
-        }
-        else{
-          return res.status(404).json({
-            error:result.error
-          })
-        }
-    }
-    else{
-      console.log('gmail or facebook  existssss');
-
-      const token=signToken(req.body.type,data.user_id);
-
-      return res.status(200).json({
-        token: token,//token,
-        expiresIn:3600,
-        username:data.user._id
-    });  
-    }
-  }
-  else{
-    let fetchedUser;
-  
-    User.findById({ _id: req.body.username })
-    .then((user) => {
-        if (!user) {
-            return res.status(404).json({
-               type:"bare email",
-               error: "Wrong username or password."
-            });
-        }
-        console.log(user);
-        fetchedUser = user;
-        console.log(req.body.password);
-        console.log(user.password);
-        return bcrypt.compareSync(req.body.password, user.password);
-    })
-    .then(async(result) => {
-        if (!result) {
-            return res.status(404).json({
-              type:"bare email",
-               error: "Wrong username or password."
-            });
-        }
-        const token=await signToken(req.body.type,req.body.username);
-
-        res.status(200).json({
-            token: token,
-            expiresIn: 3600,
-            username: result._id,
+const signup = async (req, res) => {
+  const pass = changePasswordAccType(req.body.type, req.body.password);
+  const hash = await bcrypt.hash(pass, 10);
+  if (req.body.type == "gmail" || req.body.type == "facebook") {
+    const email = decodeJwt.decodeJwt(req.body.googleOrFacebookToken).payload
+      .email;
+    const data = await availabeGmailOrFacebook(email, req.body.type);
+    //case if not available in database random new username and send it
+    if (data.exist == false) {
+      const username = randomUsername.randomUserName();
+      const result = await createUser(email, hash, username, req.body.type);
+      if (result.username != null) {
+        const token = signToken(req.body.type, username);
+        return res.status(200).json({
+          token: token, //token,
+          expiresIn: 3600,
+          username: username,
         });
-    })
-    .catch((err) => {
-      console.log(err);
+      } else {
+        return res.status(404).json({
+          error: result.error,
+        });
+      }
+    } else {
+      const token = signToken(req.body.type, data.user_id);
+      return res.status(200).json({
+        token: token, //token,
+        expiresIn: 3600,
+        username: data.user._id,
+      });
+    }
+  } else {
+    //signup with bare email
+    const result = await createUser(
+      req.body.email,
+      hash,
+      req.body.username,
+      req.body.type
+    );
+    if (result.username != null) {
+      const token = await signToken(req.body.type, req.body.username);
+
+      return res.status(200).json({
+        token: token, //token,
+        expiresIn: 3600,
+        username: req.body.username,
+      });
+    } else {
+      return res.status(404).json({
+        error: result.error,
+      });
+    }
+  }
+};
+
+const login = async (req, res) => {
+  const pass = changePasswordAccType(req.body.type, req.body.password);
+  const hash = await bcrypt.hash(pass, 10);
+  if (req.body.type == "gmail" || req.body.type == "facebook") {
+    const email = decodeJwt.decodeJwt(req.body.googleOrFacebookToken).payload
+      .email;
+    const data = await availabeGmailOrFacebook(email, req.body.type);
+    //case if not available in database random new username and send it
+    if (data.exist == false) {
+      const username = randomUsername.randomUserName();
+      const result = await createUser(email, hash, username, req.body.type);
+      if (result.username != null) {
+        const token = signToken(req.body.type, username);
+        return res.status(200).json({
+          token: token, //token,
+          expiresIn: 3600,
+          username: username,
+        });
+      } else {
+        return res.status(404).json({
+          error: result.error,
+        });
+      }
+    } else {
+      const token = signToken(req.body.type, data.user_id);
+      return res.status(200).json({
+        token: token, //token,
+        expiresIn: 3600,
+        username: data.user._id,
+      });
+    }
+  } else {
+    User.findById({ _id: req.body.username })
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({
+            type: "bare email",
+            error: "Wrong username or password.",
+          });
+        }
+        fetchedUser = user;
+        return bcrypt.compareSync(req.body.password, user.password);
+      })
+      .then(async (result) => {
+        if (!result) {
+          return res.status(404).json({
+            type: "bare email",
+            error: "Wrong username or password.",
+          });
+        }
+        const token = await signToken(req.body.type, req.body.username);
+        res.status(200).json({
+          token: token,
+          expiresIn: 3600,
+          username: req.body.username,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
         return res.status(401).json({
           type: "bare email",
-           error: "Wrong username or password."
+          error: "Wrong username or password.",
         });
-    });
+      });
   }
-
-}
-  
-
+};
 
 module.exports = {
   availableUser,
   availableUsername,
   signup,
   availableGorF,
-  login
-}
+  login,
+};
 
 // const signup = async(req,res)=>{
 
@@ -361,7 +326,7 @@ module.exports = {
 //             //search in database if found send it to login
 
 //         }
-     
+
 //         bcrypt.hash(pass, 10).then(function(hash) {
 //             const user = new User({
 //                 email: req.body.email,
@@ -385,13 +350,6 @@ module.exports = {
 //                 });
 //         });
 // }
-
-
-
-
-
-
-
 
 // const signToken = (id) => {
 //   return jwt.sign({ id }, process.env.JWT_SECRET, {

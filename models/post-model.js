@@ -4,13 +4,19 @@ const mongoose = require("mongoose");
 // change the key name of the object came out from mongo from _id to postID (if you want)
 
 const spamSchema = mongoose.Schema({
-  spammerID: String,
+  spammerID: {
+    type: String,
+    ref: "User",
+  },
   spamType: String,
   spamText: String,
 });
 
 const voteSchema = mongoose.Schema({
-  userID: String,
+  userID: {
+    type: String /*mongoose.Schema.ObjectId,*/,
+    ref: "User",
+  },
   voteType: Number,
 });
 
@@ -78,6 +84,7 @@ const postSchema = mongoose.Schema({
   userID: {
     type: String,
     required: [true, "A post must have a user!"],
+    ref: "User",
   },
   spammers: [
     {
@@ -92,6 +99,7 @@ const postSchema = mongoose.Schema({
   mintionedInUsers: [
     {
       type: String,
+      ref: "User",
     },
   ],
   commentsNum: Number,
