@@ -195,7 +195,7 @@ const signup=async(req,res)=>{
   
   const pass=changePasswordAccType(req.body.type,req.body.password);
   const hash= await bcrypt.hash(pass, 10);
-  if(req.body.type=='gmail'|| req.body.type=='facebbok'){
+  if(req.body.type=='gmail'|| req.body.type=='facebook'){
     const email=decodeJwt.decodeJwt(req.body.googleOrFacebookToken).payload.email;
     const data=await availabeGmailOrFacebook(email,req.body.type);
     console.log(data);
@@ -260,7 +260,7 @@ const signup=async(req,res)=>{
 const login=async(req,res)=>{
   const pass=changePasswordAccType(req.body.type,req.body.password);
   const hash= await bcrypt.hash(pass, 10);
-  if(req.body.type=='gmail'|| req.body.type=='facebbok'){
+  if(req.body.type=='gmail'|| req.body.type=='facebook'){
     const email=decodeJwt.decodeJwt(req.body.googleOrFacebookToken).payload.email;
     const data=await availabeGmailOrFacebook(email,req.body.type);
     console.log(data);
