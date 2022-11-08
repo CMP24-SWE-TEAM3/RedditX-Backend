@@ -17,13 +17,6 @@ const voteSchema = mongoose.Schema({
 
 const postSchema = mongoose.Schema({
 
-  _id: {
-    type: String,
-    minLength: [5, "the minimum length is 5 characters"],
-    maxLength: [20, "the maximum length is 20"],
-    required: [true, "this name isn't unique"],
-    unique: [true, "the post must have an id"],
-},
   title: {
     type: String,
     required: [true, "A post must have a title!"],
@@ -73,7 +66,10 @@ const postSchema = mongoose.Schema({
   flairText: String,
   flairTextColor: String,
   flairBackGround: String,
-  createdAt: String,
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
   followers: [
     {
       type: String,
@@ -104,6 +100,14 @@ const postSchema = mongoose.Schema({
     },
   ],
 });
+
+postSchema.virtual('hotnessFactor').get(function () {
+  return this.createdAt * 2 + this.votesCount + this.commentsNum;
+})
+
+postSchema.virtual('bestFactor').get(function () {
+  return this.createdAt * 1 + this.votesCount + this.commentsNum;
+})
 
 const Post = mongoose.model("Post", postSchema);
 

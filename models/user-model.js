@@ -129,8 +129,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         minLength: [5, "the minimum length is 5 characters"],
         maxLength: [20, "the maximum length is 20"],
-        required: [true, "this name isn't unique"],
-        unique: [true, "the user must have an id"],
     },
     inboxCount: Number,
     canCreateSubreddit: {
@@ -160,7 +158,6 @@ const userSchema = new mongoose.Schema({
       and comment karma */
     karma: Number,
     birthdate: {
-        required: [false, "you must specify the birthdate of the user"],
         type: String,
     },
     phoneNumber: {
@@ -184,7 +181,7 @@ const userSchema = new mongoose.Schema({
         validate: [validator.isStrongPassword, "provide a strong password"],
         minLength: [8, "the minimum length of password is 8"],
         maxLength: [200, "the max length of the password is 200"],
-        
+
         /*we didn't put required field due to google and facebook signing in*/
     },
     passwordConfirm: {
@@ -212,14 +209,13 @@ const userSchema = new mongoose.Schema({
     gender: {
         type: String,
         enum: ["male", "female"],
-        required: [false, "please provide your gender"],
     },
     about: {
         type: String,
         /*default: `My name is ${this._id.slice(3)}`,*/
     },
     prefs: userPrefsSchema,
-    type:{
+    type: {
         type: String,
         required: true
     },
