@@ -20,5 +20,10 @@ router.post(
   communityController.resizeCommunityBanner,
   communityController.uploadCommunityBanner
 );
+router.post(
+  '/set-suggested-sort',
+  //auth-check,
+  communityController.setSuggestedSort
 
+);
 module.exports = router;
