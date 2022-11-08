@@ -73,7 +73,21 @@ exports.uploadCommunityBanner = catchAsync(async (req, res, next) => {
     message: "Banner is updated successfully",
   });
 });
-
+exports.setSuggestedSort = (req, res) => {
+  Community.findOneAndUpdate(
+    { communityID: req.body.srName },
+    { $set: { suggestedCommentSort: req.body.suggestedCommentSort } },
+    { new: true },
+    (err, doc) => {
+      if (err) {
+        console.log("error happened while updating");
+      } else {
+        console.log("asd");
+        return res.status(200);
+      }
+    }
+  );
+};
 exports.getCommunity = catchAsync(async (req, res, next) => {
   const community = await Community.findById(req.body.id); // Note that front passes for ex: t5_imagePro
   if (!community)

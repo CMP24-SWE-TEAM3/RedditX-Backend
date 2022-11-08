@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const { default: isEmail } = require("validator/lib/isemail");
+//const { default: isEmail } = require("validator/lib/isemail");
 
 const userPrefsSchema = new mongoose.Schema({
   /*********************************************************************************
@@ -310,7 +310,7 @@ const userSchema = new mongoose.Schema({
   notifications: [
     {
       type: mongoose.Schema.ObjectId,
-      ref: "Notification",
+      //ref: "Notification",
     },
   ],
   /***************************************

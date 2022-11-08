@@ -24,5 +24,9 @@ router.post(
 router.get("/", communityController.getCommunity);
 
 router.post("/", communityController.createCommunity);
-
+router.post(
+  "/set-suggested-sort",
+  //auth-check,
+  communityController.setSuggestedSort
+);
 module.exports = router;
