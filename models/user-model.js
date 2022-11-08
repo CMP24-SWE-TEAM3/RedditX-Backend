@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const { default: isEmail } = require("validator/lib/isemail");
+//const { default: isEmail } = require("validator/lib/isemail");
 
 const userPrefsSchema = new mongoose.Schema({
     /*********************************************************************************
@@ -147,7 +147,6 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: [true, "Please provide your email"],
-        unique: true,
         lowercase: true,
         validate: [validator.isEmail, "Please provide a valid email"],
     },
@@ -161,7 +160,7 @@ const userSchema = new mongoose.Schema({
       and comment karma */
     karma: Number,
     birthdate: {
-        required: [true, "you must specify the birthdate of the user"],
+        required: [false, "you must specify the birthdate of the user"],
         type: String,
     },
     phoneNumber: {
@@ -184,8 +183,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         validate: [validator.isStrongPassword, "provide a strong password"],
         minLength: [8, "the minimum length of password is 8"],
-        maxLength: [40, "the max length of the password is 40"],
-        select: false,
+        maxLength: [200, "the max length of the password is 200"],
+        
         /*we didn't put required field due to google and facebook signing in*/
     },
     passwordConfirm: {
@@ -213,13 +212,17 @@ const userSchema = new mongoose.Schema({
     gender: {
         type: String,
         enum: ["male", "female"],
-        required: [true, "please provide your gender"],
+        required: [false, "please provide your gender"],
     },
     about: {
         type: String,
         /*default: `My name is ${this._id.slice(3)}`,*/
     },
     prefs: userPrefsSchema,
+    type:{
+        type: String,
+        required: true
+    },
     /*********************************************************************************
      * the relations
      **********************************************************************************/
