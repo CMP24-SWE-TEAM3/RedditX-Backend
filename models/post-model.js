@@ -16,6 +16,14 @@ const voteSchema = mongoose.Schema({
 });
 
 const postSchema = mongoose.Schema({
+
+  _id: {
+    type: String,
+    minLength: [5, "the minimum length is 5 characters"],
+    maxLength: [20, "the maximum length is 20"],
+    required: [true, "this name isn't unique"],
+    unique: [true, "the post must have an id"],
+},
   title: {
     type: String,
     required: [true, "A post must have a title!"],

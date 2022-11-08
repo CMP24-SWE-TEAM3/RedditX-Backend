@@ -18,6 +18,8 @@ const postSubmitRouter = require("./routes/post-submit-routes");
 const postSaveRouter = require("./routes/post-save-routes");
 const postUnsaveRouter = require("./routes/post-unsave-routes");
 const authRouter=require("./routes/auth-routes");
+const commentRouter=require("./routes/comment-routes");
+
 const AppError = require("./utils/app-error");
 
 const app = express();
@@ -106,6 +108,7 @@ app.use("/api/unsave", postUnsaveRouter);
 app.use("/api/block-user", userBlockRouter);
 app.use("/api/spam", userSpamRouter);
 app.use("/auth",authRouter);
+app.use("/api",commentRouter);
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404)); // Here will assume that this is an error and skip all middlewares forward to the error handler middleware we defined
 });
