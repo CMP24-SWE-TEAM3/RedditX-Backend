@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+/*const nodemailer = require('nodemailer');
 const pug = require('pug');
 
 module.exports = class Email {
@@ -46,4 +46,4 @@ module.exports = class Email {
       'Your password reset link, (Valid for only 10 minutes)'
     );
   }
-};
+};*/

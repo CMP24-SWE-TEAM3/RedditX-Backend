@@ -21,9 +21,9 @@ router.post(
   communityController.uploadCommunityBanner
 );
 
-router.get("/", communityController.getCommunities);
+//router.get("/", communityController.getCommunities);
 
-router.post("/", authCheck, communityController.createCommunity);
+//router.post("/", authCheck, communityController.createCommunity);
 router.post(
   "/set-suggested-sort",
   authCheck,

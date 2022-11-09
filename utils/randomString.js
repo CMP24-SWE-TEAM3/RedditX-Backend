@@ -1,3 +1,7 @@
+/**
+ * Makes a random string of length 25 characters
+ * @returns {string} result
+ */
 module.exports = makeRandomString = () => {
   let result = "";
   let characters =

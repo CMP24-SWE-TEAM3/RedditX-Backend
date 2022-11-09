@@ -13,7 +13,7 @@ jest.setTimeout(1000000);
 
 describe("POST /api/block-user", () => {
   let token =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2Njc5NDQ5OTcsImV4cCI6MTY2Nzk0ODU5N30.JdaVN9dccn_0wOWiSfWB8IJEVm7h-KXZikphw_27Wv0";
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2Njc5NTQzOTMsImV4cCI6MTY2Nzk1Nzk5M30.-KbGLRgSTOC7gdCunSICU0NsbrlOTie98JgKn_tjs-I";
 
   describe("given a userID, action=true(block), and a valid token", () => {
     test("should respond with a 200 status code", async () => {
@@ -89,7 +89,7 @@ describe("POST /api/block-user", () => {
 
 describe("POST /api/me/upload-user-photo", () => {
   let token =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2Njc5NDQ5OTcsImV4cCI6MTY2Nzk0ODU5N30.JdaVN9dccn_0wOWiSfWB8IJEVm7h-KXZikphw_27Wv0";
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2Njc5NTQzOTMsImV4cCI6MTY2Nzk1Nzk5M30.-KbGLRgSTOC7gdCunSICU0NsbrlOTie98JgKn_tjs-I";
 
   describe("given an attachment (picture), action=upload, and a valid token", () => {
     test("should respond with a 200 status code", async () => {

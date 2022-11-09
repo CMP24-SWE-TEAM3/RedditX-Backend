@@ -4,7 +4,11 @@ const Post = require("./../models/post-model");
 const User = require("./../models/user-model");
 const makeRandomString = require("./../utils/randomString");
 const multer = require("multer");
+const APIFeatures = require("../utils/api-features");
 
+/**
+ * Name and save the uploaded files
+ */
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "public/posts/files");
@@ -24,8 +28,16 @@ const upload = multer({
   storage: multerStorage,
 });
 
+/**
+ * Upload the files
+ */
 exports.uploadPostFiles = upload.array("attachments", 10);
 
+/**
+ * Creates a post and saves the file names to database
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
 exports.submit = catchAsync(async (req, res, next) => {
   req.body.attachments = [];
   if (req.files) {
@@ -40,6 +52,11 @@ exports.submit = catchAsync(async (req, res, next) => {
   res.status(201).json(newPost);
 });
 
+/**
+ * User saves a post
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
 exports.save = catchAsync(async (req, res, next) => {
   if (!req.body.linkID)
     return next(new AppError("No linkID is provided!", 400));
@@ -57,6 +74,11 @@ exports.save = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * User unsaves a post
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
 exports.unsave = catchAsync(async (req, res, next) => {
   if (!req.body.linkID)
     return next(new AppError("No linkID is provided!", 400));
