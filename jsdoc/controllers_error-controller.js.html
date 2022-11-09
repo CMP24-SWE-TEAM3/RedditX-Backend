@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/error-controller.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/error-controller.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const AppError = require("../utils/app-error");
+
+/**
+ * Handles casting errors in mongodb
+ * @param {object} error
+ * @returns {AppError} res
+ */
+const handleCastErrorDB = (error) => {
+  const message = `Invalid ${error.path}: ${error.value}.`;
+  return new AppError(message, 400);
+};
+
+/**
+ * Handles duplicate field in mongodb
+ * @param {object} error
+ * @returns {AppError} res
+ */
+const handleDuplicateFieldDB = (error) => {
+  const message = `Duplicate field value: ${error.keyValue.name}. Please use another value!`;
+  return new AppError(message, 400);
+};
+
+/**
+ * Handles validation errors in mongodb
+ * @param {object} error
+ * @returns {AppError} res
+ */
+const handleValidatorErrorDB = (error) => {
+  const errors = Object.values(error.errors).map((val) => val.message);
+  const message = `Invalid input data. ${errors.join(". ")}`;
+  return new AppError(message, 400);
+};
+
+/**
+ * Handles invalid token error
+ * @returns {AppError} res
+ */
+const handleJWTError = () =>
+  new AppError("Invalid token. Please log in again!", 401);
+
+/**
+ * Handles token expiration error
+ * @returns {AppError} res
+ */
+const handleTokenExpiredError = () =>
+  new AppError("Token is expired! Please log in again!", 401);
+
+/**
+ * Handles errors in development
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ * @returns {object} res
+ */
+const sendErrorDev = (req, res, err) => {
+  return res.status(err.statusCode).json({
+    status: err.status,
+    error: err,
+    message: err.message,
+    stack: err.stack,
+  });
+};
+
+/**
+ * Handles errors in production
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ * @returns {object} res
+ */
+const sendErrorProd = (req, res, err) => {
+  if (err.isOperational) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+    });
+  }
+  console.error("ERROR 💥", err);
+  return res.status(500).json({
+    status: "error",
+    message: "Something went very wrong!",
+  });
+};
+
+/**
+ * Handles some errors
+ * @param {object} err
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ * @returns {object} res
+ */
+module.exports = (err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || "error";
+  if (process.env.NODE_ENV !== "development") {
+    let error = { ...err };
+    error.message = err.message;
+    if (err.name === "CastError") error = handleCastErrorDB(error);
+    if (err.code === 11000) error = handleDuplicateFieldDB(error);
+    if (err.name === "ValidationError") error = handleValidatorErrorDB(error);
+    if (err.name === "JsonWebTokenError") error = handleJWTError();
+    if (err.name === "TokenExpiredError") error = handleTokenExpiredError();
+    sendErrorProd(req, res, error);
+  } else sendErrorDev(req, res, err);
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#block">block</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 09 2022 02:36:10 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

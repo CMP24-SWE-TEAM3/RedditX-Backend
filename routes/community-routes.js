@@ -1,13 +1,13 @@
 const express = require("express");
 const communityController = require("../controllers/community-controller");
 const startUploadSinglePhoto = require("../utils/upload-single-photo");
-//const authController = require('../controllers/authController');
+const authCheck = require("../middlewares/auth-check");
 
 const router = express.Router();
 
 router.post(
   "/:subreddit/api/upload-sr-icon",
-  /*authController.protect,*/
+  authCheck,
   startUploadSinglePhoto,
   communityController.resizeCommunityIcon,
   communityController.uploadCommunityIcon
@@ -15,15 +15,18 @@ router.post(
 
 router.post(
   "/:subreddit/api/upload-sr-banner",
-  /*authController.protect,*/
+  authCheck,
   startUploadSinglePhoto,
   communityController.resizeCommunityBanner,
   communityController.uploadCommunityBanner
 );
-router.post(
-  '/set-suggested-sort',
-  //auth-check,
-  communityController.setSuggestedSort
 
+//router.get("/", communityController.getCommunities);
+
+//router.post("/", authCheck, communityController.createCommunity);
+router.post(
+  "/set-suggested-sort",
+  authCheck,
+  communityController.setSuggestedSort
 );
 module.exports = router;
