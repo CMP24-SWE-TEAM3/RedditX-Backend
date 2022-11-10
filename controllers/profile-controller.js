@@ -1,11 +1,7 @@
-const AppError = require("../utils/app-error");
-const catchAsync = require("../utils/catch-async");
 const User = require('./../models/user-model');
 const Comment = require('./../models/comment-model');
 const Post = require('./../models/post-model');
-//const factory = require("./handler-factory");
-const makeRandomString = require("../utils/randomString");
-const sharp = require("sharp");
+
      
 function mergeTwo(A, B)
 {
@@ -27,12 +23,11 @@ function mergeTwo(A, B)
         D.push(B[j++]);
  
     return D;
-}
+};
+
 const userOverview=async(username)=>{
-  //if(!username)return next(new AppError("username is not found!", 500));
   const overview = await User.findById(username);
   if (overview) {
-  
   const posts= await Post.find( { _id : { $in : overview.hasPost } } );
   const comments= await Comment.find( { _id : { $in : overview.hasComment } } );
   const replies= await Comment.find( { _id : { $in : overview.hasReply } } );
@@ -44,7 +39,6 @@ const userOverview=async(username)=>{
       test:true,
       userOverview: overviewReturn.reverse(),
     };
-  //return overviewReturn.reverse();
   }
   else {
     return {
@@ -54,8 +48,6 @@ const userOverview=async(username)=>{
   }
 };
 const getUserOverview = async(req,res)=>{
-  console.log(req.params.username);
-  //if(!req.params.username)return next(new AppError("username is not found!", 500));
   const data= await userOverview(req.params.username);
   console.log(data);
   if (data.test) {
@@ -68,52 +60,73 @@ const getUserOverview = async(req,res)=>{
       response: "username is not found!",
     });
   }
-   //res.status(200).json({
-    ///status: "success",
-    //data: data
-  //});
-  //next();
 };
 const userSubmitted=async(username)=>{
   const user = await User.findById(username);
   if (user) {
   
   const posts= await Post.find( { _id : { $in : user.hasPost } } );
-  return posts;
-  }
+  return {
+    test:true,
+    userSubmitted: posts,
+  };
+}
+else {
+  return {
+    test:false,
+    userSubmitted: null,
+  };
+}
   };
 
-const getUserSubmitted = catchAsync(async(req,res,next)=>{
-  if(!req.params.username)return next(new AppError("username is not found!", 500));
+const getUserSubmitted = async(req,res)=>{
   const data= await userSubmitted(req.params.username);
-   res.status(200).json({
-    status: "success",
-    data: data
-  });
-  //next();
-}); 
+  if (data.test) {
+    return res.status(200).json({
+      status: "success",
+      data: data
+    });
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
+    });
+  }
+  };
 
   const userComments=async(username)=>{
     const user = await User.findById(username);
     if (user) {
-    
-    const posts= await Post.find( { _id : { $in : user.hasComment } } );
-    return posts;
-    }
+    const comments= await Post.find( { _id : { $in : user.hasComment } } );
+    console.log(comments);
+    return {
+      test:true,
+      userComments: comments,
     };
-    const getUserComments = catchAsync(async(req,res,next)=>{
-      if(!req.params.username)return next(new AppError("username is not found!", 500));
+  }
+  else {
+    return {
+      test:false,
+      userComments: null,
+    };
+  }
+    };
+    const getUserComments = async(req,res)=>{
       const data= await userComments(req.params.username);
-      res.status(200).json({
-        status: "success",
-        data: data
-      });
-      //next();
-    }); 
+      if (data.test) {
+        return res.status(200).json({
+          status: "success",
+          data: data
+        });
+      } else {
+        return res.status(404).json({
+          response: "username is not found!",
+        });
+      }
+    }; 
   const userDownVoted=async(username)=>{
     const dVote = await User.findById(username).select('hasVote'); 
+    if(dVote){
     const votes= dVote.hasVote;
-    //console.log(dVote);
     let postIDs=[];
     votes.forEach((el)=>{
         if(el.type===-1){
@@ -122,23 +135,36 @@ const getUserSubmitted = catchAsync(async(req,res,next)=>{
     });
     
     const posts= await Post.find( { _id : { $in : postIDs } } );
-
-   return posts;
+    return {
+      test:true,
+      uservotes: posts,
+    };
+  }
+  else {
+    return {
+      test:false,
+      userDownvotes: null,
+    };
+  }
    };
-const getUserDownVoted = catchAsync(async(req,res,next)=>{
-  if(!req.params.username)return next(new AppError("username is not found!", 500));
+const getUserDownVoted = async(req,res)=>{
   const data= await userDownVoted(req.params.username);
-    res.status(200).json({
+  if (data.test) {
+    return res.status(200).json({
       status: "success",
       data: data
     });
-    //next();
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
     });
+  }
+    };
 
 const userUpVoted=async(username)=>{
     const uVote = await User.findById(username).select('hasVote'); 
+    if (uVote) {
     const votes= uVote.hasVote;
-    //console.log(dVote);
     let postIDs=[];
     votes.forEach((el)=>{
         if(el.type===1){
@@ -147,19 +173,32 @@ const userUpVoted=async(username)=>{
     });
     
     const posts= await Post.find( { _id : { $in : postIDs } } );
-
-    return posts;
-  };
+    return {
+      test:true,
+      userUpvoted: posts,
+    };
+  }
+  else {
+    return {
+      test:false,
+      userUpvoted: null,
+    };
+  }
+ };
     
-const getUserUpVoted = catchAsync(async(req,res,next)=>{
-  if(!req.params.username)return next(new AppError("username is not found!", 500));
+const getUserUpVoted = async(req,res)=>{
   const data= await userUpVoted(req.params.username);
-    res.status(200).json({
+  if (data.test) {
+    return res.status(200).json({
       status: "success",
       data: data
     });
-    //next();
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
     });
+  }
+    };
     module.exports = {
         getUserDownVoted,
         getUserOverview,
