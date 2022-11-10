@@ -81,10 +81,9 @@ exports.addSubreddit = (req, res, next) => {
  */
 exports.getPosts = catchAsync(async (req, res) => {
 
-  console.log(req.query);
   /*first of all : check if the request has certain subreddit or not*/
   if (!req.addedFilter) {
-    /* here the request dosn't contain certain subreddit then we will get the posts from friends and subreddits*/
+    /* here the request dosn't contain certain subreddit then we will get the posts from friends and subreddits and persons teh user follow*/
 
 
     /* if user signed in we will do the following
@@ -93,7 +92,7 @@ exports.getPosts = catchAsync(async (req, res) => {
     3. get the posts based on these categories and the users*/
     if (req.username) {
       /*step 1,2 :get the categories and friends of the user*/
-      const { member, friend } = (await (User.findById(req.username).select('-_id member friend')));
+      const { member, friend, follows } = (await (User.findById(req.username).select('-_id member friend follows')));
       const subreddits = member.map((el) => {
         if (!el.isMuted) {
           return el.communityId;
@@ -111,6 +110,11 @@ exports.getPosts = catchAsync(async (req, res) => {
             {
               userID: {
                 $in: friend
+              }
+            },
+            {
+              userID: {
+                $in: follows
               }
             }
           ]

@@ -13,7 +13,7 @@ beforeAll(async () => {
     dbConnect();
 });
 
-let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2NjgwNzg4OTUsImV4cCI6MTY2ODA4MjQ5NX0.Qah-zUhYPrY0yvwzU0GXDVj41mxyTnKpNkDuH-2Q1iw';
+let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2NjgxMDI0OTgsImV4cCI6MTY2ODEwNjA5OH0.ciUfioK5EbpgNGbqkt7yDyKGkib86bTzPxCJfPWG1T8';
 
 
 /****************************************************************************************************************************************
@@ -80,6 +80,7 @@ describe("GET /r/new if he is signed in", () => {
         const username = decoded.username;
         const user = await User.findById(username);
         const friends = user.friend;
+        const follows = user.follows;
         const subreddits = user.member.map((el) => {
             if (!el.isBanned)
                 return el.communityId;
@@ -91,7 +92,7 @@ describe("GET /r/new if he is signed in", () => {
             }
         }
         for (let i = 0; i < res.body.posts.length; i++) {
-            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1) {
+            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1 && friends.indexOf(posts[i].userID)) {
                 successInSubredditsAndUsers = false;
                 break;
             }
@@ -156,6 +157,8 @@ describe("GET /r/best if not signed in", () => {
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
             if (posts[i].createdAt + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+                console.log(posts[i]);
+                console.log(posts[i - 1]);
                 successIncriteria = false;
                 break;
             }
@@ -176,6 +179,8 @@ describe("GET /r/{subreddit}/best if not signed in", () => {
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
             if (posts[i].createdAt + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+                console.log(posts[i]);
+                console.log(posts[i - 1]);
                 successIncriteria = false;
                 break;
             }
@@ -208,11 +213,12 @@ describe("GET /r/best if he is signed in", () => {
         const username = decoded.username;
         const user = await User.findById(username);
         const friends = user.friend;
+        const follows = user.follows;
+
         const subreddits = user.member.map((el) => {
             if (!el.isBanned)
                 return el.communityId;
         })
-
         for (let i = 1; i < res.body.posts.length; i++) {
             if (posts[i].createdAt + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
@@ -220,7 +226,7 @@ describe("GET /r/best if he is signed in", () => {
             }
         }
         for (let i = 0; i < res.body.posts.length; i++) {
-            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1) {
+            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1 && follows.indexOf(posts[i].userID)) {
                 successInSubredditsAndUsers = false;
                 break;
             }
@@ -339,6 +345,7 @@ describe("GET /r/hot if he is signed in", () => {
         const username = decoded.username;
         const user = await User.findById(username);
         const friends = user.friend;
+        const follows = user.follows;
         const subreddits = user.member.map((el) => {
             if (!el.isBanned)
                 return el.communityId;
@@ -351,7 +358,7 @@ describe("GET /r/hot if he is signed in", () => {
             }
         }
         for (let i = 0; i < res.body.posts.length; i++) {
-            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1) {
+            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1 && friends.indexOf(posts[i].userID)) {
                 successInSubredditsAndUsers = false;
                 break;
             }
@@ -411,6 +418,8 @@ describe("GET /r/top if not signed in", () => {
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
             if (posts[i].votesCount > posts[i - 1].votesCount) {
+                console.log(posts[i]);
+                console.log(posts[i - 1]);
                 successIncriteria = false;
                 break;
             }
@@ -431,6 +440,8 @@ describe("GET /r/{subreddit}/top if not signed in", () => {
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
             if (posts[i].votesCount > posts[i - 1].votesCount) {
+                console.log(posts[i]);
+                console.log(posts[i - 1]);
                 successIncriteria = false;
                 break;
             }
@@ -463,6 +474,8 @@ describe("GET /r/top if he is signed in", () => {
         const username = decoded.username;
         const user = await User.findById(username);
         const friends = user.friend;
+        const follows = user.follows;
+
         const subreddits = user.member.map((el) => {
             if (!el.isBanned)
                 return el.communityId;
@@ -475,7 +488,7 @@ describe("GET /r/top if he is signed in", () => {
             }
         }
         for (let i = 0; i < res.body.posts.length; i++) {
-            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1) {
+            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1 && friends.indexOf(posts[i].userID)) {
                 successInSubredditsAndUsers = false;
                 break;
             }
@@ -568,13 +581,13 @@ describe("GET /r/random if he is signed in", () => {
         const username = decoded.username;
         const user = await User.findById(username);
         const friends = user.friend;
+        const follows = user.follows;
         const subreddits = user.member.map((el) => {
             if (!el.isBanned)
                 return el.communityId;
         })
-
         for (let i = 0; i < res.body.posts.length; i++) {
-            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1) {
+            if (subreddits.indexOf(posts[i].communityID) === -1 && friends.indexOf(posts[i].userID) === -1 && friends.indexOf(posts[i].userID)) {
                 successInSubredditsAndUsers = false;
                 break;
             }
