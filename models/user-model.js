@@ -93,7 +93,7 @@ const userPrefsSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   } /* determine the availability of the threaded messages */,
-  prefShowTrending:{
+  prefShowTrending: {
     type: Boolean,
     default: true
   },
@@ -195,152 +195,156 @@ const userSchema = new mongoose.Schema({
       },
       message: "the passwords aren't the same",
     },
-  },
-  passWordResetExpires: {
-    type: Date,
-    select: false,
-  },
-  passwordChangedAt: {
-    type: Date,
-    select: false,
-    default: this.createdAt,
-  },
-  hasVerifiedEmail: {
-    type: Boolean,
-    default: false,
-  },
-  gender: {
-    type: String,
-    enum: ["male", "female"],
-  },
-  about: {
-    type: String,
-  },
-  prefs: userPrefsSchema,
-  /*********************************************************************************
-   * the relations
-   **********************************************************************************/
-
-  /***************************************
-   * recursive relations
-   ***************************************/
-  friendRequestToMe: [
-    {
-      type: String /*mongoose.Schema.ObjectId,*/,
-      ref: "User",
+    passWordResetExpires: {
+      type: Date,
+      select: false,
     },
-  ],
-  friendRequestFromMe: [
-    {
+    passwordChangedAt: {
+      type: Date,
+      select: false,
+      default: this.createdAt,
+    },
+    hasVerifiedEmail: {
+      type: Boolean,
+      default: false,
+    },
+    gender: {
       type: String,
-      ref: "User",
+      enum: ["male", "female"],
     },
-  ],
-  friend: [
-    {
-      type: String /*mongoose.Schema.ObjectId,*/,
-      ref: "User",
+    about: {
+      type: String,
+      /*default: `My name is ${this._id.slice(3)}`,*/
     },
-  ],
-  blocksFromMe: [
-    {
-      type: String /*mongoose.Schema.ObjectId,*/,
-      ref: "User",
+    prefs: userPrefsSchema,
+    type: {
+      type: String,
+      required: true
     },
-  ],
-  blocksToMe: [
-    {
-      type: String /*mongoose.Schema.ObjectId,*/,
-      ref: "User",
-    },
-  ],
-  follows: [
-    {
-      type: String /* mongoose.Schema.ObjectId,*/,
-      ref: "User",
-    },
-  ],
-  followers: [
-    {
-      type: String /* mongoose.Schema.ObjectId,*/,
-      ref: "User",
-    },
-  ],
-  /***************************************
-   * communities relations
-   ***************************************/
-  member: [
-    {
-      type: memberSchema,
-    },
-  ],
-  moderators: [
-    {
-      type: moderatorSchema,
-    },
-  ],
-  /***************************************
-   * category relation
-   ***************************************/
-  categories: [
-    {
-      type: mongoose.Schema.ObjectId,
-      // ref:'Category'
-    },
-  ],
+    /*********************************************************************************
+     * the relations
+     **********************************************************************************/
 
-  /***************************************
-   * posts relations
-   ***************************************/
-  hasPost: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "Post",
-    },
-  ],
-  followPost: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "Post",
-    },
-  ],
-  savedPosts: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "Post",
-    },
-  ],
-  mentionedInPosts: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "Post",
-    },
-  ],
-  /***************************************
-   * notifications relations
-   ***************************************/
-  notifications: [
-    {
-      type: mongoose.Schema.ObjectId,
-      //ref: "Notification",
-    },
-  ],
-  /***************************************
-   * comment relations
-   ***************************************/
-  votedComments: [
-    {
-      type: mongoose.Schema.ObjectId,
-      /*ref: 'Comment'*/
-    },
-  ],
-  mentionedInComments: [
-    {
-      type: mongoose.Schema.ObjectId,
-      /*ref: 'Comment'*/
-    },
-  ],
-});
+    /***************************************
+     * recursive relations
+     ***************************************/
+    friendRequestToMe: [
+      {
+        type: String /*mongoose.Schema.ObjectId,*/,
+        ref: "User",
+      },
+    ],
+    friendRequestFromMe: [
+      {
+        type: String,
+        ref: "User",
+      },
+    ],
+    friend: [
+      {
+        type: String /*mongoose.Schema.ObjectId,*/,
+        ref: "User",
+      },
+    ],
+    blocksFromMe: [
+      {
+        type: String /*mongoose.Schema.ObjectId,*/,
+        ref: "User",
+      },
+    ],
+    blocksToMe: [
+      {
+        type: String /*mongoose.Schema.ObjectId,*/,
+        ref: "User",
+      },
+    ],
+    follows: [
+      {
+        type: String /* mongoose.Schema.ObjectId,*/,
+        ref: "User",
+      },
+    ],
+    followers: [
+      {
+        type: String /* mongoose.Schema.ObjectId,*/,
+        ref: "User",
+      },
+    ],
+    /***************************************
+     * communities relations
+     ***************************************/
+    member: [
+      {
+        type: memberSchema,
+      },
+    ],
+    moderators: [
+      {
+        type: moderatorSchema,
+      },
+    ],
+    /***************************************
+     * category relation
+     ***************************************/
+    categories: [
+      {
+        type: mongoose.Schema.ObjectId,
+        // ref:'Category'
+      },
+    ],
+
+    /***************************************
+     * posts relations
+     ***************************************/
+    hasPost: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Post",
+      },
+    ],
+    followPost: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Post",
+      },
+    ],
+    savedPosts: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Post",
+      },
+    ],
+    mentionedInPosts: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Post",
+      },
+    ],
+    /***************************************
+     * notifications relations
+     ***************************************/
+    notifications: [
+      {
+        type: mongoose.Schema.ObjectId,
+        //ref: "Notification",
+      },
+    ],
+    /***************************************
+     * comment relations
+     ***************************************/
+    votedComments: [
+      {
+        type: mongoose.Schema.ObjectId,
+        /*ref: 'Comment'*/
+      },
+    ],
+    mentionedInComments: [
+      {
+        type: mongoose.Schema.ObjectId,
+        /*ref: 'Comment'*/
+      },
+    ],
+  });
 
 const User = mongoose.model("User", userSchema);
 

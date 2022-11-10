@@ -116,6 +116,14 @@ postSchema.virtual("bestFactor").get(function () {
   return this.createdAt * 1 + this.votesCount + this.commentsNum;
 });
 
+postSchema.virtual('hotnessFactor').get(function () {
+  return this.createdAt * 2 + this.votesCount + this.commentsNum;
+})
+
+postSchema.virtual('bestFactor').get(function () {
+  return this.createdAt * 1 + this.votesCount + this.commentsNum;
+})
+
 const Post = mongoose.model("Post", postSchema);
 
 module.exports = Post;

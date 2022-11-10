@@ -112,8 +112,8 @@ const signup = async (req, res) => {
   const pass = changePasswordAccType(req.body.type, req.body.password);
   const hash = await bcrypt.hash(pass, 10);
   if (req.body.type == "gmail" || req.body.type == "facebook") {
-    const decodeReturn=decodeJwt.decodeJwt(req.body.googleOrFacebookToken);
-    if(decodeReturn.error!=null) {
+    const decodeReturn = decodeJwt.decodeJwt(req.body.googleOrFacebookToken);
+    if (decodeReturn.error != null) {
       return res.status(400).json({
         error: "invalid token",
       });
@@ -173,8 +173,8 @@ const login = async (req, res) => {
   const pass = changePasswordAccType(req.body.type, req.body.password);
   const hash = await bcrypt.hash(pass, 10);
   if (req.body.type == "gmail" || req.body.type == "facebook") {
-    const decodeReturn=decodeJwt.decodeJwt(req.body.googleOrFacebookToken);
-    if(decodeReturn.error!=null) {
+    const decodeReturn = decodeJwt.decodeJwt(req.body.googleOrFacebookToken);
+    if (decodeReturn.error != null) {
       return res.status(404).json({
         error: "invalid token",
       });
@@ -223,19 +223,19 @@ const login = async (req, res) => {
             type: "bare email",
             error: "Wrong username or password.",
           });
-      
+
         }
         console.log('here');
         const token = await signToken(req.body.type, req.body.username);
-       return  res.status(200).json({
+        return res.status(200).json({
           token: token,
           expiresIn: 3600,
           username: req.body.username,
         });
       })
       .catch((err) => {
-        console.log(err);
-        return res.status(404).json({
+        // console.log(err);
+        return res.status(401).json({
           type: "bare email",
           error: "Wrong username or password."
         });
@@ -243,7 +243,7 @@ const login = async (req, res) => {
   }
 };
 
-const userPrefs=async(username)=>{
+const userPrefs = async (username) => {
   const user = await User.findById(username);
   console.log(user);
   if (user) {
@@ -252,77 +252,77 @@ const userPrefs=async(username)=>{
     }
   }
 };
-const getUserPrefs = async(req,res)=>{
-  const data= await userPrefs(req.params.username);
+const getUserPrefs = async (req, res) => {
+  const data = await userPrefs(req.params.username);
   console.log(data);
-   res.status(200).json({
+  res.status(200).json({
     status: "success",
     prefs: data.user.hasPost
   });
 };
-const userAbout=async(username)=>{
+const userAbout = async (username) => {
   const user = await User.findById(username);
-    if (user) {
-      return {
-        "user": User.about
-      }
+  if (user) {
+    return {
+      "user": User.about
     }
-  };
-  const getUserAbout = async(req,res)=>{
-    const data= await userAbout(req.params.username);
-    res.status(200).json({
-      status: "success",
-      data: data
-    });
-  }; 
+  }
+};
+const getUserAbout = async (req, res) => {
+  const data = await userAbout(req.params.username);
+  res.status(200).json({
+    status: "success",
+    data: data
+  });
+};
 
-  const userSubmiited=async(username)=>{
-    const post = await User.findById(username);
-      if (post) {
-        return {
-          "post": User.hasPost
-        }
-      }
-    };
-    const getUserSubmiited = async(req,res)=>{
-      const data= await userSubmiited(req.params.username);
-      res.status(200).json({
-        status: "success",
-        data: data
-      });
-    }; 
+const userSubmiited = async (username) => {
+  const post = await User.findById(username);
+  if (post) {
+    return {
+      "post": User.hasPost
+    }
+  }
+};
+const getUserSubmiited = async (req, res) => {
+  const data = await userSubmiited(req.params.username);
+  res.status(200).json({
+    status: "success",
+    data: data
+  });
+};
 
-    const userComment=async(username)=>{
-      const comment = await User.findById(username);
-        if (comment) {
-          return {
-            "comment": User.hasPost
-          }
-        }
-      };
-    const getUserComment = async(req,res)=>{
-      const data= await userComment(req.params.username);
-        res.status(200).json({
-          status: "success",
-          data: data
-        });
-      }; 
-        const userUpvoted=async(username)=>{
-          const comment = await User.findById(username);
-            if (comment) {
-              return {
-                "comment": User.hasPost
-              }
-            }
-          };
-        const getUserUpvoted = async(req,res)=>{
-          const data= await userUpvoted(req.params.username);
-            res.status(200).json({
-              status: "success",
-              data: data
-            });
-          }; 
-    
+const userComment = async (username) => {
+  const comment = await User.findById(username);
+  if (comment) {
+    return {
+      "comment": User.hasPost
+    }
+  }
+};
+const getUserComment = async (req, res) => {
+  const data = await userComment(req.params.username);
+  res.status(200).json({
+    status: "success",
+    data: data
+  });
+};
+const userUpvoted = async (username) => {
+  const comment = await User.findById(username);
+  if (comment) {
+    return {
+      "comment": User.hasPost
+    }
+  }
+};
+const getUserUpvoted = async (req, res) => {
+  const data = await userUpvoted(req.params.username);
+  res.status(200).json({
+    status: "success",
+    data: data
+  });
+};
+
 module.exports = {
   availableUser,
   availableUsername,

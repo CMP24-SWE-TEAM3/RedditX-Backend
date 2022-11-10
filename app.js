@@ -17,6 +17,7 @@ const communityRouter = require("./routes/community-routes");
 const postSubmitRouter = require("./routes/post-submit-routes");
 const postSaveRouter = require("./routes/post-save-routes");
 const postUnsaveRouter = require("./routes/post-unsave-routes");
+const postListingRouter = require("./routes/post-listing-routes");
 const authRouter = require("./routes/auth-routes");
 const commentRouter = require("./routes/comment-routes");
 
@@ -100,6 +101,7 @@ app.use("/", limiter); // limit only api requests
 app.use(express.json({ limit: "10kb" }));
 
 // ROUTES
+app.use("/r", postListingRouter);
 app.use("/api/me", userRouter);
 app.use("/r", communityRouter);
 app.use("/api/submit", postSubmitRouter);
