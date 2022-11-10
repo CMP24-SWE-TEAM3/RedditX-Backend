@@ -1,7 +1,6 @@
 const APIFeatures = require('../utils/api-features');
 const dbConnect = require('./../db-connection/connection');
-const Tour = require('./data-to-test/tour-model');
-
+User = require('./../models/user-model');
 /*we will test the api features with virtual data represent tours for example and queryStr related to it*/
 
 let queryStr = {};
@@ -11,14 +10,14 @@ beforeAll(() => {
     queryStr = {
         page: '2',
         limit: '5',
-        sort: 'price',
-        selectFields: 'name,price',
-        ratingsAverage: {
-            gte: '4.7'
+        sort: 'commentKarma',
+        selectFields: 'email,phoneNumber',
+        postKarma: {
+            gte: '0'
         },
 
     }
-    features = new APIFeatures(Tour.find({}), queryStr);
+    features = new APIFeatures(User.find({}), queryStr);
 })
 
 
@@ -28,14 +27,14 @@ describe('test the filter method', () => {
         /*should exclude page and sort and limit*/
         expect(filterRes.length).toBe(5);
         expect(filterRes).toStrictEqual(filterRes.sort((a, b) => {
-            if (a.price > b.price)
+            if (a.commentKarma > b.commentKarma)
                 return 1;
-            if (a.price < b.price)
+            if (a.postKarma < b.postKarma)
                 return -1;
             return 0;
         }));
-        expect(filterRes).toHaveProperty('price');
-        expect(filterRes).toHaveProperty('name');
+        expect(filterRes).toHaveProperty('email');
+        expect(filterRes).toHaveProperty('phoneNumber');
 
     })
 })
