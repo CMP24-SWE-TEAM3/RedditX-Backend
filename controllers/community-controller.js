@@ -2,6 +2,7 @@ const AppError = require("../utils/app-error");
 const catchAsync = require("../utils/catch-async");
 const Community = require("./../models/community-model");
 const sharp = require("sharp");
+const validators=require('../validate/comment-validators');
 
 /**
  * Name, resize, and save the uploaded file
@@ -80,20 +81,29 @@ exports.uploadCommunityBanner = catchAsync(async (req, res, next) => {
     message: "Banner is updated successfully",
   });
 });
-exports.setSuggestedSort = (req, res) => {
-  Community.findOneAndUpdate(
-    { communityID: req.body.srName },
-    { $set: { suggestedCommentSort: req.body.suggestedCommentSort } },
-    { new: true },
+exports.setSuggestedSort = async(req, res) => {
+  const id=req.body.srName.substring(3);
+
+  // if((req.body.srName.substring(0,2)!=='t5')||(!validators.validateObjectId(id))){
+  //   return res.status(500);
+  // }
+  
+  
+  Community.findByIdAndUpdate({ _id: req.body.srName }, { $set: { suggestedCommentSort: req.body.suggestedCommentSort} }, { new: true },
     (err, doc) => {
-      if (err) {
-        console.log("error happened while updating");
-      } else {
-        console.log("asd");
-        return res.status(200);
-      }
+        if (err) {
+            console.log("error happened while updating");
+            return res.status(500).json({
+                status:"failed"
+            });
+        } else {
+            return res.status(200).json({
+                status:"done"
+            });
+        }
     }
-  );
+);
+  
 };
 /*exports.getCommunity = catchAsync(async (req, res, next) => {
   console.log(req.username);

@@ -12,7 +12,13 @@
       var segments = token.split('.');
   
       if (segments.length !== 3) {
-        throw new Error('Not enough or too many segments');
+        // throw new Error('Not enough or too many segments');
+        return {
+          header: header,
+          payload: payload,
+          signature: signatureSeg,
+          error:"token is not valid"
+        }
       }
   
       // All segment should be base64
@@ -20,14 +26,15 @@
       var payloadSeg = segments[1];
       var signatureSeg = segments[2];
   
-      // base64 decode and parse JSON
+      // base64 deco de and parse JSON
       var header = JSON.parse(base64urlDecode(headerSeg));
       var payload = JSON.parse(base64urlDecode(payloadSeg));
      
       return {
         header: header,
         payload: payload,
-        signature: signatureSeg
+        signature: signatureSeg,
+        error:null
       }
       
     }

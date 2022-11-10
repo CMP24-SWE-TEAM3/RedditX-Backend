@@ -166,3 +166,88 @@ describe("POST /api/unsave", () => {
     });
   });
 });
+
+describe("vote over a post",()=>{
+    let token1="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJhaG1lZDIzMSIsImlhdCI6MTY2ODEwODA0MCwiZXhwIjoxNjY4MTExNjQwfQ.NCSKQecAt-bn-FnKsiPVgoZ0wWugRWqZA2bsp7CBynA";
+    describe("upvote a post",()=>{
+        test("should respond with a 200 status code", async () => {
+                 
+                  const res = await request(app)
+                    .post("/api/vote")
+                    .set("Authorization", token1)
+                    .send({
+                        postId:"t3_636ac2f383b37b9ed9aca0ed"
+                        ,dir:1
+                    });
+                  expect(res.statusCode).toBe(200);
+        });
+    });
+    describe("downvote a post",()=>{
+        test("should respond with a 200 status code", async () => {
+                 
+                  const res = await request(app)
+                    .post("/api/vote")
+                    .set("Authorization", token1)
+                    .send({
+                        postId:"t3_636ac2f383b37b9ed9aca0ed"
+                        ,dir:-1
+                    });
+                    console.log(res.statusCode);
+                  expect(res.statusCode).toBe(200);
+        });
+    });
+    describe("cancel upvote a post",()=>{
+        test("should respond with a 200 status code", async () => {
+                 
+                  const res = await request(app)
+                    .post("/api/vote")
+                    .set("Authorization", token1)
+                    .send({
+                        postId:"t3_636ac2f383b37b9ed9aca0ed"
+                        ,dir:0
+                    });
+                    console.log(res.statusCode);
+                  expect(res.statusCode).toBe(200);
+        });
+    });
+    describe("cancel downvote a post",()=>{
+        test("should respond with a 200 status code", async () => {
+                 
+                  const res = await request(app)
+                    .post("/api/vote")
+                    .set("Authorization", token1)
+                    .send({
+                        postId:"t3_636ac2f383b37b9ed9aca0ed"
+                        ,dir:2
+                    });
+                  expect(res.statusCode).toBe(200);
+        });
+    });
+    describe("upvote to an unvalid post",()=>{
+        test("should respond with a 500 status code", async () => {
+                 
+                  const res = await request(app)
+                    .post("/api/vote")
+                    .set("Authorization", token1)
+                    .send({
+                       "postId":"t3_636ac2f383b34311137b9ed9aca0ed"
+                        ,"dir":2
+                    });
+                  expect(res.statusCode).toBe(500);
+        });
+    });
+    describe("unvaild vote dir to an post",()=>{
+        test("should respond with a 500 status code", async () => {
+                 
+                  const res = await request(app)
+                    .post("/api/vote")
+                    .set("Authorization", token1)
+                    .send({
+                        postId:"t3_636ac2f383b37b9ed9aca0ed"
+                        ,dir:5
+                    });
+                  expect(res.statusCode).toBe(500);
+                  expect(res.body.status).toBe("invalid post id or vote id");
+        });
+    });
+});
