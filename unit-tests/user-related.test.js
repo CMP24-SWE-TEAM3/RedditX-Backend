@@ -243,4 +243,284 @@ describe("POST /api/spam", () => {
       expect(res.statusCode).toBe(401);
     });
   });
+  
 });
+
+describe("User System",()=>{
+  let token ="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJBaG1lZCIsImlhdCI6MTY2ODA5NDc4MiwiZXhwIjoxNjY4MDk4MzgyfQ.iwA7mQpIS9EVV_KImILKu0gCDPN1NpdCFvD0RRPFTbw";
+  describe("test available username",()=>{
+      describe("username available",()=>{
+        const username ="t2_hamada";
+        test("should return 202 status code", async () => {
+          const res = await request(app)
+            .get(`/auth/available-username/${username}`)
+            .set("Authorization", token)
+            
+            expect(res.statusCode).toBe(200);
+        });
+      });
+      describe("username available",()=>{
+        const username ="t2_hen";
+        test("should return 202 status code", async () => {
+          const res = await request(app)
+            .get(`/auth/available-username/${username}`)
+            .set("Authorization", token)
+            
+            expect(res.statusCode).toBe(404);
+        });
+  
+      });
+  
+  
+  });
+  describe("test Signup",()=>{
+      
+    describe("signup using Google account",()=>{
+      describe("valid signup using google account",()=>{
+        test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
+              const res = await request(app)
+                .post("/auth/signup")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ3YjE5MTI0MGZjZmYzMDdkYzQ3NTg1OWEyYmUzNzgzZGMxYWY4OWYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2Nzg0Nzg3MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY3ODQ3ODcyLCJleHAiOjE2Njc4NTE0NzIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.tU7Ky_qDckXM87BK6Lg6sxBC82gsKGzPZGTdS3g7kfnh4z-BGmUo50-eEBmuNokiuQBM1s0PazJWgLpxi9R5K8Znq0TXQu4S_BbqtndXwD7rhXC5IbfYiqW642XSW2r0t-hg1ioRCUCYAaIaAQVwtY_C_g9YuGSyNcBqXOCi3gSp9wo4KRumLHqNgrOdHFSTK5a5hVo0HW6UTtO4ccgi3ryN8CCyMyijKYnk_iWLqP-qS_4fxWuLcwqb95Z-snB64xLgv-gdNwxkgUlJ13ts4vd2PymqqckKhP-5kaQZo1u7agweGCRNppujjC4Mrm3pdpY66WkAB1TRfmh7XfUByQ",
+                  "type":"gmail",
+                  "password":"",
+                  "username":"",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(200);
+              expect(res.body.expiresIn).toBe(3600);
+              expect(res.body.username).toBe("gailey_35");
+        });
+
+      });
+      describe("invalid signup using google account",()=>{
+        test("should respond with a 400 status code", async () => {
+              const res = await request(app)
+                .post("/auth/signup")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"eyJhbGciOi.zalabia.JSUzI1NiIsImtpZCI6ImQ3YjE5MTI0MGZjZmYzMDdkYzQ3NTg1OWEyYmUzNzgzZGMxYWY4OWYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2Nzg0Nzg3MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY3ODQ3ODcyLCJleHAiOjE2Njc4NTE0NzIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.tU7Ky_qDckXM87BK6Lg6sxBC82gsKGzPZGTdS3g7kfnh4z-BGmUo50-eEBmuNokiuQBM1s0PazJWgLpxi9R5K8Znq0TXQu4S_BbqtndXwD7rhXC5IbfYiqW642XSW2r0t-hg1ioRCUCYAaIaAQVwtY_C_g9YuGSyNcBqXOCi3gSp9wo4KRumLHqNgrOdHFSTK5a5hVo0HW6UTtO4ccgi3ryN8CCyMyijKYnk_iWLqP-qS_4fxWuLcwqb95Z-snB64xLgv-gdNwxkgUlJ13ts4vd2PymqqckKhP-5kaQZo1u7agweGCRNppujjC4Mrm3pdpY66WkAB1TRfmh7XfUByQ",
+                  "type":"gmail",
+                  "password":"",
+                  "username":"",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(400);
+            
+        });
+
+      });
+    });
+    describe("signup using Facebook account",()=>{
+      describe("valid signup using google account",()=>{
+        test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
+              const res = await request(app)
+                .post("/auth/signup")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ3YjE5MTI0MGZjZmYzMDdkYzQ3NTg1OWEyYmUzNzgzZGMxYWY4OWYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBJYnJhaGltIiwicGljdHVyZSI6Imh0dHBzOi8vZ3JhcGguZmFjZWJvb2suY29tLzU1NDg1NjQ1NTUyNDI4MDYvcGljdHVyZSIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9yZWRkaXQtY2xvbmUtYWQ2NmMiLCJhdWQiOiJyZWRkaXQtY2xvbmUtYWQ2NmMiLCJhdXRoX3RpbWUiOjE2Njc4NTI2MDUsInVzZXJfaWQiOiI1SXYwcTZ5RnptVnd4M291eXNkenVoN3U3NzgyIiwic3ViIjoiNUl2MHE2eUZ6bVZ3eDNvdXlzZHp1aDd1Nzc4MiIsImlhdCI6MTY2Nzg1MjYwNSwiZXhwIjoxNjY3ODU2MjA1LCJlbWFpbCI6Im1vZGVpYnJhaGltXzIwMDFAaG90bWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZmFjZWJvb2suY29tIjpbIjU1NDg1NjQ1NTUyNDI4MDYiXSwiZW1haWwiOlsibW9kZWlicmFoaW1fMjAwMUBob3RtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6ImZhY2Vib29rLmNvbSJ9fQ.CX8TvYlyp1usf83GSMQcAARh3oWsdXdRK_TjuokxtZcZ19p-PUZzMDj1zzJAFfvWZ6eSfUxYEFvTosbv-MJIMFBm8swvdGnSumP_lbaOK-AM_FWkmiQHF5t0o4Y6CZ--gj3t628t3GXpJBKWdh1pwowuHZw0ST1LXuFeo492-wyYv5zBCijXZdMdMqsxiKu7bMqTYyKv4mKeDkx4A5QS6rXZfI7j1Lm4SYq1jkRsVU7dTG8efKREx7nAVjKG6Fisc1Ftwy4x9cDXyMmmReL9Dh_8TQ1YmR-lbSVRqacpmPPanJeCEG6w2vSZdM7PnZIluO8zmvGMIYhFlEIxsY1k4g",
+                  "type":"facebook",
+                  "password":"",
+                  "username":"",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(200);
+              expect(res.body.expiresIn).toBe(3600);
+              expect(res.body.username).toBe("cimbri_134");
+        });
+
+      });
+      describe("invalid signup using facebook account",()=>{
+        test("should respond with a 400 status code", async () => {
+              const res = await request(app)
+                .post("/auth/signup")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"eyJhbGciOi.zalabia.JSUzI1NiIsImtpZCI6ImQ3YjE5MTI0MGZjZmYzMDdkYzQ3NTg1OWEyYmUzNzgzZGMxYWY4OWYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2Nzg0Nzg3MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY3ODQ3ODcyLCJleHAiOjE2Njc4NTE0NzIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.tU7Ky_qDckXM87BK6Lg6sxBC82gsKGzPZGTdS3g7kfnh4z-BGmUo50-eEBmuNokiuQBM1s0PazJWgLpxi9R5K8Znq0TXQu4S_BbqtndXwD7rhXC5IbfYiqW642XSW2r0t-hg1ioRCUCYAaIaAQVwtY_C_g9YuGSyNcBqXOCi3gSp9wo4KRumLHqNgrOdHFSTK5a5hVo0HW6UTtO4ccgi3ryN8CCyMyijKYnk_iWLqP-qS_4fxWuLcwqb95Z-snB64xLgv-gdNwxkgUlJ13ts4vd2PymqqckKhP-5kaQZo1u7agweGCRNppujjC4Mrm3pdpY66WkAB1TRfmh7XfUByQ",
+                  "type":"facebook",
+                  "password":"",
+                  "username":"",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(400);
+            
+        });
+
+      });
+    });
+    
+    describe("signup using bare email",()=>{
+      // describe("valid signup using bare email",()=>{
+      //   test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
+      //         const res = await request(app)
+      //           .post("/auth/signup")
+      //           .set("Authorization", token)
+      //           .send({
+      //             "googleOrFacebookToken":"",
+      //             "type":"bare email",
+      //             "password":"lotfy",
+      //             "username":"ahmed231",
+      //             "email":"ahmed231@gmail.com"
+      //           })
+      //         expect(res.statusCode).toBe(200);
+      //         expect(res.body.expiresIn).toBe(3600);
+      //         expect(res.body.username).toBe("ahmed231");
+      //   });
+
+      // });
+      describe("invalid signup using bare email",()=>{
+        test("should respond with a 400 status code", async () => {
+              const res = await request(app)
+                .post("/auth/signup")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"",
+                  "type":"bare email",
+                  "password":"lotfy",
+                  "username":"ahmed231",
+                  "email":"ahmed231@gmail.com"
+                })
+              expect(res.statusCode).toBe(400);
+              expect(res.body.error).toBe("duplicate username");
+        });
+
+      });
+    });
+
+  });
+  describe("test login",()=>{
+    describe("login using Google account",()=>{
+      describe("valid login using existing google account",()=>{
+        test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
+              const res = await request(app)
+                .post("/auth/login")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ3YjE5MTI0MGZjZmYzMDdkYzQ3NTg1OWEyYmUzNzgzZGMxYWY4OWYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2Nzg0Nzg3MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY3ODQ3ODcyLCJleHAiOjE2Njc4NTE0NzIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.tU7Ky_qDckXM87BK6Lg6sxBC82gsKGzPZGTdS3g7kfnh4z-BGmUo50-eEBmuNokiuQBM1s0PazJWgLpxi9R5K8Znq0TXQu4S_BbqtndXwD7rhXC5IbfYiqW642XSW2r0t-hg1ioRCUCYAaIaAQVwtY_C_g9YuGSyNcBqXOCi3gSp9wo4KRumLHqNgrOdHFSTK5a5hVo0HW6UTtO4ccgi3ryN8CCyMyijKYnk_iWLqP-qS_4fxWuLcwqb95Z-snB64xLgv-gdNwxkgUlJ13ts4vd2PymqqckKhP-5kaQZo1u7agweGCRNppujjC4Mrm3pdpY66WkAB1TRfmh7XfUByQ",
+                  "type":"gmail",
+                  "password":"",
+                  "username":"",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(200);
+              expect(res.body.expiresIn).toBe(3600);
+              expect(res.body.username).toBe("gailey_35");
+        });
+
+      });
+      describe("invalid login using google account",()=>{
+        test("should respond with a 404 status code", async () => {
+              const res = await request(app)
+                .post("/auth/login")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"eyJhbGciOiJSUzI1.zalabia.NiIsImtpZCI6ImQ3YjE5MTI0MGZjZmYzMDdkYzQ3NTg1OWEyYmUzNzgzZGMxYWY4OWYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2Nzg0Nzg3MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY3ODQ3ODcyLCJleHAiOjE2Njc4NTE0NzIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.tU7Ky_qDckXM87BK6Lg6sxBC82gsKGzPZGTdS3g7kfnh4z-BGmUo50-eEBmuNokiuQBM1s0PazJWgLpxi9R5K8Znq0TXQu4S_BbqtndXwD7rhXC5IbfYiqW642XSW2r0t-hg1ioRCUCYAaIaAQVwtY_C_g9YuGSyNcBqXOCi3gSp9wo4KRumLHqNgrOdHFSTK5a5hVo0HW6UTtO4ccgi3ryN8CCyMyijKYnk_iWLqP-qS_4fxWuLcwqb95Z-snB64xLgv-gdNwxkgUlJ13ts4vd2PymqqckKhP-5kaQZo1u7agweGCRNppujjC4Mrm3pdpY66WkAB1TRfmh7XfUByQ",
+                  "type":"gmail",
+                  "password":"",
+                  "username":"",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(404);
+            
+        });
+
+      });
+
+    });
+    describe("login using Facebook account",()=>{
+      describe("valid login using existing facebook account if not account will be created",()=>{
+        test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
+              const res = await request(app)
+                .post("/auth/login")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImQ3YjE5MTI0MGZjZmYzMDdkYzQ3NTg1OWEyYmUzNzgzZGMxYWY4OWYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBJYnJhaGltIiwicGljdHVyZSI6Imh0dHBzOi8vZ3JhcGguZmFjZWJvb2suY29tLzU1NDg1NjQ1NTUyNDI4MDYvcGljdHVyZSIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9yZWRkaXQtY2xvbmUtYWQ2NmMiLCJhdWQiOiJyZWRkaXQtY2xvbmUtYWQ2NmMiLCJhdXRoX3RpbWUiOjE2Njc4NTI2MDUsInVzZXJfaWQiOiI1SXYwcTZ5RnptVnd4M291eXNkenVoN3U3NzgyIiwic3ViIjoiNUl2MHE2eUZ6bVZ3eDNvdXlzZHp1aDd1Nzc4MiIsImlhdCI6MTY2Nzg1MjYwNSwiZXhwIjoxNjY3ODU2MjA1LCJlbWFpbCI6Im1vZGVpYnJhaGltXzIwMDFAaG90bWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZmFjZWJvb2suY29tIjpbIjU1NDg1NjQ1NTUyNDI4MDYiXSwiZW1haWwiOlsibW9kZWlicmFoaW1fMjAwMUBob3RtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6ImZhY2Vib29rLmNvbSJ9fQ.CX8TvYlyp1usf83GSMQcAARh3oWsdXdRK_TjuokxtZcZ19p-PUZzMDj1zzJAFfvWZ6eSfUxYEFvTosbv-MJIMFBm8swvdGnSumP_lbaOK-AM_FWkmiQHF5t0o4Y6CZ--gj3t628t3GXpJBKWdh1pwowuHZw0ST1LXuFeo492-wyYv5zBCijXZdMdMqsxiKu7bMqTYyKv4mKeDkx4A5QS6rXZfI7j1Lm4SYq1jkRsVU7dTG8efKREx7nAVjKG6Fisc1Ftwy4x9cDXyMmmReL9Dh_8TQ1YmR-lbSVRqacpmPPanJeCEG6w2vSZdM7PnZIluO8zmvGMIYhFlEIxsY1k4g",
+                  "type":"facebook",
+                  "password":"",
+                  "username":"",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(200);
+              expect(res.body.expiresIn).toBe(3600);
+              expect(res.body.username).toBe("cimbri_134");
+        });
+
+      });
+      describe("invalid login using facebook account",()=>{
+        test("should respond with a 404 status code", async () => {
+              const res = await request(app)
+                .post("/auth/login")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"eyJhbGciOiJSUzI1.zalabia.NiIsImtpZCI6ImQ3YjE5MTI0MGZjZmYzMDdkYzQ3NTg1OWEyYmUzNzgzZGMxYWY4OWYiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2Nzg0Nzg3MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY3ODQ3ODcyLCJleHAiOjE2Njc4NTE0NzIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.tU7Ky_qDckXM87BK6Lg6sxBC82gsKGzPZGTdS3g7kfnh4z-BGmUo50-eEBmuNokiuQBM1s0PazJWgLpxi9R5K8Znq0TXQu4S_BbqtndXwD7rhXC5IbfYiqW642XSW2r0t-hg1ioRCUCYAaIaAQVwtY_C_g9YuGSyNcBqXOCi3gSp9wo4KRumLHqNgrOdHFSTK5a5hVo0HW6UTtO4ccgi3ryN8CCyMyijKYnk_iWLqP-qS_4fxWuLcwqb95Z-snB64xLgv-gdNwxkgUlJ13ts4vd2PymqqckKhP-5kaQZo1u7agweGCRNppujjC4Mrm3pdpY66WkAB1TRfmh7XfUByQ",
+                  "type":"facebook",
+                  "password":"",
+                  "username":"",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(404);
+            
+        });
+
+      });
+    });
+    
+    describe("login using bare email",()=>{
+      describe("valid login using bare email",()=>{
+        test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
+              const res = await request(app)
+                .post("/auth/login")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"",
+                  "type":"bare email",
+                  "password":"lotfy",
+                  "username":"ahmed231",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(200);
+              expect(res.body.expiresIn).toBe(3600);
+              expect(res.body.username).toBe("ahmed231");
+        });
+
+      });
+      // describe("invalid login using bare email and invalid username",()=>{
+      //   test("should respond with a 400 status code", async () => {
+      //         const res = await request(app)
+      //           .post("/auth/login")
+      //           .set("Authorization", token)
+      //           .send({
+      //             "googleOrFacebookToken":"",
+      //             "type":"bare email",
+      //             "password":"lotfy",
+      //             "username":"ahmed231112",
+      //             "email":""
+      //           })
+      //         expect(res.statusCode).toBe(404);
+      //   });
+
+      // });
+      describe("invalid login using bare email and invalid password",()=>{
+        test("should respond with a 400 status code", async () => {
+              const res = await request(app)
+                .post("/auth/login")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"",
+                  "type":"bare email",
+                  "password":"lotfy2",
+                  "username":"ahmed231",
+                  "email":""
+                })
+              expect(res.statusCode).toBe(404);
+        });
+
+      });
+    });
+
+  });
+
+
+});
+

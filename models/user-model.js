@@ -93,6 +93,10 @@ const userPrefsSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   } /* determine the availability of the threaded messages */,
+  prefShowTrending:{
+    type: Boolean,
+    default: true
+  },
 });
 
 const memberSchema = new mongoose.Schema({
@@ -145,7 +149,6 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "Please provide your email"],
-    unique: true,
     lowercase: true,
     validate: [validator.isEmail, "Please provide a valid email"],
   },
