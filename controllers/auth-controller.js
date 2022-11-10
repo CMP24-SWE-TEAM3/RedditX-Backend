@@ -62,7 +62,7 @@ const signToken = (emailType, username) => {
   return jwt.sign(
     { emailType: emailType, username: username },
     "mozaisSoHotButNabilisTheHottest",
-    { expiresIn: "1h" }
+    { expiresIn: "24h" }
   );
 };
 

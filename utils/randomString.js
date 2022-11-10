@@ -1,5 +1,5 @@
 /**
- * Makes a random string of length 25 characters
+ * Makes a random string of length 24 characters
  * @returns {string} result
  */
 module.exports = makeRandomString = () => {

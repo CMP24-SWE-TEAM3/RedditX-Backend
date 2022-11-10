@@ -9,11 +9,10 @@ beforeAll(async () => {
   dbConnect();
 });
 
-jest.setTimeout(1000000);
-
 describe("POST /api/submit", () => {
+  jest.setTimeout(1000000);
   let token =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2Njc5NTQzOTMsImV4cCI6MTY2Nzk1Nzk5M30.-KbGLRgSTOC7gdCunSICU0NsbrlOTie98JgKn_tjs-I";
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgwMzUyNzMsImV4cCI6MTY2ODQ2NzI3M30.qVrkKurw9sRwSLt2V6xvBS7gBQC1PJ3abnga93wgR7M";
 
   describe("given a text, title, attachment (file) and a valid token", () => {
     test("should respond with a 201 status code", async () => {
@@ -27,6 +26,18 @@ describe("POST /api/submit", () => {
         .field("title", "This is a post title")
         .attach("attachments", `${__dirname}/1.jpg`);
       expect(res.statusCode).toBe(201);
+    });
+    test("should respond with a body that have a field called userID=t2_hamada", async () => {
+      const res = await request(app)
+        .post("/api/submit")
+        .set("Authorization", token)
+        .field(
+          "text",
+          "This is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post text"
+        )
+        .field("title", "This is a post title")
+        .attach("attachments", `${__dirname}/1.jpg`);
+      expect(res.body.userID).toBe("t2_hamada");
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
@@ -70,8 +81,9 @@ describe("POST /api/submit", () => {
 });
 
 describe("POST /api/save", () => {
+  jest.setTimeout(1000000);
   let token =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2Njc5NTQzOTMsImV4cCI6MTY2Nzk1Nzk5M30.-KbGLRgSTOC7gdCunSICU0NsbrlOTie98JgKn_tjs-I";
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgwMzUyNzMsImV4cCI6MTY2ODQ2NzI3M30.qVrkKurw9sRwSLt2V6xvBS7gBQC1PJ3abnga93wgR7M";
 
   describe("given a linkID and a valid token", () => {
     test("should respond with a 200 status code", async () => {
@@ -82,6 +94,15 @@ describe("POST /api/save", () => {
           linkID: "t3_636a7e19a05b08800b06ad4e",
         });
       expect(res.statusCode).toBe(200);
+    });
+    test("should respond with a body that have a field called message=Post is saved successfully", async () => {
+      const res = await request(app)
+        .post("/api/save")
+        .set("Authorization", token)
+        .send({
+          linkID: "t3_636a7e19a05b08800b06ad4e",
+        });
+      expect(res.body.message).toBe("Post is saved successfully");
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
@@ -119,8 +140,9 @@ describe("POST /api/save", () => {
 });
 
 describe("POST /api/unsave", () => {
+  jest.setTimeout(1000000);
   let token =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2Njc5NTQzOTMsImV4cCI6MTY2Nzk1Nzk5M30.-KbGLRgSTOC7gdCunSICU0NsbrlOTie98JgKn_tjs-I";
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgwMzUyNzMsImV4cCI6MTY2ODQ2NzI3M30.qVrkKurw9sRwSLt2V6xvBS7gBQC1PJ3abnga93wgR7M";
 
   describe("given a linkID and a valid token", () => {
     test("should respond with a 200 status code", async () => {
@@ -131,6 +153,15 @@ describe("POST /api/unsave", () => {
           linkID: "t3_636a7e19a05b08800b06ad4e",
         });
       expect(res.statusCode).toBe(200);
+    });
+    test("should respond with a body that have a field called message=Post is unsaved successfully", async () => {
+      const res = await request(app)
+        .post("/api/unsave")
+        .set("Authorization", token)
+        .send({
+          linkID: "t3_636a7e19a05b08800b06ad4e",
+        });
+      expect(res.body.message).toBe("Post is unsaved successfully");
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)

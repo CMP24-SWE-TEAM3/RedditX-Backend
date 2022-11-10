@@ -9,11 +9,12 @@ beforeAll(async () => {
   dbConnect();
 });
 
-jest.setTimeout(1000000);
-
 describe("POST /r/t5_imagePro235/api/upload-sr-icon", () => {
+  jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJBaG1lZCIsImlhdCI6MTY2Nzk5OTk2NSwiZXhwIjoxNjY4MDAzNTY1fQ.GKdjNMQSHolVJraL4w0a6PySix0Nuujl0TZ2XS1aePg";
+
+
 
   describe("given an attachment (picture) and a valid token", () => {
     test("should respond with a 200 status code", async () => {
@@ -23,6 +24,14 @@ describe("POST /r/t5_imagePro235/api/upload-sr-icon", () => {
         .field("action", "upload")
         .attach("attachment", `${__dirname}/1.jpg`);
       expect(res.statusCode).toBe(200);
+    });
+    test("should respond with a body that have a field called message=Icon is updated successfully", async () => {
+      const res = await request(app)
+        .post("/r/t5_imagePro235/api/upload-sr-icon")
+        .set("Authorization", token)
+        .field("action", "upload")
+        .attach("attachment", `${__dirname}/1.jpg`);
+      expect(res.body.message).toBe("Icon is updated successfully");
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
@@ -50,16 +59,17 @@ describe("POST /r/t5_imagePro235/api/upload-sr-icon", () => {
       const res = await request(app)
         .post("/r/t5_imagePro235/api/upload-sr-icon")
         .set("Authorization", token)
-        .field("action", "upload")
-        .attach("attachment", `${__dirname}/1.jpg`);
+        .field("action", "upload");
       expect(res.statusCode).toBe(401);
     });
   });
 });
 
 describe("POST /r/t5_imagePro235/api/upload-sr-banner", () => {
+  jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJBaG1lZCIsImlhdCI6MTY2Nzk5OTk2NSwiZXhwIjoxNjY4MDAzNTY1fQ.GKdjNMQSHolVJraL4w0a6PySix0Nuujl0TZ2XS1aePg";
+
 
   describe("given an attachment (picture) and a valid token", () => {
     test("should respond with a 200 status code", async () => {
@@ -69,6 +79,14 @@ describe("POST /r/t5_imagePro235/api/upload-sr-banner", () => {
         .field("action", "upload")
         .attach("attachment", `${__dirname}/1.jpg`);
       expect(res.statusCode).toBe(200);
+    });
+    test("should respond with a body that have a field called message=Banner is updated successfully", async () => {
+      const res = await request(app)
+        .post("/r/t5_imagePro235/api/upload-sr-banner")
+        .set("Authorization", token)
+        .field("action", "upload")
+        .attach("attachment", `${__dirname}/1.jpg`);
+      expect(res.body.message).toBe("Banner is updated successfully");
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
@@ -96,8 +114,7 @@ describe("POST /r/t5_imagePro235/api/upload-sr-banner", () => {
       const res = await request(app)
         .post("/r/t5_imagePro235/api/upload-sr-banner")
         .set("Authorization", token)
-        .field("action", "upload")
-        .attach("attachment", `${__dirname}/1.jpg`);
+        .field("action", "upload");
       expect(res.statusCode).toBe(401);
     });
   });
