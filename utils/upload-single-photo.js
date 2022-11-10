@@ -2,6 +2,9 @@ const multer = require("multer");
 
 const multerStorage = multer.memoryStorage();
 
+/**
+ * Filter from files that are not images
+ */
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image")) {
     cb(null, true);
@@ -15,4 +18,7 @@ const upload = multer({
   fileFilter: multerFilter,
 });
 
+/**
+ * Upload single file
+ */
 module.exports = startUploadSinglePhoto = upload.single("attachment");

@@ -43,7 +43,11 @@ const communityOptionsSchema = mongoose.Schema({
     type: Boolean,
     default: 1,
   },
-  suggestedCommentSort: String,
+  suggestedCommentSort: 
+  {
+    type: String,
+    default:"top"
+  },
   postType: Number, // 0 any, 1 videos and images only, and 2 text only
   region: String,
   privacyType: String, // "public" (anyone can view and submit), "private" (only approved members can view and submit), or "restricted" (anyone can view, but only some are approved to submit links)
@@ -68,10 +72,8 @@ const moderatorSchema = mongoose.Schema({
 });
 
 const communitySchema = mongoose.Schema({
-  communityID: {
+  _id: {
     type: String,
-    required: [true, "A community must have an id!"],
-    unique: [true, "A community must have an unique id!"],
   },
   communityRules: [
     {

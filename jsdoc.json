@@ -1,21 +1,22 @@
 {
-    "source": {
-        "include": [
-            "middlewares",
-            "controllers"
-        ],
-        "includePattern": ".js$",
-        "excludePattern": "(node_modules/|docs)"
-    },
-    "plugins": [
-        "plugins/markdown"
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "recurseDepth": 10,
+  "source": {
+    "include": [
+      "./"
     ],
-    "templates": {
-        "cleverLinks": true,
-        "monospaceLinks": true
-    },
-    "opts": {
-        "recurse": true,
-        "destination": "./docs/"
-    }
+    "includePattern": ".js$",
+    "excludePattern": "(node_modules/*)"
+  },
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": true
+  },
+  "opts": {
+    "destination": "./jsdoc",
+    "recurse": true,
+    "readme": "./readme.md"
+  }
 }

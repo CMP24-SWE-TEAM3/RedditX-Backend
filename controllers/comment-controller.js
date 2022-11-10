@@ -1,16 +1,27 @@
 const Comment=require('../models/comment-model');
-//const { findById } = require('../models/post-model');
 const Post =require('../models/post-model');
+const validators=require('../validate/comment-validators');
 
 
 const vote=async(req,res)=>{
 
     const id=req.body.postId.substring(0,2);
     const dir=req.body.dir;
+    const postIdCasted=req.body.postId.substring(3);
+    const check=validators.validateVoteIn(id,dir,postIdCasted);
+    if(!check){
+        return res.status(500).json({
+            status:"invalid post id or vote id"
+        });
+    }
     let error;
     if(id==='t3'){ //post
-        const post=await  Post.findById({ _id: req.body.postId })
-           
+        const post=await  Post.findById({ _id: postIdCasted });
+         if(!post){
+            return res.status(500).json({
+                status:"not found"
+            });
+         }  
         let votesCount=post.votesCount;
         let operation;
         if(dir==1||dir==2){
@@ -19,14 +30,17 @@ const vote=async(req,res)=>{
         else if(dir==0||dir==-1){
             operation=-1;
         }
-        await Post.findOneAndUpdate({ _id: post._id }, { $set: { votesCount: votesCount+operation} }, { new: true },
+        Post.findByIdAndUpdate({ _id: postIdCasted }, { $set: { votesCount: votesCount+operation} }, { new: true },
             (err, doc) => {
                 if (err) {
                     console.log("error happened while updating");
-                    
+                    return res.status(500).json({
+                        status:"failed"
+                    });
                 } else {
-                    console.log('asd');
-                    return res.status(200);
+                    return res.status(200).json({
+                        status:"done"
+                    });
                 }
             }
         );
@@ -34,8 +48,12 @@ const vote=async(req,res)=>{
     }
     else if(id==='t1'){//comment or reply
 
-        const comment=await  Comment.findById({ _id: req.body.postId })
-           
+        const comment=await  Comment.findById({ _id: postIdCasted })
+        if(!comment){
+            return res.status(500).json({
+                status:"not found"
+            });
+         } 
         let votesCount=comment.votesCount;
         let operation;
         if(dir==1||dir==2){
@@ -44,21 +62,24 @@ const vote=async(req,res)=>{
         else if(dir==0||dir==-1){
             operation=-1;
         }
-        await Comment.findOneAndUpdate({ _id: comment._id }, { $set: { votesCount: votesCount+operation} }, { new: true },
+         Comment.findByIdAndUpdate({ _id: postIdCasted }, { $set: { votesCount: votesCount+operation} }, { new: true },
             (err, doc) => {
                 if (err) {
                     console.log("error happened while updating");
-                    
+                    return res.status(500).json({
+                        status:"failed"
+                    });
                 } else {
-                    console.log('asd');
-                    return res.status(200);
+                    console.log('asdhere');
+                    return res.status(200).json({
+                        status:"done"
+                    });
                 }
             }
         );
 
 
     }
-    
 
 }
 module.exports={
