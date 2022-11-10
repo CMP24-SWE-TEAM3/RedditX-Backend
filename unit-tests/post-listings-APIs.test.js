@@ -13,6 +13,9 @@ beforeAll(async () => {
     dbConnect();
 });
 
+let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2NjgwNzg4OTUsImV4cCI6MTY2ODA4MjQ5NX0.Qah-zUhYPrY0yvwzU0GXDVj41mxyTnKpNkDuH-2Q1iw';
+
+
 /****************************************************************************************************************************************
  * get: r/{subreddit}/new
  * **************************************************************************************************************************************
@@ -69,7 +72,6 @@ describe("GET /r/{subreddit}/new if not signed in", () => {
 describe("GET /r/new if he is signed in", () => {
     /* in this test we will test the subreddits and users of the posts returned*/
     it("should return all new posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const res = await request(app).get("/r/new").set("Authorization", token);
         const posts = res.body.posts;
         let successInTime = true;
@@ -106,7 +108,6 @@ describe("GET /r/new if he is signed in", () => {
 describe("GET /r/{subreddit}/new if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all new posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/new`).set('Authorization', token);
         const posts = res.body.posts;
@@ -199,7 +200,6 @@ describe("GET /r/{subreddit}/best if not signed in", () => {
 describe("GET /r/best if he is signed in", () => {
     /* in this test we will test the subreddits and users of the posts returned*/
     it("should return all best posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const res = await request(app).get("/r/best").set("Authorization", token);
         const posts = res.body.posts;
         let successIncriteria = true;
@@ -237,7 +237,6 @@ describe("GET /r/best if he is signed in", () => {
 describe("GET /r/{subreddit}/best if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all best posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/best`).set('Authorization', token);
         const posts = res.body.posts;
@@ -332,7 +331,6 @@ describe("GET /r/{subreddit}/hot if not signed in", () => {
 describe("GET /r/hot if he is signed in", () => {
     /* in this test we will test the subreddits and users of the posts returned*/
     it("should return all hot posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const res = await request(app).get("/r/hot").set("Authorization", token);
         const posts = res.body.posts;
         let successIncriteria = true;
@@ -370,7 +368,6 @@ describe("GET /r/hot if he is signed in", () => {
 describe("GET /r/{subreddit}/hot if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all hot posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/hot`).set('Authorization', token);
         const posts = res.body.posts;
@@ -458,7 +455,6 @@ describe("GET /r/{subreddit}/top if not signed in", () => {
 describe("GET /r/top if he is signed in", () => {
     /* in this test we will test the subreddits and users of the posts returned*/
     it("should return all top posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const res = await request(app).get("/r/top").set("Authorization", token);
         const posts = res.body.posts;
         let successIncriteria = true;
@@ -496,7 +492,6 @@ describe("GET /r/top if he is signed in", () => {
 describe("GET /r/{subreddit}/top if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all top posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/top`).set('Authorization', token);
         const posts = res.body.posts;
@@ -565,7 +560,6 @@ describe("GET /r/{subreddit}/random if not signed in", () => {
 describe("GET /r/random if he is signed in", () => {
     /* in this test we will test the subreddits and users of the posts returned*/
     it("should return all random posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const res = await request(app).get("/r/random").set("Authorization", token);
         const posts = res.body.posts;
         let successIncriteria = true;
@@ -596,7 +590,6 @@ describe("GET /r/random if he is signed in", () => {
 describe("GET /r/{subreddit}/random if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all random posts from all subreddits ", async () => {
-        let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2Njc5NDUyMjgsImV4cCI6MTY2Nzk0ODgyOH0.ipUlWcnp783qRn8X6yQaJBNKoChTREBXiTBC9GdbrNY';
         const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/random`).set('Authorization', token);
         const posts = res.body.posts;
