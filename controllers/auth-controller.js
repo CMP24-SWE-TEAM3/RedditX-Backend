@@ -1,12 +1,8 @@
-const { promisify } = require("util"); // built in nofe module
-//const catchAsync = require("./../utils/catchAsync");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user-model");
-const catchAsync = require("../utils/catch-async");
 const bcrypt = require("bcryptjs");
 const decodeJwt = require("./google-facebook-oAuth");
 const randomUsername = require("../utils/random-username");
-//const crypto = require("crypto");
 
 //check whether user name is in database or not (function)
 const availableUser = async (username) => {
@@ -223,9 +219,8 @@ const login = async (req, res) => {
             type: "bare email",
             error: "Wrong username or password.",
           });
-
         }
-        console.log('here');
+        console.log("here");
         const token = await signToken(req.body.type, req.body.username);
         return res.status(200).json({
           token: token,
@@ -237,7 +232,7 @@ const login = async (req, res) => {
         // console.log(err);
         return res.status(401).json({
           type: "bare email",
-          error: "Wrong username or password."
+          error: "Wrong username or password.",
         });
       });
   }
@@ -248,8 +243,8 @@ const userPrefs = async (username) => {
   console.log(user);
   if (user) {
     return {
-      "user": user
-    }
+      user: user,
+    };
   }
 };
 const getUserPrefs = async (req, res) => {
@@ -257,22 +252,22 @@ const getUserPrefs = async (req, res) => {
   console.log(data);
   res.status(200).json({
     status: "success",
-    prefs: data.user.hasPost
+    prefs: data.user.hasPost,
   });
 };
 const userAbout = async (username) => {
   const user = await User.findById(username);
   if (user) {
     return {
-      "user": User.about
-    }
+      user: User.about,
+    };
   }
 };
 const getUserAbout = async (req, res) => {
   const data = await userAbout(req.params.username);
   res.status(200).json({
     status: "success",
-    data: data
+    data: data,
   });
 };
 
@@ -280,15 +275,15 @@ const userSubmiited = async (username) => {
   const post = await User.findById(username);
   if (post) {
     return {
-      "post": User.hasPost
-    }
+      post: User.hasPost,
+    };
   }
 };
 const getUserSubmiited = async (req, res) => {
   const data = await userSubmiited(req.params.username);
   res.status(200).json({
     status: "success",
-    data: data
+    data: data,
   });
 };
 
@@ -296,30 +291,30 @@ const userComment = async (username) => {
   const comment = await User.findById(username);
   if (comment) {
     return {
-      "comment": User.hasPost
-    }
+      comment: User.hasPost,
+    };
   }
 };
 const getUserComment = async (req, res) => {
   const data = await userComment(req.params.username);
   res.status(200).json({
     status: "success",
-    data: data
+    data: data,
   });
 };
 const userUpvoted = async (username) => {
   const comment = await User.findById(username);
   if (comment) {
     return {
-      "comment": User.hasPost
-    }
+      comment: User.hasPost,
+    };
   }
 };
 const getUserUpvoted = async (req, res) => {
   const data = await userUpvoted(req.params.username);
   res.status(200).json({
     status: "success",
-    data: data
+    data: data,
   });
 };
 
@@ -330,6 +325,5 @@ module.exports = {
   availableGorF,
   login,
   getUserPrefs,
-  getUserSubmiited
+  getUserSubmiited,
 };
-

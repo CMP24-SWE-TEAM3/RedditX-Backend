@@ -12,10 +12,7 @@ beforeAll(async () => {
 describe("POST /r/t5_imagePro235/api/upload-sr-icon", () => {
   jest.setTimeout(1000000);
   let token =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJBaG1lZCIsImlhdCI6MTY2Nzk5OTk2NSwiZXhwIjoxNjY4MDAzNTY1fQ.GKdjNMQSHolVJraL4w0a6PySix0Nuujl0TZ2XS1aePg";
-
-
-
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
   describe("given an attachment (picture) and a valid token", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
@@ -68,8 +65,7 @@ describe("POST /r/t5_imagePro235/api/upload-sr-icon", () => {
 describe("POST /r/t5_imagePro235/api/upload-sr-banner", () => {
   jest.setTimeout(1000000);
   let token =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJBaG1lZCIsImlhdCI6MTY2Nzk5OTk2NSwiZXhwIjoxNjY4MDAzNTY1fQ.GKdjNMQSHolVJraL4w0a6PySix0Nuujl0TZ2XS1aePg";
-
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
 
   describe("given an attachment (picture) and a valid token", () => {
     test("should respond with a 200 status code", async () => {
@@ -120,18 +116,18 @@ describe("POST /r/t5_imagePro235/api/upload-sr-banner", () => {
   });
 });
 
-describe("set suggested sort",()=>{
-    let token1="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJhaG1lZDIzMSIsImlhdCI6MTY2ODEwODA0MCwiZXhwIjoxNjY4MTExNjQwfQ.NCSKQecAt-bn-FnKsiPVgoZ0wWugRWqZA2bsp7CBynA";
+describe("set suggested sort", () => {
+  let token1 =
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
 
-    test("should respond with a 200 status code", async () => {
-                 
-        const res = await request(app)
-          .post("/r/set-suggested-sort")
-          .set("Authorization", token1)
-          .send({
-            "srName":"t5_imagePro235",
-            "suggestedCommentSort":"top"
-          });
-        expect(res.statusCode).toBe(200);
-});
+  test("should respond with a 200 status code", async () => {
+    const res = await request(app)
+      .post("/r/set-suggested-sort")
+      .set("Authorization", token1)
+      .send({
+        srName: "t5_imagePro235",
+        suggestedCommentSort: "top",
+      });
+    expect(res.statusCode).toBe(200);
+  });
 });

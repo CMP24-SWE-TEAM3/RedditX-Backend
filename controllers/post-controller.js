@@ -31,14 +31,14 @@ const upload = multer({
 /**
  * Upload the files
  */
-exports.uploadPostFiles = upload.array("attachments", 10);
+const uploadPostFiles = upload.array("attachments", 10);
 
 /**
  * Creates a post and saves the file names to database
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.submit = catchAsync(async (req, res, next) => {
+const submit = catchAsync(async (req, res, next) => {
   req.body.attachments = [];
   if (req.files) {
     req.files.forEach((file) => req.body.attachments.push(file.filename));
@@ -46,6 +46,7 @@ exports.submit = catchAsync(async (req, res, next) => {
   req.body.userID = req.username;
   req.body.voters = [{ userID: req.username, voteType: 1 }];
   const user = await User.findById(req.username);
+  if (!user) return next(new AppError("This user doesn't exist!", 404));
   const newPost = await Post.create(req.body);
   user.hasPost.push(newPost._id);
   await user.save();
@@ -57,10 +58,11 @@ exports.submit = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.save = catchAsync(async (req, res, next) => {
+const save = catchAsync(async (req, res, next) => {
   if (!req.body.linkID)
     return next(new AppError("No linkID is provided!", 400));
   const user = await User.findById(req.username);
+  if (!user) return next(new AppError("This user doesn't exist!", 404));
   if (user.savedPosts.find((el) => el.toString() === req.body.linkID.slice(3)))
     return res.status(200).json({
       status: "success",
@@ -79,10 +81,11 @@ exports.save = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.unsave = catchAsync(async (req, res, next) => {
+const unsave = catchAsync(async (req, res, next) => {
   if (!req.body.linkID)
     return next(new AppError("No linkID is provided!", 400));
   const user = await User.findById(req.username);
+  if (!user) return next(new AppError("This user doesn't exist!", 404));
   user.savedPosts.splice(
     user.savedPosts.findIndex((el) => el === req.body.linkID.slice(3)),
     1
@@ -94,33 +97,30 @@ exports.unsave = catchAsync(async (req, res, next) => {
   });
 });
 
-
-
 /**
  * add subreddit to req if the path of the api has the certain subreddit
  * @param {Object} req the request comes from client and edited by previous middlewares eg. possible-auth-check and contain the username if the user is signed in
  * @param {Object} res the response that will be sent to the client or passed and in this function will passed to next middleware getPosts
  * @param {Function} next the faunction that call the next middleware in this case getPosts
- * @returns {void} 
+ * @returns {void}
  */
-exports.addSubreddit = (req, res, next) => {
-  if (req.params.subreddit) req.addedFilter = { communityID: `t5_${req.params.subreddit}` };
+const addSubreddit = (req, res, next) => {
+  if (req.params.subreddit)
+    req.addedFilter = { communityID: `t5_${req.params.subreddit}` };
   next();
-}
+};
 
 /**
  * get posts from the database based on the subreddits and friends of the signed in user if this is exist and based on criteria also and if it isn't will return based on criteria only
  * @param {Function} (req,res,next)
  * @param {Object} req the request comes from client and edited by previous middlewares eg. possible-auth-check and addSubreddit and contain the username and the subreddit
  * @param {Object} res the response that will be sent to the client
- * @returns {void} 
+ * @returns {void}
  */
-exports.getPosts = catchAsync(async (req, res) => {
-
+const getPosts = catchAsync(async (req, res) => {
   /*first of all : check if the request has certain subreddit or not*/
   if (!req.addedFilter) {
     /* here the request dosn't contain certain subreddit then we will get the posts from friends and subreddits and persons teh user follow*/
-
 
     /* if user signed in we will do the following
     1.get the categories of the user
@@ -128,56 +128,59 @@ exports.getPosts = catchAsync(async (req, res) => {
     3. get the posts based on these categories and the users*/
     if (req.username) {
       /*step 1,2 :get the categories and friends of the user*/
-      const { member, friend, follows } = (await (User.findById(req.username).select('-_id member friend follows')));
+      const { member, friend, follows } = await User.findById(
+        req.username
+      ).select("-_id member friend follows");
       const subreddits = member.map((el) => {
         if (!el.isMuted) {
           return el.communityId;
         }
-      })
+      });
       /* step 3 :add the subreddits to addedFilter*/
       req.addedFilter = {
-        $or:
-          [
-            {
-              communityID: {
-                $in: subreddits
-              }
+        $or: [
+          {
+            communityID: {
+              $in: subreddits,
             },
-            {
-              userID: {
-                $in: friend
-              }
+          },
+          {
+            userID: {
+              $in: friend,
             },
-            {
-              userID: {
-                $in: follows
-              }
-            }
-          ]
-      }
+          },
+          {
+            userID: {
+              $in: follows,
+            },
+          },
+        ],
+      };
     }
   }
   let sort = {};
   if (req.params.criteria) {
-    if (req.params.criteria === 'best')
+    if (req.params.criteria === "best")
       sort = {
         bestFactor: 1,
       };
-    else if (req.params.criteria === 'hot')
+    else if (req.params.criteria === "hot")
       sort = {
         hotnessFactor: 1,
       };
-    else if (req.params.criteria === 'new') {
+    else if (req.params.criteria === "new") {
       sort = {
-        createdAt: 1
+        createdAt: 1,
       };
-    }
-    else if (req.params.criteria === 'top')
+    } else if (req.params.criteria === "top")
       sort = {
         votesCount: 1,
       };
   }
-  const features = new APIFeatures(Post.find(req.addedFilter, null, { sort }), req.query)
+  const features = new APIFeatures(
+    Post.find(req.addedFilter, null, { sort }),
+    req.query
+  )
     .filter()
     .paginate()
     .sort()
@@ -185,7 +188,16 @@ exports.getPosts = catchAsync(async (req, res) => {
 
   const posts = await features.query;
   res.status(200).json({
-    status: 'succeeded',
-    posts
-  })
-})
+    status: "succeeded",
+    posts,
+  });
+});
+
+module.exports = {
+  uploadPostFiles,
+  submit,
+  save,
+  unsave,
+  addSubreddit,
+  getPosts,
+};
