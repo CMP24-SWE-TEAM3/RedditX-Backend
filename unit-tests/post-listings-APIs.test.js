@@ -13,9 +13,9 @@ beforeAll(async () => {
     dbConnect();
 });
 
-let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2NjgxNjM1MDAsImV4cCI6MTY2ODE2NzEwMH0.Wy7rMo_2uCpbAIKUKn-AsX9xXis4aJS5Mu9gP7AFiJ0';
+let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2NjgxNjczODQsImV4cCI6MTY2ODI1Mzc4NH0._8gbDeqDtBjq_ku1Pslm7Vbnxu5raEJR991dKXugjOE';
 
-const subreddit = 'imagePro235';
+const subreddit = 'imagepro';
 /****************************************************************************************************************************************
  * get: r/{subreddit}/new
  * **************************************************************************************************************************************
@@ -27,7 +27,7 @@ describe("GET /r/new if not signed in", () => {
         const posts = res.body.posts;
         let successInTime = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt > posts[i - 1].createdAt) {
+            if (new Date(posts[i].createdAt) > new Date(posts[i - 1].createdAt)) {
                 successInTime = false;
                 break;
             }
@@ -46,7 +46,7 @@ describe("GET /r/{subreddit}/new if not signed in", () => {
         const posts = res.body.posts;
         let successInTime = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt > posts[i - 1].createdAt) {
+            if (new Date(posts[i].createdAt) > new Date(posts[i - 1].createdAt)) {
                 successInTime = false;
                 break;
             }
@@ -85,7 +85,7 @@ describe("GET /r/new if he is signed in", () => {
                 return el.communityId;
         })
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt > posts[i - 1].createdAt) {
+            if (new Date(posts[i].createdAt) > new Date(posts[i - 1].createdAt)) {
                 successInTime = false;
                 break;
             }
@@ -112,7 +112,7 @@ describe("GET /r/{subreddit}/new if he is signed in", () => {
         const posts = res.body.posts;
         let successInTime = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt > posts[i - 1].createdAt) {
+            if (new Date(posts[i].createdAt) > new Date(posts[i - 1].createdAt)) {
                 successInTime = false;
                 break;
             }
@@ -154,7 +154,8 @@ describe("GET /r/best if not signed in", () => {
         const posts = res.body.posts;
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if ((posts[i].createdAt.getMonth() / 12 + posts[i].createdAt().getDay / 30 + posts[i].createdAt.getYear() / 2022) * 1 > (posts[i - 1].createdAt.getMonth() / 12 + posts[i - 1].createdAt().getDay / 30 + posts[i - 1].createdAt.getYear() / 2022) * 1) {
+
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 1 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 1 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -173,7 +174,8 @@ describe("GET /r/{subreddit}/best if not signed in", () => {
         const posts = res.body.posts;
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if ((posts[i].createdAt.getMonth() / 12 + posts[i].createdAt().getDay / 30 + posts[i].createdAt.getYear() / 2022) * 1 / 3 > (posts[i - 1].createdAt.getMonth() / 12 + posts[i - 1].createdAt().getDay / 30 + posts[i - 1].createdAt.getYear() / 2022) * 1) {
+
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 1 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 1 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -213,7 +215,8 @@ describe("GET /r/best if he is signed in", () => {
                 return el.communityId;
         })
         for (let i = 1; i < res.body.posts.length; i++) {
-            if ((posts[i].createdAt.getMonth() / 12 + posts[i].createdAt().getDay / 30 + posts[i].createdAt.getYear() / 2022) * 1 / 3 > (posts[i - 1].createdAt.getMonth() / 12 + posts[i - 1].createdAt().getDay / 30 + posts[i - 1].createdAt.getYear() / 2022) * 1) {
+
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 1 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 1 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -248,7 +251,8 @@ describe("GET /r/{subreddit}/best if he is signed in", () => {
             }
         }
         for (let i = 1; i < res.body.posts.length; i++) {
-            if ((posts[i].createdAt.getMonth() / 12 + posts[i].createdAt().getDay / 30 + posts[i].createdAt.getYear() / 2022) * 1 / 3 > (posts[i - 1].createdAt.getMonth() / 12 + posts[i - 1].createdAt().getDay / 30 + posts[i - 1].createdAt.getYear() / 2022) * 1) {
+
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 1 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 1 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -285,7 +289,7 @@ describe("GET /r/hot if not signed in", () => {
         const posts = res.body.posts;
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if ((posts[i].createdAt.getMonth() / 12 + posts[i].createdAt().getDay() / 30 + posts[i].createdAt.getYear() / 2022) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (posts[i - 1].createdAt.getMonth() / 12 + posts[i - 1].createdAt().getDay() / 30 + posts[i - 1].createdAt.getYear() / 2022) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -304,7 +308,7 @@ describe("GET /r/{subreddit}/hot if not signed in", () => {
         const posts = res.body.posts;
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if ((posts[i].createdAt.getMonth() / 12 + posts[i].createdAt().getDay() / 30 + posts[i].createdAt.getYear() / 2022) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (posts[i - 1].createdAt.getMonth() / 12 + posts[i - 1].createdAt().getDay() / 30 + posts[i - 1].createdAt.getYear() / 2022) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -344,7 +348,7 @@ describe("GET /r/hot if he is signed in", () => {
         })
 
         for (let i = 1; i < res.body.posts.length; i++) {
-            if ((posts[i].createdAt.getMonth() / 12 + posts[i].createdAt().getDay() / 30 + posts[i].createdAt.getYear() / 2022) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (posts[i - 1].createdAt.getMonth() / 12 + posts[i - 1].createdAt().getDay() / 30 + posts[i - 1].createdAt.getYear() / 2022) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -378,7 +382,7 @@ describe("GET /r/{subreddit}/hot if he is signed in", () => {
             }
         }
         for (let i = 1; i < res.body.posts.length; i++) {
-            if ((posts[i].createdAt.getMonth() / 12 + posts[i].createdAt().getDay() / 30 + posts[i].createdAt.getYear() / 2022) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (posts[i - 1].createdAt.getMonth() / 12 + posts[i - 1].createdAt().getDay() / 30 + posts[i - 1].createdAt.getYear() / 2022) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -606,3 +610,4 @@ describe("GET /r/{subreddit}/random if he is signed in", () => {
 
     });
 });
+
