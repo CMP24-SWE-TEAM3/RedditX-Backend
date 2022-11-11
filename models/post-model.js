@@ -1,22 +1,26 @@
-// starter project
 const mongoose = require("mongoose");
 
 // postID here is the _id from mongoDB, so if you want to send the post in response,
 // change the key name of the object came out from mongo from _id to postID (if you want)
 
 const spamSchema = mongoose.Schema({
-  spammerID: String,
+  spammerID: {
+    type: String,
+    ref: "User",
+  },
   spamType: String,
   spamText: String,
 });
 
 const voteSchema = mongoose.Schema({
-  userID: String,
+  userID: {
+    type: String /*mongoose.Schema.ObjectId,*/,
+    ref: "User",
+  },
   voteType: Number,
 });
 
 const postSchema = mongoose.Schema({
-
   title: {
     type: String,
     required: [true, "A post must have a title!"],
@@ -83,6 +87,7 @@ const postSchema = mongoose.Schema({
   userID: {
     type: String,
     required: [true, "A post must have a user!"],
+    ref: "User",
   },
   spammers: [
     {
@@ -97,8 +102,18 @@ const postSchema = mongoose.Schema({
   mintionedInUsers: [
     {
       type: String,
+      ref: "User",
     },
   ],
+  commentsNum: Number,
+});
+
+postSchema.virtual("hotnessFactor").get(function () {
+  return this.createdAt * 2 + this.votesCount + this.commentsNum;
+});
+
+postSchema.virtual("bestFactor").get(function () {
+  return this.createdAt * 1 + this.votesCount + this.commentsNum;
 });
 
 postSchema.virtual('hotnessFactor').get(function () {

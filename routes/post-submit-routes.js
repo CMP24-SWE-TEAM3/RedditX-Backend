@@ -1,11 +1,12 @@
 const express = require("express");
 const postController = require("../controllers/post-controller");
+const authCheck = require("../middlewares/auth-check");
 
 const router = express.Router();
 
 router.post(
   "/",
-  /*authController.protect,*/
+  authCheck,
   postController.uploadPostFiles,
   postController.submit
 );

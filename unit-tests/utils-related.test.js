@@ -1,6 +1,15 @@
+const randomString = require("./../utils/randomString");
 const APIFeatures = require('../utils/api-features');
 const dbConnect = require('./../db-connection/connection');
 User = require('./../models/user-model');
+
+describe("Random string generator", () => {
+    test("should respond with a 24 characters string", async () => {
+        const res = randomString();
+        expect(res.length).toBe(24);
+    });
+});
+
 /*we will test the api features with virtual data represent tours for example and queryStr related to it*/
 
 let queryStr = {};
