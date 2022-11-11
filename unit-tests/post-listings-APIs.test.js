@@ -13,9 +13,9 @@ beforeAll(async () => {
     dbConnect();
 });
 
-let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2NjgxMDI0OTgsImV4cCI6MTY2ODEwNjA5OH0.ciUfioK5EbpgNGbqkt7yDyKGkib86bTzPxCJfPWG1T8';
+let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2NjgxNjczODQsImV4cCI6MTY2ODI1Mzc4NH0._8gbDeqDtBjq_ku1Pslm7Vbnxu5raEJR991dKXugjOE';
 
-
+const subreddit = 't5_imagepro';
 /****************************************************************************************************************************************
  * get: r/{subreddit}/new
  * **************************************************************************************************************************************
@@ -27,7 +27,7 @@ describe("GET /r/new if not signed in", () => {
         const posts = res.body.posts;
         let successInTime = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt > posts[i - 1].createdAt) {
+            if (new Date(posts[i].createdAt) > new Date(posts[i - 1].createdAt)) {
                 successInTime = false;
                 break;
             }
@@ -42,12 +42,11 @@ describe("GET /r/new if not signed in", () => {
 
 describe("GET /r/{subreddit}/new if not signed in", () => {
     it("should return all new posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/new`);
         const posts = res.body.posts;
         let successInTime = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt > posts[i - 1].createdAt) {
+            if (new Date(posts[i].createdAt) > new Date(posts[i - 1].createdAt)) {
                 successInTime = false;
                 break;
             }
@@ -86,7 +85,7 @@ describe("GET /r/new if he is signed in", () => {
                 return el.communityId;
         })
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt > posts[i - 1].createdAt) {
+            if (new Date(posts[i].createdAt) > new Date(posts[i - 1].createdAt)) {
                 successInTime = false;
                 break;
             }
@@ -109,12 +108,11 @@ describe("GET /r/new if he is signed in", () => {
 describe("GET /r/{subreddit}/new if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all new posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/new`).set('Authorization', token);
         const posts = res.body.posts;
         let successInTime = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt > posts[i - 1].createdAt) {
+            if (new Date(posts[i].createdAt) > new Date(posts[i - 1].createdAt)) {
                 successInTime = false;
                 break;
             }
@@ -156,9 +154,8 @@ describe("GET /r/best if not signed in", () => {
         const posts = res.body.posts;
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
-                console.log(posts[i]);
-                console.log(posts[i - 1]);
+
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 1 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 1 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -173,14 +170,12 @@ describe("GET /r/best if not signed in", () => {
 
 describe("GET /r/{subreddit}/best if not signed in", () => {
     it("should return all best posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/best`);
         const posts = res.body.posts;
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
-                console.log(posts[i]);
-                console.log(posts[i - 1]);
+
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 1 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 1 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -220,7 +215,8 @@ describe("GET /r/best if he is signed in", () => {
                 return el.communityId;
         })
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 1 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 1 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -243,7 +239,7 @@ describe("GET /r/best if he is signed in", () => {
 describe("GET /r/{subreddit}/best if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all best posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
+
         const res = await request(app).get(`/r/${subreddit}/best`).set('Authorization', token);
         const posts = res.body.posts;
         let successIncriteria = true;
@@ -255,7 +251,8 @@ describe("GET /r/{subreddit}/best if he is signed in", () => {
             }
         }
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 1 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 1 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -292,7 +289,7 @@ describe("GET /r/hot if not signed in", () => {
         const posts = res.body.posts;
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt * 2 + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt * 2 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -307,12 +304,11 @@ describe("GET /r/hot if not signed in", () => {
 
 describe("GET /r/{subreddit}/hot if not signed in", () => {
     it("should return all hot posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/hot`);
         const posts = res.body.posts;
         let successIncriteria = true;
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt * 2 + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt * 2 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -352,7 +348,7 @@ describe("GET /r/hot if he is signed in", () => {
         })
 
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt * 2 + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt * 2 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -375,7 +371,6 @@ describe("GET /r/hot if he is signed in", () => {
 describe("GET /r/{subreddit}/hot if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all hot posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/hot`).set('Authorization', token);
         const posts = res.body.posts;
         let successIncriteria = true;
@@ -387,7 +382,7 @@ describe("GET /r/{subreddit}/hot if he is signed in", () => {
             }
         }
         for (let i = 1; i < res.body.posts.length; i++) {
-            if (posts[i].createdAt * 2 + posts[i].votesCount + posts[i].commentsNum > posts[i - 1].createdAt * 2 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
+            if ((new Date(posts[i].createdAt).getDay() / 30 + new Date(posts[i].createdAt).getYear() / 2022 + new Date(posts[i].createdAt).getMonth() / 30) * 2 / 3 + posts[i].votesCount + posts[i].commentsNum > (new Date(posts[i - 1].createdAt).getDay() / 30 + new Date(posts[i - 1].createdAt).getYear() / 2022 + new Date(posts[i - 1].createdAt).getMonth() / 30) * 2 / 3 + posts[i - 1].votesCount + posts[i - 1].commentsNum) {
                 successIncriteria = false;
                 break;
             }
@@ -434,7 +429,6 @@ describe("GET /r/top if not signed in", () => {
 
 describe("GET /r/{subreddit}/top if not signed in", () => {
     it("should return all top posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/top`);
         const posts = res.body.posts;
         let successIncriteria = true;
@@ -505,7 +499,6 @@ describe("GET /r/top if he is signed in", () => {
 describe("GET /r/{subreddit}/top if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all top posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/top`).set('Authorization', token);
         const posts = res.body.posts;
         let successIncriteria = true;
@@ -550,7 +543,6 @@ describe("GET /r/random if not signed in", () => {
 
 describe("GET /r/{subreddit}/random if not signed in", () => {
     it("should return all random posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/random`);
         const posts = res.body.posts;
         let successIncriteria = true;
@@ -603,7 +595,6 @@ describe("GET /r/random if he is signed in", () => {
 describe("GET /r/{subreddit}/random if he is signed in", () => {
     /*this test is very similar ti its corresponding but sithout authentication */
     it("should return all random posts from all subreddits ", async () => {
-        const subreddit = 'tesla'
         const res = await request(app).get(`/r/${subreddit}/random`).set('Authorization', token);
         const posts = res.body.posts;
         let successInCommunity = true;
@@ -619,3 +610,4 @@ describe("GET /r/{subreddit}/random if he is signed in", () => {
 
     });
 });
+
