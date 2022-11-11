@@ -31,7 +31,7 @@ const Comment = require('./../models/comment-model');
 const Post = require('./../models/post-model');
 
 /**
- * merge three sorted array in one sorted one
+ * Merge three sorted array in one sorted one
  * @param {Array} (A,B)
  * @returns {Array} D
  */    
@@ -58,7 +58,7 @@ function mergeTwo(A, B)
 };
 
 /**
- * get overview which is written by the user from database
+ * Get overview which is written by the user from database
  * @param {String} (username)
  * @returns {object} userOverview
  */
@@ -86,7 +86,7 @@ const userOverview=async(username)=>{
 };
 
 /**
- * get user overview
+ * Get user overview
  * @param {function} (req, res)
  * @returns {object} res
  */
@@ -103,7 +103,7 @@ const getUserOverview = async(req,res)=>{
   }
 };
 /**
- * get posts which is written by the user from database
+ * Get posts which is written by the user from database
  * @param {String} (username)
  * @returns {object} userSubmitted
  */
@@ -125,7 +125,7 @@ else {
 }
   };
 /**
- * get user posts
+ * Get user posts
  * @param {function} (req, res)
  * @returns {object} res
  */
@@ -142,7 +142,7 @@ const getUserSubmitted = async(req,res)=>{
   }
   };
 /**
- * get comments which is written by the user from database
+ * Get comments which is written by the user from database
  * @param {String} (username)
  * @returns {object} userComments
  */
@@ -164,7 +164,7 @@ const getUserSubmitted = async(req,res)=>{
     };
 
     /**
- * get user comments
+ * Get user comments
  * @param {function} (req, res)
  * @returns {object} res
  */
@@ -181,7 +181,7 @@ const getUserSubmitted = async(req,res)=>{
       }
     }; 
    /**
- * get posts which downvoted by the user from database
+ * Get posts which downvoted by the user from database
  * @param {String} (username)
  * @returns {object} uservotes
  */
@@ -210,7 +210,7 @@ const getUserSubmitted = async(req,res)=>{
   }
    };
   /**
- * get posts which downvoted by the user 
+ * Get posts which downvoted by the user 
  * @param {function} (req,res)
  * @returns {object} res
  */
@@ -227,7 +227,7 @@ const getUserDownVoted = async(req,res)=>{
   }
     };
 /**
- * get posts which upvoted by the user from database
+ * Get posts which upvoted by the user from database
  * @param {String} (username)
  * @returns {object} userUpvoted
  */
@@ -256,7 +256,7 @@ const userUpVoted=async(username)=>{
   }
  };
  /**
- * get posts which upvoted by the user
+ * Get posts which upvoted by the user
  * @param {function} (req, res)
  * @returns {object} res
  */   
@@ -289,13 +289,13 @@ const getUserUpVoted = async(req,res)=>{
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#block">block</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#block">block</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Nov 11 2022 18:53:50 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Nov 11 2022 21:05:09 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -151,8 +151,6 @@ const aboutSchema = new mongoose.Schema({
   /*********************************************************************************
    * the attributes
    **********************************************************************************/
-  tatolKarma: Number,
-  linkKarma: Number,
   isBlocked: {
     type: Boolean,
     default: false,
@@ -263,9 +261,18 @@ const userSchema = new mongoose.Schema({
   about: {
     type: String,
   },
-  prefs: userPrefsSchema,
-  meReturn: meSchema,
-  aboutReturn: aboutSchema,
+  prefs:{
+    type: userPrefsSchema,
+    default: () => ({}),
+  },
+  meReturn:{
+    type: meSchema,
+    default: () => ({}),
+  },
+  aboutReturn: {
+    type: aboutSchema,
+    default: () => ({}),
+  },
   /*********************************************************************************
    * the relations
    **********************************************************************************/

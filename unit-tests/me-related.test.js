@@ -32,10 +32,10 @@ describe("User System",()=>{
     });
     describe("username about",()=>{
       const username ="t2_hamada";
-      test("should respond with a body that have a field called createdAt to be equal 2022-11-11T13:08:42.648Z", async () => {
+      test("should respond with a body that have a field called isBlocked to be equal false", async () => {
         const res = await request(app)
             .get(`/api/v1/me/about/${username}`)
-            expect(res.body.data.createdAt).toBe("2022-11-11T13:08:42.648Z");
+            expect(res.body.data.isBlocked).toBe(false);
       });
     });
       describe("username about",()=>{
@@ -55,7 +55,7 @@ describe("User System",()=>{
   describe("User System",()=>{
     describe("test username me info ",()=>{
         describe("username me info",()=>{
-          const username ="t2_hamada";
+          const username ="t2_moazMohamed";
           test("should respond with 200 status code", async () => {
             const res = await request(app)
               .get(`/api/v1/me/${username}`)
@@ -63,7 +63,7 @@ describe("User System",()=>{
           });
         });
         describe("username me info",()=>{
-          const username ="t2_hamada";
+          const username ="t2_moazMohamed";
         test("should specify json in the content type header", async () => {
           const res = await request(app)
               .get(`/api/v1/me/${username}`)
@@ -74,11 +74,12 @@ describe("User System",()=>{
         });
       });
       describe("username me info",()=>{
-        const username ="t2_hamada";
-        test("should respond with a body that have a field called createdAt to be equal 2022-11-11T13:08:42.648Z", async () => {
+        const username ="t2_moazMohamed";
+        test("should respond with a body that have a field called emailCommentReply to be equal true", async () => {
           const res = await request(app)
               .get(`/api/v1/me/${username}`)
-              expect(res.body.data.createdAt).toBe("2022-11-11T13:08:42.648Z");
+        
+              expect(res.body.data.emailCommentReply).toBe(true);
         });
       });
         describe("username me info",()=>{
@@ -118,10 +119,10 @@ describe("User System",()=>{
       });
       describe("username prefs",()=>{
         const username ="t2_hamada";
-        test("should respond with a body that have a field called createdAt to be equal 2022-11-11T13:08:42.648Z", async () => {
+        test("should respond with a body that have a field called emailPrivateMessage to be equal true", async () => {
           const res = await request(app)
               .get(`/api/v1/me/prefs/${username}`)
-              expect(res.body.data[0].createdAt).toBe("2022-11-11T13:08:42.648Z");
+              expect(res.body.data.emailPrivateMessage).toBe(true);
         });
       });
         describe("username prefs",()=>{

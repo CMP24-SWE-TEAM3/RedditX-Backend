@@ -3,7 +3,7 @@ const Comment = require('./../models/comment-model');
 const Post = require('./../models/post-model');
 
 /**
- * merge three sorted array in one sorted one
+ * Merge three sorted array in one sorted one
  * @param {Array} (A,B)
  * @returns {Array} D
  */    
@@ -30,7 +30,7 @@ function mergeTwo(A, B)
 };
 
 /**
- * get overview which is written by the user from database
+ * Get overview which is written by the user from database
  * @param {String} (username)
  * @returns {object} userOverview
  */
@@ -58,7 +58,7 @@ const userOverview=async(username)=>{
 };
 
 /**
- * get user overview
+ * Get user overview
  * @param {function} (req, res)
  * @returns {object} res
  */
@@ -75,7 +75,7 @@ const getUserOverview = async(req,res)=>{
   }
 };
 /**
- * get posts which is written by the user from database
+ * Get posts which is written by the user from database
  * @param {String} (username)
  * @returns {object} userSubmitted
  */
@@ -97,7 +97,7 @@ else {
 }
   };
 /**
- * get user posts
+ * Get user posts
  * @param {function} (req, res)
  * @returns {object} res
  */
@@ -114,7 +114,7 @@ const getUserSubmitted = async(req,res)=>{
   }
   };
 /**
- * get comments which is written by the user from database
+ * Get comments which is written by the user from database
  * @param {String} (username)
  * @returns {object} userComments
  */
@@ -136,7 +136,7 @@ const getUserSubmitted = async(req,res)=>{
     };
 
     /**
- * get user comments
+ * Get user comments
  * @param {function} (req, res)
  * @returns {object} res
  */
@@ -153,7 +153,7 @@ const getUserSubmitted = async(req,res)=>{
       }
     }; 
    /**
- * get posts which downvoted by the user from database
+ * Get posts which downvoted by the user from database
  * @param {String} (username)
  * @returns {object} uservotes
  */
@@ -182,7 +182,7 @@ const getUserSubmitted = async(req,res)=>{
   }
    };
   /**
- * get posts which downvoted by the user 
+ * Get posts which downvoted by the user 
  * @param {function} (req,res)
  * @returns {object} res
  */
@@ -199,7 +199,7 @@ const getUserDownVoted = async(req,res)=>{
   }
     };
 /**
- * get posts which upvoted by the user from database
+ * Get posts which upvoted by the user from database
  * @param {String} (username)
  * @returns {object} userUpvoted
  */
@@ -228,7 +228,7 @@ const userUpVoted=async(username)=>{
   }
  };
  /**
- * get posts which upvoted by the user
+ * Get posts which upvoted by the user
  * @param {function} (req, res)
  * @returns {object} res
  */   
