@@ -270,7 +270,8 @@ const userSchema = new mongoose.Schema({
   aboutReturn: aboutSchema,
   type: {
     type: String,
-    // required: true,
+    enum: ["bare email", "facebook", "google"],
+    default: "bare email",
   },
   /*********************************************************************************
    * the relations

@@ -106,7 +106,7 @@ const unsave = catchAsync(async (req, res, next) => {
  */
 const addSubreddit = (req, res, next) => {
   if (req.params.subreddit)
-    req.addedFilter = { communityID: `t5_${req.params.subreddit}` };
+    req.addedFilter = { communityID: req.params.subreddit };
   next();
 };
 
@@ -117,7 +117,7 @@ const addSubreddit = (req, res, next) => {
  * @param {Object} res the response that will be sent to the client
  * @returns {void}
  */
-const getPosts = catchAsync(async (req, res) => {
+const getPosts = catchAsync(async (req, res, next) => {
   /*first of all : check if the request has certain subreddit or not*/
   if (!req.addedFilter) {
     /* here the request dosn't contain certain subreddit then we will get the posts from friends and subreddits and persons teh user follow*/
@@ -162,20 +162,26 @@ const getPosts = catchAsync(async (req, res) => {
   if (req.params.criteria) {
     if (req.params.criteria === "best")
       sort = {
-        bestFactor: 1,
+        bestFactor: -1,
       };
     else if (req.params.criteria === "hot")
       sort = {
-        hotnessFactor: 1,
+        hotnessFactor: -1,
       };
     else if (req.params.criteria === "new") {
       sort = {
-        createdAt: 1,
+        createdAt: -1,
       };
     } else if (req.params.criteria === "top")
       sort = {
-        votesCount: 1,
+        votesCount: -1,
       };
+    else if (req.params.criteria === "random") {
+      sort = {};
+    } else {
+      /*if the request has any other criteria */
+      return next(new AppError("not found this page", 404));
+    }
   }
   const features = new APIFeatures(
     Post.find(req.addedFilter, null, { sort }),
