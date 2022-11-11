@@ -256,95 +256,11 @@ const login = async (req, res) => {
   }
 };
 
-const userPrefs = async (username) => {
-  const user = await User.findById(username);
-  console.log(user);
-  if (user) {
-    return {
-      user: user,
-    };
-  }
-};
-const getUserPrefs = async (req, res) => {
-  const data = await userPrefs(req.params.username);
-  console.log(data);
-  res.status(200).json({
-    status: "success",
-    prefs: data.user.hasPost,
-  });
-};
-const userAbout = async (username) => {
-  const user = await User.findById(username);
-  if (user) {
-    return {
-      user: User.about,
-    };
-  }
-};
-const getUserAbout = async (req, res) => {
-  const data = await userAbout(req.params.username);
-  res.status(200).json({
-    status: "success",
-    data: data,
-  });
-};
-
-const userSubmiited = async (username) => {
-  const post = await User.findById(username);
-  if (post) {
-    return {
-      post: User.hasPost,
-    };
-  }
-};
-const getUserSubmiited = async (req, res) => {
-  const data = await userSubmiited(req.params.username);
-  res.status(200).json({
-    status: "success",
-    data: data,
-  });
-};
-
-const userComment = async (username) => {
-  const comment = await User.findById(username);
-  if (comment) {
-    return {
-      comment: User.hasPost,
-    };
-  }
-};
-const getUserComment = async (req, res) => {
-  const data = await userComment(req.params.username);
-  res.status(200).json({
-    status: "success",
-    data: data,
-  });
-};
-const userUpvoted = async (username) => {
-  const comment = await User.findById(username);
-  if (comment) {
-    return {
-      comment: User.hasPost,
-    };
-  }
-};
-const getUserUpvoted = async (req, res) => {
-  const data = await userUpvoted(req.params.username);
-  res.status(200).json({
-    status: "success",
-    data: data,
-  });
-};
-
 module.exports = {
+  availableEmail,
   availableUser,
   availableUsername,
   signup,
   availableGorF,
   login,
-  getUserPrefs,
-  getUserSubmiited,
-  getUserAbout,
-  getUserComment,
-  getUserUpvoted,
 };
