@@ -6,6 +6,7 @@ const userPrefsSchema = new mongoose.Schema({
   /*********************************************************************************
    * the attributes
    **********************************************************************************/
+  
   emailPrivateMessage: {
     type: Boolean,
     default: true,

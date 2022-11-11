@@ -27,6 +27,7 @@
       var signatureSeg = segments[2];
   
       // base64 deco de and parse JSON
+    
       var header = JSON.parse(base64urlDecode(headerSeg));
       var payload = JSON.parse(base64urlDecode(payloadSeg));
      

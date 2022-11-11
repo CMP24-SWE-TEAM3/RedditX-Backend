@@ -32,7 +32,6 @@
     "helmet": "^6.0.0",
     "hpp": "^0.2.3",
     "jest": "^29.3.0",
-    "jsdoc": "^4.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb-memory-server": "^8.9.5",
     "mongoose": "^6.5.2",

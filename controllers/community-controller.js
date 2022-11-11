@@ -80,6 +80,12 @@ const uploadCommunityBanner = catchAsync(async (req, res, next) => {
     message: "Banner is updated successfully",
   });
 });
+/**
+ * Set suggested comment sort of a subreddit (srName and suggestedCommentSort must be sent in request body)
+ * @param {Object} req request must contain srName and suggested comment sort
+ * @param {Object} res
+ * @returns {object} status
+ */
 const setSuggestedSort = async (req, res) => {
   if (req.body.srName.substring(0, 2) !== "t5") {
     return res.status(500).json({

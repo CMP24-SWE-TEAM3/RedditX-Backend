@@ -4,7 +4,14 @@ const bcrypt = require("bcryptjs");
 const decodeJwt = require("./google-facebook-oAuth");
 const randomUsername = require("../utils/random-username");
 
-//check whether user name is in database or not (function)
+
+
+/**
+ * Check whether user name is in database or not (function)
+ * @param {Object} username username of the user.
+ * @returns {String} state of the operation whether false or true to indicate the sucess.
+ * @returns {Object} user return from the database.
+ */
 const availableUser = async (username) => {
   const user = await User.findById(username);
   if (user) {
@@ -20,6 +27,13 @@ const availableUser = async (username) => {
   }
 };
 
+
+/**
+ * Check whether email is in database or not (function)
+ * @param {String} email  state of the operation whether false or true to indicate the sucess.
+ * @returns {Boolean} exist whether the email exists or not.
+ 
+*/
 const availableEmail = async (email) => {
   const user = await User.findOne({ email: email });
   if (user) {
@@ -32,7 +46,13 @@ const availableEmail = async (email) => {
     };
   }
 };
-
+/**
+ * Check whether google account or facebook account is in database or not (function)
+ * @param {String} email the email that will be searched by in the database.
+ * @param {String} type the type of the email that will be searched by in the database.
+ * @returns {Object} user the returned user from the database.
+ * @returns {Boolean} exist whether the email exists or not.
+ */
 const availabeGmailOrFacebook = async (email, type) => {
   const user = await User.findOne({ email: email, type: type });
   if (user) {
@@ -48,7 +68,11 @@ const availabeGmailOrFacebook = async (email, type) => {
   }
 };
 
-//available-gmailorfacebook (route)
+/**
+ * Check whether google account or facebook account is in database or not (route)
+ * @param {Object} req request that contain email and type.
+ * @returns {String} response whether available or not.
+ */
 const availableGorF = async (req, res) => {
   const data = await availabeGmailOrFacebook(req.body.email, req.body.type);
   if (data.exist == false) {
@@ -62,11 +86,21 @@ const availableGorF = async (req, res) => {
   }
 };
 
-//change password according to type of signup
+/**
+ * Change password according to type of email
+ * @param {param} type type of the email.
+ * @param {param} password password of the email.
+ * @returns {String} (type whether '1' or the password parameter).
+ */
 const changePasswordAccType = (type, password) => {
   return type == "facebook" || type == "gmail" ? "1" : password;
 };
-//signing token
+/**
+ * Signing the token
+ * @param {String} emailType email type.
+ * @param {String} username username of the user.
+ * @returns {String} (signed token)
+ */
 const signToken = (emailType, username) => {
   return jwt.sign(
     { emailType: emailType, username: username },
@@ -75,7 +109,12 @@ const signToken = (emailType, username) => {
   );
 };
 
-//route (available-username)
+/**
+ * Check whether username is in database or not (route)
+ * @param {Object} req request that contains the username.
+ * @param {Object} res
+ * @returns {object} response whether available or not.
+ */
 const availableUsername = async (req, res) => {
   const data = await availableUser(req.query.username);
   if (data.state == false) {
@@ -89,14 +128,24 @@ const availableUsername = async (req, res) => {
   }
 };
 
-//save User in database
+/**
+ * Save user in database
+ * @param {String} email email of the user
+ * @param {String} hash hashed password
+ * @param {String} username username of the user
+ * @param {String} type type of the email
+ * @returns {object} (status,username)
+ */
 const createUser = async (email, hash, username, type) => {
+ 
+  console.log("h");
   const user = new User({
     email: email,
     password: hash,
     _id: username,
     type: type,
     isPasswordSet: type == "gmail" || type == "facebook" ? false : true,
+    
   });
   const result = user
     .save()
@@ -116,8 +165,13 @@ const createUser = async (email, hash, username, type) => {
   return result;
 };
 
-//route (signup)
+/**
+ * Signup (route)
+ * @param {Object} (req, res)
+ * @returns {object} {token,expiresIn,username} or {error}
+ */
 const signup = async (req, res) => {
+  console.log("entered");
   const pass = changePasswordAccType(req.body.type, req.body.password);
   const hash = await bcrypt.hash(pass, 10);
   if (req.body.type == "gmail" || req.body.type == "facebook") {
@@ -156,6 +210,10 @@ const signup = async (req, res) => {
   } else {
     //signup with bare email
     const data = await availableEmail(req.body.email);
+
+    console.log(data);
+
+
     if (data.exist)
       return res.status(400).json({
         error: "Duplicate email!",
@@ -182,6 +240,13 @@ const signup = async (req, res) => {
     }
   }
 };
+
+/**
+ * Login (route)
+ * @param {Object} req req must contain the correct data.
+ * @param {Object} res
+ * @returns {object} {token,expiresIn,username} or {error}
+ */
 
 const login = async (req, res) => {
   const pass = changePasswordAccType(req.body.type, req.body.password);
@@ -264,3 +329,4 @@ module.exports = {
   availableGorF,
   login,
 };
+
