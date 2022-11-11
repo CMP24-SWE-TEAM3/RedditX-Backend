@@ -53,7 +53,7 @@ const userPrefsSchema = new mongoose.Schema({
   },
   labelNSFW: {
     type: Boolean,
-    default: true,
+    default: false,
   } /* determine if the user to label nsfw content in the feed*/,
   markMessagesRead: {
     type: Boolean,
@@ -122,6 +122,17 @@ const voteSchema = new mongoose.Schema({
   type: Number,
 });
 
+const moderatorSchema = new mongoose.Schema({
+  communityId: {
+    type: String /*mongoose.Schema.ObjectId,*/,
+    ref: "Community",
+  },
+  role: {
+    type: String,
+    enum: ["creator", "moderator"],
+  },
+});
+
 const meSchema = new mongoose.Schema({
   /*********************************************************************************
    * the attributes
@@ -159,17 +170,6 @@ const aboutSchema = new mongoose.Schema({
   acceptFollowers: {
     type: Boolean,
     default: true,
-  },
-});
-
-const moderatorSchema = new mongoose.Schema({
-  communityId: {
-    type: String /*mongoose.Schema.ObjectId,*/,
-    ref: "Community",
-  },
-  role: {
-    type: String,
-    enum: ["creator", "moderator"],
   },
 });
 
@@ -266,9 +266,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     /*default: `My name is ${this._id.slice(3)}`,*/
   },
-  prefs: userPrefsSchema,
-  meReturn: meSchema,
-  aboutReturn: aboutSchema,
+  prefs: {
+    type: userPrefsSchema,
+    default: () => ({}),
+  },
+  meReturn: {
+    type: meSchema,
+    default: () => ({}),
+  },
+  aboutReturn: {
+    type: aboutSchema,
+    default: () => ({}),
+  },
   type: {
     type: String,
     enum: ["bare email", "facebook", "gmail"],
@@ -364,7 +373,7 @@ const userSchema = new mongoose.Schema({
   hasReply: [
     {
       type: mongoose.Schema.ObjectId,
-      ref: "Reply",
+      ref: "Comment",
     },
   ],
   hasVote: [

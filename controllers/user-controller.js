@@ -3,6 +3,7 @@ const catchAsync = require("../utils/catch-async");
 const User = require("./../models/user-model");
 const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
+const Community = require("./../models/community-model");
 const sharp = require("sharp");
 
 /**
@@ -106,6 +107,13 @@ exports.spam = catchAsync(async (req, res, next) => {
       spamText: req.body.spamText,
     });
     post.spamCount++;
+    if (post.communityID !== undefined && post.communityID !== "") {
+      const community = await Community.findById(post.communityID).select(
+        "communityOptions"
+      );
+      if (post.spamCount >= community.communityOptions.spamsNumBeforeRemove)
+        post.isDeleted = true;
+    }
     await post.save();
   } else {
     // Spam a comment
@@ -122,6 +130,14 @@ exports.spam = catchAsync(async (req, res, next) => {
       text: req.body.spamText,
     });
     comment.spamCount++;
+    const post = await Post.findById(comment.replyingTo).select("communityID");
+    if (post.communityID !== undefined && post.communityID !== "") {
+      const community = await Community.findById(post.communityID).select(
+        "communityOptions"
+      );
+      if (comment.spamCount >= community.communityOptions.spamsNumBeforeRemove)
+        comment.isDeleted = true;
+    }
     await comment.save();
   }
   res.status(200).json({

@@ -25,6 +25,11 @@ const flairSchema = mongoose.Schema({
   },
 });
 
+const statsSchema = mongoose.Schema({
+  date: String, // "1/1/2022"
+  count: Number,
+});
+
 const communityOptionsSchema = mongoose.Schema({
   emailUsernameMention: {
     type: Boolean,
@@ -43,15 +48,21 @@ const communityOptionsSchema = mongoose.Schema({
     type: Boolean,
     default: 1,
   },
-  suggestedCommentSort: 
-  {
+  suggestedCommentSort: {
     type: String,
-    default:"top"
+    default: "top",
   },
   postType: Number, // 0 any, 1 videos and images only, and 2 text only
   region: String,
   privacyType: String, // "public" (anyone can view and submit), "private" (only approved members can view and submit), or "restricted" (anyone can view, but only some are approved to submit links)
-  spamsNumBeforeRemove: Number,
+  spamsNumBeforeRemove: {
+    type: Number,
+    default: 20,
+  },
+  isAutoApproved: {
+    type: Boolean,
+    default: 1,
+  },
 });
 
 const memberSchema = mongoose.Schema({
@@ -111,12 +122,30 @@ const communitySchema = mongoose.Schema({
   createdAt: String,
   rank: Number,
   trendPoints: Number,
+  pageViews: [
+    {
+      type: statsSchema,
+    },
+  ],
+  joined: [
+    {
+      type: statsSchema,
+    },
+  ],
+  left: [
+    {
+      type: statsSchema,
+    },
+  ],
   flairList: [
     {
       type: flairSchema,
     },
   ],
-  communityOptions: communityOptionsSchema,
+  communityOptions: {
+    type: communityOptionsSchema,
+    default: () => ({}),
+  },
   members: [
     {
       type: memberSchema,

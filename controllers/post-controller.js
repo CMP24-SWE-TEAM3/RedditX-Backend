@@ -1,6 +1,7 @@
 const AppError = require("../utils/app-error");
 const catchAsync = require("../utils/catch-async");
 const Post = require("./../models/post-model");
+const Community = require("./../models/community-model");
 const User = require("./../models/user-model");
 const makeRandomString = require("./../utils/randomString");
 const multer = require("multer");
@@ -47,6 +48,12 @@ const submit = catchAsync(async (req, res, next) => {
   req.body.voters = [{ userID: req.username, voteType: 1 }];
   const user = await User.findById(req.username);
   if (!user) return next(new AppError("This user doesn't exist!", 404));
+  if (req.body.communityID) {
+    const community = await Community.findById(req.body.communityID).select(
+      "communityOptions"
+    );
+    if (!community.communityOptions.isAutoApproved) req.body.isPending = true;
+  }
   const newPost = await Post.create(req.body);
   user.hasPost.push(newPost._id);
   await user.save();

@@ -104,10 +104,29 @@ const setSuggestedSort = async (req, res) => {
   );
 };
 
+const getCommunities = catchAsync(async (req, res, next) => {
+  const communities = await Community.find();
+  if (!communities)
+    return next(new AppError("This subreddit doesn't exist!", 404));
+  res.status(200).json({
+    status: "success",
+    message: communities,
+  });
+});
+const createCommunity = catchAsync(async (req, res, next) => {
+  const community = await Community.create(req.body); // Note that front passes for ex: t5_imagePro
+  res.status(200).json({
+    status: "success",
+    message: community,
+  });
+});
+
 module.exports = {
   resizeCommunityIcon,
   resizeCommunityBanner,
   uploadCommunityIcon,
   uploadCommunityBanner,
   setSuggestedSort,
+  getCommunities,
+  createCommunity,
 };
