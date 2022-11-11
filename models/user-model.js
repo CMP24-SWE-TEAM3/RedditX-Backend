@@ -133,65 +133,6 @@ const meSchema = new mongoose.Schema({
   /*********************************************************************************
    * the attributes
    **********************************************************************************/
-  _id: {
-    type: String,
-    minLength: [5, "the minimum length is 5 characters"],
-    maxLength: [20, "the maximum length is 20"],
-  },
-  language: String,
-  about: String,
-  countryCode: String,
-  searchIncludeOver18: {
-    type: Boolean,
-    default: true,
-  },
-  numComments: {
-    type: Boolean,
-    default: true,
-  },
-  showLinkFlair: {
-    type: Boolean,
-    default: true,
-  },
-  emailemailCommentReply: {
-    type: Boolean,
-    default: true,
-  },
-  threadedMessages: {
-    type: Boolean,
-    default: true,
-  },
-  enableFollowers: {
-    type: Boolean,
-    default: true,
-  },
-  markMessagesRead: {
-    type: Boolean,
-    default: true,
-  },
-  liveOrangereds: {
-    type: Boolean,
-    default: true,
-  },
-  labelNSFW: {
-    type: Boolean,
-    default: false,
-  },
-  showPostInNewWindow: {
-    type: Boolean,
-    default: true,
-  },
-  over18: {
-    type: Boolean
-  },
-  emailPrivateMessage: {
-    type: Boolean,
-    default: true,
-  },
-  emailPostReply: {
-    type: Boolean,
-    default: true,
-  },
   emailUserNewFollwer: {
     type: Boolean,
     default: true,
@@ -204,65 +145,14 @@ const meSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  emailUnsubscripeAll: {
-    type: Boolean,
-    default: false,
-  },
-  emailMessages: {
-    type: Boolean,
-    default: true,
-  },
-  emailUpVoteComment: {
-    type: Boolean,
-    default: true,
-  },
-  showLocationBasedRecommendation: {
-    type: Boolean,
-    default: true,
-  },
-  avatar: String,
-  defaultCommentSort: {
-    type: String,
-    enum: ["top", "new", "random", "best", "hot"],
-    default: "new",
-  }
 });
 
 const aboutSchema = new mongoose.Schema({
   /*********************************************************************************
    * the attributes
    **********************************************************************************/
-  _id: {
-    type: String,
-    minLength: [5, "the minimum length is 5 characters"],
-    maxLength: [20, "the maximum length is 20"],
-  },
-  createdAt: {
-    type: Date,
-    required: [true, "missing the date of creation of the user"],
-    default: Date.now(),
-  },
-  email: {
-    type: String,
-    required: [true, "Please provide your email"],
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, "Please provide a valid email"],
-  },
-  commentKarma: Number,
-  tatalKarma: Number,
+  tatolKarma: Number,
   linkKarma: Number,
-  inboxCount: Number,
-  avatar: String,
-  about: String,
-  isMuted: {
-    type: Boolean,
-    default: false,
-  },
-  isBanned: {
-    type: Boolean,
-    default: false,
-  },
   isBlocked: {
     type: Boolean,
     default: false,
@@ -271,26 +161,11 @@ const aboutSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  prefsShowTrending: {
+  prefShowTrending: {
     type: Boolean,
     default: true,
   },
-  canCreateSubreddit: {
-    type: Boolean,
-    default: true,
-  },
-  hasVerifiedEmail: {
-    type: Boolean,
-    default: false,
-  },
-  isPasswordSet: {
-    type: Boolean,
-    required: [
-      true,
-      "provide the value of isPasswordSet to determine the type of signing of user",
-    ],
-  },
-  over18: {
+  acceptFollowers: {
     type: Boolean,
     default: true,
   }
