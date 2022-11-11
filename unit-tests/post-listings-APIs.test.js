@@ -15,7 +15,7 @@ beforeAll(async () => {
 
 let token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9uYWJpbDEiLCJpYXQiOjE2NjgxNjczODQsImV4cCI6MTY2ODI1Mzc4NH0._8gbDeqDtBjq_ku1Pslm7Vbnxu5raEJR991dKXugjOE';
 
-const subreddit = 'imagepro';
+const subreddit = 't5_imagepro';
 /****************************************************************************************************************************************
  * get: r/{subreddit}/new
  * **************************************************************************************************************************************

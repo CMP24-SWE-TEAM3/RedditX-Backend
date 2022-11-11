@@ -104,7 +104,7 @@ exports.unsave = catchAsync(async (req, res, next) => {
  * @returns {void} 
  */
 exports.addSubreddit = (req, res, next) => {
-  if (req.params.subreddit) req.addedFilter = { communityID: `t5_${req.params.subreddit}` };
+  if (req.params.subreddit) req.addedFilter = { communityID: req.params.subreddit };
   next();
 }
 
@@ -115,7 +115,7 @@ exports.addSubreddit = (req, res, next) => {
  * @param {Object} res the response that will be sent to the client
  * @returns {void} 
  */
-exports.getPosts = catchAsync(async (req, res) => {
+exports.getPosts = catchAsync(async (req, res, next) => {
 
   /*first of all : check if the request has certain subreddit or not*/
   if (!req.addedFilter) {
@@ -181,7 +181,7 @@ exports.getPosts = catchAsync(async (req, res) => {
     }
     else {
       /*if the request has any other criteria */
-      throw new AppError('not found this page', 404);
+      return next(new AppError('not found this page', 404));
     }
   }
   const features = new APIFeatures(Post.find(req.addedFilter, null, { sort }), req.query)
