@@ -20,6 +20,19 @@ const availableUser = async (username) => {
   }
 };
 
+const availableEmail = async (email) => {
+  const user = await User.findOne({ email: email });
+  if (user) {
+    return {
+      exist: true,
+    };
+  } else {
+    return {
+      exist: false,
+    };
+  }
+};
+
 const availabeGmailOrFacebook = async (email, type) => {
   const user = await User.findOne({ email: email, type: type });
   if (user) {
@@ -64,7 +77,7 @@ const signToken = (emailType, username) => {
 
 //route (available-username)
 const availableUsername = async (req, res) => {
-  const data = await availableUser(req.params.username);
+  const data = await availableUser(req.query.username);
   if (data.state == false) {
     return res.status(200).json({
       response: "Avaliable",
@@ -116,12 +129,10 @@ const signup = async (req, res) => {
     }
     const email = decodeReturn.payload.email;
     const data = await availabeGmailOrFacebook(email, req.body.type);
-    console.log(data);
     //case if not available in database random new username and send it
     if (data.exist == false) {
       const username = randomUsername.randomUserName();
       const result = await createUser(email, hash, username, req.body.type);
-      console.log(result);
       if (result.username != null) {
         const token = signToken(req.body.type, username);
         return res.status(200).json({
@@ -144,6 +155,11 @@ const signup = async (req, res) => {
     }
   } else {
     //signup with bare email
+    const data = await availableEmail(req.body.email);
+    if (data.exist)
+      return res.status(400).json({
+        error: "Duplicate email!",
+      });
     const result = await createUser(
       req.body.email,
       hash,
@@ -328,4 +344,7 @@ module.exports = {
   login,
   getUserPrefs,
   getUserSubmiited,
+  getUserAbout,
+  getUserComment,
+  getUserUpvoted,
 };
