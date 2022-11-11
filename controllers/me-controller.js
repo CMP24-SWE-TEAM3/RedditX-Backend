@@ -1,22 +1,18 @@
-const AppError = require("../utils/app-error");
-const catchAsync = require("../utils/catch-async");
 const User = require('./../models/user-model');
-//const factory = require("./handler-factory");
-const makeRandomString = require("../utils/randomString");
-const sharp = require("sharp");
+
 
 const userPrefs=async(username)=>{
   const user = await User.findById(username);
   if (user) {
     return {
       test:true,
-      "user": user.prefs,
+      user: user.prefs,
     };
   }
   else {
     return {
       test:false,
-      "user": null,
+      user: null,
     };
   }
 };
@@ -24,8 +20,7 @@ const getUserPrefs = async(req,res)=>{
   const data= await userPrefs(req.params.username);
   if (data.test) {
     return res.status(200).json({
-      status: "success",
-      data: data
+      data: data.user
     });
   } else {
     return res.status(404).json({
@@ -35,7 +30,8 @@ const getUserPrefs = async(req,res)=>{
 };
 const userMe=async(username)=>{
   const user = await User.findById(username);
-const obj={ 
+  if (user) {
+  const obj={ 
   numComments: user.prefs.commentsNum,
   threadedMessages: user.prefs.threadedMessages,
   showLinkFlair: user.prefs.showLinkFlair,
@@ -58,21 +54,19 @@ const obj={
   about: user.about,
   avatar: user.avatar,
   userID: user._id,
-  numComments: user.meReturn.numComments,
   emailUserNewFollwer: user.meReturn.emailUserNewFollwer,
   emailUpVotePost: user.meReturn.emailUpVotePost,
   emailUsernameMention: user.meReturn.emailUsernameMention,
 };
-if (user) {
   return {
     test:true,
-    "user": obj,
+    user: obj,
   };
 }
 else {
   return {
     test:false,
-    "user": null,
+    user: null,
   };
 }
   };
@@ -81,8 +75,7 @@ else {
     const data= await userMe(req.params.username);
     if (data.test) {
       return res.status(200).json({
-        status: "success",
-        data: data
+        data: data.user
       });
     } else {
       return res.status(404).json({
@@ -92,6 +85,7 @@ else {
       };
 const userAbout=async(username)=>{
     const user = await User.findById(username);
+    if (user) {
     const obj={ 
       prefShowTrending: user.aboutReturn.prefShowTrending,
       isBlocked: user.aboutReturn.isBlocked,
@@ -113,16 +107,15 @@ const userAbout=async(username)=>{
       avatar: user.avatar,
       userID: user._id,
     };
-    if (user) {
       return {
         test:true,
-        "user": obj,
+        user: obj,
       };
     }
     else {
       return {
         test:false,
-        "user": null,
+        user: null,
       };
     }
     };
@@ -130,8 +123,7 @@ const userAbout=async(username)=>{
       const data= await userAbout(req.params.username);
       if (data.test) {
         return res.status(200).json({
-          status: "success",
-          data: data
+          data: data.user
         });
       } else {
         return res.status(404).json({

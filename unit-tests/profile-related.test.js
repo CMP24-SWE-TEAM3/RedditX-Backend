@@ -1,0 +1,231 @@
+const request = require("supertest");
+const app = require("../app");
+const dotenv = require("dotenv");
+dotenv.config({ path: "./.env" });
+const dbConnect = require("../db-connection/connection");
+
+/* Connecting to the database before each test. */
+beforeAll(async () => {
+  dbConnect();
+});
+jest.setTimeout(1000000);
+describe("User System",()=>{
+  describe("test username overview",()=>{
+      describe("username overview",()=>{
+        const username ="t2_hamada";
+        test("should respond with 200 status code", async () => {
+          const res = await request(app)
+            .get(`/user/overview/${username}`)
+            expect(res.statusCode).toBe(200);
+        });
+      });
+      describe("username overview",()=>{
+        const username ="t2_hamada";
+      test("should specify json in the content type header", async () => {
+        const res = await request(app)
+            .get(`/user/overview/${username}`)
+            
+        expect(res.headers["content-type"]).toEqual(
+          expect.stringContaining("json")
+        );
+      });
+    });
+    describe("username overview",()=>{
+      const username ="t2_hamada";
+      test("should respond with a body that have a field called createdAt to be equal 2022-11-11T13:08:42.648Z", async () => {
+        const res = await request(app)
+            .get(`/user/overview/${username}`)
+            expect(res.body.data[0].createdAt).toBe("2022-11-11T13:08:42.648Z");
+      });
+    });
+      describe("username overview",()=>{
+        const username ="t2_hamd";
+        test("should respond with 404 status code", async () => {
+          const res = await request(app)
+            .get(`/user/overview/${username}`)
+            
+            expect(res.statusCode).toBe(404);
+        });
+  
+      });
+    });
+  
+  });
+
+  describe("User System",()=>{
+    describe("test username comments",()=>{
+        describe("username comments",()=>{
+          const username ="t2_hamada";
+          test("should respond with 200 status code", async () => {
+            const res = await request(app)
+              .get(`/user/comment/${username}`)
+              
+              expect(res.statusCode).toBe(200);
+          });
+        });
+        describe("username comments",()=>{
+          const username ="t2_hamada";
+        test("should specify json in the content type header", async () => {
+          const res = await request(app)
+              .get(`/user/comment/${username}`)
+              
+          expect(res.headers["content-type"]).toEqual(
+            expect.stringContaining("json")
+          );
+        });
+      });
+      describe("username comments",()=>{
+        const username ="t2_hamada";
+        test("should respond with a body that have a field called createdAt to be equal 2022-11-08T20:34:43.515Z", async () => {
+          const res = await request(app)
+              .get(`/user/comment/${username}`)
+              expect(res.body.data[0].createdAt).toBe("2022-11-08T20:34:43.515Z");
+        });
+      });
+        describe("username comments",()=>{
+          const username ="t2_hamd";
+          test("should respond with 404 status code", async () => {
+            const res = await request(app)
+              .get(`/user/comment/${username}`)
+              
+              expect(res.statusCode).toBe(404);
+          });
+    
+        });
+    
+    });
+    });
+
+    describe("User System",()=>{
+          describe("test username posts",()=>{
+            describe("username posts",()=>{
+              const username ="t2_hamada";
+              test("should respond with 200 status code", async () => {
+                const res = await request(app)
+                  .get(`/user/submitted/${username}`)
+                  
+                  expect(res.statusCode).toBe(200);
+              });
+            });
+            describe("username posts",()=>{
+              const username ="t2_hamada";
+            test("should specify json in the content type header", async () => {
+              const res = await request(app)
+                  .get(`/user/submitted/${username}`)
+                  
+              expect(res.headers["content-type"]).toEqual(
+                expect.stringContaining("json")
+              );
+            });
+          });
+          describe("username posts",()=>{
+            const username ="t2_hamada";
+            test("should respond with a body that have a field called createdAt to be equal 2022-11-08T18:33:20.176Z", async () => {
+              const res = await request(app)
+                  .get(`/user/submitted/${username}`)
+                  expect(res.body.data[0].createdAt).toBe("2022-11-08T18:33:20.176Z");
+            });
+          });
+            describe("username posts",()=>{
+              const username ="t2_hamd";
+              test("should respond with 404 status code", async () => {
+                const res = await request(app)
+                  .get(`/user/submitted/${username}`)
+                  
+                  expect(res.statusCode).toBe(404);
+              });
+
+            });
+        
+        
+        });
+    });
+        describe("User System",()=>{
+              describe("test username downvotes",()=>{
+                describe("username downvotes",()=>{
+                  const username ="t2_hamada";
+                  test("should respond with 200 status code", async () => {
+                    const res = await request(app)
+                      .get(`/user/downvoted/${username}`)
+                      
+                      expect(res.statusCode).toBe(200);
+                  });
+                });
+                describe("username downvotes",()=>{
+                  const username ="t2_hamada";
+                test("should specify json in the content type header", async () => {
+                  const res = await request(app)
+                      .get(`/user/downvoted/${username}`)
+                      
+                  expect(res.headers["content-type"]).toEqual(
+                    expect.stringContaining("json")
+                  );
+                });
+              });
+              describe("username downvotes",()=>{
+                const username ="t2_hamada";
+                test("should respond with a body that have a field called flairText to be equal hero", async () => {
+                  const res = await request(app)
+                      .get(`/user/downvoted/${username}`)
+                      
+                      expect(res.body.data[0].flairText).toBe("hero");
+                });
+              });
+                describe("username downvotes",()=>{
+                  const username ="t2_hamd";
+                  test("should respond with 404 status code", async () => {
+                    const res = await request(app)
+                      .get(`/user/downvoted/${username}`)
+                      
+                      expect(res.statusCode).toBe(404);
+                  });
+            
+                });
+            
+            });
+            });
+            describe("User System",()=>{
+                 describe("test username upvotes",()=>{
+                    describe("username upvotes",()=>{
+                      const username ="t2_hamada";
+                      test("should respond with 200 status code", async () => {
+                        const res = await request(app)
+                          .get(`/user/upvoted/${username}`)
+                          
+                          expect(res.statusCode).toBe(200);
+                      });
+                    });
+                    describe("username upvotes",()=>{
+                      const username ="t2_hamada";
+                    test("should specify json in the content type header", async () => {
+                      const res = await request(app)
+                          .get(`/user/upvoted/${username}`)
+                          
+                      expect(res.headers["content-type"]).toEqual(
+                        expect.stringContaining("json")
+                      );
+                    });
+                  });
+                  describe("username upvotes",()=>{
+                    const username ="t2_hamada";
+                    test("should respond with a body that have a field called createdAt to be equal 2022-11-08T20:24:52.271Z", async () => {
+                      const res = await request(app)
+                          .get(`/user/upvoted/${username}`)
+                        
+                          expect(res.body.data[0].createdAt).toBe("2022-11-08T20:24:52.271Z");
+                    });
+                  });
+                    describe("username upvotes",()=>{
+                      const username ="t2_hamd";
+                      test("should respond with 404 status code", async () => {
+                        const res = await request(app)
+                          .get(`/user/upvoted/${username}`)
+                          
+                          expect(res.statusCode).toBe(404);
+                      });
+                
+                    });
+                
+                
+                });
+});
