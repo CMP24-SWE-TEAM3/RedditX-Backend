@@ -125,21 +125,28 @@ exports.getPosts = catchAsync(async (req, res) => {
   if (req.params.criteria) {
     if (req.params.criteria === 'best')
       sort = {
-        bestFactor: 1,
+        bestFactor: -1,
       };
     else if (req.params.criteria === 'hot')
       sort = {
-        hotnessFactor: 1,
+        hotnessFactor: -1,
       };
     else if (req.params.criteria === 'new') {
       sort = {
-        createdAt: 1
+        createdAt: -1
       };
     }
     else if (req.params.criteria === 'top')
       sort = {
-        votesCount: 1,
+        votesCount: -1,
       };
+    else if (req.params.criteria === 'random') {
+      sort = {};
+    }
+    else {
+      /*if the request has any other criteria */
+      throw new AppError('not found this page', 404);
+    }
   }
   const features = new APIFeatures(Post.find(req.addedFilter, null, { sort }), req.query)
     .filter()

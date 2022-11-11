@@ -102,11 +102,11 @@ const postSchema = mongoose.Schema({
 });
 
 postSchema.virtual('hotnessFactor').get(function () {
-  return this.createdAt * 2 + this.votesCount + this.commentsNum;
+  return (this.createdAt.getMonth() / 12 + this.createdAt().getDay() / 30 + this.createdAt.getYear() / 2022) * 2 / 3 + this.votesCount + this.commentsNum;
 })
 
 postSchema.virtual('bestFactor').get(function () {
-  return this.createdAt * 1 + this.votesCount + this.commentsNum;
+  return (this.createdAt.getMonth() / 12 + this.createdAt().getDay / 30 + this.createdAt.getYear() / 2022) * 1 / 3 + this.votesCount + this.commentsNum;
 })
 
 const Post = mongoose.model("Post", postSchema);
