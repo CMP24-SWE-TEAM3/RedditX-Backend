@@ -6,6 +6,7 @@ const userPrefsSchema = new mongoose.Schema({
   /*********************************************************************************
    * the attributes
    **********************************************************************************/
+  
   emailPrivateMessage: {
     type: Boolean,
     default: true,
@@ -265,9 +266,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     /*default: `My name is ${this._id.slice(3)}`,*/
   },
-  prefs: userPrefsSchema,
-  meReturn: meSchema,
-  aboutReturn: aboutSchema,
+  prefs: {
+    type: userPrefsSchema,
+    default: () => ({}),
+  },
+  meReturn: {
+    type: meSchema,
+    default: () => ({}),
+  },
+  aboutReturn: {
+    type: aboutSchema,
+    default: () => ({}),
+  },
   type: {
     type: String,
     enum: ["bare email", "facebook", "gmail"],

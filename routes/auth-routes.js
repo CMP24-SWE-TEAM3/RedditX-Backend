@@ -12,6 +12,5 @@ router.get(
   );
 router.post("/signup",authController.signup);
 router.post("/login",authController.login);
-router.get("/get-user-prefs/:username",authController.getUserPrefs);
 module.exports = router;
   

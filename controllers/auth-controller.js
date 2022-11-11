@@ -20,6 +20,19 @@ const availableUser = async (username) => {
   }
 };
 
+const availableEmail = async (email) => {
+  const user = await User.findOne({ email: email });
+  if (user) {
+    return {
+      exist: true,
+    };
+  } else {
+    return {
+      exist: false,
+    };
+  }
+};
+
 const availabeGmailOrFacebook = async (email, type) => {
   const user = await User.findOne({ email: email, type: type });
   if (user) {
@@ -64,7 +77,7 @@ const signToken = (emailType, username) => {
 
 //route (available-username)
 const availableUsername = async (req, res) => {
-  const data = await availableUser(req.params.username);
+  const data = await availableUser(req.query.username);
   if (data.state == false) {
     return res.status(200).json({
       response: "Avaliable",
@@ -78,12 +91,15 @@ const availableUsername = async (req, res) => {
 
 //save User in database
 const createUser = async (email, hash, username, type) => {
+ 
+  console.log("h");
   const user = new User({
     email: email,
     password: hash,
     _id: username,
     type: type,
     isPasswordSet: type == "gmail" || type == "facebook" ? false : true,
+    
   });
   const result = user
     .save()
@@ -105,6 +121,7 @@ const createUser = async (email, hash, username, type) => {
 
 //route (signup)
 const signup = async (req, res) => {
+  console.log("entered");
   const pass = changePasswordAccType(req.body.type, req.body.password);
   const hash = await bcrypt.hash(pass, 10);
   if (req.body.type == "gmail" || req.body.type == "facebook") {
@@ -116,12 +133,10 @@ const signup = async (req, res) => {
     }
     const email = decodeReturn.payload.email;
     const data = await availabeGmailOrFacebook(email, req.body.type);
-    console.log(data);
     //case if not available in database random new username and send it
     if (data.exist == false) {
       const username = randomUsername.randomUserName();
       const result = await createUser(email, hash, username, req.body.type);
-      console.log(result);
       if (result.username != null) {
         const token = signToken(req.body.type, username);
         return res.status(200).json({
@@ -144,6 +159,12 @@ const signup = async (req, res) => {
     }
   } else {
     //signup with bare email
+    const data = await availableEmail(req.body.email);
+    console.log(data);
+    if (data.exist)
+      return res.status(400).json({
+        error: "Duplicate email!",
+      });
     const result = await createUser(
       req.body.email,
       hash,
@@ -240,92 +261,12 @@ const login = async (req, res) => {
   }
 };
 
-const userPrefs = async (username) => {
-  const user = await User.findById(username);
-  console.log(user);
-  if (user) {
-    return {
-      user: user,
-    };
-  }
-};
-const getUserPrefs = async (req, res) => {
-  const data = await userPrefs(req.params.username);
-  console.log(data);
-  res.status(200).json({
-    status: "success",
-    prefs: data.user.hasPost,
-  });
-};
-const userAbout = async (username) => {
-  const user = await User.findById(username);
-  if (user) {
-    return {
-      user: User.about,
-    };
-  }
-};
-const getUserAbout = async (req, res) => {
-  const data = await userAbout(req.params.username);
-  res.status(200).json({
-    status: "success",
-    data: data,
-  });
-};
-
-const userSubmiited = async (username) => {
-  const post = await User.findById(username);
-  if (post) {
-    return {
-      post: User.hasPost,
-    };
-  }
-};
-const getUserSubmiited = async (req, res) => {
-  const data = await userSubmiited(req.params.username);
-  res.status(200).json({
-    status: "success",
-    data: data,
-  });
-};
-
-const userComment = async (username) => {
-  const comment = await User.findById(username);
-  if (comment) {
-    return {
-      comment: User.hasPost,
-    };
-  }
-};
-const getUserComment = async (req, res) => {
-  const data = await userComment(req.params.username);
-  res.status(200).json({
-    status: "success",
-    data: data,
-  });
-};
-const userUpvoted = async (username) => {
-  const comment = await User.findById(username);
-  if (comment) {
-    return {
-      comment: User.hasPost,
-    };
-  }
-};
-const getUserUpvoted = async (req, res) => {
-  const data = await userUpvoted(req.params.username);
-  res.status(200).json({
-    status: "success",
-    data: data,
-  });
-};
-
 module.exports = {
+  availableEmail,
   availableUser,
   availableUsername,
   signup,
   availableGorF,
   login,
-  getUserPrefs,
-  getUserSubmiited,
 };
+
