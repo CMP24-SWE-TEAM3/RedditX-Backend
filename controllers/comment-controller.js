@@ -1,18 +1,19 @@
 const Comment = require("../models/comment-model");
 const Post = require("../models/post-model");
 const validators = require("../validate/comment-validators");
-const AppError = require("../utils/app-error");
 
 const vote = async (req, res) => {
-  if (!req.body.postId || !req.body.dir)
-    return next(new AppError("invalid post id or vote id", 500));
-  const id = req.body.postId.substring(0, 2);
+  if (req.body.id === undefined || req.body.dir === undefined)
+    return res.status(500).json({
+      status: "invalid post id or dir",
+    });
+  const id = req.body.id.substring(0, 2);
   const dir = req.body.dir;
-  const postIdCasted = req.body.postId.substring(3);
+  const postIdCasted = req.body.id.substring(3);
   const check = validators.validateVoteIn(id, dir, postIdCasted);
   if (!check) {
     return res.status(500).json({
-      status: "invalid post id or vote id",
+      status: "invalid post id or dir",
     });
   }
   if (id === "t3") {
@@ -68,12 +69,10 @@ const vote = async (req, res) => {
       { new: true },
       (err, doc) => {
         if (err) {
-          console.log("error happened while updating");
           return res.status(500).json({
             status: "failed",
           });
         } else {
-          console.log("asdhere");
           return res.status(200).json({
             status: "done",
           });

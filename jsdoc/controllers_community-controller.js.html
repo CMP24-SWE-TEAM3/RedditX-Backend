@@ -35,7 +35,7 @@ const sharp = require("sharp");
  * Name, resize, and save the uploaded file
  * @param {function} (req, res, next)
  */
-exports.resizeCommunityIcon = catchAsync(async (req, res, next) => {
+const resizeCommunityIcon = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `community-icon-${
     req.params.subreddit
@@ -51,7 +51,7 @@ exports.resizeCommunityIcon = catchAsync(async (req, res, next) => {
  * Name, resize, and save the uploaded file
  * @param {function} (req, res, next)
  */
-exports.resizeCommunityBanner = catchAsync(async (req, res, next) => {
+const resizeCommunityBanner = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `community-banner-${
     req.params.subreddit
@@ -68,7 +68,7 @@ exports.resizeCommunityBanner = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.uploadCommunityIcon = catchAsync(async (req, res, next) => {
+const uploadCommunityIcon = catchAsync(async (req, res, next) => {
   const community = await Community.findById(req.params.subreddit); // Note that front passes for ex: t5_imagePro
   if (!community)
     return next(new AppError("This subreddit doesn't exist!", 404));
@@ -91,7 +91,7 @@ exports.uploadCommunityIcon = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.uploadCommunityBanner = catchAsync(async (req, res, next) => {
+const uploadCommunityBanner = catchAsync(async (req, res, next) => {
   const community = await Community.findById(req.params.subreddit); // Note that front passes for ex: t5_imagePro
   if (!community)
     return next(new AppError("This subreddit doesn't exist!", 404));
@@ -108,49 +108,37 @@ exports.uploadCommunityBanner = catchAsync(async (req, res, next) => {
     message: "Banner is updated successfully",
   });
 });
-exports.setSuggestedSort = (req, res) => {
-  Community.findOneAndUpdate(
-    { communityID: req.body.srName },
+const setSuggestedSort = async (req, res) => {
+  if (req.body.srName.substring(0, 2) !== "t5") {
+    return res.status(500).json({
+      status: "failed",
+    });
+  }
+  Community.findByIdAndUpdate(
+    { _id: req.body.srName },
     { $set: { suggestedCommentSort: req.body.suggestedCommentSort } },
     { new: true },
     (err, doc) => {
       if (err) {
-        console.log("error happened while updating");
+        return res.status(500).json({
+          status: "failed",
+        });
       } else {
-        console.log("asd");
-        return res.status(200);
+        return res.status(200).json({
+          status: "done",
+        });
       }
     }
   );
 };
-/*exports.getCommunity = catchAsync(async (req, res, next) => {
-  console.log(req.username);
-  const community = await Community.findById(req.body.id); // Note that front passes for ex: t5_imagePro
-  if (!community)
-    return next(new AppError("This subreddit doesn't exist!", 404));
-  res.status(200).json({
-    status: "success",
-    message: community,
-  });
-});
 
-exports.getCommunities = catchAsync(async (req, res, next) => {
-  const communities = await Community.find();
-  if (!communities)
-    return next(new AppError("This subreddit doesn't exist!", 404));
-  res.status(200).json({
-    status: "success",
-    message: communities,
-  });
-});
-
-exports.createCommunity = catchAsync(async (req, res, next) => {
-  const community = await Community.create(req.body); // Note that front passes for ex: t5_imagePro
-  res.status(200).json({
-    status: "success",
-    message: community,
-  });
-});*/
+module.exports = {
+  resizeCommunityIcon,
+  resizeCommunityBanner,
+  uploadCommunityIcon,
+  uploadCommunityBanner,
+  setSuggestedSort,
+};
 </code></pre>
         </article>
     </section>
@@ -161,13 +149,13 @@ exports.createCommunity = catchAsync(async (req, res, next) => {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#block">block</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubreddit">addSubreddit</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 09 2022 02:36:10 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Nov 11 2022 17:08:33 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

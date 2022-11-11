@@ -160,6 +160,68 @@
 
         
             
+<h4 class="name" id="getPosts"><span class="type-signature">(constant) </span>getPosts<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>get posts from the database based on the subreddits and friends of the signed in user if this is exist and based on criteria also and if it isn't will return based on criteria only</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_post-controller.js.html">controllers/post-controller.js</a>, <a href="controllers_post-controller.js.html#line120">line 120</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
 <h4 class="name" id="multerStorage"><span class="type-signature">(constant) </span>multerStorage<span class="type-signature"></span></h4>
 
 
@@ -222,7 +284,7 @@
 
         
             
-<h4 class="name" id="resizeCommunityBanner"><span class="type-signature"></span>resizeCommunityBanner<span class="type-signature"></span></h4>
+<h4 class="name" id="resizeCommunityBanner"><span class="type-signature">(constant) </span>resizeCommunityBanner<span class="type-signature"></span></h4>
 
 
 
@@ -284,7 +346,7 @@
 
         
             
-<h4 class="name" id="resizeCommunityIcon"><span class="type-signature"></span>resizeCommunityIcon<span class="type-signature"></span></h4>
+<h4 class="name" id="resizeCommunityIcon"><span class="type-signature">(constant) </span>resizeCommunityIcon<span class="type-signature"></span></h4>
 
 
 
@@ -408,7 +470,7 @@
 
         
             
-<h4 class="name" id="save"><span class="type-signature"></span>save<span class="type-signature"></span></h4>
+<h4 class="name" id="save"><span class="type-signature">(constant) </span>save<span class="type-signature"></span></h4>
 
 
 
@@ -452,7 +514,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_post-controller.js.html">controllers/post-controller.js</a>, <a href="controllers_post-controller.js.html#line60">line 60</a>
+        <a href="controllers_post-controller.js.html">controllers/post-controller.js</a>, <a href="controllers_post-controller.js.html#line61">line 61</a>
     </li></ul></dd>
     
 
@@ -532,7 +594,7 @@
 
         
             
-<h4 class="name" id="submit"><span class="type-signature"></span>submit<span class="type-signature"></span></h4>
+<h4 class="name" id="submit"><span class="type-signature">(constant) </span>submit<span class="type-signature"></span></h4>
 
 
 
@@ -594,7 +656,7 @@
 
         
             
-<h4 class="name" id="unsave"><span class="type-signature"></span>unsave<span class="type-signature"></span></h4>
+<h4 class="name" id="unsave"><span class="type-signature">(constant) </span>unsave<span class="type-signature"></span></h4>
 
 
 
@@ -638,7 +700,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="controllers_post-controller.js.html">controllers/post-controller.js</a>, <a href="controllers_post-controller.js.html#line82">line 82</a>
+        <a href="controllers_post-controller.js.html">controllers/post-controller.js</a>, <a href="controllers_post-controller.js.html#line84">line 84</a>
     </li></ul></dd>
     
 
@@ -656,7 +718,7 @@
 
         
             
-<h4 class="name" id="uploadCommunityBanner"><span class="type-signature"></span>uploadCommunityBanner<span class="type-signature"></span></h4>
+<h4 class="name" id="uploadCommunityBanner"><span class="type-signature">(constant) </span>uploadCommunityBanner<span class="type-signature"></span></h4>
 
 
 
@@ -718,7 +780,7 @@
 
         
             
-<h4 class="name" id="uploadCommunityIcon"><span class="type-signature"></span>uploadCommunityIcon<span class="type-signature"></span></h4>
+<h4 class="name" id="uploadCommunityIcon"><span class="type-signature">(constant) </span>uploadCommunityIcon<span class="type-signature"></span></h4>
 
 
 
@@ -780,7 +842,7 @@
 
         
             
-<h4 class="name" id="uploadPostFiles"><span class="type-signature"></span>uploadPostFiles<span class="type-signature"></span></h4>
+<h4 class="name" id="uploadPostFiles"><span class="type-signature">(constant) </span>uploadPostFiles<span class="type-signature"></span></h4>
 
 
 
@@ -907,6 +969,207 @@
 
     
         <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addSubreddit"><span class="type-signature"></span>addSubreddit<span class="signature">(req, res, next)</span><span class="type-signature"> &rarr; {void}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>add subreddit to req if the path of the api has the certain subreddit</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the request comes from client and edited by previous middlewares eg. possible-auth-check and contain the username if the user is signed in</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the response that will be sent to the client or passed and in this function will passed to next middleware getPosts</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the faunction that call the next middleware in this case getPosts</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="controllers_post-controller.js.html">controllers/post-controller.js</a>, <a href="controllers_post-controller.js.html#line107">line 107</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">void</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
 
         
             
@@ -2119,13 +2382,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#block">block</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubreddit">addSubreddit</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 09 2022 02:36:10 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Nov 11 2022 17:08:33 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

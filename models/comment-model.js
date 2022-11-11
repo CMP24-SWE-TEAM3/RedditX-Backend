@@ -31,7 +31,7 @@ const commentSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
-  creationDate: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },

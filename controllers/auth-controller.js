@@ -116,10 +116,12 @@ const signup = async (req, res) => {
     }
     const email = decodeReturn.payload.email;
     const data = await availabeGmailOrFacebook(email, req.body.type);
+    console.log(data);
     //case if not available in database random new username and send it
     if (data.exist == false) {
       const username = randomUsername.randomUserName();
       const result = await createUser(email, hash, username, req.body.type);
+      console.log(result);
       if (result.username != null) {
         const token = signToken(req.body.type, username);
         return res.status(200).json({

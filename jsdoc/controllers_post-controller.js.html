@@ -59,14 +59,14 @@ const upload = multer({
 /**
  * Upload the files
  */
-exports.uploadPostFiles = upload.array("attachments", 10);
+const uploadPostFiles = upload.array("attachments", 10);
 
 /**
  * Creates a post and saves the file names to database
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.submit = catchAsync(async (req, res, next) => {
+const submit = catchAsync(async (req, res, next) => {
   req.body.attachments = [];
   if (req.files) {
     req.files.forEach((file) => req.body.attachments.push(file.filename));
@@ -74,6 +74,7 @@ exports.submit = catchAsync(async (req, res, next) => {
   req.body.userID = req.username;
   req.body.voters = [{ userID: req.username, voteType: 1 }];
   const user = await User.findById(req.username);
+  if (!user) return next(new AppError("This user doesn't exist!", 404));
   const newPost = await Post.create(req.body);
   user.hasPost.push(newPost._id);
   await user.save();
@@ -85,10 +86,11 @@ exports.submit = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.save = catchAsync(async (req, res, next) => {
+const save = catchAsync(async (req, res, next) => {
   if (!req.body.linkID)
     return next(new AppError("No linkID is provided!", 400));
   const user = await User.findById(req.username);
+  if (!user) return next(new AppError("This user doesn't exist!", 404));
   if (user.savedPosts.find((el) => el.toString() === req.body.linkID.slice(3)))
     return res.status(200).json({
       status: "success",
@@ -107,10 +109,11 @@ exports.save = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.unsave = catchAsync(async (req, res, next) => {
+const unsave = catchAsync(async (req, res, next) => {
   if (!req.body.linkID)
     return next(new AppError("No linkID is provided!", 400));
   const user = await User.findById(req.username);
+  if (!user) return next(new AppError("This user doesn't exist!", 404));
   user.savedPosts.splice(
     user.savedPosts.findIndex((el) => el === req.body.linkID.slice(3)),
     1
@@ -121,6 +124,116 @@ exports.unsave = catchAsync(async (req, res, next) => {
     message: "Post is unsaved successfully",
   });
 });
+
+/**
+ * add subreddit to req if the path of the api has the certain subreddit
+ * @param {Object} req the request comes from client and edited by previous middlewares eg. possible-auth-check and contain the username if the user is signed in
+ * @param {Object} res the response that will be sent to the client or passed and in this function will passed to next middleware getPosts
+ * @param {Function} next the faunction that call the next middleware in this case getPosts
+ * @returns {void}
+ */
+const addSubreddit = (req, res, next) => {
+  if (req.params.subreddit)
+    req.addedFilter = { communityID: req.params.subreddit };
+  next();
+};
+
+/**
+ * get posts from the database based on the subreddits and friends of the signed in user if this is exist and based on criteria also and if it isn't will return based on criteria only
+ * @param {Function} (req,res,next)
+ * @param {Object} req the request comes from client and edited by previous middlewares eg. possible-auth-check and addSubreddit and contain the username and the subreddit
+ * @param {Object} res the response that will be sent to the client
+ * @returns {void}
+ */
+const getPosts = catchAsync(async (req, res, next) => {
+  /*first of all : check if the request has certain subreddit or not*/
+  if (!req.addedFilter) {
+    /* here the request dosn't contain certain subreddit then we will get the posts from friends and subreddits and persons teh user follow*/
+
+    /* if user signed in we will do the following
+    1.get the categories of the user
+    2. get the friends of the user
+    3. get the posts based on these categories and the users*/
+    if (req.username) {
+      /*step 1,2 :get the categories and friends of the user*/
+      const { member, friend, follows } = await User.findById(
+        req.username
+      ).select("-_id member friend follows");
+      const subreddits = member.map((el) => {
+        if (!el.isBanned) {
+          return el.communityId;
+        }
+      });
+      /* step 3 :add the subreddits to addedFilter*/
+      req.addedFilter = {
+        $or: [
+          {
+            communityID: {
+              $in: subreddits,
+            },
+          },
+          {
+            userID: {
+              $in: friend,
+            },
+          },
+          {
+            userID: {
+              $in: follows,
+            },
+          },
+        ],
+      };
+    }
+  }
+  let sort = {};
+  if (req.params.criteria) {
+    if (req.params.criteria === "best")
+      sort = {
+        bestFactor: -1,
+      };
+    else if (req.params.criteria === "hot")
+      sort = {
+        hotnessFactor: -1,
+      };
+    else if (req.params.criteria === "new") {
+      sort = {
+        createdAt: -1,
+      };
+    } else if (req.params.criteria === "top")
+      sort = {
+        votesCount: -1,
+      };
+    else if (req.params.criteria === "random") {
+      sort = {};
+    } else {
+      /*if the request has any other criteria */
+      return next(new AppError("not found this page", 404));
+    }
+  }
+  const features = new APIFeatures(
+    Post.find(req.addedFilter, null, { sort }),
+    req.query
+  )
+    .filter()
+    .paginate()
+    .sort()
+    .selectFields();
+  const posts = await features.query;
+  res.status(200).json({
+    status: "succeeded",
+    posts,
+  });
+});
+
+module.exports = {
+  uploadPostFiles,
+  submit,
+  save,
+  unsave,
+  addSubreddit,
+  getPosts,
+};
 </code></pre>
         </article>
     </section>
@@ -131,13 +244,13 @@ exports.unsave = catchAsync(async (req, res, next) => {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#block">block</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubreddit">addSubreddit</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 09 2022 02:36:10 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Nov 11 2022 17:08:33 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

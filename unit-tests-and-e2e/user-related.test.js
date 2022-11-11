@@ -308,7 +308,7 @@ describe("User System", () => {
       });
     });
     describe("signup using Facebook account", () => {
-      describe("valid signup using google account", () => {
+      describe("valid signup using facebook account", () => {
         test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
           const res = await request(app)
             .post("/auth/signup")

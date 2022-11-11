@@ -9,8 +9,8 @@ beforeAll(async () => {
   dbConnect();
 });
 
-describe("POST /api/submit", () => {
-  jest.setTimeout(1000000);
+jest.setTimeout(1000000);
+/*describe("POST /api/submit", () => {
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
 
@@ -81,7 +81,6 @@ describe("POST /api/submit", () => {
 });
 
 describe("POST /api/save", () => {
-  jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
 
@@ -140,7 +139,6 @@ describe("POST /api/save", () => {
 });
 
 describe("POST /api/unsave", () => {
-  jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
 
@@ -196,8 +194,8 @@ describe("POST /api/unsave", () => {
       expect(res.statusCode).toBe(401);
     });
   });
-});
-/*
+});*/
+
 describe("vote over a post", () => {
   let token1 =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
@@ -207,7 +205,7 @@ describe("vote over a post", () => {
         .post("/api/vote")
         .set("Authorization", token1)
         .send({
-          postId: "t3_636aa116e608c49517c5f4d6",
+          id: "t3_636aa116e608c49517c5f4d6",
           dir: 1,
         });
       expect(res.statusCode).toBe(200);
@@ -219,7 +217,7 @@ describe("vote over a post", () => {
         .post("/api/vote")
         .set("Authorization", token1)
         .send({
-          postId: "t3_636aa116e608c49517c5f4d6",
+          id: "t3_636aa116e608c49517c5f4d6",
           dir: -1,
         });
       console.log(res.statusCode);
@@ -232,7 +230,7 @@ describe("vote over a post", () => {
         .post("/api/vote")
         .set("Authorization", token1)
         .send({
-          postId: "t3_636aa116e608c49517c5f4d6",
+          id: "t3_636aa116e608c49517c5f4d6",
           dir: 0,
         });
       console.log(res.statusCode);
@@ -245,7 +243,7 @@ describe("vote over a post", () => {
         .post("/api/vote")
         .set("Authorization", token1)
         .send({
-          postId: "t3_636aa116e608c49517c5f4d6",
+          id: "t3_636aa116e608c49517c5f4d6",
           dir: 2,
         });
       expect(res.statusCode).toBe(200);
@@ -257,7 +255,7 @@ describe("vote over a post", () => {
         .post("/api/vote")
         .set("Authorization", token1)
         .send({
-          postId: "t3_636ac2f383b34311137b9ed9aca0ed",
+          id: "t3_636ac2f383b34311137b9ed9aca0ed",
           dir: 2,
         });
       expect(res.statusCode).toBe(500);
@@ -269,12 +267,11 @@ describe("vote over a post", () => {
         .post("/api/vote")
         .set("Authorization", token1)
         .send({
-          postId: "t3_636aa116e608c49517c5f4d6",
+          id: "t3_636aa116e608c49517c5f4d6",
           dir: 5,
         });
       expect(res.statusCode).toBe(500);
-      expect(res.body.status).toBe("invalid post id or vote id");
+      expect(res.body.status).toBe("invalid post id or dir");
     });
   });
 });
-*/

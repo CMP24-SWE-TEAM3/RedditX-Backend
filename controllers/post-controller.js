@@ -132,7 +132,7 @@ const getPosts = catchAsync(async (req, res, next) => {
         req.username
       ).select("-_id member friend follows");
       const subreddits = member.map((el) => {
-        if (!el.isMuted) {
+        if (!el.isBanned) {
           return el.communityId;
         }
       });
@@ -191,7 +191,6 @@ const getPosts = catchAsync(async (req, res, next) => {
     .paginate()
     .sort()
     .selectFields();
-
   const posts = await features.query;
   res.status(200).json({
     status: "succeeded",
