@@ -160,7 +160,10 @@ const signup = async (req, res) => {
   } else {
     //signup with bare email
     const data = await availableEmail(req.body.email);
+
     console.log(data);
+
+
     if (data.exist)
       return res.status(400).json({
         error: "Duplicate email!",
