@@ -277,6 +277,11 @@ const getPosts = catchAsync(async (req, res, next) => {
       return next(new AppError("not found this page", 404));
     }
   }
+  /*if the request didn't contain liit in its query then will add it to the query with 10 at default */
+  if (!req.query.limit) {
+    req.query.limit = '10';
+  }
+
   const features = new APIFeatures(
     Post.find(req.addedFilter, null, { sort }),
     req.query

@@ -113,20 +113,12 @@ const postSchema = mongoose.Schema({
 });
 
 postSchema.virtual("hotnessFactor").get(function () {
-  return this.createdAt * 2 + this.votesCount + this.commentsNum;
-});
-
-postSchema.virtual("bestFactor").get(function () {
-  return this.createdAt * 1 + this.votesCount + this.commentsNum;
-});
-
-postSchema.virtual("hotnessFactor").get(function () {
   return (
     ((this.createdAt.getMonth() / 12 +
       this.createdAt().getDay() / 30 +
       this.createdAt.getYear() / 2022) *
       2) /
-      3 +
+    3 +
     this.votesCount +
     this.commentsNum
   );
@@ -138,11 +130,23 @@ postSchema.virtual("bestFactor").get(function () {
       this.createdAt().getDay / 30 +
       this.createdAt.getYear() / 2022) *
       1) /
-      3 +
+    3 +
     this.votesCount +
     this.commentsNum
   );
 });
+
+postSchema.pre(/^find/, async function (next) {
+  this.find({ isPending: { $ne: true } });
+});
+
+postSchema.post(/^find/, async function (doc, next) {
+  await Post.updateMany(this.getFilter(), {
+    $inc: { 'insightCnt': 1 }
+  });
+  next();
+});
+
 
 const Post = mongoose.model("Post", postSchema);
 
