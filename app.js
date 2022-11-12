@@ -6,22 +6,13 @@ const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const cookieParser = require("cookie-parser");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const compression = require("compression");
 const globalErrorHandler = require("./controllers/error-controller");
 const userRouter = require("./routes/user-routes");
-const userBlockRouter = require("./routes/user-block-routes");
-const userSpamRouter = require("./routes/user-spam-routes");
 const communityRouter = require("./routes/community-routes");
-const postSubmitRouter = require("./routes/post-submit-routes");
-const postSaveRouter = require("./routes/post-save-routes");
-const postUnsaveRouter = require("./routes/post-unsave-routes");
-const postListingRouter = require("./routes/post-listing-routes");
+const listingRouter = require("./routes/listing-routes");
 const authRouter = require("./routes/auth-routes");
-const meRouter = require("./routes/me-routes");
-const profileRouter = require("./routes/profile-routes");
-const commentRouter = require("./routes/comment-routes");
 
 const AppError = require("./utils/app-error");
 
@@ -103,17 +94,10 @@ app.use("/", limiter); // limit only api requests
 app.use(express.json({ limit: "10kb" }));
 
 // ROUTES
-app.use("/r", postListingRouter);
-app.use("/api/me", userRouter);
-app.use("/r", communityRouter);
-app.use("/api/submit", postSubmitRouter);
-app.use("/api/save", postSaveRouter);
-app.use("/api/unsave", postUnsaveRouter);
-app.use("/api/block-user", userBlockRouter);
-app.use("/api/spam", userSpamRouter);
-app.use("/auth", authRouter);
-app.use("/user", profileRouter);
-app.use("/api/v1/me", meRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
+app.use("/api/r", communityRouter);
+app.use("/api/listing", listingRouter);
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404)); // Here will assume that this is an error and skip all middlewares forward to the error handler middleware we defined
 });

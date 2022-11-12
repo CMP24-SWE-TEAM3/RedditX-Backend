@@ -1,11 +1,13 @@
 const AppError = require("../utils/app-error");
 const catchAsync = require("../utils/catch-async");
-const Post = require("./../models/post-model");
-const Community = require("./../models/community-model");
-const User = require("./../models/user-model");
-const makeRandomString = require("./../utils/randomString");
+const Post = require("../models/post-model");
+const Community = require("../models/community-model");
+const Comment = require("../models/comment-model");
+const User = require("../models/user-model");
+const makeRandomString = require("../utils/randomString");
 const multer = require("multer");
 const APIFeatures = require("../utils/api-features");
+const validators = require("./../validate/listing-validators");
 
 /**
  * Name and save the uploaded files
@@ -103,6 +105,91 @@ const unsave = catchAsync(async (req, res, next) => {
     message: "Post is unsaved successfully",
   });
 });
+
+/**
+ * Vote over a post or a comment (id and dir must be sent in request body)
+ * @param {Object} req request must contain dir and id.
+ * @param {Object} res
+ * @returns {String} status whether failed or not.
+ */
+const vote = async (req, res) => {
+  if (req.body.id === undefined || req.body.dir === undefined)
+    return res.status(500).json({
+      status: "invalid id or dir",
+    });
+  const id = req.body.id.substring(0, 2);
+  const dir = req.body.dir;
+  const postIdCasted = req.body.id.substring(3);
+  const check = validators.validateVoteIn(id, dir, postIdCasted);
+  if (!check) {
+    return res.status(500).json({
+      status: "invalid id or dir",
+    });
+  }
+  if (id === "t3") {
+    //post
+    const post = await Post.findById(postIdCasted);
+    if (!post) {
+      return res.status(500).json({
+        status: "not found",
+      });
+    }
+    let votesCount = post.votesCount;
+    let operation;
+    if (dir == 1 || dir == 2) {
+      operation = 1;
+    } else if (dir == 0 || dir == -1) {
+      operation = -1;
+    }
+    Post.findByIdAndUpdate(
+      { _id: postIdCasted },
+      { $set: { votesCount: votesCount + operation } },
+      { new: true },
+      (err, doc) => {
+        if (err) {
+          return res.status(500).json({
+            status: "failed",
+          });
+        } else {
+          return res.status(200).json({
+            status: "done",
+          });
+        }
+      }
+    );
+  } else if (id === "t1") {
+    //comment or reply
+    const comment = await Comment.findById(postIdCasted);
+    if (!comment) {
+      return res.status(500).json({
+        status: "not found",
+      });
+    }
+    let votesCount = comment.votesCount;
+    let operation;
+    if (dir == 1 || dir == 2) {
+      operation = 1;
+    } else if (dir == 0 || dir == -1) {
+      operation = -1;
+    }
+    Comment.findByIdAndUpdate(
+      { _id: postIdCasted },
+      { $set: { votesCount: votesCount + operation } },
+      { new: true },
+      (err, doc) => {
+        if (err) {
+          return res.status(500).json({
+            status: "failed",
+          });
+        } else {
+          return res.status(200).json({
+            status: "done",
+          });
+        }
+      }
+    );
+  }
+};
 
 /**
  * add subreddit to req if the path of the api has the certain subreddit
@@ -212,4 +299,5 @@ module.exports = {
   unsave,
   addSubreddit,
   getPosts,
+  vote,
 };

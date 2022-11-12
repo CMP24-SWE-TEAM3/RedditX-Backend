@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/community-controller.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/community-controller.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const AppError = require("../utils/app-error");
+const catchAsync = require("../utils/catch-async");
+const Community = require("./../models/community-model");
+const sharp = require("sharp");
+
+/**
+ * Name, resize, and save the uploaded file
+ * @param {function} (req, res, next)
+ */
+const resizeCommunityIcon = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
+  req.file.filename = `community-icon-${
+    req.params.subreddit
+  }-${Date.now()}.jpg`;
+  await sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat("jpg")
+    .toFile(`public/subreddits/files/${req.file.filename}`);
+  next();
+});
+
+/**
+ * Name, resize, and save the uploaded file
+ * @param {function} (req, res, next)
+ */
+const resizeCommunityBanner = catchAsync(async (req, res, next) => {
+  if (!req.file) return next();
+  req.file.filename = `community-banner-${
+    req.params.subreddit
+  }-${Date.now()}.jpg`;
+  await sharp(req.file.buffer)
+    .resize(2000, 500)
+    .toFormat("jpg")
+    .toFile(`public/subreddits/files/${req.file.filename}`);
+  next();
+});
+
+/**
+ * Saves filename to database
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const uploadCommunityIcon = catchAsync(async (req, res, next) => {
+  if (!req.file) return next(new AppError("No photo is uploaded!", 400));
+  const community = await Community.findById(req.params.subreddit); // Note that front passes for ex: t5_imagePro
+  if (!community)
+    return next(new AppError("This subreddit doesn't exist!", 404));
+  if (
+    !community.moderators.find((moderator) => moderator.userID === req.username)
+  )
+    return next(
+      new AppError("You are not a moderator of this subreddit!", 401)
+    );
+  community.icon = req.file.filename;
+  await community.save();
+  res.status(200).json({
+    status: "success",
+    message: "Icon is updated successfully",
+  });
+});
+
+/**
+ * Saves filename to database
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const uploadCommunityBanner = catchAsync(async (req, res, next) => {
+  if (!req.file) return next(new AppError("No photo is uploaded!", 400));
+  const community = await Community.findById(req.params.subreddit); // Note that front passes for ex: t5_imagePro
+  if (!community)
+    return next(new AppError("This subreddit doesn't exist!", 404));
+  if (
+    !community.moderators.find((moderator) => moderator.userID === req.username)
+  )
+    return next(
+      new AppError("You are not a moderator of this subreddit!", 401)
+    );
+  community.banner = req.file.filename;
+  await community.save();
+  res.status(200).json({
+    status: "success",
+    message: "Banner is updated successfully",
+  });
+});
+/**
+ * Set suggested comment sort of a subreddit (srName and suggestedCommentSort must be sent in request body)
+ * @param {Object} req request must contain srName and suggested comment sort
+ * @param {Object} res
+ * @returns {object} status
+ */
+const setSuggestedSort = async (req, res) => {
+  if (req.body.srName.substring(0, 2) !== "t5") {
+    return res.status(500).json({
+      status: "failed",
+    });
+  }
+  Community.findByIdAndUpdate(
+    { _id: req.body.srName },
+    { $set: { suggestedCommentSort: req.body.suggestedCommentSort } },
+    { new: true },
+    (err, doc) => {
+      if (err) {
+        return res.status(500).json({
+          status: "failed",
+        });
+      } else {
+        return res.status(200).json({
+          status: "done",
+        });
+      }
+    }
+  );
+};
+
+module.exports = {
+  resizeCommunityIcon,
+  resizeCommunityBanner,
+  uploadCommunityIcon,
+  uploadCommunityBanner,
+  setSuggestedSort,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubreddit">addSubreddit</a></li><li><a href="global.html#availabeGmailOrFacebook">availabeGmailOrFacebook</a></li><li><a href="global.html#availableEmail">availableEmail</a></li><li><a href="global.html#availableGorF">availableGorF</a></li><li><a href="global.html#availableUser">availableUser</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#changePasswordAccType">changePasswordAccType</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signToken">signToken</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li><li><a href="global.html#vote">vote</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sat Nov 12 2022 03:50:22 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

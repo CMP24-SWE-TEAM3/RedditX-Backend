@@ -66,7 +66,10 @@ const communityOptionsSchema = mongoose.Schema({
 });
 
 const memberSchema = mongoose.Schema({
-  userID: String,
+  userID: {
+    type: String,
+    ref: "User",
+  },
   isMuted: {
     type: Boolean,
     default: 0,
@@ -78,8 +81,14 @@ const memberSchema = mongoose.Schema({
 });
 
 const moderatorSchema = mongoose.Schema({
-  userID: String,
-  role: String,
+  userID: {
+    type: String,
+    ref: "User",
+  },
+  role: {
+    type: String,
+    enum: ["creator", "moderator"],
+  },
 });
 
 const communitySchema = mongoose.Schema({

@@ -9,7 +9,7 @@ beforeAll(async () => {
   dbConnect();
 });
 
-describe("POST /api/block-user", () => {
+describe("POST /api/user/block-user", () => {
   jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
@@ -17,7 +17,7 @@ describe("POST /api/block-user", () => {
   describe("given a userID, action=true(block), and a valid token", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/block-user")
+        .post("/api/user/block-user")
         .set("Authorization", token)
         .send({
           userID: "t2_moazMohamed",
@@ -27,7 +27,7 @@ describe("POST /api/block-user", () => {
     });
     test("should respond with a body that have a field called message=Blocks are updated successfully", async () => {
       const res = await request(app)
-        .post("/api/block-user")
+        .post("/api/user/block-user")
         .set("Authorization", token)
         .send({
           userID: "t2_moazMohamed",
@@ -37,7 +37,7 @@ describe("POST /api/block-user", () => {
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
-        .post("/api/block-user")
+        .post("/api/user/block-user")
         .set("Authorization", token)
         .send({
           userID: "t2_moazMohamed",
@@ -51,7 +51,7 @@ describe("POST /api/block-user", () => {
   describe("given a userID, action=false(unblock), and a valid token", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/block-user")
+        .post("/api/user/block-user")
         .set("Authorization", token)
         .send({
           userID: "t2_moazMohamed",
@@ -61,7 +61,7 @@ describe("POST /api/block-user", () => {
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
-        .post("/api/block-user")
+        .post("/api/user/block-user")
         .set("Authorization", token)
         .send({
           userID: "t2_moazMohamed",
@@ -75,7 +75,7 @@ describe("POST /api/block-user", () => {
   describe("when the userID is missing", () => {
     test("should respond with a 400 status code", async () => {
       const res = await request(app)
-        .post("/api/block-user")
+        .post("/api/user/block-user")
         .set("Authorization", token)
         .send({});
       expect(res.statusCode).toBe(400);
@@ -85,7 +85,7 @@ describe("POST /api/block-user", () => {
     test("should respond with a 401 status code", async () => {
       token = "lkjkl";
       const res = await request(app)
-        .post("/api/block-user")
+        .post("/api/user/block-user")
         .set("Authorization", token)
         .send({
           userID: "t2_moazMohamed",
@@ -96,7 +96,7 @@ describe("POST /api/block-user", () => {
   });
 });
 
-describe("POST /api/me/upload-user-photo", () => {
+describe("POST /api/user/me/upload-user-photo", () => {
   jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
@@ -104,7 +104,7 @@ describe("POST /api/me/upload-user-photo", () => {
   describe("given an attachment (picture), action=upload, and a valid token", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/me/upload-user-photo")
+        .post("/api/user/me/upload-user-photo")
         .set("Authorization", token)
         .field("action", "upload")
         .attach("attachment", `${__dirname}/1.jpg`);
@@ -112,7 +112,7 @@ describe("POST /api/me/upload-user-photo", () => {
     });
     test("should respond with a body that have a field called message=Avatar is updated successfully", async () => {
       const res = await request(app)
-        .post("/api/me/upload-user-photo")
+        .post("/api/user/me/upload-user-photo")
         .set("Authorization", token)
         .field("action", "upload")
         .attach("attachment", `${__dirname}/1.jpg`);
@@ -120,7 +120,7 @@ describe("POST /api/me/upload-user-photo", () => {
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
-        .post("/api/me/upload-user-photo")
+        .post("/api/user/me/upload-user-photo")
         .set("Authorization", token)
         .field("action", "upload")
         .attach("attachment", `${__dirname}/1.jpg`);
@@ -132,14 +132,14 @@ describe("POST /api/me/upload-user-photo", () => {
   describe("given an attachment (picture), action=delete, and a valid token", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/me/upload-user-photo")
+        .post("/api/user/me/upload-user-photo")
         .set("Authorization", token)
         .field("action", "delete");
       expect(res.statusCode).toBe(200);
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
-        .post("/api/me/upload-user-photo")
+        .post("/api/user/me/upload-user-photo")
         .set("Authorization", token)
         .field("action", "upload")
         .attach("attachment", `${__dirname}/1.jpg`);
@@ -149,28 +149,28 @@ describe("POST /api/me/upload-user-photo", () => {
     });
   });
   describe("when the attachment is missing", () => {
-    test("should respond with a 500 status code", async () => {
+    test("should respond with a 400 status code", async () => {
       const res = await request(app)
-        .post("/api/me/upload-user-photo")
+        .post("/api/user/me/upload-user-photo")
         .set("Authorization", token)
         .field("action", "upload");
-      expect(res.statusCode).toBe(500);
+      expect(res.statusCode).toBe(400);
     });
   });
   describe("when the action is missing", () => {
-    test("should respond with a 500 status code", async () => {
+    test("should respond with a 400 status code", async () => {
       const res = await request(app)
-        .post("/api/me/upload-user-photo")
+        .post("/api/user/me/upload-user-photo")
         .set("Authorization", token)
         .attach("attachment", `${__dirname}/1.jpg`);
-      expect(res.statusCode).toBe(500);
+      expect(res.statusCode).toBe(400);
     });
   });
   describe("when token is invalid", () => {
     test("should respond with a 401 status code", async () => {
       token = "lkjkl";
       const res = await request(app)
-        .post("/api/me/upload-user-photo")
+        .post("/api/user/me/upload-user-photo")
         .set("Authorization", token)
         .field("action", "upload");
       expect(res.statusCode).toBe(401);
@@ -178,7 +178,7 @@ describe("POST /api/me/upload-user-photo", () => {
   });
 });
 
-describe("POST /api/spam", () => {
+describe("POST /api/user/spam", () => {
   jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
@@ -186,7 +186,7 @@ describe("POST /api/spam", () => {
   describe("given a linkID, spamText, spamType and a valid token", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/spam")
+        .post("/api/user/spam")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -197,7 +197,7 @@ describe("POST /api/spam", () => {
     });
     test("should respond with a body that have a field called message=Spams are updated successfully", async () => {
       const res = await request(app)
-        .post("/api/spam")
+        .post("/api/user/spam")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -208,7 +208,7 @@ describe("POST /api/spam", () => {
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
-        .post("/api/spam")
+        .post("/api/user/spam")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -223,7 +223,7 @@ describe("POST /api/spam", () => {
   describe("when the linkID is missing", () => {
     test("should respond with a 400 status code", async () => {
       const res = await request(app)
-        .post("/api/spam")
+        .post("/api/user/spam")
         .set("Authorization", token)
         .send({});
       expect(res.statusCode).toBe(400);
@@ -233,7 +233,7 @@ describe("POST /api/spam", () => {
     test("should respond with a 401 status code", async () => {
       token = "lkjkl";
       const res = await request(app)
-        .post("/api/spam")
+        .post("/api/user/spam")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -250,20 +250,18 @@ describe("User System", () => {
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
   describe("test available username", () => {
     describe("username available", () => {
-      const username = "t2_hamada";
-      test("should return 202 status code", async () => {
+      test("should return 200 status code", async () => {
         const res = await request(app)
-          .get(`/auth/available-username/${username}`)
+          .get(`/api/auth/username-available?username=t2_hen`)
           .set("Authorization", token);
 
         expect(res.statusCode).toBe(200);
       });
     });
     describe("username available", () => {
-      const username = "t2_hen";
-      test("should return 202 status code", async () => {
+      test("should return 200 status code", async () => {
         const res = await request(app)
-          .get(`/auth/available-username/${username}`)
+          .get(`/api/auth/username-available?username=t2_moazHassan`)
           .set("Authorization", token);
 
         expect(res.statusCode).toBe(404);
@@ -275,7 +273,7 @@ describe("User System", () => {
       describe("valid signup using google account", () => {
         test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
           const res = await request(app)
-            .post("/auth/signup")
+            .post("/api/auth/signup")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken:
@@ -293,7 +291,7 @@ describe("User System", () => {
       describe("invalid signup using google account", () => {
         test("should respond with a 400 status code", async () => {
           const res = await request(app)
-            .post("/auth/signup")
+            .post("/api/auth/signup")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken:
@@ -311,7 +309,7 @@ describe("User System", () => {
       describe("valid signup using facebook account", () => {
         test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
           const res = await request(app)
-            .post("/auth/signup")
+            .post("/api/auth/signup")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken:
@@ -329,7 +327,7 @@ describe("User System", () => {
       describe("invalid signup using facebook account", () => {
         test("should respond with a 400 status code", async () => {
           const res = await request(app)
-            .post("/auth/signup")
+            .post("/api/auth/signup")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken:
@@ -348,7 +346,7 @@ describe("User System", () => {
       // describe("valid signup using bare email",()=>{
       //   test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
       //         const res = await request(app)
-      //           .post("/auth/signup")
+      //           .post("/api/auth/signup")
       //           .set("Authorization", token)
       //           .send({
       //             "googleOrFacebookToken":"",
@@ -366,7 +364,7 @@ describe("User System", () => {
       describe("invalid signup using bare email", () => {
         test("should respond with a 400 status code", async () => {
           const res = await request(app)
-            .post("/auth/signup")
+            .post("/api/auth/signup")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken: "",
@@ -376,7 +374,7 @@ describe("User System", () => {
               email: "ahmed231@gmail.com",
             });
           expect(res.statusCode).toBe(400);
-          expect(res.body.error).toBe("duplicate username");
+          expect(res.body.error).toBe("Duplicate email!");
         });
       });
     });
@@ -386,7 +384,7 @@ describe("User System", () => {
       describe("valid login using existing google account", () => {
         test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
           const res = await request(app)
-            .post("/auth/login")
+            .post("/api/auth/login")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken:
@@ -404,7 +402,7 @@ describe("User System", () => {
       describe("invalid login using google account", () => {
         test("should respond with a 404 status code", async () => {
           const res = await request(app)
-            .post("/auth/login")
+            .post("/api/auth/login")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken:
@@ -422,7 +420,7 @@ describe("User System", () => {
       describe("valid login using existing facebook account if not account will be created", () => {
         test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
           const res = await request(app)
-            .post("/auth/login")
+            .post("/api/auth/login")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken:
@@ -440,7 +438,7 @@ describe("User System", () => {
       describe("invalid login using facebook account", () => {
         test("should respond with a 404 status code", async () => {
           const res = await request(app)
-            .post("/auth/login")
+            .post("/api/auth/login")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken:
@@ -459,7 +457,7 @@ describe("User System", () => {
       describe("valid login using bare email", () => {
         test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
           const res = await request(app)
-            .post("/auth/login")
+            .post("/api/auth/login")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken: "",
@@ -476,7 +474,7 @@ describe("User System", () => {
       // describe("invalid login using bare email and invalid username",()=>{
       //   test("should respond with a 400 status code", async () => {
       //         const res = await request(app)
-      //           .post("/auth/login")
+      //           .post("/api/auth/login")
       //           .set("Authorization", token)
       //           .send({
       //             "googleOrFacebookToken":"",
@@ -492,7 +490,7 @@ describe("User System", () => {
       describe("invalid login using bare email and invalid password", () => {
         test("should respond with a 400 status code", async () => {
           const res = await request(app)
-            .post("/auth/login")
+            .post("/api/auth/login")
             .set("Authorization", token)
             .send({
               googleOrFacebookToken: "",
