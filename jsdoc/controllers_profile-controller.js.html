@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/profile-controller.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/profile-controller.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const User = require('./../models/user-model');
+const Comment = require('./../models/comment-model');
+const Post = require('./../models/post-model');
+
+/**
+ * Merge three sorted array in one sorted one
+ * @param {Array} (A,B)
+ * @returns {Array} D
+ */    
+function mergeTwo(A, B)
+{
+    let m = A.length;
+    let n = B.length;
+    let D = [];
+ 
+    let i = 0, j = 0;
+    while (i &lt; m &amp;&amp; j &lt; n) {
+ 
+        if (A[i].createdAt &lt;= B[j].createdAt)
+            D.push(A[i++]);
+        else
+            D.push(B[j++]);
+    }
+    while (i &lt; m)
+        D.push(A[i++]);
+    while (j &lt; n)
+        D.push(B[j++]);
+ 
+    return D;
+};
+
+/**
+ * Get overview which is written by the user from database
+ * @param {String} (username)
+ * @returns {object} userOverview
+ */
+const userOverview=async(username)=>{
+  const overview = await User.findById(username);
+  if (overview) {
+  const posts= await Post.find( { _id : { $in : overview.hasPost } } );
+  const comments= await Comment.find( { _id : { $in : overview.hasComment } } );
+  const replies= await Comment.find( { _id : { $in : overview.hasReply } } );
+
+    let merged = mergeTwo(posts, comments);
+    let overviewReturn=[];
+    overviewReturn= mergeTwo(merged, replies);
+    return {
+      test:true,
+      userOverview: overviewReturn.reverse(),
+    };
+  }
+  else {
+    return {
+      test:false,
+      userOverview: null,
+    };
+  }
+};
+
+/**
+ * Get user overview
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const getUserOverview = async(req,res)=>{
+  const data= await userOverview(req.params.username);
+  if (data.test) {
+    return res.status(200).json({
+      data: data.userOverview
+    });
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
+    });
+  }
+};
+/**
+ * Get posts which is written by the user from database
+ * @param {String} (username)
+ * @returns {object} userSubmitted
+ */
+const userSubmitted=async(username)=>{
+  const user = await User.findById(username);
+  if (user) {
+  
+  const posts= await Post.find( { _id : { $in : user.hasPost } } );
+  return {
+    test:true,
+    userSubmitted: posts,
+  };
+}
+else {
+  return {
+    test:false,
+    userSubmitted: null,
+  };
+}
+  };
+/**
+ * Get user posts
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const getUserSubmitted = async(req,res)=>{
+  const data= await userSubmitted(req.params.username);
+  if (data.test) {
+    return res.status(200).json({
+      data: data.userSubmitted
+    });
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
+    });
+  }
+  };
+/**
+ * Get comments which is written by the user from database
+ * @param {String} (username)
+ * @returns {object} userComments
+ */
+  const userComments=async(username)=>{
+    const user = await User.findById(username);
+    if (user) {
+      const comments= await Comment.find( { _id : { $in : user.hasComment } } );
+    return {
+      test:true,
+      userComments: comments,
+    };
+  }
+  else {
+    return {
+      test:false,
+      userComments: null,
+    };
+  }
+    };
+
+    /**
+ * Get user comments
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+    const getUserComments = async(req,res)=>{
+      const data= await userComments(req.params.username);
+      if (data.test) {
+        return res.status(200).json({
+          data: data.userComments
+        });
+      } else {
+        return res.status(404).json({
+          response: "username is not found!",
+        });
+      }
+    }; 
+   /**
+ * Get posts which downvoted by the user from database
+ * @param {String} (username)
+ * @returns {object} uservotes
+ */
+  const userDownVoted=async(username)=>{
+    const dVote = await User.findById(username).select('hasVote'); 
+    if(dVote){
+    const votes= dVote.hasVote;
+    let postIDs=[];
+    votes.forEach((el)=>{
+        if(el.type===-1){
+            postIDs.push(el.postID);
+        }
+    });
+    
+    const posts= await Post.find( { _id : { $in : postIDs } } );
+    return {
+      test:true,
+      uservotes: posts,
+    };
+  }
+  else {
+    return {
+      test:false,
+      uservotes: null,
+    };
+  }
+   };
+  /**
+ * Get posts which downvoted by the user 
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const getUserDownVoted = async(req,res)=>{
+  const data= await userDownVoted(req.params.username);
+  if (data.test) {
+    return res.status(200).json({
+      data: data.uservotes
+    });
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
+    });
+  }
+    };
+/**
+ * Get posts which upvoted by the user from database
+ * @param {String} (username)
+ * @returns {object} userUpvoted
+ */
+const userUpVoted=async(username)=>{
+    const uVote = await User.findById(username).select('hasVote'); 
+    if (uVote) {
+    const votes= uVote.hasVote;
+    let postIDs=[];
+    votes.forEach((el)=>{
+        if(el.type===1){
+            postIDs.push(el.postID);
+        }
+    });
+    
+    const posts= await Post.find( { _id : { $in : postIDs } } );
+    return {
+      test:true,
+      userUpvoted: posts,
+    };
+  }
+  else {
+    return {
+      test:false,
+      userUpvoted: null,
+    };
+  }
+ };
+ /**
+ * Get posts which upvoted by the user
+ * @param {function} (req, res)
+ * @returns {object} res
+ */   
+const getUserUpVoted = async(req,res)=>{
+  const data= await userUpVoted(req.params.username);
+  if (data.test) {
+    return res.status(200).json({
+      data: data.userUpvoted
+    });
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
+    });
+  }
+    };
+    module.exports = {
+        getUserDownVoted,
+        getUserOverview,
+        getUserUpVoted,
+        getUserSubmitted,
+        getUserComments
+    };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubreddit">addSubreddit</a></li><li><a href="global.html#availabeGmailOrFacebook">availabeGmailOrFacebook</a></li><li><a href="global.html#availableEmail">availableEmail</a></li><li><a href="global.html#availableGorF">availableGorF</a></li><li><a href="global.html#availableUser">availableUser</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#changePasswordAccType">changePasswordAccType</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signToken">signToken</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li><li><a href="global.html#vote">vote</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sat Nov 12 2022 03:50:22 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -9,15 +9,15 @@ beforeAll(async () => {
   dbConnect();
 });
 
-jest.setTimeout(1000000);
-/*describe("POST /api/submit", () => {
+describe("POST /api/listing/submit", () => {
+  jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
 
   describe("given a text, title, attachment (file) and a valid token", () => {
     test("should respond with a 201 status code", async () => {
       const res = await request(app)
-        .post("/api/submit")
+        .post("/api/listing/submit")
         .set("Authorization", token)
         .field(
           "text",
@@ -29,7 +29,7 @@ jest.setTimeout(1000000);
     });
     test("should respond with a body that have a field called userID=t2_hamada", async () => {
       const res = await request(app)
-        .post("/api/submit")
+        .post("/api/listing/submit")
         .set("Authorization", token)
         .field(
           "text",
@@ -41,7 +41,7 @@ jest.setTimeout(1000000);
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
-        .post("/api/submit")
+        .post("/api/listing/submit")
         .set("Authorization", token)
         .field(
           "text",
@@ -57,7 +57,7 @@ jest.setTimeout(1000000);
   describe("when the title or text are missing", () => {
     test("should respond with a 400 status code", async () => {
       const res = await request(app)
-        .post("/api/submit")
+        .post("/api/listing/submit")
         .set("Authorization", token)
         .send({
           title: "This is a post title",
@@ -69,7 +69,7 @@ jest.setTimeout(1000000);
     test("should respond with a 401 status code", async () => {
       token = "lkjkl";
       const res = await request(app)
-        .post("/api/submit")
+        .post("/api/listing/submit")
         .set("Authorization", token)
         .send({
           text: "This is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post textThis is a post text",
@@ -80,14 +80,15 @@ jest.setTimeout(1000000);
   });
 });
 
-describe("POST /api/save", () => {
+describe("POST /api/listing/save", () => {
+  jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
 
   describe("given a linkID and a valid token", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/save")
+        .post("/api/listing/save")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -96,7 +97,7 @@ describe("POST /api/save", () => {
     });
     test("should respond with a body that have a field called message=Post is saved successfully", async () => {
       const res = await request(app)
-        .post("/api/save")
+        .post("/api/listing/save")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -105,7 +106,7 @@ describe("POST /api/save", () => {
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
-        .post("/api/save")
+        .post("/api/listing/save")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -118,7 +119,7 @@ describe("POST /api/save", () => {
   describe("when the linkID is missing", () => {
     test("should respond with a 400 status code", async () => {
       const res = await request(app)
-        .post("/api/save")
+        .post("/api/listing/save")
         .set("Authorization", token)
         .send({});
       expect(res.statusCode).toBe(400);
@@ -128,7 +129,7 @@ describe("POST /api/save", () => {
     test("should respond with a 401 status code", async () => {
       token = "lkjkl";
       const res = await request(app)
-        .post("/api/save")
+        .post("/api/listing/save")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -138,14 +139,15 @@ describe("POST /api/save", () => {
   });
 });
 
-describe("POST /api/unsave", () => {
+describe("POST /api/listing/unsave", () => {
+  jest.setTimeout(1000000);
   let token =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
 
   describe("given a linkID and a valid token", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/unsave")
+        .post("/api/listing/unsave")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -154,7 +156,7 @@ describe("POST /api/unsave", () => {
     });
     test("should respond with a body that have a field called message=Post is unsaved successfully", async () => {
       const res = await request(app)
-        .post("/api/unsave")
+        .post("/api/listing/unsave")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -163,7 +165,7 @@ describe("POST /api/unsave", () => {
     });
     test("should specify json in the content type header", async () => {
       const res = await request(app)
-        .post("/api/unsave")
+        .post("/api/listing/unsave")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -176,7 +178,7 @@ describe("POST /api/unsave", () => {
   describe("when the linkID is missing", () => {
     test("should respond with a 400 status code", async () => {
       const res = await request(app)
-        .post("/api/unsave")
+        .post("/api/listing/unsave")
         .set("Authorization", token)
         .send({});
       expect(res.statusCode).toBe(400);
@@ -186,7 +188,7 @@ describe("POST /api/unsave", () => {
     test("should respond with a 401 status code", async () => {
       token = "lkjkl";
       const res = await request(app)
-        .post("/api/unsave")
+        .post("/api/listing/unsave")
         .set("Authorization", token)
         .send({
           linkID: "t3_636aa116e608c49517c5f4d6",
@@ -194,15 +196,16 @@ describe("POST /api/unsave", () => {
       expect(res.statusCode).toBe(401);
     });
   });
-});*/
+});
 
 describe("vote over a post", () => {
+  jest.setTimeout(1000000);
   let token1 =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
   describe("upvote a post", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t3_636aa116e608c49517c5f4d6",
@@ -214,33 +217,31 @@ describe("vote over a post", () => {
   describe("downvote a post", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t3_636aa116e608c49517c5f4d6",
           dir: -1,
         });
-      console.log(res.statusCode);
       expect(res.statusCode).toBe(200);
     });
   });
   describe("cancel upvote a post", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t3_636aa116e608c49517c5f4d6",
           dir: 0,
         });
-      console.log(res.statusCode);
       expect(res.statusCode).toBe(200);
     });
   });
   describe("cancel downvote a post", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t3_636aa116e608c49517c5f4d6",
@@ -249,10 +250,10 @@ describe("vote over a post", () => {
       expect(res.statusCode).toBe(200);
     });
   });
-  describe("upvote to an unvalid post", () => {
+  describe("upvote to an invalid post", () => {
     test("should respond with a 500 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t3_636ac2f383b34311137b9ed9aca0ed",
@@ -261,10 +262,10 @@ describe("vote over a post", () => {
       expect(res.statusCode).toBe(500);
     });
   });
-  describe("unvaild vote dir to an post", () => {
+  describe("invaild vote dir to an post", () => {
     test("should respond with a 500 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t3_636aa116e608c49517c5f4d6",
@@ -274,11 +275,11 @@ describe("vote over a post", () => {
       expect(res.body.status).toBe("invalid id or dir");
     });
   });
-  
-  describe("upvote to an unvalid comment", () => {
+
+  describe("upvote to an invalid comment", () => {
     test("should respond with a 500 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t1_636ac2f383b34311137b9ed9aca0ed",
@@ -287,10 +288,10 @@ describe("vote over a post", () => {
       expect(res.statusCode).toBe(500);
     });
   });
-  describe("unvaild vote dir to an comment", () => {
+  describe("invaild vote dir to an comment", () => {
     test("should respond with a 500 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t1_636a8816687a4fec0ac7c3fc",
@@ -302,11 +303,11 @@ describe("vote over a post", () => {
   describe("upvote to an comment", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
-          id:"t1_636a8816687a4fec0ac7c3fc"
-                        ,dir:1
+          id: "t1_636a8816687a4fec0ac7c3fc",
+          dir: 1,
         });
       expect(res.statusCode).toBe(200);
     });
@@ -314,33 +315,31 @@ describe("vote over a post", () => {
   describe("downvote a comment", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t1_636a8816687a4fec0ac7c3fc",
           dir: -1,
         });
-      console.log(res.statusCode);
       expect(res.statusCode).toBe(200);
     });
   });
   describe("cancel upvote a comment", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t1_636a8816687a4fec0ac7c3fc",
           dir: 0,
         });
-      console.log(res.statusCode);
       expect(res.statusCode).toBe(200);
     });
   });
   describe("cancel downvote a comment", () => {
     test("should respond with a 200 status code", async () => {
       const res = await request(app)
-        .post("/api/vote")
+        .post("/api/listing/vote")
         .set("Authorization", token1)
         .send({
           id: "t1_636a8816687a4fec0ac7c3fc",

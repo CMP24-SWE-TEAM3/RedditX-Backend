@@ -45,6 +45,10 @@ const postSchema = mongoose.Schema({
     type: Boolean,
     default: 0,
   },
+  isPending: {
+    type: Boolean,
+    default: 0,
+  },
   attachments: [String],
   spoiler: {
     type: Boolean,
@@ -116,13 +120,29 @@ postSchema.virtual("bestFactor").get(function () {
   return this.createdAt * 1 + this.votesCount + this.commentsNum;
 });
 
-postSchema.virtual('hotnessFactor').get(function () {
-  return (this.createdAt.getMonth() / 12 + this.createdAt().getDay() / 30 + this.createdAt.getYear() / 2022) * 2 / 3 + this.votesCount + this.commentsNum;
-})
+postSchema.virtual("hotnessFactor").get(function () {
+  return (
+    ((this.createdAt.getMonth() / 12 +
+      this.createdAt().getDay() / 30 +
+      this.createdAt.getYear() / 2022) *
+      2) /
+      3 +
+    this.votesCount +
+    this.commentsNum
+  );
+});
 
-postSchema.virtual('bestFactor').get(function () {
-  return (this.createdAt.getMonth() / 12 + this.createdAt().getDay / 30 + this.createdAt.getYear() / 2022) * 1 / 3 + this.votesCount + this.commentsNum;
-})
+postSchema.virtual("bestFactor").get(function () {
+  return (
+    ((this.createdAt.getMonth() / 12 +
+      this.createdAt().getDay / 30 +
+      this.createdAt.getYear() / 2022) *
+      1) /
+      3 +
+    this.votesCount +
+    this.commentsNum
+  );
+});
 
 const Post = mongoose.model("Post", postSchema);
 
