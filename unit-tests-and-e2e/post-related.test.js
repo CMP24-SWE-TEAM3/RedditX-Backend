@@ -312,6 +312,18 @@ describe("upvote to an comment", () => {
     expect(res.statusCode).toBe(200);
   });
 });
+describe("upvote to a non-existing comment", () => {
+  test("should respond with a 500 status code", async () => {
+    const res = await request(app)
+      .post("/api/listing/vote")
+      .set("Authorization", token1)
+      .send({
+        id: "t1_636a8816687a4f998ec0ac7c3fc",
+        dir: 2,
+      });
+    expect(res.statusCode).toBe(500);
+  });
+});
 describe("downvote a comment", () => {
   test("should respond with a 200 status code", async () => {
     const res = await request(app)

@@ -65,23 +65,23 @@ const availabeGmailOrFacebook = async (email, type) => {
   }
 };
 
-/**
- * Check whether google account or facebook account is in database or not (route)
- * @param {Object} req request that contain email and type.
- * @returns {String} response whether available or not.
- */
-const availableGorF = async (req, res) => {
-  const data = await availabeGmailOrFacebook(req.body.email, req.body.type);
-  if (data.exist == false) {
-    return res.status(200).json({
-      response: "Avaliable",
-    });
-  } else {
-    return res.status(404).json({
-      response: "Not Avaliable",
-    });
-  }
-};
+// /**
+//  * Check whether google account or facebook account is in database or not (route)
+//  * @param {Object} req request that contain email and type.
+//  * @returns {String} response whether available or not.
+//  */
+// const availableGorF = async (req, res) => {
+//   const data = await availabeGmailOrFacebook(req.body.email, req.body.type);
+//   if (data.exist == false) {
+//     return res.status(200).json({
+//       response: "Avaliable",
+//     });
+//   } else {
+//     return res.status(404).json({
+//       response: "Not Avaliable",
+//     });
+//   }
+// };
 
 /**
  * Change password according to type of email
@@ -313,6 +313,6 @@ module.exports = {
   availableUser,
   availableUsername,
   signup,
-  availableGorF,
+  
   login,
 };
