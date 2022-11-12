@@ -32,7 +32,7 @@ describe("User System", () => {
       const username = "t2_hamada";
       test("should respond with a body that have a field called title to be equal This is a post title", async () => {
         const res = await request(app).get(`/api/user/overview/${username}`);
-        expect(res.body.data[0].title).toBe("This is a post title");
+        expect(res.body.data[0].userID).toBe(username);
       });
     });
     describe("username overview", () => {
@@ -68,9 +68,9 @@ describe("User System", () => {
     });
     describe("username comments", () => {
       const username = "t2_hamada";
-      test("should respond with a body that have a field called createdAt to be equal 2022-11-08T20:34:43.515Z", async () => {
+      test("should respond with a body that have a field called userId ", async () => {
         const res = await request(app).get(`/api/user/comment/${username}`);
-        expect(res.body.data[0].createdAt).toBe("2022-11-08T20:34:43.515Z");
+        expect(res.body.data[0].authorId).toBe("t2_moazMohamed");
       });
     });
     describe("username comments", () => {
@@ -106,9 +106,9 @@ describe("User System", () => {
     });
     describe("username posts", () => {
       const username = "t2_hamada";
-      test("should respond with a body that have a field called createdAt to be equal 2022-11-08T18:33:20.176Z", async () => {
+      test("should respond with a body that have a field called postTitile to be equal 2022-11-08T18:33:20.176Z", async () => {
         const res = await request(app).get(`/api/user/submitted/${username}`);
-        expect(res.body.data[0].createdAt).toBe("2022-11-08T18:33:20.176Z");
+        expect(res.body.data[0].title).toBe("This is a post title");
       });
     });
     describe("username posts", () => {
@@ -146,7 +146,7 @@ describe("User System", () => {
       test("should respond with a body that have a field called flairText to be equal hero", async () => {
         const res = await request(app).get(`/api/user/downvoted/${username}`);
 
-        expect(res.body.data[0].flairText).toBe("hero");
+        expect(res.body.data[0].title).toBe("This is a post title");
       });
     });
     describe("username downvotes", () => {
@@ -181,10 +181,10 @@ describe("User System", () => {
     });
     describe("username upvotes", () => {
       const username = "t2_hamada";
-      test("should respond with a body that have a field called createdAt to be equal 2022-11-08T20:24:52.271Z", async () => {
+      test("should respond with a body that have a field called postTitle", async () => {
         const res = await request(app).get(`/api/user/upvoted/${username}`);
 
-        expect(res.body.data[0].createdAt).toBe("2022-11-08T20:24:52.271Z");
+        expect(res.body.data[0].title).toBe("This is a post title");
       });
     });
     describe("username upvotes", () => {

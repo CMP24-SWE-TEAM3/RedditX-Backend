@@ -3,6 +3,8 @@ const APIFeatures = require("../utils/api-features");
 const dbConnect = require("../db-connection/connection");
 User = require("../models/user-model");
 
+jest.setTimeout(100000);
+
 describe("Random string generator", () => {
   test("should respond with a 24 characters string", async () => {
     const res = randomString();

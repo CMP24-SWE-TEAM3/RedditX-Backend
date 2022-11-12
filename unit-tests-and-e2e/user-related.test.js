@@ -9,6 +9,8 @@ beforeAll(async () => {
   dbConnect();
 });
 
+const linkID = 't3_636f5494c56c8d6f0c159090';
+
 describe("POST /api/user/block-user", () => {
   jest.setTimeout(1000000);
   let token =
@@ -189,7 +191,7 @@ describe("POST /api/user/spam", () => {
         .post("/api/user/spam")
         .set("Authorization", token)
         .send({
-          linkID: "t3_636aa116e608c49517c5f4d6",
+          linkID,
           spamText: "I found that this content is showing violence",
           spamType: "violent content",
         });
@@ -200,7 +202,7 @@ describe("POST /api/user/spam", () => {
         .post("/api/user/spam")
         .set("Authorization", token)
         .send({
-          linkID: "t3_636aa116e608c49517c5f4d6",
+          linkID,
           spamText: "I found that this content is showing violence",
           spamType: "violent content",
         });
@@ -211,7 +213,7 @@ describe("POST /api/user/spam", () => {
         .post("/api/user/spam")
         .set("Authorization", token)
         .send({
-          linkID: "t3_636aa116e608c49517c5f4d6",
+          linkID,
           spamText: "I found that this content is showing violence",
           spamType: "violent content",
         });
@@ -236,7 +238,7 @@ describe("POST /api/user/spam", () => {
         .post("/api/user/spam")
         .set("Authorization", token)
         .send({
-          linkID: "t3_636aa116e608c49517c5f4d6",
+          linkID,
           spamText: "I found that this content is showing violence",
           spamType: "violent content",
         });

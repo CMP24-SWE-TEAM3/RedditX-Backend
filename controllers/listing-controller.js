@@ -135,54 +135,59 @@ const vote = async (req, res) => {
         status: "not found",
       });
     }
-    var voters=post.voters;
-    var isFound=false;
-    var index=0;
+    var voters = post.voters;
+    var isFound = false;
+    var index = 0;
     var voter;
-  
-    for(let z=0;z<voters.length;z++){
+
+    for (let z = 0; z < voters.length; z++) {
       console.log("loop");
-      if(voters[z].userID === req.username){
+      if (voters[z].userID === req.username) {
         console.log("jj");
-        isFound=true;
-       voter=voters[z];
+        isFound = true;
+        voter = voters[z];
         console.log("inside loop");
 
         break;
       }
       index++;
     }
-  
 
-    if(!isFound){
-      if(dir==1||dir==-1){
-        
-        voters.push({"userID":req.username,"voteType":dir});
 
-      }
-      else if(dir==0||dir==2){
-        
-          return res.status(500).json({
-            status: "invalid dir",
-          });
-      }
-    }
-    else {
-      
-      if((dir==0&&voter.voteType==1)||(dir==2&&voter.voteType==-1)){
-     
-        voters.splice(index,1);
+    if (!isFound) {
+      if (dir == 1 || dir == -1) {
+
+        voters.push({ "userID": req.username, "voteType": dir });
 
       }
-      else if((dir==0&&voter.voteType==-1)||(dir==2&&voter.voteType==1)||(dir==voter.voteType)){
+      else if (dir == 0 || dir == 2) {
+
         return res.status(500).json({
           status: "invalid dir",
         });
       }
-      else if((voter.voteType==1&&dir==-1)||(voter.voteType==-1&&dir==1)){
-        voters[index].voteType=dir;
+    }
+    else {
+
+      if ((dir == 0 && voter.voteType == 1) || (dir == 2 && voter.voteType == -1)) {
+
+        voters.splice(index, 1);
+
       }
-    
+      else if ((dir == 0 && voter.voteType == -1) || (dir == 2 && voter.voteType == 1)) {
+        return res.status(500).json({
+          status: "invalid dir",
+        });
+      }
+      else if ((voter.voteType == 1 && dir == -1) || (voter.voteType == -1 && dir == 1)) {
+        voters[index].voteType = dir;
+      }
+      else if (dir == voter.voteType) {
+        return res.status(200).json({
+          status: 'already voted'
+        });
+      }
+
     }
 
     console.log(voters);
@@ -195,9 +200,12 @@ const vote = async (req, res) => {
     }
     Post.findByIdAndUpdate(
       { _id: postIdCasted },
-      { $set: { votesCount: votesCount + operation 
-      , voters:voters
-      } },
+      {
+        $set: {
+          votesCount: votesCount + operation
+          , voters: voters
+        }
+      },
       { new: true },
       (err, doc) => {
         if (err) {
@@ -219,51 +227,55 @@ const vote = async (req, res) => {
         status: "not found",
       });
     }
-    var voters=comment.voters;
-    var isFound=false;
-    var index=0;
+    var voters = comment.voters;
+    var isFound = false;
+    var index = 0;
     var voter;
-  
-    for(let z=0;z<voters.length;z++){
+
+    for (let z = 0; z < voters.length; z++) {
       console.log("loop");
-      if(voters[z].userID === req.username){
-        isFound=true;
-       voter=voters[z];
+      if (voters[z].userID === req.username) {
+        isFound = true;
+        voter = voters[z];
 
         break;
       }
       index++;
     }
-  
-    if(!isFound){
-      if(dir==1||dir==-1){
-        
-        voters.push({"userID":req.username,"voteType":dir});
+
+    if (!isFound) {
+      if (dir == 1 || dir == -1) {
+
+        voters.push({ "userID": req.username, "voteType": dir });
 
       }
-      else if(dir==0||dir==2){
-        
-          return res.status(500).json({
-            status: "invalid dir",
-          });
-      }
-    }
-    else {
-      
-      if((dir==0&&voter.voteType==1)||(dir==2&&voter.voteType==-1)){
-     
-        voters.splice(index,1);
+      else if (dir == 0 || dir == 2) {
 
-      }
-      else if((dir==0&&voter.voteType==-1)||(dir==2&&voter.voteType==1)||(dir==voter.voteType)){
         return res.status(500).json({
           status: "invalid dir",
         });
       }
-      else if((voter.voteType==1&&dir==-1)||(voter.voteType==-1&&dir==1)){
-        voters[index].voteType=dir;
+    }
+    else {
+
+      if ((dir == 0 && voter.voteType == 1) || (dir == 2 && voter.voteType == -1)) {
+
+        voters.splice(index, 1);
+
       }
-    
+      else if ((dir == 0 && voter.voteType == -1) || (dir == 2 && voter.voteType == 1)) {
+        return res.status(500).json({
+          status: "invalid dir",
+        });
+      }
+      else if ((voter.voteType == 1 && dir == -1) || (voter.voteType == -1 && dir == 1)) {
+        voters[index].voteType = dir;
+      } else if (dir == voter.voteType) {
+        return res.status(200).json({
+          status: 'already voted'
+        });
+      }
+
     }
 
 
@@ -278,7 +290,7 @@ const vote = async (req, res) => {
     }
     Comment.findByIdAndUpdate(
       { _id: postIdCasted },
-      { $set: { votesCount: votesCount + operation,voters:voters } },
+      { $set: { votesCount: votesCount + operation, voters: voters } },
       { new: true },
       (err, doc) => {
         if (err) {
@@ -385,7 +397,6 @@ const getPosts = catchAsync(async (req, res, next) => {
   if (!req.query.limit) {
     req.query.limit = '10';
   }
-
   const features = new APIFeatures(
     Post.find(req.addedFilter, null, { sort }),
     req.query
