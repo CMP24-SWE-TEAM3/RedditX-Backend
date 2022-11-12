@@ -11,7 +11,7 @@ const validators = require("../validate/comment-validators");
 const vote = async (req, res) => {
   if (req.body.id === undefined || req.body.dir === undefined)
     return res.status(500).json({
-      status: "invalid id or dir",
+      status: "invalid id or dir" ,
     });
   const id = req.body.id.substring(0, 2);
   const dir = req.body.dir;
