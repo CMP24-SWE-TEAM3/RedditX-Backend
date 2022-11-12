@@ -41,6 +41,7 @@ const resizeCommunityBanner = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const uploadCommunityIcon = catchAsync(async (req, res, next) => {
+  if (!req.file) return next(new AppError("No photo is uploaded!", 400));
   const community = await Community.findById(req.params.subreddit); // Note that front passes for ex: t5_imagePro
   if (!community)
     return next(new AppError("This subreddit doesn't exist!", 404));
@@ -64,6 +65,7 @@ const uploadCommunityIcon = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const uploadCommunityBanner = catchAsync(async (req, res, next) => {
+  if (!req.file) return next(new AppError("No photo is uploaded!", 400));
   const community = await Community.findById(req.params.subreddit); // Note that front passes for ex: t5_imagePro
   if (!community)
     return next(new AppError("This subreddit doesn't exist!", 404));

@@ -3,6 +3,7 @@ const catchAsync = require("../utils/catch-async");
 const User = require("./../models/user-model");
 const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
+const Community = require("./../models/community-model");
 const sharp = require("sharp");
 
 /**
@@ -10,7 +11,7 @@ const sharp = require("sharp");
  * @param {function} (req, res, next)
  */
 
-exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
+const resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `user-${req.username}-${Date.now()}.jpg`;
   await sharp(req.file.buffer)
@@ -25,11 +26,12 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.uploadUserPhoto = catchAsync(async (req, res, next) => {
+const uploadUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.body.action)
-    return next(new AppError("No attachment or action is provided!", 500));
+    return next(new AppError("No attachment or action is provided!", 400));
   let avatar = "default.jpg";
   if (req.body.action === "upload") {
+    if (!req.file) return next(new AppError("No photo is uploaded!", 400));
     avatar = req.file.filename;
   }
   await User.findByIdAndUpdate(
@@ -48,7 +50,7 @@ exports.uploadUserPhoto = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.block = catchAsync(async (req, res, next) => {
+const block = catchAsync(async (req, res, next) => {
   if (!req.body.userID)
     return next(new AppError("No linkID is provided!", 400));
   const toUser = await User.findById(req.body.userID);
@@ -88,7 +90,7 @@ exports.block = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-exports.spam = catchAsync(async (req, res, next) => {
+const spam = catchAsync(async (req, res, next) => {
   if (!req.body.linkID)
     return next(new AppError("No linkID is provided!", 400));
   if (req.body.linkID[1] === "3") {
@@ -106,6 +108,16 @@ exports.spam = catchAsync(async (req, res, next) => {
       spamText: req.body.spamText,
     });
     post.spamCount++;
+    if (post.communityID !== undefined && post.communityID !== "") {
+      const community = await Community.findById(post.communityID).select(
+        "communityOptions"
+      );
+      if (
+        community &&
+        post.spamCount >= community.communityOptions.spamsNumBeforeRemove
+      )
+        post.isDeleted = true;
+    }
     await post.save();
   } else {
     // Spam a comment
@@ -122,6 +134,17 @@ exports.spam = catchAsync(async (req, res, next) => {
       text: req.body.spamText,
     });
     comment.spamCount++;
+    const post = await Post.findById(comment.replyingTo).select("communityID");
+    if (post.communityID !== undefined && post.communityID !== "") {
+      const community = await Community.findById(post.communityID).select(
+        "communityOptions"
+      );
+      if (
+        community &&
+        comment.spamCount >= community.communityOptions.spamsNumBeforeRemove
+      )
+        comment.isDeleted = true;
+    }
     await comment.save();
   }
   res.status(200).json({
@@ -129,3 +152,173 @@ exports.spam = catchAsync(async (req, res, next) => {
     message: "Spams are updated successfully",
   });
 });
+
+/**
+ * Get user prefs from database
+ * @param {String} (username)
+ * @returns {object} user
+ */
+const userPrefs = async (username) => {
+  const user = await User.findById(username);
+  if (user) {
+    return {
+      test: true,
+      user: user.prefs,
+    };
+  } else {
+    return {
+      test: false,
+      user: null,
+    };
+  }
+};
+/**
+ * Get user prefs
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const getUserPrefs = async (req, res) => {
+  const data = await userPrefs(req.username);
+  if (data.test) {
+    return res.status(200).json({
+      data: data.user,
+    });
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
+    });
+  }
+};
+/**
+ * Get user me info from database
+ * @param {String} (username)
+ * @returns {object} user
+ */
+const userMe = async (username) => {
+  const user = await User.findById(username);
+  if (user) {
+    const obj = {
+      numComments: user.prefs.commentsNum,
+      threadedMessages: user.prefs.threadedMessages,
+      showLinkFlair: user.prefs.showLinkFlair,
+      countryCode: user.prefs.countryCode,
+      langauge: user.prefs.langauge,
+      over18: user.prefs.over18,
+      defaultCommentSort: user.prefs.defaultCommentSort,
+      showLocationBasedRecommendations:
+        user.prefs.showLocationBasedRecommendations,
+      searchInclude18: user.prefs.searchInclude18,
+      publicVotes: user.prefs.publicVotes,
+      enableFollwers: user.prefs.enableFollwers,
+      liveOrangeRed: user.prefs.liveOrangereds,
+      labelNSFW: user.prefs.labelNSFW,
+      newWindow: user.prefs.showPostInNewWindow,
+      emailPrivateMessage: user.prefs.emailPrivateMessage,
+      emailPostReply: user.prefs.emailPostReply,
+      emailMessages: user.prefs.emailMessages,
+      emailCommentReply: user.prefs.emailCommentReply,
+      emailUpvoteComment: user.prefs.emailUpvoteComment,
+      about: user.about,
+      avatar: user.avatar,
+      userID: user._id,
+      emailUserNewFollwer: user.meReturn.emailUserNewFollwer,
+      emailUpVotePost: user.meReturn.emailUpVotePost,
+      emailUsernameMention: user.meReturn.emailUsernameMention,
+    };
+    return {
+      test: true,
+      user: obj,
+    };
+  } else {
+    return {
+      test: false,
+      user: null,
+    };
+  }
+};
+/**
+ * Get user me info
+ * @param {function} (req,,res)
+ * @returns {object} res
+ */
+const getUserMe = async (req, res) => {
+  const data = await userMe(req.username);
+  if (data.test) {
+    return res.status(200).json({
+      data: data.user,
+    });
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
+    });
+  }
+};
+
+/**
+ * Get user about from database
+ * @param {String} (username)
+ * @returns {object} user
+ */
+const userAbout = async (username) => {
+  const user = await User.findById(username);
+  if (user) {
+    const obj = {
+      prefShowTrending: user.aboutReturn.prefShowTrending,
+      isBlocked: user.aboutReturn.isBlocked,
+      isBanned: user.member.isBanned,
+      isMuted: user.member.isMuted,
+      canCreateSubreddit: user.canCreateSubreddit,
+      isMod: user.aboutReturn.isMuted,
+      over18: user.prefs.over18,
+      hasVerifiedEmail: user.hasVerifiedEmail,
+      createdAt: user.createdAt,
+      inboxCount: user.inboxCount,
+      totalKarma: user.karma,
+      linkKarma: user.postKarma,
+      acceptFollowers: user.aboutReturn.acceptFollowers,
+      commentKarma: user.commentKarma,
+      passwordSet: user.isPasswordSet,
+      email: user.email,
+      about: user.about,
+      avatar: user.avatar,
+      userID: user._id,
+    };
+    return {
+      test: true,
+      user: obj,
+    };
+  } else {
+    return {
+      test: false,
+      user: null,
+    };
+  }
+};
+/**
+ * Get user about
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const getUserAbout = async (req, res) => {
+  const data = await userAbout(req.params.username);
+  if (data.test) {
+    return res.status(200).json({
+      data: data.user,
+    });
+  } else {
+    return res.status(404).json({
+      response: "username is not found!",
+    });
+  }
+};
+
+module.exports = {
+  resizeUserPhoto,
+  uploadUserPhoto,
+  block,
+  spam,
+
+  getUserMe,
+  getUserAbout,
+  getUserPrefs,
+};

@@ -4,8 +4,6 @@ const bcrypt = require("bcryptjs");
 const decodeJwt = require("./google-facebook-oAuth");
 const randomUsername = require("../utils/random-username");
 
-
-
 /**
  * Check whether user name is in database or not (function)
  * @param {Object} username username of the user.
@@ -26,7 +24,6 @@ const availableUser = async (username) => {
     };
   }
 };
-
 
 /**
  * Check whether email is in database or not (function)
@@ -105,7 +102,7 @@ const signToken = (emailType, username) => {
   return jwt.sign(
     { emailType: emailType, username: username },
     "mozaisSoHotButNabilisTheHottest",
-    { expiresIn: "24h" }
+    { expiresIn: "120h" }
   );
 };
 
@@ -117,7 +114,7 @@ const signToken = (emailType, username) => {
  */
 const availableUsername = async (req, res) => {
   const data = await availableUser(req.query.username);
-  if (data.state == false) {
+  if (data.state) {
     return res.status(200).json({
       response: "Avaliable",
     });
@@ -137,15 +134,12 @@ const availableUsername = async (req, res) => {
  * @returns {object} (status,username)
  */
 const createUser = async (email, hash, username, type) => {
- 
-  console.log("h");
   const user = new User({
     email: email,
     password: hash,
     _id: username,
     type: type,
     isPasswordSet: type == "gmail" || type == "facebook" ? false : true,
-    
   });
   const result = user
     .save()
@@ -171,7 +165,6 @@ const createUser = async (email, hash, username, type) => {
  * @returns {object} {token,expiresIn,username} or {error}
  */
 const signup = async (req, res) => {
-  console.log("entered");
   const pass = changePasswordAccType(req.body.type, req.body.password);
   const hash = await bcrypt.hash(pass, 10);
   if (req.body.type == "gmail" || req.body.type == "facebook") {
@@ -210,10 +203,6 @@ const signup = async (req, res) => {
   } else {
     //signup with bare email
     const data = await availableEmail(req.body.email);
-
-    console.log(data);
-
-
     if (data.exist)
       return res.status(400).json({
         error: "Duplicate email!",
@@ -224,7 +213,6 @@ const signup = async (req, res) => {
       req.body.username,
       req.body.type
     );
-    console.log(result);
     if (result.username != null) {
       const token = await signToken(req.body.type, req.body.username);
 
@@ -303,7 +291,6 @@ const login = async (req, res) => {
             error: "Wrong username or password.",
           });
         }
-        console.log("here");
         const token = await signToken(req.body.type, req.body.username);
         return res.status(200).json({
           token: token,
@@ -312,7 +299,6 @@ const login = async (req, res) => {
         });
       })
       .catch((err) => {
-        // console.log(err);
         return res.status(401).json({
           type: "bare email",
           error: "Wrong username or password.",
@@ -329,4 +315,3 @@ module.exports = {
   availableGorF,
   login,
 };
-
