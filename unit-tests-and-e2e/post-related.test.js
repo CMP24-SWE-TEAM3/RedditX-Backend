@@ -198,154 +198,154 @@ describe("POST /api/listing/unsave", () => {
   });
 });
 
-/*describe("vote over a post", () => {
-  jest.setTimeout(1000000);
-  let token1 =
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
-  describe("upvote a post", () => {
-    test("should respond with a 200 status code", async () => {
-      const res = await request(app)
-        .post("/api/listing/vote")
-        .set("Authorization", token1)
-        .send({
-          id: 't3_636f5494c56c8d6f0c159090',
-          dir: 1,
-        });
-      expect(res.statusCode).toBe(200);
-    });
-  });
-  describe("downvote a post", () => {
-    test("should respond with a 200 status code", async () => {
-      const res = await request(app)
-        .post("/api/listing/vote")
-        .set("Authorization", token1)
-        .send({
-          id: 't3_636f5494c56c8d6f0c159090',
-          dir: -1,
-        });
-      expect(res.statusCode).toBe(200);
-    });
-  });
-  // describe("cancel upvote a post", () => {
-  //   test("should respond with a 200 status code", async () => {
-  //     const res = await request(app)
-  //       .post("/api/listing/vote")
-  //       .set("Authorization", token1)
-  //       .send({
-  //         id: 't3_636f5494c56c8d6f0c159090',
-  //         dir: 0,
-  //       });
-  //     expect(res.statusCode).toBe(200);
-  //   });
-  // });
-  // describe("cancel downvote a post", () => {
-  //   test("should respond with a 200 status code", async () => {
-  //     const res = await request(app)
-  //       .post("/api/listing/vote")
-  //       .set("Authorization", token1)
-  //       .send({
-  //         id: 't3_636f5494c56c8d6f0c159090',
-  //         dir: 2,
-  //       });
-  //     expect(res.statusCode).toBe(200);
-  //   });
-  // });
-  describe("upvote to an invalid post", () => {
-    test("should respond with a 500 status code", async () => {
-      const res = await request(app)
-        .post("/api/listing/vote")
-        .set("Authorization", token1)
-        .send({
-          id: 't3_636f5494c56c8d6f0c159090',
-          dir: 2,
-        });
-      expect(res.statusCode).toBe(500);
-    });
-  });
-  describe("invaild vote dir to an post", () => {
-    test("should respond with a 500 status code", async () => {
-      const res = await request(app)
-        .post("/api/listing/vote")
-        .set("Authorization", token1)
-        .send({
-          id: 't3_636f5494c56c8d6f0c159090',
-          dir: 5,
-        });
-      expect(res.statusCode).toBe(500);
-      expect(res.body.status).toBe("invalid id or dir");
-    });
-  });
+// describe("vote over a post", () => {
+//   jest.setTimeout(1000000);
+//   let token1 =
+//     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
+//   describe("upvote a post", () => {
+//     test("should respond with a 200 status code", async () => {
+//       const res = await request(app)
+//         .post("/api/listing/vote")
+//         .set("Authorization", token1)
+//         .send({
+//           id: 't3_636f5494c56c8d6f0c159090',
+//           dir: 1,
+//         });
+//       expect(res.statusCode).toBe(200);
+//     });
+//   });
+//   describe("downvote a post", () => {
+//     test("should respond with a 200 status code", async () => {
+//       const res = await request(app)
+//         .post("/api/listing/vote")
+//         .set("Authorization", token1)
+//         .send({
+//           id: 't3_636f5494c56c8d6f0c159090',
+//           dir: -1,
+//         });
+//       expect(res.statusCode).toBe(200);
+//     });
+//   });
+//   // describe("cancel upvote a post", () => {
+//   //   test("should respond with a 200 status code", async () => {
+//   //     const res = await request(app)
+//   //       .post("/api/listing/vote")
+//   //       .set("Authorization", token1)
+//   //       .send({
+//   //         id: 't3_636f5494c56c8d6f0c159090',
+//   //         dir: 0,
+//   //       });
+//   //     expect(res.statusCode).toBe(200);
+//   //   });
+//   // });
+//   // describe("cancel downvote a post", () => {
+//   //   test("should respond with a 200 status code", async () => {
+//   //     const res = await request(app)
+//   //       .post("/api/listing/vote")
+//   //       .set("Authorization", token1)
+//   //       .send({
+//   //         id: 't3_636f5494c56c8d6f0c159090',
+//   //         dir: 2,
+//   //       });
+//   //     expect(res.statusCode).toBe(200);
+//   //   });
+//   // });
+//   describe("upvote to an invalid post", () => {
+//     test("should respond with a 500 status code", async () => {
+//       const res = await request(app)
+//         .post("/api/listing/vote")
+//         .set("Authorization", token1)
+//         .send({
+//           id: 't3_636f5494c56c8d6f0c159090',
+//           dir: 2,
+//         });
+//       expect(res.statusCode).toBe(500);
+//     });
+//   });
+// describe("invaild vote dir to an post", () => {
+//   test("should respond with a 500 status code", async () => {
+//     const res = await request(app)
+//       .post("/api/listing/vote")
+//       .set("Authorization", token1)
+//       .send({
+//         id: 't3_636f5494c56c8d6f0c159090',
+//         dir: 5,
+//       });
+//     expect(res.statusCode).toBe(500);
+//     expect(res.body.status).toBe("invalid id or dir");
+//   });
+// });
 
-  describe("upvote to an invalid comment", () => {
-    test("should respond with a 500 status code", async () => {
-      const res = await request(app)
-        .post("/api/listing/vote")
-        .set("Authorization", token1)
-        .send({
-          id: "t1_636ac2f383b34311137b9ed9aca0ed",
-          dir: 2,
-        });
-      expect(res.statusCode).toBe(500);
-    });
-  });
-  describe("invaild vote dir to an comment", () => {
-    test("should respond with a 500 status code", async () => {
-      const res = await request(app)
-        .post("/api/listing/vote")
-        .set("Authorization", token1)
-        .send({
-          id: "t1_636a8816687a4fec0ac7c3fc",
-          dir: 5,
-        });
-      expect(res.statusCode).toBe(500);
-    });
-  });
-  describe("upvote to an comment", () => {
-    test("should respond with a 200 status code", async () => {
-      const res = await request(app)
-        .post("/api/listing/vote")
-        .set("Authorization", token1)
-        .send({
-          id: "t1_636a8816687a4fec0ac7c3fc",
-          dir: 1,
-        });
-      expect(res.statusCode).toBe(200);
-    });
-  });
-  describe("downvote a comment", () => {
-    test("should respond with a 200 status code", async () => {
-      const res = await request(app)
-        .post("/api/listing/vote")
-        .set("Authorization", token1)
-        .send({
-          id: "t1_636a8816687a4fec0ac7c3fc",
-          dir: -1,
-        });
-      expect(res.statusCode).toBe(200);
-    });
-  });
-  // describe("cancel upvote a comment", () => {
-  //   test("should respond with a 200 status code", async () => {
-  //     const res = await request(app)
-  //       .post("/api/listing/vote")
-  //       .set("Authorization", token1)
-  //       .send({
-  //         id: "t1_636a8816687a4fec0ac7c3fc",
-  //         dir: 0,
-  //       });
-  //     expect(res.statusCode).toBe(200);
-  //   });
-  // });
-  // describe("cancel downvote a comment", () => {
-  //   test("should respond with a 200 status code", async () => {
-  //     const res = await request(app)
-  //       .post("/api/listing/vote")
-  //       .set("Authorization", token1)
-  //       .send({
-  //         id: "t1_636a8816687a4fec0ac7c3fc",
-  //         dir: 2,
-  //       });
-  //     expect(res.statusCode).toBe(200);
-  //   });
-  // });
-});*/
+// describe("upvote to an invalid comment", () => {
+//   test("should respond with a 500 status code", async () => {
+//     const res = await request(app)
+//       .post("/api/listing/vote")
+//       .set("Authorization", token1)
+//       .send({
+//         id: "t1_636ac2f383b34311137b9ed9aca0ed",
+//         dir: 2,
+//       });
+//     expect(res.statusCode).toBe(500);
+//   });
+// });
+// describe("invaild vote dir to an comment", () => {
+//   test("should respond with a 500 status code", async () => {
+//     const res = await request(app)
+//       .post("/api/listing/vote")
+//       .set("Authorization", token1)
+//       .send({
+//         id: "t1_636a8816687a4fec0ac7c3fc",
+//         dir: 5,
+//       });
+//     expect(res.statusCode).toBe(500);
+//   });
+// });
+// describe("upvote to an comment", () => {
+//   test("should respond with a 200 status code", async () => {
+//     const res = await request(app)
+//       .post("/api/listing/vote")
+//       .set("Authorization", token1)
+//       .send({
+//         id: "t1_636a8816687a4fec0ac7c3fc",
+//         dir: 1,
+//       });
+//     expect(res.statusCode).toBe(200);
+//   });
+// });
+// describe("downvote a comment", () => {
+//   test("should respond with a 200 status code", async () => {
+//     const res = await request(app)
+//       .post("/api/listing/vote")
+//       .set("Authorization", token1)
+//       .send({
+//         id: "t1_636a8816687a4fec0ac7c3fc",
+//         dir: -1,
+//       });
+//     expect(res.statusCode).toBe(200);
+//   });
+// });
+// describe("cancel upvote a comment", () => {
+//   test("should respond with a 200 status code", async () => {
+//     const res = await request(app)
+//       .post("/api/listing/vote")
+//       .set("Authorization", token1)
+//       .send({
+//         id: "t1_636a8816687a4fec0ac7c3fc",
+//         dir: 0,
+//       });
+//     expect(res.statusCode).toBe(200);
+//   });
+// });
+// describe("cancel downvote a comment", () => {
+//   test("should respond with a 200 status code", async () => {
+//     const res = await request(app)
+//       .post("/api/listing/vote")
+//       .set("Authorization", token1)
+//       .send({
+//         id: "t1_636a8816687a4fec0ac7c3fc",
+//         dir: 2,
+//       });
+//     expect(res.statusCode).toBe(200);
+//   });
+// });
+// });
