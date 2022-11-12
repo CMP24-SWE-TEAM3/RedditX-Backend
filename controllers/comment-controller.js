@@ -4,7 +4,7 @@ const validators = require("../validate/comment-validators");
 
 /**
  * Vote over a post or a comment (id and dir must be sent in request body)
- * @param {Object} req request must contain dir and id.
+ * @param {Object}  req request must contain dir and id.
  * @param {Object} res
  * @returns {String} status whether failed or not. 
  */
