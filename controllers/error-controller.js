@@ -32,20 +32,6 @@ const handleValidatorErrorDB = (error) => {
 };
 
 /**
- * Handles invalid token error
- * @returns {AppError} res
- */
-const handleJWTError = () =>
-  new AppError("Invalid token. Please log in again!", 401);
-
-/**
- * Handles token expiration error
- * @returns {AppError} res
- */
-const handleTokenExpiredError = () =>
-  new AppError("Token is expired! Please log in again!", 401);
-
-/**
  * Handles errors in development
  * @param {object} req
  * @param {object} res
@@ -90,7 +76,7 @@ const sendErrorProd = (req, res, err) => {
  * @param {function} next
  * @returns {object} res
  */
-module.exports = (err, req, res, next) => {
+const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
   if (process.env.NODE_ENV !== "development") {
@@ -99,8 +85,12 @@ module.exports = (err, req, res, next) => {
     if (err.name === "CastError") error = handleCastErrorDB(error);
     if (err.code === 11000) error = handleDuplicateFieldDB(error);
     if (err.name === "ValidationError") error = handleValidatorErrorDB(error);
-    if (err.name === "JsonWebTokenError") error = handleJWTError();
-    if (err.name === "TokenExpiredError") error = handleTokenExpiredError();
     sendErrorProd(req, res, error);
   } else sendErrorDev(req, res, err);
+};
+module.exports = {
+  globalErrorHandler,
+  handleCastErrorDB,
+  handleDuplicateFieldDB,
+  handleValidatorErrorDB,
 };

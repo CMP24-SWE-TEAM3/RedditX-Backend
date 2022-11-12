@@ -103,5 +103,5 @@ app.all("*", (req, res, next) => {
 });
 
 // Error handler middleware
-app.use(globalErrorHandler);
+app.use(globalErrorHandler.globalErrorHandler);
 module.exports = app;

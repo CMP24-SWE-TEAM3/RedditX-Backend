@@ -9,7 +9,7 @@ beforeAll(async () => {
   dbConnect();
 });
 
-const linkID = 't3_636f5494c56c8d6f0c159090';
+const linkID = "t3_636f5494c56c8d6f0c159090";
 
 describe("POST /api/user/block-user", () => {
   jest.setTimeout(1000000);
@@ -192,6 +192,17 @@ describe("POST /api/user/spam", () => {
         .set("Authorization", token)
         .send({
           linkID,
+          spamText: "I found that this content is showing violence",
+          spamType: "violent content",
+        });
+      expect(res.statusCode).toBe(200);
+    });
+    test("should respond with a 200 status code", async () => {
+      const res = await request(app)
+        .post("/api/user/spam")
+        .set("Authorization", token)
+        .send({
+          linkID: "t1_636a8816687a4fec0ac7c3fc",
           spamText: "I found that this content is showing violence",
           spamType: "violent content",
         });
