@@ -8,7 +8,7 @@ const dbConnect = require("../db-connection/connection");
 beforeAll(async () => {
   dbConnect();
 });
-const linkID = 't3_636f5494c56c8d6f0c159090';
+const linkID = "t3_636f5494c56c8d6f0c159090";
 describe("POST /api/listing/submit", () => {
   jest.setTimeout(1000000);
   let token =
@@ -91,7 +91,7 @@ describe("POST /api/listing/save", () => {
         .post("/api/listing/save")
         .set("Authorization", token)
         .send({
-          linkID
+          linkID,
         });
       expect(res.statusCode).toBe(200);
     });
@@ -100,7 +100,7 @@ describe("POST /api/listing/save", () => {
         .post("/api/listing/save")
         .set("Authorization", token)
         .send({
-          linkID
+          linkID,
         });
       expect(res.body.message).toBe("Post is saved successfully");
     });
@@ -198,7 +198,7 @@ describe("POST /api/listing/unsave", () => {
   });
 });
 
-describe("vote over a post", () => {
+/*describe("vote over a post", () => {
   jest.setTimeout(1000000);
   let token1 =
     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbFR5cGUiOiJiYXJlIGVtYWlsIiwidXNlcm5hbWUiOiJ0Ml9oYW1hZGEiLCJpYXQiOjE2NjgxNzExOTMsImV4cCI6MTY2ODYwMzE5M30.5La8KnuxWTb2u0neXtSWNr_9seVWam0tFEUjAwpqlC0";
@@ -348,4 +348,4 @@ describe("vote over a post", () => {
   //     expect(res.statusCode).toBe(200);
   //   });
   // });
-});
+});*/
