@@ -27,10 +27,18 @@
       var signatureSeg = segments[2];
   
       // base64 deco de and parse JSON
-    
+      try{
       var header = JSON.parse(base64urlDecode(headerSeg));
       var payload = JSON.parse(base64urlDecode(payloadSeg));
-     
+      }
+      catch(exception){
+        return {
+          header: header,
+          payload: payload,
+          signature: signatureSeg,
+          error:"token is not valid"
+        }
+      }
       return {
         header: header,
         payload: payload,

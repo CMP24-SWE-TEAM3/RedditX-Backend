@@ -271,7 +271,7 @@ describe("vote over a post", () => {
           dir: 5,
         });
       expect(res.statusCode).toBe(500);
-      expect(res.body.status).toBe("invalid post id or dir");
+      expect(res.body.status).toBe("invalid id or dir");
     });
   });
   
