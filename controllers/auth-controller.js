@@ -165,6 +165,7 @@ const createUser = async (email, hash, username, type) => {
  * @returns {object} {token,expiresIn,username} or {error}
  */
 const signup = async (req, res) => {
+  console.log(req.body);
   const pass = changePasswordAccType(req.body.type, req.body.password);
   const hash = await bcrypt.hash(pass, 10);
   if (req.body.type == "gmail" || req.body.type == "facebook") {

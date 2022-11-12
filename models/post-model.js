@@ -100,7 +100,7 @@ const postSchema = mongoose.Schema({
   ],
   voters: [
     {
-      type: voteSchema, // Do we need this?
+      type: voteSchema, 
     },
   ],
   mintionedInUsers: [

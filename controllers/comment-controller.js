@@ -1,6 +1,6 @@
 const Comment = require("../models/comment-model");
 const Post = require("../models/post-model");
-const validators = require("../validate/comment-validators");
+const validators = require("../validate/listing-validators");
 
 /**
  * Vote over a post or a comment (id and dir must be sent in request body)
@@ -9,12 +9,15 @@ const validators = require("../validate/comment-validators");
  * @returns {String} status whether failed or not. 
  */
 const vote = async (req, res) => {
+  console.log(req.body);
+  console.log("asdad");
   if (req.body.id === undefined || req.body.dir === undefined)
     return res.status(500).json({
       status: "invalid id or dir" ,
     });
   const id = req.body.id.substring(0, 2);
   const dir = req.body.dir;
+  console.log(req.body);
   const postIdCasted = req.body.id.substring(3);
   const check = validators.validateVoteIn(id, dir, postIdCasted);
   if (!check) {
@@ -55,7 +58,6 @@ const vote = async (req, res) => {
     );
   } else if (id === "t1") {
     //comment or reply
-
     const comment = await Comment.findById({ _id: postIdCasted });
     if (!comment) {
       return res.status(500).json({

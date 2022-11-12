@@ -8,6 +8,13 @@ const spamSchema = mongoose.Schema({
   text: String,
   type: String,
 });
+const voteSchema = mongoose.Schema({
+  userID: {
+    type: String /*mongoose.Schema.ObjectId,*/,
+    ref: "User",
+  },
+  voteType: Number,
+});
 const commentSchema = new mongoose.Schema({
   authorId: {
     type: String,
@@ -31,6 +38,11 @@ const commentSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
+  voters: [
+    {
+      type: voteSchema, 
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
