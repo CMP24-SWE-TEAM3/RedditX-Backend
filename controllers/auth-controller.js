@@ -300,7 +300,7 @@ const login = async (req, res) => {
         });
       })
       .catch((err) => {
-        return res.status(401).json({
+        return res.status(404).json({
           type: "bare email",
           error: "Wrong username or password.",
         });

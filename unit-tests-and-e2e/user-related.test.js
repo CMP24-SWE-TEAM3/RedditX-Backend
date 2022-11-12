@@ -3,6 +3,7 @@ const app = require("../app");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
 const dbConnect = require("../db-connection/connection");
+const randomUsername=require("../utils/random-username");
 
 /* Connecting to the database before each test. */
 beforeAll(async () => {
@@ -345,24 +346,25 @@ describe("User System", () => {
     });
 
     describe("signup using bare email", () => {
-      // describe("valid signup using bare email",()=>{
-      //   test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
-      //         const res = await request(app)
-      //           .post("/api/auth/signup")
-      //           .set("Authorization", token)
-      //           .send({
-      //             "googleOrFacebookToken":"",
-      //             "type":"bare email",
-      //             "password":"lotfy",
-      //             "username":"ahmed231",
-      //             "email":"ahmed231@gmail.com"
-      //           })
-      //         expect(res.statusCode).toBe(200);
-      //         expect(res.body.expiresIn).toBe(3600);
-      //         expect(res.body.username).toBe("ahmed231");
-      //   });
+      describe("valid signup using bare email",()=>{
+        test("should respond with a 200 status code and data{token,username,expiresIn}", async () => {
+            const username=randomUsername.randomUserName();  
+            const res = await request(app)
+                .post("/api/auth/signup")
+                .set("Authorization", token)
+                .send({
+                  "googleOrFacebookToken":"",
+                  "type":"bare email",
+                  "password":"lotfy",
+                  "username":`${username}`,
+                  "email":`${username}@gmail.com`
+                })
+              expect(res.statusCode).toBe(200);
+              expect(res.body.expiresIn).toBe(3600);
+              expect(res.body.username).toBe(username);
+        });
 
-      // });
+      });
       describe("invalid signup using bare email", () => {
         test("should respond with a 400 status code", async () => {
           const res = await request(app)
@@ -474,7 +476,7 @@ describe("User System", () => {
         });
       });
       // describe("invalid login using bare email and invalid username",()=>{
-      //   test("should respond with a 400 status code", async () => {
+      //   test("should respond with a 404 status code", async () => {
       //         const res = await request(app)
       //           .post("/api/auth/login")
       //           .set("Authorization", token)
@@ -482,8 +484,8 @@ describe("User System", () => {
       //             "googleOrFacebookToken":"",
       //             "type":"bare email",
       //             "password":"lotfy",
-      //             "username":"ahmed231112",
-      //             "email":""
+      //             "username":"ahmed2311zal12",
+      //             "email":"tes@gmail.com"
       //           })
       //         expect(res.statusCode).toBe(404);
       //   });
@@ -505,5 +507,12 @@ describe("User System", () => {
         });
       });
     });
+  });
+});
+describe("test random username func",()=>{
+
+  test("should return username of length >2", async () => {
+    const username = randomUsername.randomUserName();
+    expect(username.length).toBeGreaterThan(2);
   });
 });
