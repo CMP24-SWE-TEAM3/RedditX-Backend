@@ -1,5 +1,5 @@
 const multer = require("multer");
-
+const AppError = require("./../utils/app-error");
 const multerStorage = multer.memoryStorage();
 
 /**
@@ -21,4 +21,4 @@ const upload = multer({
 /**
  * Upload single file
  */
-module.exports = startUploadSinglePhoto = upload.single("attachment");
+module.exports = upload.single("attachment");

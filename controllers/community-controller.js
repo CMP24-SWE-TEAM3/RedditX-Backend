@@ -99,7 +99,7 @@ const setSuggestedSort = async (req, res) => {
     { _id: req.body.srName },
     { $set: { suggestedCommentSort: req.body.suggestedCommentSort } },
     { new: true },
-    (err, doc) => {
+    (err) => {
       if (err) {
         return res.status(500).json({
           status: "failed",

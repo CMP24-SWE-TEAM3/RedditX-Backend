@@ -207,7 +207,7 @@ const vote = async (req, res) => {
         },
       },
       { new: true },
-      (err, doc) => {
+      (err) => {
         if (err) {
           return res.status(500).json({
             status: "failed",
@@ -227,10 +227,10 @@ const vote = async (req, res) => {
         status: "not found",
       });
     }
-    var voters = comment.voters;
-    var isFound = false;
-    var index = 0;
-    var voter;
+    voters = comment.voters;
+    isFound = false;
+    index = 0;
+    voter;
     for (let z = 0; z < voters.length; z++) {
       console.log("loop");
       if (voters[z].userID === req.username) {
@@ -283,7 +283,7 @@ const vote = async (req, res) => {
       { _id: postIdCasted },
       { $set: { votesCount: votesCount + operation, voters: voters } },
       { new: true },
-      (err, doc) => {
+      (err) => {
         if (err) {
           return res.status(500).json({
             status: "failed",

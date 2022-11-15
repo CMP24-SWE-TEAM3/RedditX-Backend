@@ -147,7 +147,7 @@ const createUser = async (email, hash, username, type) => {
   });
   const result = user
     .save()
-    .then((result) => {
+    .then(() => {
       return {
         username: user._id,
         status: "done",
@@ -285,7 +285,6 @@ const login = async (req, res) => {
             error: "Wrong username or password.",
           });
         }
-        fetchedUser = user;
         return bcrypt.compareSync(req.body.password, user.password);
       })
       .then(async (result) => {
@@ -302,7 +301,7 @@ const login = async (req, res) => {
           username: req.body.username,
         });
       })
-      .catch((err) => {
+      .catch(() => {
         return res.status(404).json({
           type: "bare email",
           error: "Wrong username or password.",

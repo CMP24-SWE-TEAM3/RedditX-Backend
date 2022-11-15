@@ -36,13 +36,16 @@ const messageSchema = mongoose.Schema({
       100000,
       "A message text must have less than or equal to 100000 characters",
     ],
-    minLength: [1, "A message text must have more than or equal to 1 character"],
+    minLength: [
+      1,
+      "A message text must have more than or equal to 1 character",
+    ],
   },
 });
 
 const userSchema = mongoose.Schema({
   userID: String,
-  fromID: String,//leh ha7tag eluserid w ana m3aia from id??
+  fromID: String, //leh ha7tag eluserid w ana m3aia from id??
   toID: String,
 });
 
@@ -58,7 +61,7 @@ const spamLinkItemSchema = mongoose.Schema({
 });
 
 const commuitySchema = mongoose.Schema({
-  commuityID: String,////hwa ana leh ha7tag from id w ana m3aia elcommuity id??
+  commuityID: String, ////hwa ana leh ha7tag from id w ana m3aia elcommuity id??
   fromID: String,
   toID: String,
 });

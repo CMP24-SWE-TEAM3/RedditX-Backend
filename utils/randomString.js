@@ -2,7 +2,7 @@
  * Makes a random string of length 24 characters
  * @returns {string} result
  */
-module.exports = makeRandomString = () => {
+module.exports = () => {
   let result = "";
   let characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

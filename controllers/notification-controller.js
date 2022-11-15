@@ -8,7 +8,7 @@ const APIFeatures = require("../utils/api-features");
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-const getNotifications = catchAsync(async (req, res, next) => {
+const getNotifications = catchAsync(async (req, res) => {
   const user = await User.findById(req.username).select("notifications");
   /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
   if (!req.query.limit) {
