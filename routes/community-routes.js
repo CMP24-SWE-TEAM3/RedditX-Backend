@@ -25,4 +25,22 @@ router.post(
   authCheck,
   communityController.setSuggestedSort
 );
+
+router.get("/mine/moderator", authCheck, communityController.getModerates);
+router.get("/mine/subscriber", authCheck, communityController.getSubscribed);
+
+router.post("/:subreddit/about/banned", authCheck, communityController.ban);
+router.get(
+  "/:subreddit/about/banned",
+  authCheck,
+  communityController.getBanned
+);
+router.post("/:subreddit/about/muted", authCheck, communityController.mute);
+router.get("/:subreddit/about/muted", authCheck, communityController.getMuted);
+router.get(
+  "/:subreddit/about/moderators",
+  authCheck,
+  communityController.getModerators
+);
+
 module.exports = router;

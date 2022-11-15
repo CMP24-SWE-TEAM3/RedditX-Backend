@@ -317,7 +317,6 @@ module.exports = {
   uploadUserPhoto,
   block,
   spam,
-
   getUserMe,
   getUserAbout,
   getUserPrefs,

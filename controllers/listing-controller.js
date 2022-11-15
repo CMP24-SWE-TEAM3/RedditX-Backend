@@ -54,7 +54,20 @@ const submit = catchAsync(async (req, res, next) => {
     const community = await Community.findById(req.body.communityID).select(
       "communityOptions"
     );
-    if (!community.communityOptions.isAutoApproved) req.body.isPending = true;
+    const communityOptions = community.communityOptions;
+    if (!communityOptions.isAutoApproved) req.body.isPending = true;
+    if (
+      communityOptions.privacyType === "private" ||
+      communityOptions.privacyType === "restricted"
+    ) {
+      const memberOf = user.member.find(
+        (el) => el.communityId === community._id
+      );
+      if (!memberOf || memberOf.isMuted || memberOf.isBanned)
+        return next(
+          new AppError("You cannot submit a post to this subreddit", 400)
+        );
+    }
   }
   const newPost = await Post.create(req.body);
   user.hasPost.push(newPost._id);
@@ -139,20 +152,15 @@ const vote = async (req, res) => {
     var isFound = false;
     var index = 0;
     var voter;
-
     for (let z = 0; z < voters.length; z++) {
-      console.log("loop");
       if (voters[z].userID === req.username) {
         console.log("jj");
         isFound = true;
         voter = voters[z];
-        console.log("inside loop");
-
         break;
       }
       index++;
     }
-
     if (!isFound) {
       if (dir == 1 || dir == -1) {
         voters.push({ userID: req.username, voteType: dir });
@@ -185,8 +193,6 @@ const vote = async (req, res) => {
         });
       }
     }
-
-    console.log(voters);
     let votesCount = post.votesCount;
     let operation;
     if (dir == 1 || dir == 2) {
@@ -227,18 +233,15 @@ const vote = async (req, res) => {
     var isFound = false;
     var index = 0;
     var voter;
-
     for (let z = 0; z < voters.length; z++) {
       console.log("loop");
       if (voters[z].userID === req.username) {
         isFound = true;
         voter = voters[z];
-
         break;
       }
       index++;
     }
-
     if (!isFound) {
       if (dir == 1 || dir == -1) {
         voters.push({ userID: req.username, voteType: dir });
@@ -271,7 +274,6 @@ const vote = async (req, res) => {
         });
       }
     }
-
     let votesCount = comment.votesCount;
     let operation;
     if (dir == 1 || dir == 2) {

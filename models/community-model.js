@@ -54,7 +54,10 @@ const communityOptionsSchema = mongoose.Schema({
   },
   postType: Number, // 0 any, 1 videos and images only, and 2 text only
   region: String,
-  privacyType: String, // "public" (anyone can view and submit), "private" (only approved members can view and submit), or "restricted" (anyone can view, but only some are approved to submit links)
+  privacyType: {
+    type: String, // "public" (anyone can view and submit), "private" (only approved members can view and submit), or "restricted" (anyone can view, but only some are approved to submit links)
+    default: "public",
+  },
   spamsNumBeforeRemove: {
     type: Number,
     default: 20,
