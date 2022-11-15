@@ -153,41 +153,37 @@ const vote = async (req, res) => {
       index++;
     }
 
-
     if (!isFound) {
       if (dir == 1 || dir == -1) {
-
-        voters.push({ "userID": req.username, "voteType": dir });
-
-      }
-      else if (dir == 0 || dir == 2) {
-
+        voters.push({ userID: req.username, voteType: dir });
+      } else if (dir == 0 || dir == 2) {
         return res.status(500).json({
           status: "invalid dir",
         });
       }
-    }
-    else {
-
-      if ((dir == 0 && voter.voteType == 1) || (dir == 2 && voter.voteType == -1)) {
-
+    } else {
+      if (
+        (dir == 0 && voter.voteType == 1) ||
+        (dir == 2 && voter.voteType == -1)
+      ) {
         voters.splice(index, 1);
-
-      }
-      else if ((dir == 0 && voter.voteType == -1) || (dir == 2 && voter.voteType == 1)) {
+      } else if (
+        (dir == 0 && voter.voteType == -1) ||
+        (dir == 2 && voter.voteType == 1)
+      ) {
         return res.status(500).json({
           status: "invalid dir",
         });
-      }
-      else if ((voter.voteType == 1 && dir == -1) || (voter.voteType == -1 && dir == 1)) {
+      } else if (
+        (voter.voteType == 1 && dir == -1) ||
+        (voter.voteType == -1 && dir == 1)
+      ) {
         voters[index].voteType = dir;
-      }
-      else if (dir == voter.voteType) {
+      } else if (dir == voter.voteType) {
         return res.status(200).json({
-          status: 'already voted'
+          status: "already voted",
         });
       }
-
     }
 
     console.log(voters);
@@ -202,9 +198,9 @@ const vote = async (req, res) => {
       { _id: postIdCasted },
       {
         $set: {
-          votesCount: votesCount + operation
-          , voters: voters
-        }
+          votesCount: votesCount + operation,
+          voters: voters,
+        },
       },
       { new: true },
       (err, doc) => {
@@ -245,41 +241,36 @@ const vote = async (req, res) => {
 
     if (!isFound) {
       if (dir == 1 || dir == -1) {
-
-        voters.push({ "userID": req.username, "voteType": dir });
-
-      }
-      else if (dir == 0 || dir == 2) {
-
+        voters.push({ userID: req.username, voteType: dir });
+      } else if (dir == 0 || dir == 2) {
         return res.status(500).json({
           status: "invalid dir",
         });
       }
-    }
-    else {
-
-      if ((dir == 0 && voter.voteType == 1) || (dir == 2 && voter.voteType == -1)) {
-
+    } else {
+      if (
+        (dir == 0 && voter.voteType == 1) ||
+        (dir == 2 && voter.voteType == -1)
+      ) {
         voters.splice(index, 1);
-
-      }
-      else if ((dir == 0 && voter.voteType == -1) || (dir == 2 && voter.voteType == 1)) {
+      } else if (
+        (dir == 0 && voter.voteType == -1) ||
+        (dir == 2 && voter.voteType == 1)
+      ) {
         return res.status(500).json({
           status: "invalid dir",
         });
-      }
-      else if ((voter.voteType == 1 && dir == -1) || (voter.voteType == -1 && dir == 1)) {
+      } else if (
+        (voter.voteType == 1 && dir == -1) ||
+        (voter.voteType == -1 && dir == 1)
+      ) {
         voters[index].voteType = dir;
       } else if (dir == voter.voteType) {
         return res.status(200).json({
-          status: 'already voted'
+          status: "already voted",
         });
       }
-
     }
-
-
-
 
     let votesCount = comment.votesCount;
     let operation;
@@ -395,7 +386,7 @@ const getPosts = catchAsync(async (req, res, next) => {
   }
   /*if the request didn't contain liit in its query then will add it to the query with 10 at default */
   if (!req.query.limit) {
-    req.query.limit = '10';
+    req.query.limit = "10";
   }
   const features = new APIFeatures(
     Post.find(req.addedFilter, null, { sort }),

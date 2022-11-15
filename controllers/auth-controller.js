@@ -1,8 +1,12 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user-model");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const decodeJwt = require("./google-facebook-oAuth");
 const randomUsername = require("../utils/random-username");
+const Email = require("./../utils/email");
+const AppError = require("../utils/app-error");
+const catchAsync = require("../utils/catch-async");
 
 /**
  * Check whether user name is in database or not (function)
@@ -165,7 +169,6 @@ const createUser = async (email, hash, username, type) => {
  * @returns {object} {token,expiresIn,username} or {error}
  */
 const signup = async (req, res) => {
-  console.log(req.body);
   const pass = changePasswordAccType(req.body.type, req.body.password);
   const hash = await bcrypt.hash(pass, 10);
   if (req.body.type == "gmail" || req.body.type == "facebook") {
@@ -185,7 +188,7 @@ const signup = async (req, res) => {
         const token = signToken(req.body.type, username);
         return res.status(200).json({
           token: token, //token,
-          expiresIn: 3600,
+          expiresIn: 3600 * 24,
           username: username,
         });
       } else {
@@ -197,7 +200,7 @@ const signup = async (req, res) => {
       const token = signToken(req.body.type, data.user_id);
       return res.status(200).json({
         token: token, //token,
-        expiresIn: 3600,
+        expiresIn: 3600 * 24,
         username: data.user._id,
       });
     }
@@ -219,7 +222,7 @@ const signup = async (req, res) => {
 
       return res.status(200).json({
         token: token, //token,
-        expiresIn: 3600,
+        expiresIn: 3600 * 24,
         username: req.body.username,
       });
     } else {
@@ -257,7 +260,7 @@ const login = async (req, res) => {
         const token = signToken(req.body.type, username);
         return res.status(200).json({
           token: token, //token,
-          expiresIn: 3600,
+          expiresIn: 3600 * 24,
           username: username,
         });
       } else {
@@ -269,12 +272,12 @@ const login = async (req, res) => {
       const token = signToken(req.body.type, data.user_id);
       return res.status(200).json({
         token: token, //token,
-        expiresIn: 3600,
+        expiresIn: 3600 * 24,
         username: data.user._id,
       });
     }
   } else {
-    User.findById({ _id: req.body.username })
+    User.findById(req.body.username)
       .then((user) => {
         if (!user) {
           return res.status(404).json({
@@ -295,7 +298,7 @@ const login = async (req, res) => {
         const token = await signToken(req.body.type, req.body.username);
         return res.status(200).json({
           token: token,
-          expiresIn: 3600,
+          expiresIn: 3600 * 24,
           username: req.body.username,
         });
       })
@@ -308,11 +311,86 @@ const login = async (req, res) => {
   }
 };
 
+const forgotPassword = catchAsync(async (req, res, next) => {
+  if (req.body.operation) {
+    // in case of forgot username
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return next(
+        new AppError("There is no user with this email address!", 404)
+      );
+    }
+    try {
+      await new Email(user, "none").sendUsername();
+      return res.status(200).json({
+        status: "success",
+        message: "Username is sent to the email!",
+      });
+    } catch (err) {
+      return next(new AppError("There was an error in sending the mail!", 500));
+    }
+  }
+  const user = await User.findById(req.body.username);
+  if (!user) {
+    return next(new AppError("There is no user with this username!", 404));
+  }
+  // Generate the random reset token
+  const resetToken = await user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false }); // in order to save the passwordResetToken and passwordResetExpires
+  // 3) Send the reset token to the user email
+  try {
+    const reqURL = `http://dev.redditswe22.tech/user/reset-password/${resetToken}`;
+    await new Email(user, reqURL).sendPasswordReset();
+    res.status(200).json({
+      status: "success",
+      message: "Link is sent to the email!",
+    });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    return next(new AppError("There was an error in sending the mail!", 500));
+  }
+});
+
+const resetPassword = catchAsync(async (req, res, next) => {
+  // Get user with token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passswordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  // If token is not expired and there is a user, set the new password
+  if (!user) return next(new AppError("Link is invalid or expired!", 400));
+  if (req.body.confirmedNewPassword !== req.body.newPassword)
+    return next(
+      new AppError("Password is not equal to confirmed password!", 400)
+    );
+  const hash = await bcrypt.hash(req.body.newPassword, 10);
+  user.password = hash;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  console.log(user);
+  await user.save();
+  // Log the user in: send JWT
+  const token = await signToken("bare email", user._id);
+  return res.status(200).json({
+    token: token,
+    expiresIn: 3600 * 24,
+    username: user._id,
+  });
+});
+
 module.exports = {
   availableEmail,
   availableUser,
   availableUsername,
   signup,
-  
   login,
+  forgotPassword,
+  resetPassword,
 };

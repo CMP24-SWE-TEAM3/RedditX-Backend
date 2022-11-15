@@ -62,7 +62,7 @@ BRF:2
 BRH:1
 end_of_record
 TN:
-SF:controllers/auth-controller.js
+SF:controllers\auth-controller.js
 FN:13,(anonymous_0)
 FN:34,(anonymous_1)
 FN:53,(anonymous_2)
@@ -234,7 +234,7 @@ BRF:44
 BRH:34
 end_of_record
 TN:
-SF:controllers/community-controller.js
+SF:controllers\community-controller.js
 FN:10,(anonymous_0)
 FN:26,(anonymous_1)
 FN:43,(anonymous_2)
@@ -323,7 +323,7 @@ BRF:20
 BRH:14
 end_of_record
 TN:
-SF:controllers/error-controller.js
+SF:controllers\error-controller.js
 FN:8,(anonymous_0)
 FN:18,(anonymous_1)
 FN:28,(anonymous_2)
@@ -390,7 +390,7 @@ BRF:14
 BRH:10
 end_of_record
 TN:
-SF:controllers/google-facebook-oAuth.js
+SF:controllers\google-facebook-oAuth.js
 FN:3,base64urlDecode
 FN:7,base64urlUnescape
 FN:11,(anonymous_2)
@@ -423,7 +423,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:controllers/listing-controller.js
+SF:controllers\listing-controller.js
 FN:16,(anonymous_0)
 FN:19,(anonymous_1)
 FN:44,(anonymous_2)
@@ -767,7 +767,7 @@ BRF:140
 BRH:85
 end_of_record
 TN:
-SF:controllers/profile-controller.js
+SF:controllers\profile-controller.js
 FN:10,mergeTwo
 FN:37,(anonymous_1)
 FN:65,(anonymous_2)
@@ -808,7 +808,7 @@ DA:19,3
 DA:20,0
 DA:22,3
 DA:24,6
-DA:25,531
+DA:25,593
 DA:26,6
 DA:27,0
 DA:29,6
@@ -917,7 +917,7 @@ BRF:28
 BRH:27
 end_of_record
 TN:
-SF:controllers/user-controller.js
+SF:controllers\user-controller.js
 FN:14,(anonymous_0)
 FN:29,(anonymous_1)
 FN:53,(anonymous_2)
@@ -1115,7 +1115,7 @@ BRF:58
 BRH:46
 end_of_record
 TN:
-SF:db-connection/connection.js
+SF:db-connection\connection.js
 FN:6,(anonymous_0)
 FN:18,(anonymous_1)
 FNF:2
@@ -1136,7 +1136,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:middlewares/auth-check.js
+SF:middlewares\auth-check.js
 FN:3,(anonymous_0)
 FNF:1
 FNH:1
@@ -1155,7 +1155,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:middlewares/possible-auth-check.js
+SF:middlewares\possible-auth-check.js
 FN:11,(anonymous_0)
 FNF:1
 FNH:1
@@ -1179,7 +1179,7 @@ BRF:2
 BRH:2
 end_of_record
 TN:
-SF:models/comment-model.js
+SF:models\comment-model.js
 FNF:0
 FNH:0
 DA:1,6
@@ -1194,7 +1194,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:models/community-model.js
+SF:models\community-model.js
 FN:156,(anonymous_0)
 FNF:1
 FNH:0
@@ -1217,7 +1217,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:models/post-model.js
+SF:models\post-model.js
 FN:115,(anonymous_0)
 FN:127,(anonymous_1)
 FN:139,(anonymous_2)
@@ -1249,7 +1249,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:models/user-model.js
+SF:models\user-model.js
 FN:243,(anonymous_0)
 FN:272,(anonymous_1)
 FN:276,(anonymous_2)
@@ -1281,7 +1281,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:routes/auth-routes.js
+SF:routes\auth-routes.js
 FNF:0
 FNH:0
 DA:1,6
@@ -1297,7 +1297,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:routes/community-routes.js
+SF:routes\community-routes.js
 FNF:0
 FNH:0
 DA:1,6
@@ -1315,7 +1315,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:routes/listing-routes.js
+SF:routes\listing-routes.js
 FNF:0
 FNH:0
 DA:1,6
@@ -1336,7 +1336,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:routes/user-routes.js
+SF:routes\user-routes.js
 FNF:0
 FNH:0
 DA:1,6
@@ -1363,7 +1363,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:utils/api-features.js
+SF:utils\api-features.js
 FN:11,(anonymous_0)
 FN:21,(anonymous_1)
 FN:24,(anonymous_2)
@@ -1418,7 +1418,7 @@ BRF:8
 BRH:7
 end_of_record
 TN:
-SF:utils/app-error.js
+SF:utils\app-error.js
 FN:5,(anonymous_0)
 FNF:1
 FNH:1
@@ -1437,7 +1437,7 @@ BRF:2
 BRH:1
 end_of_record
 TN:
-SF:utils/catch-async.js
+SF:utils\catch-async.js
 FN:6,(anonymous_0)
 FN:7,(anonymous_1)
 FNF:2
@@ -1453,7 +1453,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:utils/random-username.js
+SF:utils\random-username.js
 FN:1,(anonymous_0)
 FNF:1
 FNH:1
@@ -1471,7 +1471,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:utils/randomString.js
+SF:utils\randomString.js
 FN:5,(anonymous_0)
 FNF:1
 FNH:1
@@ -1489,7 +1489,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:utils/upload-single-photo.js
+SF:utils\upload-single-photo.js
 FN:8,(anonymous_0)
 FNF:1
 FNH:1
@@ -1510,7 +1510,7 @@ BRF:2
 BRH:1
 end_of_record
 TN:
-SF:validate/listing-validators.js
+SF:validate\listing-validators.js
 FN:1,(anonymous_0)
 FN:13,(anonymous_1)
 FNF:2
