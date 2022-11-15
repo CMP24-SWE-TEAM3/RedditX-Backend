@@ -54,11 +54,9 @@ const submit = catchAsync(async (req, res, next) => {
     const community = await Community.findById(req.body.communityID).select(
       "communityOptions"
     );
-    const communityOptions = community.communityOptions;
-    if (!communityOptions.isAutoApproved) req.body.isPending = true;
     if (
-      communityOptions.privacyType === "private" ||
-      communityOptions.privacyType === "restricted"
+      community.communityOptions.privacyType === "private" ||
+      community.communityOptions.privacyType === "restricted"
     ) {
       const memberOf = user.member.find(
         (el) => el.communityId === community._id

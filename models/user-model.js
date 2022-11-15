@@ -344,7 +344,6 @@ const userSchema = new mongoose.Schema({
       // ref:'Category'
     },
   ],
-
   /***************************************
    * posts relations
    ***************************************/

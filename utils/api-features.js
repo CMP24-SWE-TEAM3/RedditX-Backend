@@ -20,7 +20,7 @@ class APIFeatures {
 
   filter() {
     const queryObj = { ...this.queryString };
-    const exclude = ["page", "sort", "limit", "fields"];
+    const exclude = ["page", "sort", "limit", "fields", "type"]; //  type is related to notifications, we need to exclude it
     exclude.forEach((el) => delete queryObj[el]);
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);

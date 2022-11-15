@@ -321,6 +321,20 @@ const getModerators = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Get community options of a subreddit
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getCommunityOptions = catchAsync(async (req, res, next) => {
+  const community = await Community.findById(req.params.subreddit).select(
+    "communityOptions"
+  );
+  if (!community)
+    return next(new AppError("This subreddit doesn't exist!", 404));
+  res.status(200).json(community.communityOptions);
+});
+
 module.exports = {
   resizeCommunityIcon,
   resizeCommunityBanner,
@@ -334,4 +348,5 @@ module.exports = {
   mute,
   getMuted,
   getModerators,
+  getCommunityOptions,
 };

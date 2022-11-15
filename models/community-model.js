@@ -50,7 +50,7 @@ const communityOptionsSchema = mongoose.Schema({
   },
   suggestedCommentSort: {
     type: String,
-    default: "top",
+    default: "best",
   },
   postType: Number, // 0 any, 1 videos and images only, and 2 text only
   region: String,
@@ -61,10 +61,6 @@ const communityOptionsSchema = mongoose.Schema({
   spamsNumBeforeRemove: {
     type: Number,
     default: 20,
-  },
-  isAutoApproved: {
-    type: Boolean,
-    default: 1,
   },
 });
 

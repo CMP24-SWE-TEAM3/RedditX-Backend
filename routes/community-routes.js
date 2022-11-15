@@ -42,5 +42,10 @@ router.get(
   authCheck,
   communityController.getModerators
 );
+router.get(
+  "/:subreddit/about/edit",
+  authCheck,
+  communityController.getCommunityOptions
+);
 
 module.exports = router;
