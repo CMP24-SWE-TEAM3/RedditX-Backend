@@ -9,6 +9,15 @@ const multer = require("multer");
 const APIFeatures = require("../utils/api-features");
 const validators = require("./../validate/listing-validators");
 
+
+
+
+const PostService = require('./../services/post-service');
+const UserService = require('./../services/user-service');
+
+var postServiceInstance = new PostService(Post);
+var userServiceInstance = new UserService(User);
+
 /**
  * Name and save the uploaded files
  */
@@ -328,84 +337,16 @@ const addSubreddit = (req, res, next) => {
  * @returns {void}
  */
 const getPosts = catchAsync(async (req, res, next) => {
-  /*first of all : check if the request has certain subreddit or not*/
-  if (!req.addedFilter) {
-    /* here the request dosn't contain certain subreddit then we will get the posts from friends and subreddits and persons teh user follow*/
+  if (!req.addedFilter && req.username) {
+    /* here the request dosn't contain certain subreddit then we will get the posts from friends and subreddits and persons the user follow*/
 
     /* if user signed in we will do the following
     1.get the categories of the user
     2. get the friends of the user
     3. get the posts based on these categories and the users*/
-    if (req.username) {
-      /*step 1,2 :get the categories and friends of the user*/
-      const { member, friend, follows } = await User.findById(
-        req.username
-      ).select("-_id member friend follows");
-      const subreddits = member.map((el) => {
-        if (!el.isBanned) {
-          return el.communityId;
-        }
-      });
-      /* step 3 :add the subreddits to addedFilter*/
-      req.addedFilter = {
-        $or: [
-          {
-            communityID: {
-              $in: subreddits,
-            },
-          },
-          {
-            userID: {
-              $in: friend,
-            },
-          },
-          {
-            userID: {
-              $in: follows,
-            },
-          },
-        ],
-      };
-    }
+    req = await userServiceInstance.addUserFilter(req);
   }
-  let sort = {};
-  if (req.params.criteria) {
-    if (req.params.criteria === "best")
-      sort = {
-        bestFactor: -1,
-      };
-    else if (req.params.criteria === "hot")
-      sort = {
-        hotnessFactor: -1,
-      };
-    else if (req.params.criteria === "new") {
-      sort = {
-        createdAt: -1,
-      };
-    } else if (req.params.criteria === "top")
-      sort = {
-        votesCount: -1,
-      };
-    else if (req.params.criteria === "random") {
-      sort = {};
-    } else {
-      /*if the request has any other criteria */
-      return next(new AppError("not found this page", 404));
-    }
-  }
-  /*if the request didn't contain liit in its query then will add it to the query with 10 at default */
-  if (!req.query.limit) {
-    req.query.limit = '10';
-  }
-  const features = new APIFeatures(
-    Post.find(req.addedFilter, null, { sort }),
-    req.query
-  )
-    .filter()
-    .paginate()
-    .sort()
-    .selectFields();
-  const posts = await features.query;
+  const posts = await postServiceInstance.getListingPosts(req);
   res.status(200).json({
     status: "succeeded",
     posts,

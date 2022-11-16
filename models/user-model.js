@@ -6,7 +6,7 @@ const userPrefsSchema = new mongoose.Schema({
   /*********************************************************************************
    * the attributes
    **********************************************************************************/
-  
+
   emailPrivateMessage: {
     type: Boolean,
     default: true,
@@ -427,5 +427,6 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
+
 
 module.exports = User;
