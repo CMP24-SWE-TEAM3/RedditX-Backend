@@ -26,10 +26,11 @@ class Service {
         this.deleteOne = this.deleteOne.bind(this);
         this.insert = this.insert.bind(this);
         this.updateOne = this.updateOne.bind(this);
+        this.getSearchResults = this.getSearchResults.bind(this);
     }
 
-    getAll = (query) => {
-        const features = new APIfeatures(this.model.find(), query)
+    getAll = (findQuery, query) => {
+        const features = new APIfeatures(this.model.find(findQuery), query)
             .sort()
             .filter()
             .paginate()
