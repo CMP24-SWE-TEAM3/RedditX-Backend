@@ -55,8 +55,20 @@ class PostService extends Service {
         /*if the request didn't contain liit in its query then will add it to the query with 10 at default */
         req = this.addLimit(req);
         /*return posts to controller */
-        return await this.getAll(req.query).sort(sort);
+        return await this.getAll({}, req.query).sort(sort);
     }
+
+    getSearchResults = (query) => {
+        const searchQuery = query.q;
+        delete query.q;
+        return this.getAll({
+            $or:
+                [
+                    { "text": { '$regex': searchQuery, '$options': 'i' } },
+                ]
+        }, query)
+    }
+
 }
 
 module.exports = PostService;

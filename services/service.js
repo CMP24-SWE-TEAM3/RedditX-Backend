@@ -28,8 +28,8 @@ class Service {
         this.updateOne = this.updateOne.bind(this);
     }
 
-    getAll = (query) => {
-        const features = new APIfeatures(this.model.find(), query)
+    getAll = (findQuery, query) => {
+        const features = new APIfeatures(this.model.find(findQuery), query)
             .sort()
             .filter()
             .paginate()

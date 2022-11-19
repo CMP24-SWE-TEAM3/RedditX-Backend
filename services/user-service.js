@@ -49,6 +49,18 @@ class UserService extends Service {
         };
         return req;
     }
+    getSearchResults = (query) => {
+        const searchQuery = query.q;
+        delete query.q;
+        return this.getAll({
+            $or:
+                [
+                    { "_id": { '$regex': searchQuery, '$options': 'i' } },
+                    { "about": { '$regex': searchQuery, '$options': 'i' } }
+                ]
+        }, query)
+    }
+
 }
 
 module.exports = UserService;
