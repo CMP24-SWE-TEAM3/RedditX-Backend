@@ -332,9 +332,9 @@ const getPosts = catchAsync(async (req, res, next) => {
     1.get the categories of the user
     2. get the friends of the user
     3. get the posts based on these categories and the users*/
-    req = await userServiceInstance.addUserFilter(req);
+    req.addedFilter = await userServiceInstance.addUserFilter(req.username);
   }
-  const posts = await postServiceInstance.getListingPosts(req);
+  const posts = await postServiceInstance.getListingPosts(req.params, req.query, req.addedFilter);
   res.status(200).json({
     status: "succeeded",
     posts,
