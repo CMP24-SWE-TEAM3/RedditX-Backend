@@ -20,13 +20,6 @@ const catchAsync = require('./../utils/catch-async');
 class Service {
     constructor(model) {
         this.model = model;
-        this.getAll = this.getAll.bind(this);
-        this.getOne = this.getOne.bind(this);
-        this.deleteMany = this.deleteMany.bind(this);
-        this.deleteOne = this.deleteOne.bind(this);
-        this.insert = this.insert.bind(this);
-        this.updateOne = this.updateOne.bind(this);
-        this.getSearchResults = this.getSearchResults.bind(this);
     }
 
     getAll = (findQuery, query) => {

@@ -22,13 +22,13 @@ class UserService extends Service {
         })
     }
 
-    addUserFilter = async (req) => {
+    addUserFilter = async (username) => {
         /*step 1,2 :get the categories and friends of the user*/
-        const { member, friend, follows } = await this.getOne({ _id: req.username, select: 'member friend follows' });
+        const { member, friend, follows } = await this.getOne({ _id: username, select: 'member friend follows' });
         const subreddits = this.getFilteredSubreddits(member);
 
         /* step 3 :add the subreddits to addedFilter*/
-        req.addedFilter = {
+        const addedFilter = {
             $or: [
                 {
                     communityID: {
@@ -47,8 +47,20 @@ class UserService extends Service {
                 },
             ],
         };
-        return req;
+        return addedFilter;
     }
+    getSearchResults = (query) => {
+        const searchQuery = query.q;
+        delete query.q;
+        return this.getAll({
+            $or:
+                [
+                    { "_id": { '$regex': searchQuery, '$options': 'i' } },
+                    { "about": { '$regex': searchQuery, '$options': 'i' } }
+                ]
+        }, query)
+    }
+
 }
 
 module.exports = UserService;

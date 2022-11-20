@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const sm = require('sequencematcher');
 
 // postID here is the _id from mongoDB, so if you want to send the post in response,
 // change the key name of the object came out from mongo from _id to postID (if you want)
@@ -100,7 +101,7 @@ const postSchema = mongoose.Schema({
   ],
   voters: [
     {
-      type: voteSchema, 
+      type: voteSchema,
     },
   ],
   mintionedInUsers: [
@@ -136,9 +137,12 @@ postSchema.virtual("bestFactor").get(function () {
   );
 });
 
+
+
 postSchema.pre(/^find/, async function (next) {
   this.find({ isPending: { $ne: true } });
 });
+
 
 postSchema.post(/^find/, async function (doc, next) {
   await Post.updateMany(this.getFilter(), {
