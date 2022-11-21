@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD [ "pm2", "start", "server.js" ]
+CMD [ "node", "server.js" ]
