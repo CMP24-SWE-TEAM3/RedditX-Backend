@@ -38,7 +38,7 @@ class APIFeatures {
     if (this.queryString.sort) {
       sortBy = this.queryString.sort.replace(",", " ");
     }
-    this.query = this.query.sort(sortBy + " -createdAt");
+    this.query = this.query.sort(sortBy);
     return this;
   }
 

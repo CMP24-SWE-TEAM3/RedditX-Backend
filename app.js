@@ -13,6 +13,7 @@ const userRouter = require("./routes/user-routes");
 const communityRouter = require("./routes/community-routes");
 const listingRouter = require("./routes/listing-routes");
 const authRouter = require("./routes/auth-routes");
+const searchRouter = require("./routes/search-routes");
 const notificationRouter = require("./routes/notification-routes");
 const AppError = require("./utils/app-error");
 
@@ -98,6 +99,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/r", communityRouter);
 app.use("/api/listing", listingRouter);
+app.use("/api/search", searchRouter);
 app.use("/api/notification", notificationRouter);
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404)); // Here will assume that this is an error and skip all middlewares forward to the error handler middleware we defined

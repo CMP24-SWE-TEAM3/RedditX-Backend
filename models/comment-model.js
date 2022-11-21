@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const spamSchema = mongoose.Schema({
   userID: {
     type: String,
@@ -40,7 +39,7 @@ const commentSchema = new mongoose.Schema({
   },
   voters: [
     {
-      type: voteSchema, 
+      type: voteSchema,
     },
   ],
   createdAt: {
