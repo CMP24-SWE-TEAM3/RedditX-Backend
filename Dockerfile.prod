@@ -1,6 +1,6 @@
 FROM node:17-alpine
 
-RUN npm install -g nodemon
+RUN npm install -g pm2
 
 WORKDIR /app
 
@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD [ "nodemon", "server.js" ]
+CMD [ "pm2", "start", "server.js" ]
