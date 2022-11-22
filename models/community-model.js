@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const sm = require('sequencematcher');
 
 const communityRuleSchema = mongoose.Schema({
   title: String,
@@ -168,6 +169,8 @@ const communitySchema = mongoose.Schema({
   category: String,
   categories: [String],
 });
+
+
 
 const Community = mongoose.model("Community", communitySchema);
 

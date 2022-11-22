@@ -2,14 +2,14 @@ const express = require("express");
 const listingController = require("../controllers/listing-controller");
 const possibleAuthCheck = require("../middlewares/possible-auth-check");
 const authCheck = require("../middlewares/auth-check");
-
+const addSubreddit = require('./../middlewares/append-subreddit');
 const router = express.Router();
 
 router
   .route("/posts/r/:subreddit/:criteria")
   .get(
     possibleAuthCheck,
-    listingController.addSubreddit,
+    addSubreddit,
     listingController.getPosts
   );
 router
