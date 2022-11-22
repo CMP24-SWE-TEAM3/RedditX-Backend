@@ -89,7 +89,10 @@ const setSuggestedSort = async (req, res) => {
 const getModerates = catchAsync(async (req, res, next) => {
   var communities = undefined;
   try {
-    const user = await userServiceInstance.findById(req.username, "moderators");
+    const user = await userServiceInstance.getOne({
+      _id: req.username,
+      select: "moderators",
+    });
     communities = await communityServiceInstance.getCommunities(
       user,
       "moderators"
@@ -111,7 +114,10 @@ const getModerates = catchAsync(async (req, res, next) => {
 const getSubscribed = catchAsync(async (req, res, next) => {
   var communities = undefined;
   try {
-    const user = await userServiceInstance.findById(req.username, "member");
+    const user = await userServiceInstance.getOne({
+      _id: req.username,
+      select: "member",
+    });
     communities = await communityServiceInstance.getCommunities(user, "member");
   } catch (err) {
     return next(err);
@@ -136,10 +142,10 @@ const banOrMute = catchAsync(async (req, res, next) => {
       req.body.userID,
       req.body.operation
     );
-    const toBeAffected = await userServiceInstance.findById(
-      req.body.userID,
-      "member"
-    );
+    const toBeAffected = await userServiceInstance.getOne({
+      _id: req.body.userID,
+      select: "member",
+    });
     await communityServiceInstance.banOrMuteAtUser(
       toBeAffected,
       community,

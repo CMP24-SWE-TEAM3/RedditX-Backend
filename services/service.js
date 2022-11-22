@@ -12,7 +12,7 @@
 const APIfeatures = require("./../utils/api-features");
 
 /**
- * Service class
+ * @namespace Service
  */
 class Service {
   constructor(model) {
@@ -27,7 +27,6 @@ class Service {
       .selectFields();
     return features.query;
   };
-
   getOne = (query) => {
     let fields = "";
     if (query.select) {
@@ -41,16 +40,6 @@ class Service {
     }
     return res;
   };
-
-  updateOne = (query) => {
-    return this.model.findOneAndUpdate(query);
-  };
-
-  findById = (id, select) => {
-    if (select && select !== "") return this.model.findById(id).select(select);
-    else return this.model.findById(id);
-  };
-
   find = (query, select) => {
     if (select && select !== "") return this.model.find(query).select(select);
     else return this.model.find(query);
@@ -69,6 +58,7 @@ class Service {
   };
 
   insert = (data) => {
+    console.error("Entered service");
     return this.model.create(data);
   };
 }

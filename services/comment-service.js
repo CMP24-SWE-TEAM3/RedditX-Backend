@@ -7,7 +7,11 @@
  */
 
 const Service = require("./service");
+const AppError = require("./../utils/app-error");
 
+/**
+ * @namespace CommentService
+ */
 class CommentService extends Service {
   constructor(model) {
     super(model);
@@ -32,7 +36,8 @@ class CommentService extends Service {
    * @returns {object} comment
    */
   spamComment = async (comment, spamType, spamText, username) => {
-    if (comment.spams.find((el) => el.userID === username)) return;
+    if (comment.spams.find((el) => el.userID === username))
+      throw new AppError("You spammed this comment before!");
     comment.spams.push({
       userID: username,
       type: spamType,

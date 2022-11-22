@@ -20,11 +20,11 @@ var communityServiceInstance = new CommunityService(Community);
 const submit = catchAsync(async (req, res, next) => {
   let newPost = {};
   try {
-    const user = await userServiceInstance.findById(req.username);
-    const community = await communityServiceInstance.findById(
-      req.body.communityID,
-      "communityOptions"
-    );
+    const user = await userServiceInstance.getOne({ _id: req.username });
+    const community = await communityServiceInstance.getOne({
+      _id: req.body.communityID,
+      select: "communityOptions",
+    });
     newPost = await postServiceInstance.submit(
       req.body,
       req.files,
@@ -44,7 +44,7 @@ const submit = catchAsync(async (req, res, next) => {
  */
 const save = catchAsync(async (req, res, next) => {
   try {
-    const user = await userServiceInstance.findById(req.username);
+    const user = await userServiceInstance.getOne({ _id: req.username });
     await postServiceInstance.save(req.body.linkID, user);
   } catch (err) {
     return next(err);
@@ -62,7 +62,7 @@ const save = catchAsync(async (req, res, next) => {
  */
 const unsave = catchAsync(async (req, res, next) => {
   try {
-    const user = await userServiceInstance.findById(req.username);
+    const user = await userServiceInstance.getOne({ _id: req.username });
     await postServiceInstance.unsave(req.body.linkID, user);
   } catch (err) {
     return next(err);

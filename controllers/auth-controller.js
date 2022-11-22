@@ -32,8 +32,7 @@ const availableUser = async (username) => {
  * Check whether email is in database or not (function)
  * @param {String} email  state of the operation whether false or true to indicate the sucess.
  * @returns {Boolean} exist whether the email exists or not.
- 
-*/
+ */
 const availableEmail = async (email) => {
   const user = await User.findOne({ email: email });
   if (user) {

@@ -12,6 +12,9 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+/**
+ * @namespace UserService
+ */
 class UserService extends Service {
   constructor(model) {
     super(model);
@@ -89,11 +92,11 @@ class UserService extends Service {
    * @param {string} username
    * @param {object} file
    */
-  uploadUserPhoto = async (data, username, file) => {
-    if (!data.action)
-      throw AppError("No attachment or action is provided!", 400);
+  uploadUserPhoto = async (action, username, file) => {
+    if (!action)
+      throw new AppError("No attachment or action is provided!", 400);
     let avatar = "default.jpg";
-    if (data.action === "upload") {
+    if (action === "upload") {
       if (!file) throw new AppError("No photo is uploaded!", 400);
       avatar = file.filename;
     }
@@ -107,9 +110,9 @@ class UserService extends Service {
    * @param {boolean} action
    */
   block = async (from, to, action) => {
-    if (!to) throw new AppError("No linkID is provided!", 400);
-    const toUser = await this.findById(to);
-    const myUser = await this.findById(from);
+    if (!to) throw new AppError("No username is provided!", 400);
+    const toUser = await this.getOne({ _id: to, select: "blocksToMe" });
+    const myUser = await this.getOne({ _id: from, select: "blocksFromMe" });
     if (!toUser || !myUser) throw new AppError("This user doesn't exist!", 404);
     if (action === true) {
       // block
@@ -152,7 +155,7 @@ class UserService extends Service {
    * @param {string} username
    */
   forgotPassword = async (username) => {
-    const user = await this.findById(username);
+    const user = await this.getOne({ _id: username });
     if (!user) {
       throw new AppError("There is no user with this username!", 404);
     }
