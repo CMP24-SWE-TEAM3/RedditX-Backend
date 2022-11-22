@@ -68,6 +68,7 @@ const sendErrorProd = (req, res, err) => {
   });
 };
 
+/* eslint-disable */
 /**
  * Handles some errors
  * @param {object} err
@@ -76,7 +77,7 @@ const sendErrorProd = (req, res, err) => {
  * @param {function} next
  * @returns {object} res
  */
-const globalErrorHandler = (err, req, res) => {
+const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
   if (process.env.NODE_ENV !== "development") {

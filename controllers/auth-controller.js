@@ -1,12 +1,11 @@
-const jwt = require("jsonwebtoken");
 const User = require("../models/user-model");
 const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
 const decodeJwt = require("./google-facebook-oAuth");
 const randomUsername = require("../utils/random-username");
-const Email = require("./../utils/email");
-const AppError = require("../utils/app-error");
 const catchAsync = require("../utils/catch-async");
+const UserService = require("./../services/user-service");
+
+const userServiceInstance = new UserService(User);
 
 /**
  * Check whether user name is in database or not (function)
@@ -96,19 +95,6 @@ const availabeGmailOrFacebook = async (email, type) => {
 const changePasswordAccType = (type, password) => {
   return type == "facebook" || type == "gmail" ? "1" : password;
 };
-/**
- * Signing the token
- * @param {String} emailType email type.
- * @param {String} username username of the user.
- * @returns {String} (signed token)
- */
-const signToken = (emailType, username) => {
-  return jwt.sign(
-    { emailType: emailType, username: username },
-    "mozaisSoHotButNabilisTheHottest",
-    { expiresIn: "120h" }
-  );
-};
 
 /**
  * Check whether username is in database or not (route)
@@ -185,7 +171,7 @@ const signup = async (req, res) => {
       const username = randomUsername.randomUserName();
       const result = await createUser(email, hash, username, req.body.type);
       if (result.username != null) {
-        const token = signToken(req.body.type, username);
+        const token = userServiceInstance.signToken(req.body.type, username);
         return res.status(200).json({
           token: token, //token,
           expiresIn: 3600 * 24,
@@ -197,7 +183,7 @@ const signup = async (req, res) => {
         });
       }
     } else {
-      const token = signToken(req.body.type, data.user_id);
+      const token = userServiceInstance.signToken(req.body.type, data.user_id);
       return res.status(200).json({
         token: token, //token,
         expiresIn: 3600 * 24,
@@ -218,7 +204,10 @@ const signup = async (req, res) => {
       req.body.type
     );
     if (result.username != null) {
-      const token = await signToken(req.body.type, req.body.username);
+      const token = await userServiceInstance.signToken(
+        req.body.type,
+        req.body.username
+      );
 
       return res.status(200).json({
         token: token, //token,
@@ -257,7 +246,7 @@ const login = async (req, res) => {
       const username = randomUsername.randomUserName();
       const result = await createUser(email, hash, username, req.body.type);
       if (result.username != null) {
-        const token = signToken(req.body.type, username);
+        const token = userServiceInstance.signToken(req.body.type, username);
         return res.status(200).json({
           token: token, //token,
           expiresIn: 3600 * 24,
@@ -269,7 +258,7 @@ const login = async (req, res) => {
         });
       }
     } else {
-      const token = signToken(req.body.type, data.user_id);
+      const token = userServiceInstance.signToken(req.body.type, data.user_id);
       return res.status(200).json({
         token: token, //token,
         expiresIn: 3600 * 24,
@@ -294,7 +283,10 @@ const login = async (req, res) => {
             error: "Wrong username or password.",
           });
         }
-        const token = await signToken(req.body.type, req.body.username);
+        const token = await userServiceInstance.signToken(
+          req.body.type,
+          req.body.username
+        );
         return res.status(200).json({
           token: token,
           expiresIn: 3600 * 24,
@@ -313,74 +305,42 @@ const login = async (req, res) => {
 const forgotPassword = catchAsync(async (req, res, next) => {
   if (req.body.operation) {
     // in case of forgot username
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return next(
-        new AppError("There is no user with this email address!", 404)
-      );
-    }
     try {
-      await new Email(user, "none").sendUsername();
-      return res.status(200).json({
-        status: "success",
-        message: "Username is sent to the email!",
-      });
+      await userServiceInstance.forgotUsername(req.body.email);
     } catch (err) {
-      return next(new AppError("There was an error in sending the mail!", 500));
+      return next(err);
     }
-  }
-  const user = await User.findById(req.body.username);
-  if (!user) {
-    return next(new AppError("There is no user with this username!", 404));
-  }
-  // Generate the random reset token
-  const resetToken = await user.createPasswordResetToken();
-  await user.save({ validateBeforeSave: false }); // in order to save the passwordResetToken and passwordResetExpires
-  // 3) Send the reset token to the user email
-  try {
-    const reqURL = `http://dev.redditswe22.tech/user/reset-password/${resetToken}`;
-    await new Email(user, reqURL).sendPasswordReset();
-    res.status(200).json({
+    return res.status(200).json({
       status: "success",
-      message: "Link is sent to the email!",
+      message: "Username is sent to the email!",
     });
-  } catch (err) {
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save({ validateBeforeSave: false });
-    return next(new AppError("There was an error in sending the mail!", 500));
   }
+  try {
+    await userServiceInstance.forgotPassword(req.body.username);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Link is sent to the email!",
+  });
 });
 
-const resetPassword = catchAsync(async (req, res, next) => {
-  // Get user with token
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
-
-  const user = await User.findOne({
-    passswordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() },
-  });
-  // If token is not expired and there is a user, set the new password
-  if (!user) return next(new AppError("Link is invalid or expired!", 400));
-  if (req.body.confirmedNewPassword !== req.body.newPassword)
-    return next(
-      new AppError("Password is not equal to confirmed password!", 400)
+const resetForgottenPassword = catchAsync(async (req, res, next) => {
+  var data = undefined;
+  try {
+    data = await userServiceInstance.resetForgottenPassword(
+      req.params.token,
+      req.body.newPassword,
+      req.body.confirmedNewPassword
     );
-  const hash = await bcrypt.hash(req.body.newPassword, 10);
-  user.password = hash;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-  console.log(user);
-  await user.save();
-  // Log the user in: send JWT
-  const token = await signToken("bare email", user._id);
+  } catch (err) {
+    return next(err);
+  }
   return res.status(200).json({
-    token: token,
+    token: data.token,
     expiresIn: 3600 * 24,
-    username: user._id,
+    username: data.id,
   });
 });
 
@@ -391,5 +351,5 @@ module.exports = {
   signup,
   login,
   forgotPassword,
-  resetPassword,
+  resetForgottenPassword,
 };

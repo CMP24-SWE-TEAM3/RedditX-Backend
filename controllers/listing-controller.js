@@ -1,45 +1,16 @@
-const AppError = require("../utils/app-error");
 const catchAsync = require("../utils/catch-async");
 const Post = require("../models/post-model");
-const Community = require("../models/community-model");
 const Comment = require("../models/comment-model");
+const Community = require("../models/community-model");
 const User = require("../models/user-model");
-const makeRandomString = require("../utils/randomString");
-const multer = require("multer");
 const validators = require("./../validate/listing-validators");
-
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
+const CommunityService = require("./../services/community-service");
 
-var postServiceInstance = new PostService(Post);
-var userServiceInstance = new UserService(User);
-
-/**
- * Name and save the uploaded files
- */
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/posts/files");
-  },
-  filename: async (req, file, cb) => {
-    if (file.mimetype.startsWith("image")) {
-      return cb(null, `post-file-${makeRandomString()}-${Date.now()}.jpg`);
-    }
-    cb(
-      null,
-      `post-file-${makeRandomString()}-${Date.now()}-${file.originalname}`
-    );
-  },
-});
-
-const upload = multer({
-  storage: multerStorage,
-});
-
-/**
- * Upload the files
- */
-const uploadPostFiles = upload.array("attachments", 10);
+const postServiceInstance = new PostService(Post);
+const userServiceInstance = new UserService(User);
+const communityServiceInstance = new CommunityService(Community);
 
 /**
  * Creates a post and saves the file names to database
@@ -47,34 +18,22 @@ const uploadPostFiles = upload.array("attachments", 10);
  * @returns {object} res
  */
 const submit = catchAsync(async (req, res, next) => {
-  req.body.attachments = [];
-  if (req.files) {
-    req.files.forEach((file) => req.body.attachments.push(file.filename));
-  }
-  req.body.userID = req.username;
-  req.body.voters = [{ userID: req.username, voteType: 1 }];
-  const user = await User.findById(req.username);
-  if (!user) return next(new AppError("This user doesn't exist!", 404));
-  if (req.body.communityID) {
-    const community = await Community.findById(req.body.communityID).select(
+  let newPost = {};
+  try {
+    const user = await userServiceInstance.findById(req.username);
+    const community = await communityServiceInstance.findById(
+      req.body.communityID,
       "communityOptions"
     );
-    if (
-      community.communityOptions.privacyType === "private" ||
-      community.communityOptions.privacyType === "restricted"
-    ) {
-      const memberOf = user.member.find(
-        (el) => el.communityId === community._id
-      );
-      if (!memberOf || memberOf.isMuted || memberOf.isBanned)
-        return next(
-          new AppError("You cannot submit a post to this subreddit", 400)
-        );
-    }
+    newPost = await postServiceInstance.submit(
+      req.body,
+      req.files,
+      user,
+      community
+    );
+  } catch (err) {
+    return next(err);
   }
-  const newPost = await Post.create(req.body);
-  user.hasPost.push(newPost._id);
-  await user.save();
   res.status(201).json(newPost);
 });
 
@@ -84,17 +43,12 @@ const submit = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const save = catchAsync(async (req, res, next) => {
-  if (!req.body.linkID)
-    return next(new AppError("No linkID is provided!", 400));
-  const user = await User.findById(req.username);
-  if (!user) return next(new AppError("This user doesn't exist!", 404));
-  if (user.savedPosts.find((el) => el.toString() === req.body.linkID.slice(3)))
-    return res.status(200).json({
-      status: "success",
-      message: "Post is saved successfully",
-    });
-  user.savedPosts.push(req.body.linkID.slice(3));
-  await user.save();
+  try {
+    const user = await userServiceInstance.findById(req.username);
+    await postServiceInstance.save(req.body.linkID, user);
+  } catch (err) {
+    return next(err);
+  }
   res.status(200).json({
     status: "success",
     message: "Post is saved successfully",
@@ -107,15 +61,12 @@ const save = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const unsave = catchAsync(async (req, res, next) => {
-  if (!req.body.linkID)
-    return next(new AppError("No linkID is provided!", 400));
-  const user = await User.findById(req.username);
-  if (!user) return next(new AppError("This user doesn't exist!", 404));
-  user.savedPosts.splice(
-    user.savedPosts.findIndex((el) => el === req.body.linkID.slice(3)),
-    1
-  );
-  await user.save();
+  try {
+    const user = await userServiceInstance.findById(req.username);
+    await postServiceInstance.unsave(req.body.linkID, user);
+  } catch (err) {
+    return next(err);
+  }
   res.status(200).json({
     status: "success",
     message: "Post is unsaved successfully",
@@ -332,7 +283,6 @@ const getPosts = catchAsync(async (req, res) => {
 });
 
 module.exports = {
-  uploadPostFiles,
   submit,
   save,
   unsave,

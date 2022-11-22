@@ -102,7 +102,9 @@ app.use("/api/listing", listingRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/notification", notificationRouter);
 app.all("*", (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404)); // Here will assume that this is an error and skip all middlewares forward to the error handler middleware we defined
+  return next(
+    new AppError(`Can't find ${req.originalUrl} on this server`, 404)
+  ); // Here will assume that this is an error and skip all middlewares forward to the error handler middleware we defined
 });
 
 // Error handler middleware

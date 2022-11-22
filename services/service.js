@@ -43,7 +43,21 @@ class Service {
   };
 
   updateOne = (query) => {
-    this.model.findOneAndUpdate(query);
+    return this.model.findOneAndUpdate(query);
+  };
+
+  findById = (id, select) => {
+    if (select && select !== "") return this.model.findById(id).select(select);
+    else return this.model.findById(id);
+  };
+
+  find = (query, select) => {
+    if (select && select !== "") return this.model.find(query).select(select);
+    else return this.model.find(query);
+  };
+
+  findByIdAndUpdate = (id, data, options) => {
+    return this.model.findByIdAndUpdate(id, data, options);
   };
 
   deleteOne = (query) => {

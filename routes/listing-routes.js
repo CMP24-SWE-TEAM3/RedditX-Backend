@@ -1,5 +1,6 @@
 const express = require("express");
 const listingController = require("../controllers/listing-controller");
+const startUploadingFiles = require("../utils/upload-array-photos");
 const possibleAuthCheck = require("../middlewares/possible-auth-check");
 const authCheck = require("../middlewares/auth-check");
 const addSubreddit = require("./../middlewares/append-subreddit");
@@ -18,7 +19,7 @@ router.post("/vote", authCheck, listingController.vote);
 router.post(
   "/submit",
   authCheck,
-  listingController.uploadPostFiles,
+  startUploadingFiles,
   listingController.submit
 );
 
