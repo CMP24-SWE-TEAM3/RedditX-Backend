@@ -4,22 +4,15 @@ const User = require("./../models/user-model");
 const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
-const sharp = require("sharp");
+const PostService = require("./../services/post-service");
+const UserService = require("./../services/user-service");
+const CommunityService = require("./../services/community-service");
+const CommentService = require("./../services/comment-service");
 
-/**
- * Name, resize, and save the uploaded file
- * @param {function} (req, res, next)
- */
-
-const resizeUserPhoto = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
-  req.file.filename = `user-${req.username}-${Date.now()}.jpg`;
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat("jpg")
-    .toFile(`public/users/files/${req.file.filename}`);
-  next();
-});
+const postServiceInstance = new PostService(Post);
+const userServiceInstance = new UserService(User);
+const communityServiceInstance = new CommunityService(Community);
+const commentServiceInstance = new CommentService(Comment);
 
 /**
  * Saves filename to database
@@ -27,18 +20,11 @@ const resizeUserPhoto = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const uploadUserPhoto = catchAsync(async (req, res, next) => {
-  if (!req.body.action)
-    return next(new AppError("No attachment or action is provided!", 400));
-  let avatar = "default.jpg";
-  if (req.body.action === "upload") {
-    if (!req.file) return next(new AppError("No photo is uploaded!", 400));
-    avatar = req.file.filename;
+  try {
+    await userServiceInstance.uploadUserPhoto(req.body, req.username, req.file);
+  } catch (err) {
+    return next(err);
   }
-  await User.findByIdAndUpdate(
-    req.username,
-    { avatar },
-    { runValidators: true }
-  );
   res.status(200).json({
     status: "success",
     message: "Avatar is updated successfully",
@@ -51,34 +37,15 @@ const uploadUserPhoto = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const block = catchAsync(async (req, res, next) => {
-  if (!req.body.userID)
-    return next(new AppError("No linkID is provided!", 400));
-  const toUser = await User.findById(req.body.userID);
-  const myUser = await User.findById(req.username);
-  if (!toUser || !myUser)
-    return next(new AppError("This user doesn't exist!", 404));
-  if (req.body.action === true) {
-    // block
-    if (toUser.blocksToMe.find((el) => el === req.username))
-      return res.status(200).json({
-        status: "success",
-        message: "Blocks are updated successfully",
-      });
-    myUser.blocksFromMe.push(req.body.userID);
-    toUser.blocksToMe.push(req.username);
-  } else {
-    // unblock
-    myUser.blocksFromMe.splice(
-      myUser.blocksFromMe.findIndex((el) => el === req.body.userID),
-      1
+  try {
+    await userServiceInstance.block(
+      req.username,
+      req.body.userID,
+      req.body.action
     );
-    toUser.blocksToMe.splice(
-      toUser.blocksToMe.findIndex((el) => el === req.username),
-      1
-    );
+  } catch (err) {
+    return next(err);
   }
-  await myUser.save();
-  await toUser.save();
   res.status(200).json({
     status: "success",
     message: "Blocks are updated successfully",
@@ -93,59 +60,50 @@ const block = catchAsync(async (req, res, next) => {
 const spam = catchAsync(async (req, res, next) => {
   if (!req.body.linkID)
     return next(new AppError("No linkID is provided!", 400));
-  if (req.body.linkID[1] === "3") {
-    // Spam a post
-    const post = await Post.findById(req.body.linkID.slice(3));
-    if (!post) return next(new AppError("This post doesn't exist!", 404));
-    if (post.spammers.find((el) => el.spammerID === req.username))
-      return res.status(200).json({
-        status: "success",
-        message: "Spams are updated successfully",
-      });
-    post.spammers.push({
-      spammerID: req.username,
-      spamType: req.body.spamType,
-      spamText: req.body.spamText,
-    });
-    post.spamCount++;
-    if (post.communityID !== undefined && post.communityID !== "") {
-      const community = await Community.findById(post.communityID).select(
-        "communityOptions"
+  var community = undefined;
+  try {
+    if (req.body.linkID[1] === "3") {
+      // Spam a post
+      const post = await postServiceInstance.findById(req.body.linkID.slice(3));
+      if (!post) return new AppError("This post doesn't exist!", 404);
+      if (post.communityID !== undefined && post.communityID !== "")
+        community = await communityServiceInstance.findById(
+          post.communityID,
+          "communityOptions"
+        );
+      postServiceInstance.spamPost(
+        post,
+        req.body.spamType,
+        req.body.spamText,
+        req.username,
+        community
       );
-      if (
-        community &&
-        post.spamCount >= community.communityOptions.spamsNumBeforeRemove
-      )
-        post.isDeleted = true;
-    }
-    await post.save();
-  } else {
-    // Spam a comment
-    const comment = await Comment.findById(req.body.linkID.slice(3));
-    if (!comment) return next(new AppError("This comment doesn't exist!", 404));
-    if (comment.spams.find((el) => el.userID === req.username))
-      return res.status(200).json({
-        status: "success",
-        message: "Spams are updated successfully",
-      });
-    comment.spams.push({
-      userID: req.username,
-      type: req.body.spamType,
-      text: req.body.spamText,
-    });
-    comment.spamCount++;
-    const post = await Post.findById(comment.replyingTo).select("communityID");
-    if (post.communityID !== undefined && post.communityID !== "") {
-      const community = await Community.findById(post.communityID).select(
-        "communityOptions"
+    } else {
+      // Spam a comment
+      var comment = await commentServiceInstance.findById(
+        req.body.linkID.slice(3)
       );
-      if (
-        community &&
-        comment.spamCount >= community.communityOptions.spamsNumBeforeRemove
-      )
-        comment.isDeleted = true;
+      if (!comment)
+        return next(new AppError("This comment doesn't exist!", 404));
+      comment = await commentServiceInstance.spamComment(
+        comment,
+        req.body.spamType,
+        req.body.spamText,
+        req.username
+      );
+      const post = await postServiceInstance.findById(
+        comment.replyingTo,
+        "communityID"
+      );
+      if (post && post.communityID !== undefined && post.communityID !== "")
+        community = await communityServiceInstance.findById(
+          post.communityID,
+          "communityOptions"
+        );
+      await commentServiceInstance.saveSpammedComment(comment, community);
     }
-    await comment.save();
+  } catch (err) {
+    return next(err);
   }
   res.status(200).json({
     status: "success",
@@ -313,11 +271,9 @@ const getUserAbout = async (req, res) => {
 };
 
 module.exports = {
-  resizeUserPhoto,
   uploadUserPhoto,
   block,
   spam,
-
   getUserMe,
   getUserAbout,
   getUserPrefs,

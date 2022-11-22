@@ -68,6 +68,7 @@ const sendErrorProd = (req, res, err) => {
   });
 };
 
+/* eslint-disable */
 /**
  * Handles some errors
  * @param {object} err

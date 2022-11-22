@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const sm = require('sequencematcher');
 
 // postID here is the _id from mongoDB, so if you want to send the post in response,
 // change the key name of the object came out from mongo from _id to postID (if you want)
@@ -46,10 +45,6 @@ const postSchema = mongoose.Schema({
     type: Boolean,
     default: 0,
   },
-  isPending: {
-    type: Boolean,
-    default: 0,
-  },
   attachments: [String],
   spoiler: {
     type: Boolean,
@@ -85,10 +80,6 @@ const postSchema = mongoose.Schema({
     },
   ],
   communityID: String,
-  isApproved: {
-    type: Boolean,
-    default: 0,
-  },
   userID: {
     type: String,
     required: [true, "A post must have a user!"],
@@ -119,7 +110,7 @@ postSchema.virtual("hotnessFactor").get(function () {
       this.createdAt().getDay() / 30 +
       this.createdAt.getYear() / 2022) *
       2) /
-    3 +
+      3 +
     this.votesCount +
     this.commentsNum
   );
@@ -131,26 +122,18 @@ postSchema.virtual("bestFactor").get(function () {
       this.createdAt().getDay / 30 +
       this.createdAt.getYear() / 2022) *
       1) /
-    3 +
+      3 +
     this.votesCount +
     this.commentsNum
   );
 });
 
-
-
-postSchema.pre(/^find/, async function (next) {
-  this.find({ isPending: { $ne: true } });
-});
-
-
 postSchema.post(/^find/, async function (doc, next) {
   await Post.updateMany(this.getFilter(), {
-    $inc: { 'insightCnt': 1 }
+    $inc: { insightCnt: 1 },
   });
   next();
 });
-
 
 const Post = mongoose.model("Post", postSchema);
 

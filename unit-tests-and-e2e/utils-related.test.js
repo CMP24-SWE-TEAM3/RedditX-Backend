@@ -1,3 +1,4 @@
+/* eslint-disable */
 const randomString = require("../utils/randomString");
 const APIFeatures = require("../utils/api-features");
 const dbConnect = require("../db-connection/connection");

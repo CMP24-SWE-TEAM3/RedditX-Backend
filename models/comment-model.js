@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const sm = require('sequencematcher');
 const spamSchema = mongoose.Schema({
   userID: {
     type: String,
@@ -72,10 +71,6 @@ const commentSchema = new mongoose.Schema({
     },
   ],
 });
-
-
-
-
 
 const Comment = mongoose.model("Comment", commentSchema);
 module.exports = Comment;

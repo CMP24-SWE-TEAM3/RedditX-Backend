@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const sm = require('sequencematcher');
 
 const communityRuleSchema = mongoose.Schema({
   title: String,
@@ -51,18 +50,17 @@ const communityOptionsSchema = mongoose.Schema({
   },
   suggestedCommentSort: {
     type: String,
-    default: "top",
+    default: "best",
   },
   postType: Number, // 0 any, 1 videos and images only, and 2 text only
   region: String,
-  privacyType: String, // "public" (anyone can view and submit), "private" (only approved members can view and submit), or "restricted" (anyone can view, but only some are approved to submit links)
+  privacyType: {
+    type: String, // "public" (anyone can view and submit), "private" (only approved members can view and submit), or "restricted" (anyone can view, but only some are approved to submit links)
+    default: "public",
+  },
   spamsNumBeforeRemove: {
     type: Number,
     default: 20,
-  },
-  isAutoApproved: {
-    type: Boolean,
-    default: 1,
   },
 });
 
@@ -169,8 +167,6 @@ const communitySchema = mongoose.Schema({
   category: String,
   categories: [String],
 });
-
-
 
 const Community = mongoose.model("Community", communitySchema);
 

@@ -1,4 +1,4 @@
-const AppError = require("../utils/app-error");
+/* eslint-disable */
 const globalErrorHandler = require("./../controllers/error-controller");
 
 describe("handle cast error in DB", () => {
