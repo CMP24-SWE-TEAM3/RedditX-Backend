@@ -16,7 +16,8 @@ class CommentService extends Service {
   constructor(model) {
     super(model);
   }
-  getSearchResults = (query) => {
+  getSearchResults = async (query) => {
+    console.log('here');
     const searchQuery = query.q;
     delete query.q;
     return this.getAll(

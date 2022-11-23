@@ -75,9 +75,9 @@ const commentSchema = new mongoose.Schema({
 
 commentSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'replyigTo',
-    select: '-__v'
+    path: 'replyingTo'
   });
+  next();
 })
 
 const Comment = mongoose.model("Comment", commentSchema);
