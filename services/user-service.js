@@ -69,10 +69,10 @@ class UserService extends Service {
     };
     return addedFilter;
   };
-  getSearchResults = (query) => {
+  getSearchResults = async (query, username) => {
     const searchQuery = query.q;
     delete query.q;
-    return this.getAll(
+    let users = await this.getAll(
       {
         $or: [
           { _id: { $regex: searchQuery, $options: "i" } },
@@ -81,6 +81,18 @@ class UserService extends Service {
       },
       query
     );
+
+    const { follows } = await this.getOne({
+      _id: username,
+      select: '-_id follows'
+    });
+    users = users.map((el) => {
+      el.follow = follows.indexOf(el._id) != -1;
+      delete el.prefs;
+      console.log(el)
+      return el;
+    });
+    return users;
   };
 
   /**

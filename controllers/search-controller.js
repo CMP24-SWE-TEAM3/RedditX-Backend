@@ -25,7 +25,7 @@ const getSearchResults = async (req, res, next) => {
     delete req.query.type;
     if (type === "user") {
       /**will get users that related to the search query */
-      results = await userServiceInstance.getSearchResults(req.query);
+      results = await userServiceInstance.getSearchResults(req.query, req.username);
     } else if (type === "sr") {
       /**will get subredits that related to the search query */
       results = await communityServiceInstance.getSearchResults(req.query);
