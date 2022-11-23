@@ -9,6 +9,9 @@
 const Service = require("./service");
 const AppError = require("./../utils/app-error");
 
+/**
+ * @namespace PostService
+ */
 class PostService extends Service {
   constructor(model) {
     super(model);
@@ -134,7 +137,8 @@ class PostService extends Service {
    * @param {string} community
    */
   spamPost = async (post, spamType, spamText, username, community) => {
-    if (post.spammers.find((el) => el.spammerID === username)) return;
+    if (post.spammers.find((el) => el.spammerID === username))
+      throw new AppError("You spammed this post before!");
     post.spammers.push({
       spammerID: username,
       spamType,

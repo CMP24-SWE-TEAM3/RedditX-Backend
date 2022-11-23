@@ -1,9 +1,9 @@
 /* eslint-disable */
 const request = require("supertest");
-const app = require("./../app");
+const app = require("../app");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./../config.env" });
-const dbConnect = require("./../db-connection/connection");
+const dbConnect = require("../db-connection/connection");
 const User = require("../models/user-model");
 const jwt = require("jsonwebtoken");
 

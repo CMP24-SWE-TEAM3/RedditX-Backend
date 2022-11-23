@@ -12,64 +12,64 @@
 const APIfeatures = require("./../utils/api-features");
 
 /**
- * Service class
+ * @namespace Service
  */
 class Service {
-    constructor(model) {
-        this.model = model;
+  constructor(model) {
+    this.model = model;
+  }
+
+  getAll = (findQuery, query) => {
+    const features = new APIfeatures(this.model.find(findQuery), query)
+      .sort()
+      .filter()
+      .paginate()
+      .selectFields();
+    return features.query;
+  };
+
+  getOne = (query) => {
+    let fields = "";
+    if (query.select) {
+      fields = query.select;
+      delete query.select;
     }
+    const res = this.model.findOne(query);
+    if (fields) {
+      const result = res.select(fields);
+      return result;
+    }
+    return res;
+  };
 
-    getAll = (findQuery, query) => {
-        const features = new APIfeatures(this.model.find(findQuery), query)
-            .sort()
-            .filter()
-            .paginate()
-            .selectFields();
-        return features.query;
-    };
+  updateOne = (query, body, options) => {
+    return this.model.findOneAndUpdate(query, body, options);
+  };
 
-    getOne = (query) => {
-        let fields = "";
-        if (query.select) {
-            fields = query.select;
-            delete query.select;
-        }
-        const res = this.model.findOne(query);
-        if (fields) {
-            const result = res.select(fields);
-            return result;
-        }
-        return res;
-    };
+  findById = (id, select) => {
+    if (select && select !== "") return this.model.findById(id).select(select);
+    else return this.model.findById(id);
+  };
 
-    updateOne = (query, body, options) => {
-        return this.model.findOneAndUpdate(query, body, options);
-    };
+  find = (query, select) => {
+    if (select && select !== "") return this.model.find(query).select(select);
+    else return this.model.find(query);
+  };
 
-    findById = (id, select) => {
-        if (select && select !== "") return this.model.findById(id).select(select);
-        else return this.model.findById(id);
-    };
+  findByIdAndUpdate = (id, data, options) => {
+    return this.model.findByIdAndUpdate(id, data, options);
+  };
 
-    find = (query, select) => {
-        if (select && select !== "") return this.model.find(query).select(select);
-        else return this.model.find(query);
-    };
+  deleteOne = (query) => {
+    return this.model.findOneAndDelete(query);
+  };
 
-    findByIdAndUpdate = (id, data, options) => {
-        return this.model.findByIdAndUpdate(id, data, options);
-    };
+  deleteMany = (query) => {
+    this.model.deleteMany(query);
+  };
 
-    deleteOne = (query) => {
-        return this.model.findOneAndDelete(query);
-    };
-
-    deleteMany = (query) => {
-        this.model.deleteMany(query);
-    };
-
-    insert = (data) => {
-        return this.model.create(data);
-    };
+  insert = (data) => {
+    return this.model.create(data);
+  };
 }
 module.exports = Service;

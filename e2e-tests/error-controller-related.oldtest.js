@@ -1,5 +1,5 @@
 /* eslint-disable */
-const globalErrorHandler = require("./../controllers/error-controller");
+const globalErrorHandler = require("../controllers/error-controller");
 
 describe("handle cast error in DB", () => {
   test("should respond with an object.status = fail", () => {

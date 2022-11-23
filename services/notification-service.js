@@ -9,6 +9,9 @@
 const Service = require("./service");
 const AppError = require("../utils/app-error");
 
+/**
+ * @namespace NotificationService
+ */
 class NotificationService extends Service {
   constructor(model) {
     super(model);

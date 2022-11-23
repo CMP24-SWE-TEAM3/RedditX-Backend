@@ -21,7 +21,11 @@ const commentServiceInstance = new CommentService(Comment);
  */
 const uploadUserPhoto = catchAsync(async (req, res, next) => {
   try {
-    await userServiceInstance.uploadUserPhoto(req.body, req.username, req.file);
+    await userServiceInstance.uploadUserPhoto(
+      req.body.action,
+      req.username,
+      req.file
+    );
   } catch (err) {
     return next(err);
   }
@@ -64,13 +68,15 @@ const spam = catchAsync(async (req, res, next) => {
   try {
     if (req.body.linkID[1] === "3") {
       // Spam a post
-      const post = await postServiceInstance.findById(req.body.linkID.slice(3));
+      const post = await postServiceInstance.getOne({
+        _id: req.body.linkID.slice(3),
+      });
       if (!post) return new AppError("This post doesn't exist!", 404);
       if (post.communityID !== undefined && post.communityID !== "")
-        community = await communityServiceInstance.findById(
-          post.communityID,
-          "communityOptions"
-        );
+        community = await communityServiceInstance.getOne({
+          _id: post.communityID,
+          select: "communityOptions",
+        });
       postServiceInstance.spamPost(
         post,
         req.body.spamType,
@@ -80,9 +86,9 @@ const spam = catchAsync(async (req, res, next) => {
       );
     } else {
       // Spam a comment
-      var comment = await commentServiceInstance.findById(
-        req.body.linkID.slice(3)
-      );
+      var comment = await commentServiceInstance.getOne({
+        _id: req.body.linkID.slice(3),
+      });
       if (!comment)
         return next(new AppError("This comment doesn't exist!", 404));
       comment = await commentServiceInstance.spamComment(
@@ -91,15 +97,15 @@ const spam = catchAsync(async (req, res, next) => {
         req.body.spamText,
         req.username
       );
-      const post = await postServiceInstance.findById(
-        comment.replyingTo,
-        "communityID"
-      );
+      const post = await postServiceInstance.getOne({
+        _id: comment.replyingTo,
+        select: "communityID",
+      });
       if (post && post.communityID !== undefined && post.communityID !== "")
-        community = await communityServiceInstance.findById(
-          post.communityID,
-          "communityOptions"
-        );
+        community = await communityServiceInstance.getOne({
+          _id: post.communityID,
+          select: "communityOptions",
+        });
       await commentServiceInstance.saveSpammedComment(comment, community);
     }
   } catch (err) {

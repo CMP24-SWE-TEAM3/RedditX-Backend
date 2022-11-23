@@ -9,6 +9,9 @@
 const Service = require("./service");
 const AppError = require("../utils/app-error");
 
+/**
+ * @namespace CommunityService
+ */
 class CommunityService extends Service {
   constructor(model) {
     super(model);
@@ -37,7 +40,10 @@ class CommunityService extends Service {
    */
   uploadCommunityPhoto = async (file, username, subreddit, type) => {
     if (!file) throw new AppError("No photo is uploaded!", 400);
-    const community = await this.findById(subreddit); // Note that front passes for ex: t5_imagePro
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "moderators icon banner",
+    }); // Note that front passes for ex: t5_imagePro
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     if (
       !community.moderators.find((moderator) => moderator.userID === username)
@@ -77,7 +83,10 @@ class CommunityService extends Service {
    * @returns {object} community
    */
   banOrMuteAtCommunity = async (subreddit, moderator, member, operation) => {
-    const community = await this.findById(subreddit, "members moderators");
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "members moderators",
+    });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     let performerFound = false;
     let toBeAffectedFound = false;
@@ -105,8 +114,8 @@ class CommunityService extends Service {
   };
 
   /**
-   * Saves the ban at the user side
-   * @param {string} toBeAffected
+   * Saves the ban or mute at the user side
+   * @param {object} toBeAffected
    * @param {object} community
    * @param {string} operation
    * @returns {object} community
@@ -135,7 +144,10 @@ class CommunityService extends Service {
    * @returns {Array} memberIDs
    */
   getBannedOrMuted = async (subreddit, type) => {
-    const community = await this.findById(subreddit, "members");
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "members",
+    });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     let memberIDs = [];
     community.members.forEach((el) => {
@@ -150,7 +162,10 @@ class CommunityService extends Service {
    * @returns {Array} moderatorIDs
    */
   getModerators = async (subreddit) => {
-    const community = await this.findById(subreddit, "moderators");
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "moderators",
+    });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     let moderatorIDs = [];
     community.moderators.forEach((el) => {
@@ -165,7 +180,10 @@ class CommunityService extends Service {
    * @returns {object} communityOptions
    */
   getCommunityOptions = async (subreddit) => {
-    const community = await this.findById(subreddit).select("communityOptions");
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "communityOptions",
+    });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     return community.communityOptions;
   };
