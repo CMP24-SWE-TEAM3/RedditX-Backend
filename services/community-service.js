@@ -8,6 +8,7 @@
 
 const Service = require("./service");
 const AppError = require("../utils/app-error");
+const Community=require("../models/community-model");
 
 /**
  * @namespace CommunityService
@@ -187,6 +188,14 @@ class CommunityService extends Service {
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     return community.communityOptions;
   };
+  getRandomCommunities=async()=>{
+    const cursor = Community.find();
+    var communities=[];
+    for await (const doc of cursor) {
+      communities.push(doc)  ;
+    }
+    return communities;
+  }
 }
 
 module.exports = CommunityService;
