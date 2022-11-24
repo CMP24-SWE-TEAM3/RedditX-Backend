@@ -27,5 +27,5 @@ router.get("/submitted/:username", profileController.getUserSubmitted);
 router.get("/overview/:username", profileController.getUserOverview);
 router.get("/upvoted/:username", profileController.getUserUpVoted);
 router.get("/downvoted/:username", profileController.getUserDownVoted);
-
+router.post("/subscribe",authCheck,userController.subscribe);
 module.exports = router;

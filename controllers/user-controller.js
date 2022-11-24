@@ -289,21 +289,7 @@ const returnResponse=(obj,statusCode)=>{
 
 
 
-const availableSubreddit=async(subreddit)=>{
 
-  const subre = await Community.findById(subreddit);
-  if (subre) {
-  return {
-      state: false,
-      subreddit: subre,
-  };
-  } else {
-  return {
-      state: true,
-      subreddit: null,
-  };
-  }
-}
 /**
  * Subscribe to a subreddit or a redditor
  * @param {function} (req,res)
@@ -313,48 +299,24 @@ const subscribe = async (req, res) => {
     if(!req.body.srName||!req.body.action){
       return returnResponse({error:"invalid inputs"},400);
     }
+    console.log(req.body);
+    console.log(req.username);
 
-    const id=req.body.srName.substring(0,2);
-    const action=req.body.action;
-    if(id==='t2'){
-      //check the username
-      const result=availableUser(req.body.srName);
-      if(!result.state){
-        return returnResponse({error:"invalid username"},404);
-      }
-      else{
-        
-        if(action==='sub'){
-          User.updateMany(
-            {_id:req.username},
-            {$addToSet:{"follows":req.body.srName}});
-          User.updateMany(
-            {_id:req.body.srName},
-            {$addToSet:{"followers":req.username}});
-        }
-        else{
-          User.updateMany( 
-            {_id:req.username}, 
-            {$pull: { "follows":req.body.srName}});
-          User.updateMany( 
-              {_id:req.body.srName}, 
-              {$pull: { "followers":req.username}});
-        }
-
-      }
-
+    const result=await userServiceInstance.subscribe(req.body,req.username);
+    console.log("res",result);
+    if(result.state){
+      return res.status(200).json({
+        "status":"done"
+      });
     }
-    else if(id==='t5'){
-      const result=availableSubreddit(req.body.srName);
-      if(!result.state){
-        return returnResponse({error:"invalid subreddit"},404);
-      }
-      else{
-        
+    else{
+      return res.status(404).json({
+        "status":result.error
 
-      }
+      });
     }
-
+    
+    
 };
 
 
@@ -368,4 +330,5 @@ module.exports = {
   getUserMe,
   getUserAbout,
   getUserPrefs,
+  subscribe
 };

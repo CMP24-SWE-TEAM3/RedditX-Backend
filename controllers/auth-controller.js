@@ -85,82 +85,21 @@ const signup = async (req, res) => {
  */
 
 const login = async (req, res) => {
-  const pass = authServiceInstance.changePasswordAccType(req.body.type, req.body.password);
-  const hash = await bcrypt.hash(pass, 10);
-  if (req.body.type == "gmail" || req.body.type == "facebook") {
-    const decodeReturn = decodeJwt.decodeJwt(req.body.googleOrFacebookToken);
-    if (decodeReturn.error != null) {
-      return res.status(404).json({
-        error: "invalid token",
-      });
-    }
-    const email = decodeReturn.payload.email;
-    const data = await authServiceInstance.availabeGmailOrFacebook(email, req.body.type);
-    console.log(email);
-    console.log(data);
-    //case if not available in database random new username and send it
-    if (data.exist == false) {
-      const username = randomUsername.randomUserName();
-      const result = await authServiceInstance.createUser(email, hash, username, req.body.type);
-      console.log(result);
-      if (result.username != null) {
-
-        const token = authServiceInstance.signToken(req.body.type, username);
-
-        return res.status(200).json({
-          token: token, //token,
-          expiresIn: 3600 * 24,
-          username: username,
-        });
-      } else {
-        return res.status(404).json({
-          error: "error happened",
-        });
-      }
-    } else {
-
-      const token = authServiceInstance.signToken(req.body.type, data.user_id);
-
-      return res.status(200).json({
-        token: token, //token,
-        expiresIn: 3600 * 24,
-        username: data.user._id,
-      });
-    }
-  } else {
-    User.findById(req.body.username)
-      .then((user) => {
-        if (!user) {
-          return res.status(404).json({
-            type: "bare email",
-            error: "Wrong username or password.",
-          });
-        }
-        return bcrypt.compareSync(req.body.password, user.password);
-      })
-      .then(async (result) => {
-        if (!result) {
-          return res.status(404).json({
-            type: "bare email",
-            error: "Wrong username or password.",
-          });
-        }
-
-        const token = await authServiceInstance.signToken(req.body.type, req.body.username);
-
-        return res.status(200).json({
-          token: token,
-          expiresIn: 3600 * 24,
-          username: req.body.username,
-        });
-      })
-      .catch(() => {
-        return res.status(404).json({
-          type: "bare email",
-          error: "Wrong username or password.",
-        });
-      });
-  }
+  
+  const result=await authServiceInstance.login(req.body);
+  if(result.state){
+    return res.status(200).json({
+    
+      token: result.token, //token,
+      expiresIn: result.expiresIn,
+      username: result.username,
+    })
+   }
+   else{
+    return res.status(404).json({
+      error:result.error
+    })
+   }
 };
 
 const forgotPassword = catchAsync(async (req, res, next) => {

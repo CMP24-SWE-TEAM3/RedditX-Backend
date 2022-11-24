@@ -11,7 +11,7 @@
  const bcrypt = require("bcryptjs");
  const decodeJwt = require("../controllers/google-facebook-oAuth");
  const randomUsername = require("../utils/random-username");
-
+ const User = require("../models/user-model");
 class AuthService extends Service {
     constructor(model) {
         super(model);
@@ -61,76 +61,105 @@ signToken = (emailType, username) => {
  */
 
   login=async(body)=>{
-    const pass = authServiceInstance.changePasswordAccType(req.body.type, req.body.password);
+    console.log("Asd");
+    if(!body.type){
+      return {
+        state:false,
+        error:"invalid parameters"
+
+      };
+    }
+    const pass = await this.changePasswordAccType(body.type, body.password);
   const hash = await bcrypt.hash(pass, 10);
-  if (req.body.type == "gmail" || req.body.type == "facebook") {
-    const decodeReturn = decodeJwt.decodeJwt(req.body.googleOrFacebookToken);
+  if (body.type == "gmail" || body.type == "facebook") {
+    if(!body.googleOrFacebookToken){
+      return {
+        state:false,
+        error:"invalid parameters"
+
+      };
+    }
+    const decodeReturn = decodeJwt.decodeJwt(body.googleOrFacebookToken);
     if (decodeReturn.error != null) {
-      return res.status(404).json({
-        error: "invalid token",
-      });
+      return {
+        state:false,
+        error:"invalid token"
+
+      };
+    
     }
     const email = decodeReturn.payload.email;
-    const data = await authServiceInstance.availabeGmailOrFacebook(email, req.body.type);
+    const data = await this.availabeGmailOrFacebook(email, body.type);
     console.log(email);
     console.log(data);
     //case if not available in database random new username and send it
     if (data.exist == false) {
-      const username = randomUsername.randomUserName();
-      const result = await authServiceInstance.createUser(email, hash, username, req.body.type);
+      const username =await randomUsername.randomUserName();
+      const result = await this.createUser(email, hash, username, body.type);
       console.log(result);
       if (result.username != null) {
-        const token = authServiceInstance.signToken(req.body.type, username);
-        return res.status(200).json({
+        const token = await this.signToken(body.type, username);
+        return {
+          state:true,
+          error:null,
           token: token, //token,
-          expiresIn: 3600,
+          expiresIn: 3600*24,
           username: username,
-        });
+        };
       } else {
-        return res.status(404).json({
-          error: "error happened",
-        });
+        return {
+          state:false,
+          error:"error happened while creating"
+  
+        };
+       
       }
     } else {
-      const token = authServiceInstance.signToken(req.body.type, data.user_id);
-      return res.status(200).json({
+      const token = await this.signToken(body.type, data.user_id);
+      return {
+        state:true,
+        error:null,
         token: token, //token,
-        expiresIn: 3600,
+        expiresIn: 3600*24,
         username: data.user._id,
-      });
+      };
     }
   } else {
-    User.findById({ _id: req.body.username })
-      .then((user) => {
-        if (!user) {
-          return res.status(404).json({
-            type: "bare email",
-            error: "Wrong username or password.",
-          });
-        }
-        fetchedUser = user;
-        return bcrypt.compareSync(req.body.password, user.password);
-      })
-      .then(async (result) => {
-        if (!result) {
-          return res.status(404).json({
-            type: "bare email",
-            error: "Wrong username or password.",
-          });
-        }
-        const token = await authServiceInstance.signToken(req.body.type, req.body.username);
-        return res.status(200).json({
-          token: token,
-          expiresIn: 3600,
-          username: req.body.username,
-        });
-      })
-      .catch((err) => {
-        return res.status(404).json({
-          type: "bare email",
-          error: "Wrong username or password.",
-        });
-      });
+    if(!body.username || !body.password){
+      return {
+        state:false,
+        error:"invalid parameters"
+
+      };
+    }
+    const user=await this.getOne({_id: body.username});
+    if (!user) {
+      return {
+        state:false,
+        error:"Wrong username or password"
+
+      };
+     
+    }
+    const compareResult=await bcrypt.compareSync(body.password, user.password);
+    console.log(compareResult);
+    if (!compareResult) {
+      return {
+        state:false,
+        error:"Wrong username or password"
+      };
+    }
+    const token = await this.signToken(body.type, body.username);
+    return {
+      state:true,
+      error:null,
+      token: token, //token,
+      expiresIn: 3600*24,
+      username: body.username
+    };
+    
+   
+     
   }
   };
 
@@ -198,6 +227,7 @@ signup=async(body)=>{
   else {
     //signup with bare email
     const data = await this.availableEmail(body.email);
+    console.log(data);
     if (data.exist)
     return {
       state:false,
@@ -211,8 +241,8 @@ signup=async(body)=>{
       body.type
     );
     if (result.username != null) {
-      const token = await authServiceInstance.signToken(body.type,body.username);
-
+      const token = await this.signToken(body.type,body.username);
+      console.log("sad");
       return {
         state:true,
         error:null,
@@ -237,7 +267,7 @@ signup=async(body)=>{
  
 */
 availableEmail = async (email) => {
-    const user = await User.findOne({ email: email });
+    const user = await this.getOne({ email: email });
     if (user) {
       return {
         exist: true,

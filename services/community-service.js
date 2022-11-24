@@ -196,6 +196,21 @@ class CommunityService extends Service {
     }
     return communities;
   }
+  availableSubreddit=async(subreddit)=>{
+
+    const subre = await this.getOne({_id:subreddit});
+    if (subre) {
+    return {
+        state: false,
+        subreddit: subre,
+    };
+    } else {
+    return {
+        state: true,
+        subreddit: null,
+    };
+    }
+  }
 }
 
 module.exports = CommunityService;
