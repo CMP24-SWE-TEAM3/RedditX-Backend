@@ -5,6 +5,7 @@ const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
 const sharp = require("sharp");
+const availableUser=require("./auth-controller").availableUser;
 
 /**
  * Name, resize, and save the uploaded file
@@ -312,12 +313,89 @@ const getUserAbout = async (req, res) => {
   }
 };
 
+const returnResponse=(obj,statusCode)=>{
+  return res.status(statusCode).json(
+    obj
+  );
+}
+
+
+
+const availableSubreddit=async(subreddit)=>{
+
+  const subre = await Community.findById(subreddit);
+  if (subre) {
+  return {
+      state: false,
+      subreddit: subre,
+  };
+  } else {
+  return {
+      state: true,
+      subreddit: null,
+  };
+  }
+}
+/**
+ * Subscribe to a subreddit or a redditor
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const subscribe = async (req, res) => {
+    if(!req.body.srName||!req.body.action){
+      return returnResponse({error:"invalid inputs"},400);
+    }
+
+    const id=req.body.srName.substring(0,2);
+    const action=req.body.action;
+    if(id==='t2'){
+      //check the username
+      const result=availableUser(req.body.srName);
+      if(!result.state){
+        return returnResponse({error:"invalid username"},404);
+      }
+      else{
+        
+        if(action==='sub'){
+          User.updateMany(
+            {_id:req.username},
+            {$addToSet:{"follows":req.body.srName}});
+          User.updateMany(
+            {_id:req.body.srName},
+            {$addToSet:{"followers":req.username}});
+        }
+        else{
+          User.updateMany( 
+            {_id:req.username}, 
+            {$pull: { "follows":req.body.srName}});
+          User.updateMany( 
+              {_id:req.body.srName}, 
+              {$pull: { "followers":req.username}});
+        }
+
+      }
+
+    }
+    else if(id==='t5'){
+      const result=availableSubreddit(req.body.srName);
+      if(!result.state){
+        return returnResponse({error:"invalid subreddit"},404);
+      }
+      else{
+        
+
+      }
+    }
+
+};
+
+
 module.exports = {
   resizeUserPhoto,
   uploadUserPhoto,
   block,
   spam,
-
+  returnResponse,
   getUserMe,
   getUserAbout,
   getUserPrefs,

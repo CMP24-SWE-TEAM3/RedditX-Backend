@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const sm = require('sequencematcher');
 
 const communityRuleSchema = mongoose.Schema({
   title: String,

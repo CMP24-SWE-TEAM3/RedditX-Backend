@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const sm = require('sequencematcher');
 const spamSchema = mongoose.Schema({
   userID: {
     type: String,

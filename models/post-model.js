@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const sm = require('sequencematcher');
 
 // postID here is the _id from mongoDB, so if you want to send the post in response,
 // change the key name of the object came out from mongo from _id to postID (if you want)

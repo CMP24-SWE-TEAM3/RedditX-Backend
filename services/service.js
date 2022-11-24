@@ -44,7 +44,7 @@ class Service {
         }
         return res;
     };
-
+    
     updateOne = (query) => {
         this.model.findOneAndUpdate(query);
     };

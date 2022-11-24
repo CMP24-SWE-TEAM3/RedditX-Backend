@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const sm = require('sequencematcher');
 
 //const { default: isEmail } = require("validator/lib/isemail");
 
