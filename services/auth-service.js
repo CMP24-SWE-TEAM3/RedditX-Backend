@@ -61,7 +61,6 @@ signToken = (emailType, username) => {
  */
 
   login=async(body)=>{
-    console.log("Asd");
     if(!body.type){
       return {
         state:false,
@@ -90,13 +89,11 @@ signToken = (emailType, username) => {
     }
     const email = decodeReturn.payload.email;
     const data = await this.availabeGmailOrFacebook(email, body.type);
-    console.log(email);
-    console.log(data);
+  
     //case if not available in database random new username and send it
     if (data.exist == false) {
       const username =await randomUsername.randomUserName();
       const result = await this.createUser(email, hash, username, body.type);
-      console.log(result);
       if (result.username != null) {
         const token = await this.signToken(body.type, username);
         return {
@@ -142,7 +139,6 @@ signToken = (emailType, username) => {
      
     }
     const compareResult=await bcrypt.compareSync(body.password, user.password);
-    console.log(compareResult);
     if (!compareResult) {
       return {
         state:false,
@@ -175,21 +171,16 @@ signup=async(body)=>{
    var pass = this.changePasswordAccType(body.type, body.password);
   const hash = await bcrypt.hash(pass, 10);
   if (body.type == "gmail" || body.type == "facebook") {
-    console.log("hi");
     const decodeReturn = decodeJwt.decodeJwt(body.googleOrFacebookToken);
-    console.log(decodeReturn);
     if (decodeReturn.error != null) {
       return {
         state:false,
         error:"invalid token"
 
       };
-      // return res.status(400).json({
-      //   error: "invalid token",
-      // });
+  
     }
     const email = await decodeReturn.payload.email;
-    console.log(email);
     const data = await this.availabeGmailOrFacebook(email, body.type);
     //case if not available in database random new username and send it
     if (data.exist == false) {
@@ -212,9 +203,7 @@ signup=async(body)=>{
       }
     } else {
       const token = this.signToken(body.type, data.user_id);
-      console.log("tokeeee");
-      console.log(token);
-      console.log(data.user._id);
+    
       return {
         state:true,
         error:null,
@@ -227,7 +216,6 @@ signup=async(body)=>{
   else {
     //signup with bare email
     const data = await this.availableEmail(body.email);
-    console.log(data);
     if (data.exist)
     return {
       state:false,
@@ -242,7 +230,6 @@ signup=async(body)=>{
     );
     if (result.username != null) {
       const token = await this.signToken(body.type,body.username);
-      console.log("sad");
       return {
         state:true,
         error:null,

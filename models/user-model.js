@@ -124,6 +124,13 @@ const voteSchema = new mongoose.Schema({
   },
   type: Number,
 });
+const voteCommentSchema = new mongoose.Schema({
+  commentID: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Comment",
+  },
+  type: Number,
+});
 
 const moderatorSchema = new mongoose.Schema({
   communityId: {
@@ -403,8 +410,7 @@ const userSchema = new mongoose.Schema({
    ***************************************/
   votedComments: [
     {
-      type: mongoose.Schema.ObjectId,
-      ref: "Comment",
+      type: voteCommentSchema,
     },
   ],
   mentionedInComments: [
