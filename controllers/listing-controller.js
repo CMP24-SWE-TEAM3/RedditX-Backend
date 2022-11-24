@@ -1,49 +1,16 @@
-const AppError = require("../utils/app-error");
 const catchAsync = require("../utils/catch-async");
 const Post = require("../models/post-model");
-const Community = require("../models/community-model");
 const Comment = require("../models/comment-model");
+const Community = require("../models/community-model");
 const User = require("../models/user-model");
-const makeRandomString = require("../utils/randomString");
-const multer = require("multer");
-const APIFeatures = require("../utils/api-features");
 const validators = require("./../validate/listing-validators");
-
-
-
-
-const PostService = require('./../services/post-service');
-const UserService = require('./../services/user-service');
+const PostService = require("./../services/post-service");
+const UserService = require("./../services/user-service");
+const CommunityService = require("./../services/community-service");
 
 var postServiceInstance = new PostService(Post);
 var userServiceInstance = new UserService(User);
-
-/**
- * Name and save the uploaded files
- */
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/posts/files");
-  },
-  filename: async (req, file, cb) => {
-    if (file.mimetype.startsWith("image")) {
-      return cb(null, `post-file-${makeRandomString()}-${Date.now()}.jpg`);
-    }
-    cb(
-      null,
-      `post-file-${makeRandomString()}-${Date.now()}-${file.originalname}`
-    );
-  },
-});
-
-const upload = multer({
-  storage: multerStorage,
-});
-
-/**
- * Upload the files
- */
-const uploadPostFiles = upload.array("attachments", 10);
+var communityServiceInstance = new CommunityService(Community);
 
 /**
  * Creates a post and saves the file names to database
@@ -51,23 +18,22 @@ const uploadPostFiles = upload.array("attachments", 10);
  * @returns {object} res
  */
 const submit = catchAsync(async (req, res, next) => {
-  req.body.attachments = [];
-  if (req.files) {
-    req.files.forEach((file) => req.body.attachments.push(file.filename));
-  }
-  req.body.userID = req.username;
-  req.body.voters = [{ userID: req.username, voteType: 1 }];
-  const user = await User.findById(req.username);
-  if (!user) return next(new AppError("This user doesn't exist!", 404));
-  if (req.body.communityID) {
-    const community = await Community.findById(req.body.communityID).select(
-      "communityOptions"
+  let newPost = {};
+  try {
+    const user = await userServiceInstance.getOne({ _id: req.username });
+    const community = await communityServiceInstance.getOne({
+      _id: req.body.communityID,
+      select: "communityOptions",
+    });
+    newPost = await postServiceInstance.submit(
+      req.body,
+      req.files,
+      user,
+      community
     );
-    if (!community.communityOptions.isAutoApproved) req.body.isPending = true;
+  } catch (err) {
+    return next(err);
   }
-  const newPost = await Post.create(req.body);
-  user.hasPost.push(newPost._id);
-  await user.save();
   res.status(201).json(newPost);
 });
 
@@ -77,17 +43,12 @@ const submit = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const save = catchAsync(async (req, res, next) => {
-  if (!req.body.linkID)
-    return next(new AppError("No linkID is provided!", 400));
-  const user = await User.findById(req.username);
-  if (!user) return next(new AppError("This user doesn't exist!", 404));
-  if (user.savedPosts.find((el) => el.toString() === req.body.linkID.slice(3)))
-    return res.status(200).json({
-      status: "success",
-      message: "Post is saved successfully",
-    });
-  user.savedPosts.push(req.body.linkID.slice(3));
-  await user.save();
+  try {
+    const user = await userServiceInstance.getOne({ _id: req.username });
+    await postServiceInstance.save(req.body.linkID, user);
+  } catch (err) {
+    return next(err);
+  }
   res.status(200).json({
     status: "success",
     message: "Post is saved successfully",
@@ -100,15 +61,12 @@ const save = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const unsave = catchAsync(async (req, res, next) => {
-  if (!req.body.linkID)
-    return next(new AppError("No linkID is provided!", 400));
-  const user = await User.findById(req.username);
-  if (!user) return next(new AppError("This user doesn't exist!", 404));
-  user.savedPosts.splice(
-    user.savedPosts.findIndex((el) => el === req.body.linkID.slice(3)),
-    1
-  );
-  await user.save();
+  try {
+    const user = await userServiceInstance.getOne({ _id: req.username });
+    await postServiceInstance.unsave(req.body.linkID, user);
+  } catch (err) {
+    return next(err);
+  }
   res.status(200).json({
     status: "success",
     message: "Post is unsaved successfully",
@@ -148,58 +106,47 @@ const vote = async (req, res) => {
     var isFound = false;
     var index = 0;
     var voter;
-
     for (let z = 0; z < voters.length; z++) {
-      console.log("loop");
       if (voters[z].userID === req.username) {
         console.log("jj");
         isFound = true;
         voter = voters[z];
-        console.log("inside loop");
-
         break;
       }
       index++;
     }
-
-
     if (!isFound) {
       if (dir == 1 || dir == -1) {
-
-        voters.push({ "userID": req.username, "voteType": dir });
-
-      }
-      else if (dir == 0 || dir == 2) {
-
+        voters.push({ userID: req.username, voteType: dir });
+      } else if (dir == 0 || dir == 2) {
         return res.status(500).json({
           status: "invalid dir",
         });
       }
-    }
-    else {
-
-      if ((dir == 0 && voter.voteType == 1) || (dir == 2 && voter.voteType == -1)) {
-
+    } else {
+      if (
+        (dir == 0 && voter.voteType == 1) ||
+        (dir == 2 && voter.voteType == -1)
+      ) {
         voters.splice(index, 1);
-
-      }
-      else if ((dir == 0 && voter.voteType == -1) || (dir == 2 && voter.voteType == 1)) {
+      } else if (
+        (dir == 0 && voter.voteType == -1) ||
+        (dir == 2 && voter.voteType == 1)
+      ) {
         return res.status(500).json({
           status: "invalid dir",
         });
-      }
-      else if ((voter.voteType == 1 && dir == -1) || (voter.voteType == -1 && dir == 1)) {
+      } else if (
+        (voter.voteType == 1 && dir == -1) ||
+        (voter.voteType == -1 && dir == 1)
+      ) {
         voters[index].voteType = dir;
-      }
-      else if (dir == voter.voteType) {
+      } else if (dir == voter.voteType) {
         return res.status(200).json({
-          status: 'already voted'
+          status: "already voted",
         });
       }
-
     }
-
-    console.log(voters);
     let votesCount = post.votesCount;
     let operation;
     if (dir == 1 || dir == 2) {
@@ -211,12 +158,12 @@ const vote = async (req, res) => {
       { _id: postIdCasted },
       {
         $set: {
-          votesCount: votesCount + operation
-          , voters: voters
-        }
+          votesCount: votesCount + operation,
+          voters: voters,
+        },
       },
       { new: true },
-      (err, doc) => {
+      (err) => {
         if (err) {
           return res.status(500).json({
             status: "failed",
@@ -236,60 +183,51 @@ const vote = async (req, res) => {
         status: "not found",
       });
     }
-    var voters = comment.voters;
-    var isFound = false;
-    var index = 0;
-    var voter;
-
+    voters = comment.voters;
+    isFound = false;
+    index = 0;
+    voter;
     for (let z = 0; z < voters.length; z++) {
       console.log("loop");
       if (voters[z].userID === req.username) {
         isFound = true;
         voter = voters[z];
-
         break;
       }
       index++;
     }
-
     if (!isFound) {
       if (dir == 1 || dir == -1) {
-
-        voters.push({ "userID": req.username, "voteType": dir });
-
-      }
-      else if (dir == 0 || dir == 2) {
-
+        voters.push({ userID: req.username, voteType: dir });
+      } else if (dir == 0 || dir == 2) {
         return res.status(500).json({
           status: "invalid dir",
         });
       }
-    }
-    else {
-
-      if ((dir == 0 && voter.voteType == 1) || (dir == 2 && voter.voteType == -1)) {
-
+    } else {
+      if (
+        (dir == 0 && voter.voteType == 1) ||
+        (dir == 2 && voter.voteType == -1)
+      ) {
         voters.splice(index, 1);
-
-      }
-      else if ((dir == 0 && voter.voteType == -1) || (dir == 2 && voter.voteType == 1)) {
+      } else if (
+        (dir == 0 && voter.voteType == -1) ||
+        (dir == 2 && voter.voteType == 1)
+      ) {
         return res.status(500).json({
           status: "invalid dir",
         });
-      }
-      else if ((voter.voteType == 1 && dir == -1) || (voter.voteType == -1 && dir == 1)) {
+      } else if (
+        (voter.voteType == 1 && dir == -1) ||
+        (voter.voteType == -1 && dir == 1)
+      ) {
         voters[index].voteType = dir;
       } else if (dir == voter.voteType) {
         return res.status(200).json({
-          status: 'already voted'
+          status: "already voted",
         });
       }
-
     }
-
-
-
-
     let votesCount = comment.votesCount;
     let operation;
     if (dir == 1 || dir == 2) {
@@ -301,7 +239,7 @@ const vote = async (req, res) => {
       { _id: postIdCasted },
       { $set: { votesCount: votesCount + operation, voters: voters } },
       { new: true },
-      (err, doc) => {
+      (err) => {
         if (err) {
           return res.status(500).json({
             status: "failed",
@@ -316,15 +254,14 @@ const vote = async (req, res) => {
   }
 };
 
-
 /**
  * get posts from the database based on the subreddits and friends of the signed in user if this is exist and based on criteria also and if it isn't will return based on criteria only
- * @param {Function} (req,res,next)
+ * @param {Function} (req,res)
  * @param {Object} req the request comes from client and edited by previous middlewares eg. possible-auth-check and addSubreddit and contain the username and the subreddit
  * @param {Object} res the response that will be sent to the client
  * @returns {void}
  */
-const getPosts = catchAsync(async (req, res, next) => {
+const getPosts = catchAsync(async (req, res) => {
   if (!req.addedFilter && req.username) {
     /* here the request dosn't contain certain subreddit then we will get the posts from friends and subreddits and persons the user follow*/
 
@@ -334,7 +271,11 @@ const getPosts = catchAsync(async (req, res, next) => {
     3. get the posts based on these categories and the users*/
     req.addedFilter = await userServiceInstance.addUserFilter(req.username);
   }
-  const posts = await postServiceInstance.getListingPosts(req.params, req.query, req.addedFilter);
+  const posts = await postServiceInstance.getListingPosts(
+    req.params,
+    req.query,
+    req.addedFilter
+  );
   res.status(200).json({
     status: "succeeded",
     posts,
@@ -342,7 +283,6 @@ const getPosts = catchAsync(async (req, res, next) => {
 });
 
 module.exports = {
-  uploadPostFiles,
   submit,
   save,
   unsave,

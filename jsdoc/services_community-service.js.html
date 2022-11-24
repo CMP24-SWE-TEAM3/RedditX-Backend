@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/community-service.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/community-service.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * FILE: community-service
+ * description: the services related to communities only
+ * created at: 18/11/2022
+ * created by: Mohamed Nabil
+ * authors: Ahmed Lotfy, Shredan Abdullah, Moaz Mohamed, Mohamed Nabil
+ */
+
+const Service = require("./service");
+const AppError = require("../utils/app-error");
+
+/**
+ * @namespace CommunityService
+ */
+class CommunityService extends Service {
+  constructor(model) {
+    super(model);
+  }
+
+  getSearchResults = (query) => {
+    const searchQuery = query.q;
+    delete query.q;
+    return this.getAll(
+      {
+        $or: [
+          { _id: { $regex: searchQuery, $options: "i" } },
+          { description: { $regex: searchQuery, $options: "i" } },
+        ],
+      },
+      query
+    );
+  };
+
+  /**
+   * Uploads community icon or banner
+   * @param {object} file
+   * @param {string} username
+   * @param {string} subreddit
+   * @param {string} type
+   */
+  uploadCommunityPhoto = async (file, username, subreddit, type) => {
+    if (!file) throw new AppError("No photo is uploaded!", 400);
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "moderators icon banner",
+    }); // Note that front passes for ex: t5_imagePro
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    if (
+      !community.moderators.find((moderator) => moderator.userID === username)
+    )
+      throw new AppError("You are not a moderator of this subreddit!", 401);
+    community[type] = file.filename;
+    await community.save();
+  };
+
+  /**
+   * Get the list of communities that the user moderates or subscribes to them
+   * @param {object} user
+   * @param {string} type
+   * @returns {array} communities
+   */
+  getCommunities = async (user, type) => {
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    let communityIDs = [];
+    user[type].forEach((el) => {
+      communityIDs.push(el.communityId);
+    });
+    const communities = await this.find(
+      {
+        _id: { $in: communityIDs },
+      },
+      "icon description category"
+    );
+    return communities;
+  };
+
+  /**
+   * Ban a user within a community
+   * @param {string} subreddit
+   * @param {string} moderator
+   * @param {string} member
+   * @param {string} operation
+   * @returns {object} community
+   */
+  banOrMuteAtCommunity = async (subreddit, moderator, member, operation) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "members moderators",
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    let performerFound = false;
+    let toBeAffectedFound = false;
+    community.moderators.forEach((el) => {
+      if (el.userID === moderator) performerFound = true;
+      if (el.userID === member) toBeAffectedFound = true;
+    });
+    if (!performerFound || toBeAffectedFound)
+      throw new AppError(
+        "You cannot make this operation this user in this subreddit!",
+        400
+      );
+    community.members.map((el) =>
+      el.userID === member
+        ? operation === "ban"
+          ? (el.isBanned = true)
+          : operation === "unban"
+          ? (el.isBanned = false)
+          : operation === "mute"
+          ? (el.isMuted = true)
+          : (el.isMuted = false)
+        : el
+    );
+    return community;
+  };
+
+  /**
+   * Saves the ban or mute at the user side
+   * @param {object} toBeAffected
+   * @param {object} community
+   * @param {string} operation
+   * @returns {object} community
+   */
+  banOrMuteAtUser = async (toBeAffected, community, operation) => {
+    if (!toBeAffected) throw new AppError("This user doesn't exist!", 404);
+    toBeAffected.member.map((el) =>
+      el.communityId === community._id
+        ? operation === "ban"
+          ? (el.isBanned = true)
+          : operation === "unban"
+          ? (el.isBanned = false)
+          : operation === "mute"
+          ? (el.isMuted = true)
+          : (el.isMuted = false)
+        : el
+    );
+    await toBeAffected.save();
+    await community.save();
+  };
+
+  /**
+   * Get all banned or muted users within a community
+   * @param {string} subreddit
+   * @param {string} type
+   * @returns {Array} memberIDs
+   */
+  getBannedOrMuted = async (subreddit, type) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "members",
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    let memberIDs = [];
+    community.members.forEach((el) => {
+      if (el[type]) memberIDs.push(el.userID);
+    });
+    return memberIDs;
+  };
+
+  /**
+   * Get all moderators of a community
+   * @param {string} subreddit
+   * @returns {Array} moderatorIDs
+   */
+  getModerators = async (subreddit) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "moderators",
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    let moderatorIDs = [];
+    community.moderators.forEach((el) => {
+      moderatorIDs.push(el.userID);
+    });
+    return moderatorIDs;
+  };
+
+  /**
+   * Get options of a community
+   * @param {string} subreddit
+   * @returns {object} communityOptions
+   */
+  getCommunityOptions = async (subreddit) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "communityOptions",
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    return community.communityOptions;
+  };
+}
+
+module.exports = CommunityService;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="global.html#Service">Service</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#APIfeatures">APIfeatures</a></li><li><a href="global.html#availabeGmailOrFacebook">availabeGmailOrFacebook</a></li><li><a href="global.html#availableEmail">availableEmail</a></li><li><a href="global.html#availableUser">availableUser</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#changePasswordAccType">changePasswordAccType</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li><li><a href="global.html#vote">vote</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 23 2022 01:55:47 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

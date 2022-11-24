@@ -1,0 +1,8 @@
+extends baseEmail
+
+block content 
+    p Forgot your username?
+    p Your username is 
+    div(style={'background-color': '#ed2d47', 'border-color': '#0510a8', 'color': '#ffffff', 'border': 'solid 1px #0510a8', 'border-radius': '5px', 'box-sizing': 'border-box', 'cursor': 'pointer', 'display': 'inline-block', 'font-size': '14px', 'font-weight': 'bold', 'margin': '0', 'padding': '12px 25px', 'text-decoration': 'none'}) 
+        | #{name}
+    p If you didn't forget your username, please ignore this email!

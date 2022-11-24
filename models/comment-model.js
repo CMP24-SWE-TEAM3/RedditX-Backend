@@ -73,8 +73,12 @@ const commentSchema = new mongoose.Schema({
 });
 
 
-
-
+commentSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'replyingTo'
+  });
+  next();
+})
 
 const Comment = mongoose.model("Comment", commentSchema);
 module.exports = Comment;

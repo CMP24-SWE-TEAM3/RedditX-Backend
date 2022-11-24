@@ -1,11 +1,30 @@
 const mongoose = require("mongoose");
 
-const notificationItemSchema = mongoose.Schema({
-  notificationID: {
+const notificationSchema = mongoose.Schema({
+  userIcon: String,
+  communityIcon: String,
+  title: String,
+  type: {
     type: String,
-    required: [true, "A notification must have an id!"],
+    enum: [
+      "trending",
+      "mention",
+      "replyToPost",
+      "replyToComment",
+      "newFollower",
+      "modNotifications",
+      "upvoteToYourPost",
+      "upvoteToYourComment",
+      "ban",
+      "mute",
+      "unban",
+      "unmute",
+      "newFriendRequest",
+      "newFriend",
+    ],
   },
-  icon: String,
+  text: String,
+  sourceThing: String, // t3_54148d012f459b337e2382ce or t2_moazMohamed (post id, user id, community id, comment, or message id)
   isDeleted: {
     type: Boolean,
     default: 0,
@@ -14,62 +33,6 @@ const notificationItemSchema = mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  title: String,
-  type:{
-    type: String,
-    enum: ["trending", "mention","reply to post", "reply to comment","new followers", "mod notifications", "upvotes to your posts","upvotes to your comments"],
-  },//how to say eno akhtar been 7agat mo3yna bs wla msh matlob mne?
-  text: String,
-  sourceObject: String,
-});
-
-const postSchema = mongoose.Schema({
-  postID: String,
-});
-
-const commentSchema = mongoose.Schema({
-  commentID: String,
-});
-
-const commuitySchema = mongoose.Schema({
-  commuityID: String,
-});
-
-const userSchema = mongoose.Schema({
-  userID: String,
-});
-
-const messageSchema = mongoose.Schema({
-  messageID: String,
-});
-
-const notificationSchema = mongoose.Schema({
-  notification: notificationItemSchema,
-  posts: [
-    {
-      type: postSchema,
-    },
-  ],
-  users: [
-    {
-      type: userSchema,
-    },
-  ],
-  comments: [
-    {
-      type: commentSchema,
-    },
-  ],
-  commuinties: [
-    {
-      type: commuitySchema,
-    },
-  ],
-  messages: [
-    {
-      type: messageSchema,
-    },
-  ],
 });
 
 const Notification = mongoose.model("Notification", notificationSchema);

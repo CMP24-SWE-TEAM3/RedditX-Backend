@@ -26,11 +26,14 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const jwt = require("jsonwebtoken");
-const User = require("../models/user-model");
+            <pre class="prettyprint source linenums"><code>const User = require("../models/user-model");
 const bcrypt = require("bcryptjs");
 const decodeJwt = require("./google-facebook-oAuth");
 const randomUsername = require("../utils/random-username");
+const catchAsync = require("../utils/catch-async");
+const UserService = require("./../services/user-service");
+
+const userServiceInstance = new UserService(User);
 
 /**
  * Check whether user name is in database or not (function)
@@ -57,8 +60,7 @@ const availableUser = async (username) => {
  * Check whether email is in database or not (function)
  * @param {String} email  state of the operation whether false or true to indicate the sucess.
  * @returns {Boolean} exist whether the email exists or not.
- 
-*/
+ */
 const availableEmail = async (email) => {
   const user = await User.findOne({ email: email });
   if (user) {
@@ -93,23 +95,23 @@ const availabeGmailOrFacebook = async (email, type) => {
   }
 };
 
-/**
- * Check whether google account or facebook account is in database or not (route)
- * @param {Object} req request that contain email and type.
- * @returns {String} response whether available or not.
- */
-const availableGorF = async (req, res) => {
-  const data = await availabeGmailOrFacebook(req.body.email, req.body.type);
-  if (data.exist == false) {
-    return res.status(200).json({
-      response: "Avaliable",
-    });
-  } else {
-    return res.status(404).json({
-      response: "Not Avaliable",
-    });
-  }
-};
+// /**
+//  * Check whether google account or facebook account is in database or not (route)
+//  * @param {Object} req request that contain email and type.
+//  * @returns {String} response whether available or not.
+//  */
+// const availableGorF = async (req, res) => {
+//   const data = await availabeGmailOrFacebook(req.body.email, req.body.type);
+//   if (data.exist == false) {
+//     return res.status(200).json({
+//       response: "Avaliable",
+//     });
+//   } else {
+//     return res.status(404).json({
+//       response: "Not Avaliable",
+//     });
+//   }
+// };
 
 /**
  * Change password according to type of email
@@ -119,19 +121,6 @@ const availableGorF = async (req, res) => {
  */
 const changePasswordAccType = (type, password) => {
   return type == "facebook" || type == "gmail" ? "1" : password;
-};
-/**
- * Signing the token
- * @param {String} emailType email type.
- * @param {String} username username of the user.
- * @returns {String} (signed token)
- */
-const signToken = (emailType, username) => {
-  return jwt.sign(
-    { emailType: emailType, username: username },
-    "mozaisSoHotButNabilisTheHottest",
-    { expiresIn: "120h" }
-  );
 };
 
 /**
@@ -171,7 +160,7 @@ const createUser = async (email, hash, username, type) => {
   });
   const result = user
     .save()
-    .then((result) => {
+    .then(() => {
       return {
         username: user._id,
         status: "done",
@@ -209,10 +198,10 @@ const signup = async (req, res) => {
       const username = randomUsername.randomUserName();
       const result = await createUser(email, hash, username, req.body.type);
       if (result.username != null) {
-        const token = signToken(req.body.type, username);
+        const token = userServiceInstance.signToken(req.body.type, username);
         return res.status(200).json({
           token: token, //token,
-          expiresIn: 3600,
+          expiresIn: 3600 * 24,
           username: username,
         });
       } else {
@@ -221,10 +210,10 @@ const signup = async (req, res) => {
         });
       }
     } else {
-      const token = signToken(req.body.type, data.user_id);
+      const token = userServiceInstance.signToken(req.body.type, data.user_id);
       return res.status(200).json({
         token: token, //token,
-        expiresIn: 3600,
+        expiresIn: 3600 * 24,
         username: data.user._id,
       });
     }
@@ -242,11 +231,14 @@ const signup = async (req, res) => {
       req.body.type
     );
     if (result.username != null) {
-      const token = await signToken(req.body.type, req.body.username);
+      const token = await userServiceInstance.signToken(
+        req.body.type,
+        req.body.username
+      );
 
       return res.status(200).json({
         token: token, //token,
-        expiresIn: 3600,
+        expiresIn: 3600 * 24,
         username: req.body.username,
       });
     } else {
@@ -281,10 +273,10 @@ const login = async (req, res) => {
       const username = randomUsername.randomUserName();
       const result = await createUser(email, hash, username, req.body.type);
       if (result.username != null) {
-        const token = signToken(req.body.type, username);
+        const token = userServiceInstance.signToken(req.body.type, username);
         return res.status(200).json({
           token: token, //token,
-          expiresIn: 3600,
+          expiresIn: 3600 * 24,
           username: username,
         });
       } else {
@@ -293,15 +285,15 @@ const login = async (req, res) => {
         });
       }
     } else {
-      const token = signToken(req.body.type, data.user_id);
+      const token = userServiceInstance.signToken(req.body.type, data.user_id);
       return res.status(200).json({
         token: token, //token,
-        expiresIn: 3600,
+        expiresIn: 3600 * 24,
         username: data.user._id,
       });
     }
   } else {
-    User.findById({ _id: req.body.username })
+    User.findById(req.body.username)
       .then((user) => {
         if (!user) {
           return res.status(404).json({
@@ -309,7 +301,6 @@ const login = async (req, res) => {
             error: "Wrong username or password.",
           });
         }
-        fetchedUser = user;
         return bcrypt.compareSync(req.body.password, user.password);
       })
       .then(async (result) => {
@@ -319,15 +310,18 @@ const login = async (req, res) => {
             error: "Wrong username or password.",
           });
         }
-        const token = await signToken(req.body.type, req.body.username);
+        const token = await userServiceInstance.signToken(
+          req.body.type,
+          req.body.username
+        );
         return res.status(200).json({
           token: token,
-          expiresIn: 3600,
+          expiresIn: 3600 * 24,
           username: req.body.username,
         });
       })
-      .catch((err) => {
-        return res.status(401).json({
+      .catch(() => {
+        return res.status(404).json({
           type: "bare email",
           error: "Wrong username or password.",
         });
@@ -335,13 +329,56 @@ const login = async (req, res) => {
   }
 };
 
+const forgotPassword = catchAsync(async (req, res, next) => {
+  if (req.body.operation) {
+    // in case of forgot username
+    try {
+      await userServiceInstance.forgotUsername(req.body.email);
+    } catch (err) {
+      return next(err);
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "Username is sent to the email!",
+    });
+  }
+  try {
+    await userServiceInstance.forgotPassword(req.body.username);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Link is sent to the email!",
+  });
+});
+
+const resetForgottenPassword = catchAsync(async (req, res, next) => {
+  var data = undefined;
+  try {
+    data = await userServiceInstance.resetForgottenPassword(
+      req.params.token,
+      req.body.newPassword,
+      req.body.confirmedNewPassword
+    );
+  } catch (err) {
+    return next(err);
+  }
+  return res.status(200).json({
+    token: data.token,
+    expiresIn: 3600 * 24,
+    username: data.id,
+  });
+});
+
 module.exports = {
   availableEmail,
   availableUser,
   availableUsername,
   signup,
-  availableGorF,
   login,
+  forgotPassword,
+  resetForgottenPassword,
 };
 </code></pre>
         </article>
@@ -353,13 +390,13 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addSubreddit">addSubreddit</a></li><li><a href="global.html#availabeGmailOrFacebook">availabeGmailOrFacebook</a></li><li><a href="global.html#availableEmail">availableEmail</a></li><li><a href="global.html#availableGorF">availableGorF</a></li><li><a href="global.html#availableUser">availableUser</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#changePasswordAccType">changePasswordAccType</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleJWTError">handleJWTError</a></li><li><a href="global.html#handleTokenExpiredError">handleTokenExpiredError</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signToken">signToken</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadPostFiles">uploadPostFiles</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li><li><a href="global.html#vote">vote</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="global.html#Service">Service</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#APIfeatures">APIfeatures</a></li><li><a href="global.html#availabeGmailOrFacebook">availabeGmailOrFacebook</a></li><li><a href="global.html#availableEmail">availableEmail</a></li><li><a href="global.html#availableUser">availableUser</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#changePasswordAccType">changePasswordAccType</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li><li><a href="global.html#vote">vote</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sat Nov 12 2022 03:50:22 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 23 2022 01:55:47 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

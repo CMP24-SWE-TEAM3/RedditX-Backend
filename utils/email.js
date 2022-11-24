@@ -1,16 +1,16 @@
-/*const nodemailer = require('nodemailer');
-const pug = require('pug');
+const nodemailer = require("nodemailer");
+const pug = require("pug");
 
 module.exports = class Email {
   constructor(user, url) {
     this.to = user.email;
-    this.firstName = user.name.split(' ')[0];
+    this.name = user._id.slice(3);
     this.url = url;
     this.from = `Admin 1 <${process.env.EMAIL_FROM}>`;
   }
   newTransport() {
     return nodemailer.createTransport({
-      service: 'Gmail',
+      service: "Gmail",
       auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD, // App password in gmail
@@ -22,7 +22,7 @@ module.exports = class Email {
     const html = pug.renderFile(
       `${__dirname}/../views/emails/${template}.pug`,
       {
-        firstName: this.firstName,
+        name: this.name,
         url: this.url,
         subject,
       }
@@ -33,17 +33,15 @@ module.exports = class Email {
       subject,
       html,
     };
-
     await this.newTransport().sendMail(emailOptions);
-  }
-
-  async sendWelcome() {
-    await this.send('welcome', 'Welcome to the Natours Family!');
   }
   async sendPasswordReset() {
     await this.send(
-      'passwordReset',
-      'Your password reset link, (Valid for only 10 minutes)'
+      "passwordReset",
+      "Your password reset link, (Valid for only 10 minutes)"
     );
   }
-};*/
+  async sendUsername() {
+    await this.send("username", "Your Reddit Username");
+  }
+};

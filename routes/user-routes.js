@@ -3,6 +3,7 @@ const userController = require("../controllers/user-controller");
 const profileController = require("../controllers/profile-controller");
 const startUploadSinglePhoto = require("../utils/upload-single-photo");
 const authCheck = require("../middlewares/auth-check");
+const resizeUserPhoto = require("../middlewares/resize-user-photo");
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ router.post(
   "/me/upload-user-photo",
   authCheck,
   startUploadSinglePhoto,
-  userController.resizeUserPhoto,
+  resizeUserPhoto,
   userController.uploadUserPhoto
 );
 router.get("/me/prefs", authCheck, userController.getUserPrefs);

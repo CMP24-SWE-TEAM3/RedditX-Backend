@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/post-service.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/post-service.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * FILE: post-service
+ * description: the services related to posts only
+ * created at: 15/11/2022
+ * created by: Mohamed Nabil
+ * authors: Ahmed Lotfy, Shredan Abdullah, Moaz Mohamed, Mohamed Nabil
+ */
+
+const Service = require("./service");
+const AppError = require("./../utils/app-error");
+
+/**
+ * @namespace PostService
+ */
+class PostService extends Service {
+  constructor(model) {
+    super(model);
+  }
+
+  addSortCriteria(criteria) {
+    let sort = {};
+    if (criteria) {
+      if (criteria === "best")
+        sort = {
+          bestFactor: -1,
+        };
+      else if (criteria === "hot")
+        sort = {
+          hotnessFactor: -1,
+        };
+      else if (criteria === "new") {
+        sort = {
+          createdAt: -1,
+        };
+      } else if (criteria === "top")
+        sort = {
+          votesCount: -1,
+        };
+      else if (criteria === "random") {
+        sort = {};
+      } else {
+        /*if the request has any other criteria */
+        return new AppError("not found this page", 404);
+      }
+    }
+    return sort;
+  }
+
+  getListingPosts = async (params, query, addedFilter) => {
+    /*first of all : check if the request has certain subreddit or not*/
+    let sort = this.addSortCriteria(params.criteria);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    query.limit = query.limit || "10";
+    /*return posts to controller */
+    return await this.getAll(addedFilter, query).sort(sort); //addedFilter contain either the subreddit or the information of signedin user
+  };
+
+  getSearchResults = (query) => {
+    const searchQuery = query.q;
+    delete query.q;
+    return this.getAll(
+      {
+        $or: [{ text: { $regex: searchQuery, $options: "i" } }],
+      },
+      query
+    );
+  };
+
+  /**
+   * User saves a post
+   * @param {string} linkID
+   * @param {object} user
+   */
+  save = async (linkID, user) => {
+    if (!linkID) throw new AppError("No linkID is provided!", 400);
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    if (user.savedPosts.find((el) => el.toString() === linkID.slice(3))) return;
+    user.savedPosts.push(linkID.slice(3));
+    await user.save();
+  };
+
+  /**
+   * User unsaves a post
+   * @param {string} linkID
+   * @param {object} user
+   */
+  unsave = async (linkID, user) => {
+    if (!linkID) throw new AppError("No linkID is provided!", 400);
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    user.savedPosts.splice(
+      user.savedPosts.findIndex((el) => el === linkID.slice(3)),
+      1
+    );
+    await user.save();
+  };
+
+  /**
+   * Creates a post and saves the file names to database
+   * @param {object} data
+   * @param {Array} files
+   * @param {object} user
+   * @param {object} community
+   * @returns {object} newPost
+   */
+  submit = async (data, files, user, community) => {
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    data.attachments = [];
+    if (files) {
+      files.forEach((file) => data.attachments.push(file.filename));
+    }
+    data.userID = user._id;
+    data.voters = [{ userID: user._id, voteType: 1 }];
+    if (community) {
+      if (
+        community.communityOptions.privacyType === "private" ||
+        community.communityOptions.privacyType === "restricted"
+      ) {
+        const memberOf = user.member.find(
+          (el) => el.communityId === community._id
+        );
+        if (!memberOf || memberOf.isMuted || memberOf.isBanned)
+          throw new AppError("You cannot submit a post to this subreddit", 400);
+      }
+    }
+    const newPost = await this.insert(data);
+    user.hasPost.push(newPost._id);
+    await user.save();
+    return newPost;
+  };
+
+  /**
+   * Spams a post
+   * @param {object} post
+   * @param {string} spamType
+   * @param {string} spamText
+   * @param {string} username
+   * @param {string} community
+   */
+  spamPost = async (post, spamType, spamText, username, community) => {
+    if (post.spammers.find((el) => el.spammerID === username))
+      throw new AppError("You spammed this post before!");
+    post.spammers.push({
+      spammerID: username,
+      spamType,
+      spamText,
+    });
+    post.spamCount++;
+    if (community) {
+      if (
+        community &amp;&amp;
+        post.spamCount >= community.communityOptions.spamsNumBeforeRemove
+      )
+        post.isDeleted = true;
+    }
+    await post.save();
+  };
+}
+
+module.exports = PostService;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="global.html#Service">Service</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#APIfeatures">APIfeatures</a></li><li><a href="global.html#availabeGmailOrFacebook">availabeGmailOrFacebook</a></li><li><a href="global.html#availableEmail">availableEmail</a></li><li><a href="global.html#availableUser">availableUser</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#changePasswordAccType">changePasswordAccType</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li><li><a href="global.html#vote">vote</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 23 2022 01:55:47 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

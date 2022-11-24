@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
 
-
 const dbConnect = () => {
   // Connect to the database
   const dbConnectionString = process.env.DATABASE.replace(
@@ -15,8 +14,8 @@ const dbConnect = () => {
     .connect(dbConnectionString, {
       useNewUrlParser: true,
     })
-    .then((connection) => {
-      console.log(`Successfully connected to database`);
+    .then(() => {
+      console.log("Successfully connected to database");
     });
 };
 

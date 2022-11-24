@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
+const crypto = require("crypto");
 //const { default: isEmail } = require("validator/lib/isemail");
 
 const userPrefsSchema = new mongoose.Schema({
@@ -203,9 +204,9 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, "Please provide a valid email"],
   },
-  passWordResetToken: {
+  passwordResetToken: {
     type: String,
-    validate: [validator.isJWT, "the only format allowed to this field is JWT"],
+    default: "sdv5640",
   },
   postKarma: Number,
   commentKarma: Number,
@@ -238,19 +239,7 @@ const userSchema = new mongoose.Schema({
     maxLength: [200, "the max length of the password is 200"],
     /*we didn't put required field due to google and facebook signing in*/
   },
-  passwordConfirm: {
-    type: String,
-    validate: {
-      validator: function (pas) {
-        return pas === this.password;
-      },
-      message: "the passwords aren't the same",
-    },
-  },
-  passWordResetExpires: {
-    type: Date,
-    select: false,
-  },
+  passwordResetExpires: Date,
   passwordChangedAt: {
     type: Date,
     select: false,
@@ -356,7 +345,6 @@ const userSchema = new mongoose.Schema({
       // ref:'Category'
     },
   ],
-
   /***************************************
    * posts relations
    ***************************************/
@@ -427,11 +415,16 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-
-
-
+userSchema.methods.createPasswordResetToken = async function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes with millis
+  return resetToken;
+};
 
 const User = mongoose.model("User", userSchema);
-
 
 module.exports = User;

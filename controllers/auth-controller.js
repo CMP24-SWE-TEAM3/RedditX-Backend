@@ -2,9 +2,18 @@ const User = require("../models/user-model");
 const bcrypt = require("bcryptjs");
 const decodeJwt = require("./google-facebook-oAuth");
 const randomUsername = require("../utils/random-username");
+
 const AuthService = require('./../services/auth-service');
 
 var authServiceInstance = new AuthService(User);
+
+const catchAsync = require("../utils/catch-async");
+const UserService = require("./../services/user-service");
+
+const userServiceInstance = new UserService(User);
+
+
+
 
 
 
@@ -25,6 +34,7 @@ var authServiceInstance = new AuthService(User);
 //     });
 //   }
 // };
+
 
 
 /**
@@ -49,6 +59,7 @@ const availableUsername = async (req, res) => {
  * @returns {object} {token,expiresIn,username} or {error}
  */
 const signup = async (req, res) => {
+
    const result=await authServiceInstance.signup(req.body);
    console.log(result);
    if(result.state){
@@ -93,10 +104,12 @@ const login = async (req, res) => {
       const result = await authServiceInstance.createUser(email, hash, username, req.body.type);
       console.log(result);
       if (result.username != null) {
+
         const token = authServiceInstance.signToken(req.body.type, username);
+
         return res.status(200).json({
           token: token, //token,
-          expiresIn: 3600,
+          expiresIn: 3600 * 24,
           username: username,
         });
       } else {
@@ -105,15 +118,17 @@ const login = async (req, res) => {
         });
       }
     } else {
+
       const token = authServiceInstance.signToken(req.body.type, data.user_id);
+
       return res.status(200).json({
         token: token, //token,
-        expiresIn: 3600,
+        expiresIn: 3600 * 24,
         username: data.user._id,
       });
     }
   } else {
-    User.findById({ _id: req.body.username })
+    User.findById(req.body.username)
       .then((user) => {
         if (!user) {
           return res.status(404).json({
@@ -121,7 +136,6 @@ const login = async (req, res) => {
             error: "Wrong username or password.",
           });
         }
-        fetchedUser = user;
         return bcrypt.compareSync(req.body.password, user.password);
       })
       .then(async (result) => {
@@ -131,14 +145,16 @@ const login = async (req, res) => {
             error: "Wrong username or password.",
           });
         }
+
         const token = await authServiceInstance.signToken(req.body.type, req.body.username);
+
         return res.status(200).json({
           token: token,
-          expiresIn: 3600,
+          expiresIn: 3600 * 24,
           username: req.body.username,
         });
       })
-      .catch((err) => {
+      .catch(() => {
         return res.status(404).json({
           type: "bare email",
           error: "Wrong username or password.",
@@ -147,9 +163,52 @@ const login = async (req, res) => {
   }
 };
 
+const forgotPassword = catchAsync(async (req, res, next) => {
+  if (req.body.operation) {
+    // in case of forgot username
+    try {
+      await userServiceInstance.forgotUsername(req.body.email);
+    } catch (err) {
+      return next(err);
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "Username is sent to the email!",
+    });
+  }
+  try {
+    await userServiceInstance.forgotPassword(req.body.username);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Link is sent to the email!",
+  });
+});
+
+const resetForgottenPassword = catchAsync(async (req, res, next) => {
+  var data = undefined;
+  try {
+    data = await userServiceInstance.resetForgottenPassword(
+      req.params.token,
+      req.body.newPassword,
+      req.body.confirmedNewPassword
+    );
+  } catch (err) {
+    return next(err);
+  }
+  return res.status(200).json({
+    token: data.token,
+    expiresIn: 3600 * 24,
+    username: data.id,
+  });
+});
+
 module.exports = {
   availableUsername,
   signup,
-  
   login,
+  forgotPassword,
+  resetForgottenPassword,
 };
