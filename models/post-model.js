@@ -102,6 +102,11 @@ const postSchema = mongoose.Schema({
     },
   ],
   commentsNum: Number,
+  postComments: [
+    {
+      type: mongoose.Schema.ObjectId,
+    },
+  ],
 });
 
 postSchema.virtual("hotnessFactor").get(function () {

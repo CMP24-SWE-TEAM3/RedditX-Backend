@@ -11,6 +11,8 @@ const Email = require("./../utils/email");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Comment= require("../models/comment-model");
+const Post = require("../models/post-model");
 
 /**
  * @namespace UserService
@@ -87,12 +89,12 @@ class UserService extends Service {
 
     const { follows } = await this.getOne({
       _id: username,
-      select: '-_id follows'
+      select: "-_id follows"
     });
     users = users.map((el) => {
       el.follow = follows.indexOf(el._id) != -1;
       delete el.prefs;
-      console.log(el)
+      console.log(el);
       return el;
     });
     return users;
@@ -185,7 +187,191 @@ class UserService extends Service {
       throw new AppError("There was an error in sending the mail!", 500);
     }
   };
-
+/**
+* Get comments which is written by the user from database
+* @param {String} (username)
+* @returns {Array} Comments
+*/
+userComments = async (username,query) => {
+  const user = await this.findById(username, "hasComment");
+  if (!user) throw new AppError("This user doesn't exist!", 404);
+  /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+  if (!query.limit) {
+    query.limit = "10";
+  }
+  let comments = [];
+  user.hasComment.forEach((el) => {
+    comments.push(el);
+  });
+const cursor=Comment.find({
+  "_id": { $in:comments}
+},);
+let returnComments=[];
+for await (const doc of cursor) {
+ returnComments.push(doc);
+}
+  return returnComments;
+};
+/**
+ * Get replies on a comment written by the user from database
+ * @param {String} (username)
+ * @returns {Array} Comments
+ */
+ userCommentReplies = async (username,query) => {
+  const comment = await this.findById(username, "replies");
+    if (!comment) throw new AppError("This comment doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let replies = [];
+    comment.replies.forEach((el) => {
+      replies.push(el);
+    });
+    const cursor=Comment.find({
+      "_id": { $in:replies}
+    },);
+    let returnReplies=[];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnReplies.push(doc);
+    }
+    return returnReplies;
+  };
+  /**
+ * Get comments on posts of the user from database
+ * @param {String} (username)
+ * @returns {object} comments
+ */
+ userSelfReply=async(username,query)=>{
+  const post = await this.findById(username, "postComments");
+  if (!post) throw new AppError("This post doesn't exist!", 404);
+  /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+  if (!query.limit) {
+    query.limit = "10";
+  }
+  let comments = [];
+  post.postComments.forEach((el) => {
+    comments.push(el);
+  });
+  const cursor=Comment.find({
+    "_id": { $in:comments}
+  },);
+  let returnComments=[];
+  for await (const doc of cursor) {
+    console.log(doc);
+   returnComments.push(doc);
+  }
+    return returnComments;
+  }; 
+  
+   /**
+ * Get posts which is written by the user from database
+ * @param {String} (username)
+ * @returns {Array} posts
+ */
+    userSubmitted = async (username,query) => {
+      const user = await this.findById(username, "hasPost");
+      if (!user) throw new AppError("This user doesn't exist!", 404);
+      /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+      if (!query.limit) {
+        query.limit = "10";
+      }
+      let posts = [];
+      user.hasPost.forEach((el) => {
+        posts.push(el);
+      });
+      const cursor=Post.find({
+        "_id": { $in:posts}
+      },);
+      let returnPosts=[];
+      for await (const doc of cursor) {
+        console.log(doc);
+        returnPosts.push(doc);
+      }
+        return returnPosts;
+    };
+    /**
+ * Get posts which downvoted by the user from database
+ * @param {String} (username)
+ * @returns {object} downVotes
+ */
+ userDownVoted = async (username,query) => {
+  const user = await this.findById(username, "hasVote");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let downVotes = [];
+    user.hasVote.forEach((el) => {
+      if (el.type === -1) {
+        downVotes.push(el.postID);
+      }
+    });
+    const cursor=Post.find({
+      "_id": { $in:downVotes}
+    },);
+    let returnPosts=[];
+    for await (const doc of cursor) {
+      returnPosts.push(doc);
+    }
+      return returnPosts;
+};
+/**
+ * Get posts which upvoted by the user from database
+ * @param {String} (username)
+ * @returns {object} upVotes
+ */
+ userUpVoted = async (username,query) => {
+  const user = await this.findById(username, "hasVote");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+console.log(user);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let upVotes = [];
+    user.hasVote.forEach((el) => {
+      if (el.type === 1) {
+        upVotes.push(el.postID);
+      }
+    });console.log(upVotes);
+    const cursor=Post.find({
+      "_id": { $in:upVotes}
+    },);
+    let returnPosts=[];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnPosts.push(doc);
+    }//console.log(returnPosts);
+      return returnPosts;
+};
+   /**
+ * Get posts where user is being mentioned in from database
+ * @param {String} (username)
+ * @returns {object} mentions
+ */
+    userMentions=async(username,query)=>{
+      const user = await this.findById(username,"mentionedInPosts");
+      if (!user) throw new AppError("This user doesn't exist!", 404);
+      console.log(user);
+      /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    //console.log(user);
+      
+      const cursor=Post.find({
+        "_id": { $in:user.mentionedInPosts}
+      },);
+      let returnPosts=[];
+      for await (const doc of cursor) {
+        console.log(doc);
+        returnPosts.push(doc);
+      }
+        return returnPosts;
+  };
   /**
    * Resets user password and returns a new token
    * @param {string} token

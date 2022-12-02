@@ -42,8 +42,13 @@ class Service {
     return res;
   };
 
-  updateOne = (query, body, options) => {
-    return this.model.findOneAndUpdate(query, body, options);
+  updateOne = (query, update) => {///msh 3arfa ab3t elfunction ezay hena
+    return this.model.findOneAndUpdate(query, update,(error, doc) => {
+      if(!error)return doc;
+      else return null;
+            // error: any errors that occurred
+      // doc: the document before updates are applied if `new: false`, or after updates if `new = true`
+    }).clone();
   };
 
   findById = (id, select) => {

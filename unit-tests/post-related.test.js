@@ -7,6 +7,120 @@ var ObjectID = require("bson").ObjectID;
 
 const postServiceInstance = new PostService(Post);
 
+
+describe("testing userSubmitted service in post service class", () => {
+  describe("given a user", () => {
+    test("should not throw an error", async () => {
+      const user = new User({
+        _id: "t2_moazMohamed",
+        hasPost: [new ObjectID()],
+      });
+      const mockedPosts = [
+        {
+          createdAt: "2022-11-22T15:08:49.960Z",
+          _id: "6373e60c1673969ef16dbbe9",
+          communityIcon: "photo.jpg",
+          title: "Mute",
+          type: "mute",
+          text: "imagePro235 has muted you",
+          sourceThing: "t5_imagePro235",
+          isDeleted: false,
+        },
+        {
+          createdAt: "2022-11-22T15:08:49.960Z",
+          _id: "6373e63c1673969ef16dbbeb",
+          communityIcon: "photo.jpg",
+          title: "Unmute",
+          type: "unmute",
+          text: "imagePro235 has unmuted you",
+          sourceThing: "t5_imagePro235",
+          isDeleted: false,
+        },
+      ];
+      postServiceInstance.getAll = jest
+        .fn()
+        .mockReturnValueOnce(mockedPosts);
+      const hasPost = await postServiceInstance.userSubmitted(
+        user
+      );
+      expect(hasPost).toStrictEqual(mockedPosts);
+    });
+  });
+  describe("given a user, and a query with limitt=2", () => {
+    test("should not throw an error", async () => {
+      const user = new User({
+        _id: "t2_moazMohamed",
+        hasPost: [new ObjectID()],
+      });
+      const mockedPosts = [
+        {
+          createdAt: "2022-11-22T15:08:49.960Z",
+          _id: "6373e60c1673969ef16dbbe9",
+          communityIcon: "photo.jpg",
+          title: "Mute",
+          type: "mute",
+          text: "imagePro235 has muted you",
+          sourceThing: "t5_imagePro235",
+          isDeleted: false,
+        },
+        {
+          createdAt: "2022-11-22T15:08:49.960Z",
+          _id: "6373e63c1673969ef16dbbeb",
+          communityIcon: "photo.jpg",
+          title: "Unmute",
+          type: "unmute",
+          text: "imagePro235 has unmuted you",
+          sourceThing: "t5_imagePro235",
+          isDeleted: false,
+        },
+      ];
+      postServiceInstance.getAll = jest
+        .fn()
+        .mockReturnValueOnce(mockedPosts);
+      const hasPost = await postServiceInstance.userSubmitted(
+        user
+      );
+      expect(hasPost).toStrictEqual(mockedPosts);
+    });
+  });
+  describe("given an invalid user", () => {
+    test("should not throw an error", async () => {
+      const user = undefined;
+      const mockedPosts = [
+        {
+          createdAt: "2022-11-22T15:08:49.960Z",
+          _id: "6373e60c1673969ef16dbbe9",
+          communityIcon: "photo.jpg",
+          title: "Mute",
+          type: "mute",
+          text: "imagePro235 has muted you",
+          sourceThing: "t5_imagePro235",
+          isDeleted: false,
+        },
+        {
+          createdAt: "2022-11-22T15:08:49.960Z",
+          _id: "6373e63c1673969ef16dbbeb",
+          communityIcon: "photo.jpg",
+          title: "Unmute",
+          type: "unmute",
+          text: "imagePro235 has unmuted you",
+          sourceThing: "t5_imagePro235",
+          isDeleted: false,
+        },
+      ];
+      postServiceInstance.getAll = jest
+        .fn()
+        .mockReturnValueOnce(mockedPosts);
+      const hasPost = await postServiceInstance.userSubmitted(
+        user
+      );
+      expect(
+        postServiceInstance.userSubmitted(user)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
 describe("testing submit service in post service class", () => {
   describe("given a text, title, attachments (files), user, and community", () => {
     test("should respond with a valid post object", async () => {
