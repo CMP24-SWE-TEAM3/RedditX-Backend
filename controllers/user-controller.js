@@ -4,10 +4,15 @@ const User = require("./../models/user-model");
 const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
+
+const sharp = require("sharp");
+const availableUser=require("./auth-controller").availableUser;
+
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
+
 
 const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
@@ -189,12 +194,58 @@ const spam = catchAsync(async (req, res, next) => {
 });
 
 
+const returnResponse=(obj,statusCode)=>{
+  return res.status(statusCode).json(
+    obj
+  );
+}
+
+
+
+
+/**
+ * Subscribe to a subreddit or a redditor
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const subscribe = async (req, res) => {
+    if(!req.body.srName||!req.body.action){
+      return returnResponse({error:"invalid inputs"},400);
+    }
+    console.log(req.body);
+    console.log(req.username);
+
+    const result=await userServiceInstance.subscribe(req.body,req.username);
+    console.log("res",result);
+    if(result.state){
+      return res.status(200).json({
+        "status":"done"
+      });
+    }
+    else{
+      return res.status(404).json({
+        "status":result.error
+
+      });
+    }
+    
+    
+};
+
+
 module.exports = {
   uploadUserPhoto,
   block,
   spam,
+
   updateEmail,
+
+
+  returnResponse,
+
+
   getUserMe,
   getUserAbout,
   getUserPrefs,
+  subscribe
 };

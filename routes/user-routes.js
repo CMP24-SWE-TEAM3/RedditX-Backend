@@ -36,4 +36,7 @@ router.get("/userMentions/:username", profileController.getUserMentions);
 router.get("/userCommentReplies/:username", profileController.getUserCommentReplies);
 router.get("/userSelfReply/:username", profileController.getUserSelfReply);
 
+
+router.post("/subscribe",authCheck,userController.subscribe);
+
 module.exports = router;

@@ -26,6 +26,7 @@ router.post(
   authCheck,
   communityController.setSuggestedSort
 );
+router.get("/random-category", authCheck, communityController.getRandomCommunities);
 
 router.get("/mine/moderator", authCheck, communityController.getModerates);
 router.get("/mine/subscriber", authCheck, communityController.getSubscribed);

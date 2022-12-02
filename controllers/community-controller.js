@@ -127,6 +127,18 @@ const getSubscribed = catchAsync(async (req, res, next) => {
     communities,
   });
 });
+/**
+ * Get the list of random communities 
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+ const getRandomCommunities =async(req,res)=>{
+    const communities=await communityServiceInstance.getRandomCommunities();
+    return res.status(200).json({
+      communities:communities
+    });
+
+ } 
 
 /**
  * Ban or mute a user within a community
@@ -268,4 +280,5 @@ module.exports = {
   getMuted,
   getModerators,
   getCommunityOptions,
+  getRandomCommunities
 };

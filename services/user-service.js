@@ -11,8 +11,20 @@ const Email = require("./../utils/email");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
 const Comment= require("../models/comment-model");
 const Post = require("../models/post-model");
+
+const User=require("../models/user-model");
+const Community=require("../models/community-model");
+
+const AuthService = require('./../services/auth-service');
+
+var authServiceInstance = new AuthService(User);
+const CommunityService = require('./../services/community-service');
+
+var communityServiceInstance = new CommunityService(Community);
+
 
 /**
  * @namespace UserService
@@ -35,7 +47,154 @@ class UserService extends Service {
       { expiresIn: "120h" }
     );
   };
+  
 
+/**
+   * Subscribe to a subreddit or redditor
+   * @param {String} body body contains the information.
+   * @returns {Boolean} (state)
+   */
+  subscribe=async(body,username)=>{
+    const id=body.srName.substring(0,2);
+    const action=body.action;
+    
+    if(id==="t2"){
+      console.log("d");
+      //check the username
+      const result=await authServiceInstance.availableUser(body.srName);
+      console.log(result);
+      if(result.state){
+        return {
+          state:false,
+          error:"invalid username"
+        }
+      }
+      else{
+        var isFound=false;
+        var followerArr=result.user.followers;
+        for(var i=0;i<followerArr.length;i++){
+          if(followerArr[i]===username) {
+            isFound=true;
+            break;
+          }
+        }
+        
+        try{
+        if(action==='sub'){
+          if(isFound){
+            return {
+              state:false,
+              error:"already followed"
+            }
+          }
+         await this.updateOne(
+            {_id:username},
+            {$addToSet:{"follows":body.srName}});
+         await   this.updateOne(
+            {_id:body.srName},
+            {$addToSet:{"followers":username}});
+        }
+        else{
+          if(!isFound){
+            return {
+              state:false,
+              error:"operation failed the user is already not followed"
+            }
+          }
+          await this.updateOne(           
+             {_id:username}, 
+            {$pull: { "follows":body.srName}});
+            await this.updateOne(   
+
+               {_id:body.srName}, 
+              {$pull: { "followers":username}});
+        }
+      }
+      catch{
+        return {
+          state:false,
+          error:"error"
+        }
+      }
+      return {
+        state:true
+        ,error:null
+      }
+
+      }
+
+    }
+    else if(id==='t5'){
+      const result=await communityServiceInstance.availableSubreddit(body.srName);
+      if(result.state){
+        return {
+          state:false,
+          error:"invalid subreddit"
+        }
+      }
+      else{
+        const user=await authServiceInstance.availableUser(username);
+        if(user.state){
+          return {
+            state:false,
+            error:"invalid username"
+          }
+        }
+        var isFound=false;
+        var memberArr=user.user.member;
+        for(var i=0;i<memberArr.length;i++){
+          if(memberArr[i].communityId===body.srName) {
+            isFound=true;
+            break;
+          }
+        }
+        try{
+          if(action==='sub'){
+            if(isFound){
+              return {
+                state:false,
+                error:"already followed"
+              }
+            }
+           await this.updateOne(
+              {_id:username},
+              {$addToSet:{"member":{communityId:body.srName,isBanned:false,isMuted:false}}});
+           await   communityServiceInstance.updateOne(
+              {_id:body.srName},
+              {$addToSet:{"members":{userID:username,isBanned:false,isMuted:false}}});
+          }
+          else{
+            if(!isFound){
+              return {
+                state:false,
+                error:"operation failed the user is already not followed"
+              }
+            }
+            await this.updateOne(           
+               {_id:username}, 
+              {$pull: { "member":{communityId:body.srName}}});
+              await communityServiceInstance.updateOne(   
+  
+                 {_id:body.srName}, 
+                {$pull: {"members":{userID:username}}});
+          }
+        }
+        catch(err){
+          console.log(err);
+          return {
+            state:false,
+            error:"error"
+          }
+        }
+        return {
+          state:true
+          ,error:null
+        }
+
+      }
+    }
+
+  }
   getFilteredSubreddits = (subreddits) => {
     return subreddits.map((el) => {
       if (!el.isBanned) {

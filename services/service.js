@@ -51,6 +51,7 @@ class Service {
     }).clone();
   };
 
+
   findById = (id, select) => {
     if (select && select !== "") return this.model.findById(id).select(select);
     else return this.model.findById(id);
@@ -60,6 +61,7 @@ class Service {
     if (select && select !== "") return this.model.find(query).select(select);
     else return this.model.find(query);
   };
+
 
   findByIdAndUpdate = (id, data, options) => {
     return this.model.findByIdAndUpdate(id, data, options);

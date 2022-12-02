@@ -3,16 +3,16 @@ const Post = require("../models/post-model");
 const Comment = require("../models/comment-model");
 const Community = require("../models/community-model");
 const User = require("../models/user-model");
-const validators = require("./../validate/listing-validators");
 const PostService = require("./../services/post-service");
 const CommentService = require("./../services/comment-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
-
+const CommentService = require("../services/comment-service");
 var postServiceInstance = new PostService(Post);
 var commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
+var commentServiceInstance = new CommentService(Comment);
 
 
 /**
@@ -118,176 +118,18 @@ const unsave = catchAsync(async (req, res, next) => {
  */
 const vote = async (req, res) => {
   console.log(req.username);
-  if (req.body.id === undefined || req.body.dir === undefined)
-    return res.status(500).json({
-      status: "invalid id or dir",
-    });
-  var id = req.body.id.substring(0, 2);
-  var dir = req.body.dir;
-  var postIdCasted = req.body.id.substring(3);
-  const check = validators.validateVoteIn(id, dir, postIdCasted);
-  if (!check) {
-    return res.status(500).json({
-      status: "invalid id or dir",
-    });
+  const result = await commentServiceInstance.vote(req.body,req.username);
+  console.log(result);
+  if(result.state){
+    return res.status(200).json({
+      status:result.status
+    })
   }
-  if (id === "t3") {
-    //post
-    const post = await Post.findById(postIdCasted);
-    if (!post) {
-      return res.status(500).json({
-        status: "not found",
-      });
-    }
-    var voters = post.voters;
-    var isFound = false;
-    var index = 0;
-    var voter;
-    for (let z = 0; z < voters.length; z++) {
-      if (voters[z].userID === req.username) {
-        console.log("jj");
-        isFound = true;
-        voter = voters[z];
-        break;
-      }
-      index++;
-    }
-    if (!isFound) {
-      if (dir == 1 || dir == -1) {
-        voters.push({ userID: req.username, voteType: dir });
-      } else if (dir == 0 || dir == 2) {
-        return res.status(500).json({
-          status: "invalid dir",
-        });
-      }
-    } else {
-      if (
-        (dir == 0 && voter.voteType == 1) ||
-        (dir == 2 && voter.voteType == -1)
-      ) {
-        voters.splice(index, 1);
-      } else if (
-        (dir == 0 && voter.voteType == -1) ||
-        (dir == 2 && voter.voteType == 1)
-      ) {
-        return res.status(500).json({
-          status: "invalid dir",
-        });
-      } else if (
-        (voter.voteType == 1 && dir == -1) ||
-        (voter.voteType == -1 && dir == 1)
-      ) {
-        voters[index].voteType = dir;
-      } else if (dir == voter.voteType) {
-        return res.status(200).json({
-          status: "already voted",
-        });
-      }
-    }
-    let votesCount = post.votesCount;
-    let operation;
-    if (dir == 1 || dir == 2) {
-      operation = 1;
-    } else if (dir == 0 || dir == -1) {
-      operation = -1;
-    }
-    Post.findByIdAndUpdate(
-      { _id: postIdCasted },
-      {
-        $set: {
-          votesCount: votesCount + operation,
-          voters: voters,
-        },
-      },
-      { new: true },
-      (err) => {
-        if (err) {
-          return res.status(500).json({
-            status: "failed",
-          });
-        } else {
-          return res.status(200).json({
-            status: "done",
-          });
-        }
-      }
-    );
-  } else if (id === "t1") {
-    //comment or reply
-    const comment = await Comment.findById(postIdCasted);
-    if (!comment) {
-      return res.status(500).json({
-        status: "not found",
-      });
-    }
-    voters = comment.voters;
-    isFound = false;
-    index = 0;
-    voter;
-    for (let z = 0; z < voters.length; z++) {
-      console.log("loop");
-      if (voters[z].userID === req.username) {
-        isFound = true;
-        voter = voters[z];
-        break;
-      }
-      index++;
-    }
-    if (!isFound) {
-      if (dir == 1 || dir == -1) {
-        voters.push({ userID: req.username, voteType: dir });
-      } else if (dir == 0 || dir == 2) {
-        return res.status(500).json({
-          status: "invalid dir",
-        });
-      }
-    } else {
-      if (
-        (dir == 0 && voter.voteType == 1) ||
-        (dir == 2 && voter.voteType == -1)
-      ) {
-        voters.splice(index, 1);
-      } else if (
-        (dir == 0 && voter.voteType == -1) ||
-        (dir == 2 && voter.voteType == 1)
-      ) {
-        return res.status(500).json({
-          status: "invalid dir",
-        });
-      } else if (
-        (voter.voteType == 1 && dir == -1) ||
-        (voter.voteType == -1 && dir == 1)
-      ) {
-        voters[index].voteType = dir;
-      } else if (dir == voter.voteType) {
-        return res.status(200).json({
-          status: "already voted",
-        });
-      }
-    }
-    let votesCount = comment.votesCount;
-    let operation;
-    if (dir == 1 || dir == 2) {
-      operation = 1;
-    } else if (dir == 0 || dir == -1) {
-      operation = -1;
-    }
-    Comment.findByIdAndUpdate(
-      { _id: postIdCasted },
-      { $set: { votesCount: votesCount + operation, voters: voters } },
-      { new: true },
-      (err) => {
-        if (err) {
-          return res.status(500).json({
-            status: "failed",
-          });
-        } else {
-          return res.status(200).json({
-            status: "done",
-          });
-        }
-      }
-    );
+  else{
+    return res.status(500).json({
+      status:result.error
+
+    })
   }
 };
 
