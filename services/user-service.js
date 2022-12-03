@@ -12,19 +12,18 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const Comment= require("../models/comment-model");
+const Comment = require("../models/comment-model");
 const Post = require("../models/post-model");
 
-const User=require("../models/user-model");
-const Community=require("../models/community-model");
+const User = require("../models/user-model");
+const Community = require("../models/community-model");
 
-const AuthService = require('./../services/auth-service');
+const AuthService = require("./../services/auth-service");
 
 var authServiceInstance = new AuthService(User);
-const CommunityService = require('./../services/community-service');
+const CommunityService = require("./../services/community-service");
 
 var communityServiceInstance = new CommunityService(Community);
-
 
 /**
  * @namespace UserService
@@ -47,154 +46,166 @@ class UserService extends Service {
       { expiresIn: "120h" }
     );
   };
-  
 
-/**
+  /**
    * Subscribe to a subreddit or redditor
    * @param {String} body body contains the information.
    * @returns {Boolean} (state)
    */
-  subscribe=async(body,username)=>{
-    const id=body.srName.substring(0,2);
-    const action=body.action;
-    
-    if(id==="t2"){
+  subscribe = async (body, username) => {
+    const id = body.srName.substring(0, 2);
+    const action = body.action;
+
+    if (id === "t2") {
       console.log("d");
       //check the username
-      const result=await authServiceInstance.availableUser(body.srName);
+      const result = await authServiceInstance.availableUser(body.srName);
       console.log(result);
-      if(result.state){
+      if (result.state) {
         return {
-          state:false,
-          error:"invalid username"
-        }
-      }
-      else{
-        var isFound=false;
-        var followerArr=result.user.followers;
-        for(var i=0;i<followerArr.length;i++){
-          if(followerArr[i]===username) {
-            isFound=true;
+          state: false,
+          error: "invalid username",
+        };
+      } else {
+        var isFound = false;
+        var followerArr = result.user.followers;
+        for (var i = 0; i < followerArr.length; i++) {
+          if (followerArr[i] === username) {
+            isFound = true;
             break;
           }
         }
-        
-        try{
-        if(action==='sub'){
-          if(isFound){
-            return {
-              state:false,
-              error:"already followed"
+
+        try {
+          if (action === "sub") {
+            if (isFound) {
+              return {
+                state: false,
+                error: "already followed",
+              };
             }
-          }
-         await this.updateOne(
-            {_id:username},
-            {$addToSet:{"follows":body.srName}});
-         await   this.updateOne(
-            {_id:body.srName},
-            {$addToSet:{"followers":username}});
-        }
-        else{
-          if(!isFound){
-            return {
-              state:false,
-              error:"operation failed the user is already not followed"
+            await this.updateOne(
+              { _id: username },
+              { $addToSet: { follows: body.srName } }
+            );
+            await this.updateOne(
+              { _id: body.srName },
+              { $addToSet: { followers: username } }
+            );
+          } else {
+            if (!isFound) {
+              return {
+                state: false,
+                error: "operation failed the user is already not followed",
+              };
             }
+            await this.updateOne(
+              { _id: username },
+              { $pull: { follows: body.srName } }
+            );
+            await this.updateOne(
+              { _id: body.srName },
+              { $pull: { followers: username } }
+            );
           }
-          await this.updateOne(           
-             {_id:username}, 
-            {$pull: { "follows":body.srName}});
-            await this.updateOne(   
-
-               {_id:body.srName}, 
-              {$pull: { "followers":username}});
-        }
-      }
-      catch{
-        return {
-          state:false,
-          error:"error"
-        }
-      }
-      return {
-        state:true
-        ,error:null
-      }
-
-      }
-
-    }
-    else if(id==='t5'){
-      const result=await communityServiceInstance.availableSubreddit(body.srName);
-      if(result.state){
-        return {
-          state:false,
-          error:"invalid subreddit"
-        }
-      }
-      else{
-        const user=await authServiceInstance.availableUser(username);
-        if(user.state){
+        } catch {
           return {
-            state:false,
-            error:"invalid username"
-          }
+            state: false,
+            error: "error",
+          };
         }
-        var isFound=false;
-        var memberArr=user.user.member;
-        for(var i=0;i<memberArr.length;i++){
-          if(memberArr[i].communityId===body.srName) {
-            isFound=true;
+        return {
+          state: true,
+          error: null,
+        };
+      }
+    } else if (id === "t5") {
+      const result = await communityServiceInstance.availableSubreddit(
+        body.srName
+      );
+      if (result.state) {
+        return {
+          state: false,
+          error: "invalid subreddit",
+        };
+      } else {
+        const user = await authServiceInstance.availableUser(username);
+        if (user.state) {
+          return {
+            state: false,
+            error: "invalid username",
+          };
+        }
+        isFound = false;
+        var memberArr = user.user.member;
+        for (i = 0; i < memberArr.length; i++) {
+          if (memberArr[i].communityId === body.srName) {
+            isFound = true;
             break;
           }
         }
-        try{
-          if(action==='sub'){
-            if(isFound){
+        try {
+          if (action === "sub") {
+            if (isFound) {
               return {
-                state:false,
-                error:"already followed"
-              }
+                state: false,
+                error: "already followed",
+              };
             }
-           await this.updateOne(
-              {_id:username},
-              {$addToSet:{"member":{communityId:body.srName,isBanned:false,isMuted:false}}});
-           await   communityServiceInstance.updateOne(
-              {_id:body.srName},
-              {$addToSet:{"members":{userID:username,isBanned:false,isMuted:false}}});
-          }
-          else{
-            if(!isFound){
+            await this.updateOne(
+              { _id: username },
+              {
+                $addToSet: {
+                  member: {
+                    communityId: body.srName,
+                    isBanned: false,
+                    isMuted: false,
+                  },
+                },
+              }
+            );
+            await communityServiceInstance.updateOne(
+              { _id: body.srName },
+              {
+                $addToSet: {
+                  members: {
+                    userID: username,
+                    isBanned: false,
+                    isMuted: false,
+                  },
+                },
+              }
+            );
+          } else {
+            if (!isFound) {
               return {
-                state:false,
-                error:"operation failed the user is already not followed"
-              }
+                state: false,
+                error: "operation failed the user is already not followed",
+              };
             }
-            await this.updateOne(           
-               {_id:username}, 
-              {$pull: { "member":{communityId:body.srName}}});
-              await communityServiceInstance.updateOne(   
-  
-                 {_id:body.srName}, 
-                {$pull: {"members":{userID:username}}});
+            await this.updateOne(
+              { _id: username },
+              { $pull: { member: { communityId: body.srName } } }
+            );
+            await communityServiceInstance.updateOne(
+              { _id: body.srName },
+              { $pull: { members: { userID: username } } }
+            );
           }
-        }
-        catch(err){
+        } catch (err) {
           console.log(err);
           return {
-            state:false,
-            error:"error"
-          }
+            state: false,
+            error: "error",
+          };
         }
         return {
-          state:true
-          ,error:null
-        }
-
+          state: true,
+          error: null,
+        };
       }
     }
-
-  }
+  };
   getFilteredSubreddits = (subreddits) => {
     return subreddits.map((el) => {
       if (!el.isBanned) {
@@ -248,7 +259,7 @@ class UserService extends Service {
 
     const { follows } = await this.getOne({
       _id: username,
-      select: "-_id follows"
+      select: "-_id follows",
     });
     users = users.map((el) => {
       el.follow = follows.indexOf(el._id) != -1;
@@ -346,38 +357,38 @@ class UserService extends Service {
       throw new AppError("There was an error in sending the mail!", 500);
     }
   };
-/**
-* Get comments which is written by the user from database
-* @param {String} (username)
-* @returns {Array} Comments
-*/
-userComments = async (username,query) => {
-  const user = await this.findById(username, "hasComment");
-  if (!user) throw new AppError("This user doesn't exist!", 404);
-  /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-  if (!query.limit) {
-    query.limit = "10";
-  }
-  let comments = [];
-  user.hasComment.forEach((el) => {
-    comments.push(el);
-  });
-const cursor=Comment.find({
-  "_id": { $in:comments}
-},);
-let returnComments=[];
-for await (const doc of cursor) {
- returnComments.push(doc);
-}
-  return returnComments;
-};
-/**
- * Get replies on a comment written by the user from database
- * @param {String} (username)
- * @returns {Array} Comments
- */
- userCommentReplies = async (username,query) => {
-  const comment = await this.findById(username, "replies");
+  /**
+   * Get comments which is written by the user from database
+   * @param {String} (username)
+   * @returns {Array} Comments
+   */
+  userComments = async (username, query) => {
+    const user = await this.findById(username, "hasComment");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let comments = [];
+    user.hasComment.forEach((el) => {
+      comments.push(el);
+    });
+    const cursor = Comment.find({
+      _id: { $in: comments },
+    });
+    let returnComments = [];
+    for await (const doc of cursor) {
+      returnComments.push(doc);
+    }
+    return returnComments;
+  };
+  /**
+   * Get replies on a comment written by the user from database
+   * @param {String} (username)
+   * @returns {Array} Comments
+   */
+  userCommentReplies = async (username, query) => {
+    const comment = await this.findById(username, "replies");
     if (!comment) throw new AppError("This comment doesn't exist!", 404);
     /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
     if (!query.limit) {
@@ -387,10 +398,10 @@ for await (const doc of cursor) {
     comment.replies.forEach((el) => {
       replies.push(el);
     });
-    const cursor=Comment.find({
-      "_id": { $in:replies}
-    },);
-    let returnReplies=[];
+    const cursor = Comment.find({
+      _id: { $in: replies },
+    });
+    let returnReplies = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnReplies.push(doc);
@@ -398,65 +409,65 @@ for await (const doc of cursor) {
     return returnReplies;
   };
   /**
- * Get comments on posts of the user from database
- * @param {String} (username)
- * @returns {object} comments
- */
- userSelfReply=async(username,query)=>{
-  const post = await this.findById(username, "postComments");
-  if (!post) throw new AppError("This post doesn't exist!", 404);
-  /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-  if (!query.limit) {
-    query.limit = "10";
-  }
-  let comments = [];
-  post.postComments.forEach((el) => {
-    comments.push(el);
-  });
-  const cursor=Comment.find({
-    "_id": { $in:comments}
-  },);
-  let returnComments=[];
-  for await (const doc of cursor) {
-    console.log(doc);
-   returnComments.push(doc);
-  }
+   * Get comments on posts of the user from database
+   * @param {String} (username)
+   * @returns {object} comments
+   */
+  userSelfReply = async (username, query) => {
+    const post = await this.findById(username, "postComments");
+    if (!post) throw new AppError("This post doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let comments = [];
+    post.postComments.forEach((el) => {
+      comments.push(el);
+    });
+    const cursor = Comment.find({
+      _id: { $in: comments },
+    });
+    let returnComments = [];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnComments.push(doc);
+    }
     return returnComments;
-  }; 
-  
-   /**
- * Get posts which is written by the user from database
- * @param {String} (username)
- * @returns {Array} posts
- */
-    userSubmitted = async (username,query) => {
-      const user = await this.findById(username, "hasPost");
-      if (!user) throw new AppError("This user doesn't exist!", 404);
-      /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-      if (!query.limit) {
-        query.limit = "10";
-      }
-      let posts = [];
-      user.hasPost.forEach((el) => {
-        posts.push(el);
-      });
-      const cursor=Post.find({
-        "_id": { $in:posts}
-      },);
-      let returnPosts=[];
-      for await (const doc of cursor) {
-        console.log(doc);
-        returnPosts.push(doc);
-      }
-        return returnPosts;
-    };
-    /**
- * Get posts which downvoted by the user from database
- * @param {String} (username)
- * @returns {object} downVotes
- */
- userDownVoted = async (username,query) => {
-  const user = await this.findById(username, "hasVote");
+  };
+
+  /**
+   * Get posts which is written by the user from database
+   * @param {String} (username)
+   * @returns {Array} posts
+   */
+  userSubmitted = async (username, query) => {
+    const user = await this.findById(username, "hasPost");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let posts = [];
+    user.hasPost.forEach((el) => {
+      posts.push(el);
+    });
+    const cursor = Post.find({
+      _id: { $in: posts },
+    });
+    let returnPosts = [];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnPosts.push(doc);
+    }
+    return returnPosts;
+  };
+  /**
+   * Get posts which downvoted by the user from database
+   * @param {String} (username)
+   * @returns {object} downVotes
+   */
+  userDownVoted = async (username, query) => {
+    const user = await this.findById(username, "hasVote");
     if (!user) throw new AppError("This user doesn't exist!", 404);
     /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
     if (!query.limit) {
@@ -468,24 +479,24 @@ for await (const doc of cursor) {
         downVotes.push(el.postID);
       }
     });
-    const cursor=Post.find({
-      "_id": { $in:downVotes}
-    },);
-    let returnPosts=[];
+    const cursor = Post.find({
+      _id: { $in: downVotes },
+    });
+    let returnPosts = [];
     for await (const doc of cursor) {
       returnPosts.push(doc);
     }
-      return returnPosts;
-};
-/**
- * Get posts which upvoted by the user from database
- * @param {String} (username)
- * @returns {object} upVotes
- */
- userUpVoted = async (username,query) => {
-  const user = await this.findById(username, "hasVote");
+    return returnPosts;
+  };
+  /**
+   * Get posts which upvoted by the user from database
+   * @param {String} (username)
+   * @returns {object} upVotes
+   */
+  userUpVoted = async (username, query) => {
+    const user = await this.findById(username, "hasVote");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-console.log(user);
+    console.log(user);
     /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
     if (!query.limit) {
       query.limit = "10";
@@ -495,41 +506,42 @@ console.log(user);
       if (el.type === 1) {
         upVotes.push(el.postID);
       }
-    });console.log(upVotes);
-    const cursor=Post.find({
-      "_id": { $in:upVotes}
-    },);
-    let returnPosts=[];
+    });
+    console.log(upVotes);
+    const cursor = Post.find({
+      _id: { $in: upVotes },
+    });
+    let returnPosts = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnPosts.push(doc);
-    }//console.log(returnPosts);
-      return returnPosts;
-};
-   /**
- * Get posts where user is being mentioned in from database
- * @param {String} (username)
- * @returns {object} mentions
- */
-    userMentions=async(username,query)=>{
-      const user = await this.findById(username,"mentionedInPosts");
-      if (!user) throw new AppError("This user doesn't exist!", 404);
-      console.log(user);
-      /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    } //console.log(returnPosts);
+    return returnPosts;
+  };
+  /**
+   * Get posts where user is being mentioned in from database
+   * @param {String} (username)
+   * @returns {object} mentions
+   */
+  userMentions = async (username, query) => {
+    const user = await this.findById(username, "mentionedInPosts");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    console.log(user);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
     if (!query.limit) {
       query.limit = "10";
     }
     //console.log(user);
-      
-      const cursor=Post.find({
-        "_id": { $in:user.mentionedInPosts}
-      },);
-      let returnPosts=[];
-      for await (const doc of cursor) {
-        console.log(doc);
-        returnPosts.push(doc);
-      }
-        return returnPosts;
+
+    const cursor = Post.find({
+      _id: { $in: user.mentionedInPosts },
+    });
+    let returnPosts = [];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnPosts.push(doc);
+    }
+    return returnPosts;
   };
   /**
    * Resets user password and returns a new token

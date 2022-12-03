@@ -7,73 +7,6 @@ const User = require("../models/user-model");
 const CommentService = require("../services/comment-service");
 
 const commentServiceInstance = new CommentService(Comment);
-// text:data.text,
-// isRoot:true,
-// authorId:username,
-// replyingTo:data.postID,
-// voters: [{userID:username,voteType:1}]
-
-describe("testing addComment service in comment service class", () => {
-  describe("given a text,user", () => {
-    test("should respond with a valid comment object", async () => {
-      const data = {
-        _id:"seegdr",
-        text: "This is a comment text",
-        postID:"dhs6dddh7"
-         };
-      const user = new User({
-        _id: "t2_moazMohamed"
-      });
-      User.prototype.findById=jest.fn().mockReturnValueOnce(user);
-      Post.prototype.findById=jest.fn().mockReturnValueOnce(data.postID);
-      Comment.prototype.save = jest.fn().mockReturnValueOnce(data);
-      Post.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
-      const newComment = await commentServiceInstance.addComment(
-        data,
-        user
-      );
-      expect(newComment.text).toBe("This is a comment text");
-    });
-  });
-  describe("given invalid data", () => {
-    test("should respond with an error", async () => {
-      expect(
-        commentServiceInstance.addComment(undefined, undefined)
-      ).rejects.toThrowError();
-    });
-  });
-});
-/*
-describe("testing addReply service in reply service class", () => {
-  describe("given a text,user", () => {
-    test("should respond with a valid reply object", async () => {
-      const data = {
-        text: "This is a reply text",
-        commentID:""
-      };
-      const user = new User({/////ezay ab3tlo commentID
-        _id: "t2_moazMohamed"
-      });
-      commentServiceInstance.insert = jest.fn().mockReturnValueOnce({
-        text: "This is a reply text"
-      });
-      Comment.prototype.save = jest.fn().mockImplementation(() => {});
-      const newReply = await commentServiceInstance.addReply(
-        data,
-        user
-      );
-      expect(newReply.text).toBe("This is a reply text");
-    });
-  });
-  describe("given invalid data", () => {
-    test("should respond with an error", async () => {
-      expect(
-        commentServiceInstance.addReply(undefined, undefined)
-      ).rejects.toThrowError();
-    });
-  });
-});
 
 describe("testing spamComment service in comment service class", () => {
   describe("given a comment, spamType, spamText, and a username", () => {
@@ -157,4 +90,4 @@ describe("testing saveSpammedComment service in comment service class", () => {
       ).resolves.not.toThrowError();
     });
   });
-});*/
+});
