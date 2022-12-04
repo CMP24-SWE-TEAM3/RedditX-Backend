@@ -1,16 +1,9 @@
-/**
- * FILE: notification-service
- * description: the services related to notifications only
- * created at: 15/11/2022
- * created by: Moaz Mohamed
- * authors: Ahmed Lotfy, Shredan Abdullah, Moaz Mohamed, Mohamed Nabil
- */
-
 const Service = require("./service");
 const AppError = require("../utils/app-error");
 
 /**
- * @namespace NotificationService
+ * Service class to handle Notification manipulations.
+ * @class NotificationService
  */
 class NotificationService extends Service {
   constructor(model) {
@@ -21,6 +14,7 @@ class NotificationService extends Service {
    * Get notifications for a given user
    * @param {string} linkID
    * @param {object} user
+   * @function
    */
   getNotifications = async (user, query) => {
     if (!user) throw new AppError("This user doesn't exist!", 404);

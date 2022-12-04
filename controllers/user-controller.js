@@ -5,14 +5,10 @@ const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
 
-const sharp = require("sharp");
-const availableUser=require("./auth-controller").availableUser;
-
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
-
 
 const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
@@ -24,18 +20,23 @@ const commentServiceInstance = new CommentService(Comment);
  * @param {function} (req, res)
  * @returns {object} res
  */
- const updateEmail = async (req, res) =>{
-  if(!req.username||!req.body.email)return res.status(400).json({
-    response: "invaild parameters",
+const updateEmail = async (req, res) => {
+  if (!req.username || !req.body.email)
+    return res.status(400).json({
+      response: "invaild parameters",
     });
- const results= await userServiceInstance.updateOne({_id: req.username}, {email:req.body.email});
- if(!results) return res.status(400).json({
+  const results = await userServiceInstance.updateOne(
+    { _id: req.username },
+    { email: req.body.email }
+  );
+  if (!results)
+    return res.status(400).json({
       response: "error",
-   });
-console.log("ay haga");
-   return res.status(200).json({
-response: results,
-});
+    });
+  console.log("ay haga");
+  return res.status(200).json({
+    response: results,
+  });
 };
 /**
  * Saves filename to database
@@ -144,7 +145,7 @@ const spam = catchAsync(async (req, res, next) => {
  * @param {function} (req,res)
  * @returns {object} res
  */
- const getUserPrefs = catchAsync(async (req, res, next) => {
+const getUserPrefs = catchAsync(async (req, res, next) => {
   var prefs = undefined;
   try {
     const user = await userServiceInstance.findById(req.username);
@@ -153,7 +154,7 @@ const spam = catchAsync(async (req, res, next) => {
     return next(err);
   }
   res.status(200).json({
-    prefs
+    prefs,
   });
 });
 
@@ -162,7 +163,7 @@ const spam = catchAsync(async (req, res, next) => {
  * @param {function} (req,res)
  * @returns {object} res
  */
- const getUserAbout = catchAsync(async (req, res, next) => {
+const getUserAbout = catchAsync(async (req, res, next) => {
   var about = undefined;
   try {
     const user = await userServiceInstance.findById(req.username);
@@ -171,7 +172,7 @@ const spam = catchAsync(async (req, res, next) => {
     return next(err);
   }
   res.status(200).json({
-    about
+    about,
   });
 });
 
@@ -180,7 +181,7 @@ const spam = catchAsync(async (req, res, next) => {
  * @param {function} (req,,res)
  * @returns {object} res
  */
- const getUserMe = catchAsync(async (req, res, next) => {
+const getUserMe = catchAsync(async (req, res, next) => {
   var meInfo = undefined;
   try {
     const user = await userServiceInstance.findById(req.username);
@@ -189,19 +190,13 @@ const spam = catchAsync(async (req, res, next) => {
     return next(err);
   }
   res.status(200).json({
-    meInfo
+    meInfo,
   });
 });
 
-
-const returnResponse=(obj,statusCode)=>{
-  return res.status(statusCode).json(
-    obj
-  );
-}
-
-
-
+const returnResponse = (res, obj, statusCode) => {
+  return res.status(statusCode).json(obj);
+};
 
 /**
  * Subscribe to a subreddit or a redditor
@@ -209,29 +204,24 @@ const returnResponse=(obj,statusCode)=>{
  * @returns {object} res
  */
 const subscribe = async (req, res) => {
-    if(!req.body.srName||!req.body.action){
-      return returnResponse({error:"invalid inputs"},400);
-    }
-    console.log(req.body);
-    console.log(req.username);
+  if (!req.body.srName || !req.body.action) {
+    return returnResponse(res, { error: "invalid inputs" }, 400);
+  }
+  console.log(req.body);
+  console.log(req.username);
 
-    const result=await userServiceInstance.subscribe(req.body,req.username);
-    console.log("res",result);
-    if(result.state){
-      return res.status(200).json({
-        "status":"done"
-      });
-    }
-    else{
-      return res.status(404).json({
-        "status":result.error
-
-      });
-    }
-    
-    
+  const result = await userServiceInstance.subscribe(req.body, req.username);
+  console.log("res", result);
+  if (result.state) {
+    return res.status(200).json({
+      status: "done",
+    });
+  } else {
+    return res.status(404).json({
+      status: result.error,
+    });
+  }
 };
-
 
 module.exports = {
   uploadUserPhoto,
@@ -240,12 +230,10 @@ module.exports = {
 
   updateEmail,
 
-
   returnResponse,
-
 
   getUserMe,
   getUserAbout,
   getUserPrefs,
-  subscribe
+  subscribe,
 };

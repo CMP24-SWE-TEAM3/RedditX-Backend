@@ -26,25 +26,24 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * FILE: community-service
- * description: the services related to communities only
- * created at: 18/11/2022
- * created by: Mohamed Nabil
- * authors: Ahmed Lotfy, Shredan Abdullah, Moaz Mohamed, Mohamed Nabil
- */
-
-const Service = require("./service");
+            <pre class="prettyprint source linenums"><code>const Service = require("./service");
 const AppError = require("../utils/app-error");
+const Community = require("../models/community-model");
 
 /**
- * @namespace CommunityService
+ * Service class to handle Community manipulations.
+ * @class CommunityService
  */
 class CommunityService extends Service {
   constructor(model) {
     super(model);
   }
 
+  /**
+   * Get search query results
+   * @param {object} query
+   * @function
+   */
   getSearchResults = (query) => {
     const searchQuery = query.q;
     delete query.q;
@@ -65,6 +64,7 @@ class CommunityService extends Service {
    * @param {string} username
    * @param {string} subreddit
    * @param {string} type
+   * @function
    */
   uploadCommunityPhoto = async (file, username, subreddit, type) => {
     if (!file) throw new AppError("No photo is uploaded!", 400);
@@ -86,6 +86,7 @@ class CommunityService extends Service {
    * @param {object} user
    * @param {string} type
    * @returns {array} communities
+   * @function
    */
   getCommunities = async (user, type) => {
     if (!user) throw new AppError("This user doesn't exist!", 404);
@@ -109,6 +110,7 @@ class CommunityService extends Service {
    * @param {string} member
    * @param {string} operation
    * @returns {object} community
+   * @function
    */
   banOrMuteAtCommunity = async (subreddit, moderator, member, operation) => {
     const community = await this.getOne({
@@ -147,6 +149,7 @@ class CommunityService extends Service {
    * @param {object} community
    * @param {string} operation
    * @returns {object} community
+   * @function
    */
   banOrMuteAtUser = async (toBeAffected, community, operation) => {
     if (!toBeAffected) throw new AppError("This user doesn't exist!", 404);
@@ -170,6 +173,7 @@ class CommunityService extends Service {
    * @param {string} subreddit
    * @param {string} type
    * @returns {Array} memberIDs
+   * @function
    */
   getBannedOrMuted = async (subreddit, type) => {
     const community = await this.getOne({
@@ -188,6 +192,7 @@ class CommunityService extends Service {
    * Get all moderators of a community
    * @param {string} subreddit
    * @returns {Array} moderatorIDs
+   * @function
    */
   getModerators = async (subreddit) => {
     const community = await this.getOne({
@@ -206,6 +211,7 @@ class CommunityService extends Service {
    * Get options of a community
    * @param {string} subreddit
    * @returns {object} communityOptions
+   * @function
    */
   getCommunityOptions = async (subreddit) => {
     const community = await this.getOne({
@@ -214,6 +220,29 @@ class CommunityService extends Service {
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     return community.communityOptions;
+  };
+
+  getRandomCommunities = async () => {
+    const cursor = Community.find();
+    var communities = [];
+    for await (const doc of cursor) {
+      communities.push(doc);
+    }
+    return communities;
+  };
+  availableSubreddit = async (subreddit) => {
+    const subre = await this.getOne({ _id: subreddit });
+    if (subre) {
+      return {
+        state: false,
+        subreddit: subre,
+      };
+    } else {
+      return {
+        state: true,
+        subreddit: null,
+      };
+    }
   };
 }
 
@@ -228,13 +257,13 @@ module.exports = CommunityService;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="global.html#Service">Service</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#APIfeatures">APIfeatures</a></li><li><a href="global.html#availabeGmailOrFacebook">availabeGmailOrFacebook</a></li><li><a href="global.html#availableEmail">availableEmail</a></li><li><a href="global.html#availableUser">availableUser</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#changePasswordAccType">changePasswordAccType</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li><li><a href="global.html#vote">vote</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserCommentReplies">getUserCommentReplies</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSelfReply">getUserSelfReply</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 23 2022 01:55:47 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sun Dec 04 2022 20:40:38 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,32 +1,21 @@
-/**
- * FILE: user-service
- * description: the services related to users only
- * created at: 15/11/2022
- * created by: Mohamed Nabil
- * authors: Ahmed Lotfy, Shredan Abdullah, Moaz Mohamed, Mohamed Nabil
- */
 const Service = require("./service");
 const AppError = require("./../utils/app-error");
 const Email = require("./../utils/email");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
 const Comment = require("../models/comment-model");
 const Post = require("../models/post-model");
-
 const User = require("../models/user-model");
 const Community = require("../models/community-model");
-
 const AuthService = require("./../services/auth-service");
-
 var authServiceInstance = new AuthService(User);
 const CommunityService = require("./../services/community-service");
-
 var communityServiceInstance = new CommunityService(Community);
 
 /**
- * @namespace UserService
+ * Service class to handle User manipulations.
+ * @class UserService
  */
 class UserService extends Service {
   constructor(model) {
@@ -38,6 +27,7 @@ class UserService extends Service {
    * @param {String} emailType email type.
    * @param {String} username username of the user.
    * @returns {String} (signed token)
+   * @function
    */
   signToken = (emailType, username) => {
     return jwt.sign(
@@ -51,6 +41,7 @@ class UserService extends Service {
    * Subscribe to a subreddit or redditor
    * @param {String} body body contains the information.
    * @returns {Boolean} (state)
+   * @function
    */
   subscribe = async (body, username) => {
     const id = body.srName.substring(0, 2);
@@ -275,6 +266,7 @@ class UserService extends Service {
    * @param {object} data
    * @param {string} username
    * @param {object} file
+   * @function
    */
   uploadUserPhoto = async (action, username, file) => {
     if (!action)
@@ -292,6 +284,7 @@ class UserService extends Service {
    * @param {string} from
    * @param {string} to
    * @param {boolean} action
+   * @function
    */
   block = async (from, to, action) => {
     if (!to) throw new AppError("No username is provided!", 400);
@@ -322,6 +315,7 @@ class UserService extends Service {
   /**
    * Sends the username to the specified email
    * @param {string} email
+   * @function
    */
   forgotUsername = async (email) => {
     const user = await this.getOne({ email });
@@ -337,6 +331,7 @@ class UserService extends Service {
   /**
    * Sends reset link to specified user by email
    * @param {string} username
+   * @function
    */
   forgotPassword = async (username) => {
     const user = await this.getOne({ _id: username });
@@ -361,6 +356,7 @@ class UserService extends Service {
    * Get comments which is written by the user from database
    * @param {String} (username)
    * @returns {Array} Comments
+   * @function
    */
   userComments = async (username, query) => {
     const user = await this.findById(username, "hasComment");
@@ -386,6 +382,7 @@ class UserService extends Service {
    * Get replies on a comment written by the user from database
    * @param {String} (username)
    * @returns {Array} Comments
+   * @function
    */
   userCommentReplies = async (username, query) => {
     const comment = await this.findById(username, "replies");
@@ -412,6 +409,7 @@ class UserService extends Service {
    * Get comments on posts of the user from database
    * @param {String} (username)
    * @returns {object} comments
+   * @function
    */
   userSelfReply = async (username, query) => {
     const post = await this.findById(username, "postComments");
@@ -439,6 +437,7 @@ class UserService extends Service {
    * Get posts which is written by the user from database
    * @param {String} (username)
    * @returns {Array} posts
+   * @function
    */
   userSubmitted = async (username, query) => {
     const user = await this.findById(username, "hasPost");
@@ -465,6 +464,7 @@ class UserService extends Service {
    * Get posts which downvoted by the user from database
    * @param {String} (username)
    * @returns {object} downVotes
+   * @function
    */
   userDownVoted = async (username, query) => {
     const user = await this.findById(username, "hasVote");
@@ -492,6 +492,7 @@ class UserService extends Service {
    * Get posts which upvoted by the user from database
    * @param {String} (username)
    * @returns {object} upVotes
+   * @function
    */
   userUpVoted = async (username, query) => {
     const user = await this.findById(username, "hasVote");
@@ -522,6 +523,7 @@ class UserService extends Service {
    * Get posts where user is being mentioned in from database
    * @param {String} (username)
    * @returns {object} mentions
+   * @function
    */
   userMentions = async (username, query) => {
     const user = await this.findById(username, "mentionedInPosts");
@@ -549,6 +551,7 @@ class UserService extends Service {
    * @param {string} newPassword
    * @param {string} confirmedNewPassword
    * @returns {object} object
+   * @function
    */
   resetForgottenPassword = async (token, newPassword, confirmedNewPassword) => {
     // Get user with token

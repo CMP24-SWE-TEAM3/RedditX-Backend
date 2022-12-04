@@ -26,26 +26,24 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * FILE: user-service
- * description: the services related to users only
- * created at: 15/11/2022
- * created by: Mohamed Nabil
- * authors: Ahmed Lotfy, Shredan Abdullah, Moaz Mohamed, Mohamed Nabil
- */
-const Service = require("./service");
+            <pre class="prettyprint source linenums"><code>const Service = require("./service");
 const AppError = require("./../utils/app-error");
 const Email = require("./../utils/email");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Comment = require("../models/comment-model");
+const Post = require("../models/post-model");
+const User = require("../models/user-model");
+const Community = require("../models/community-model");
+const AuthService = require("./../services/auth-service");
+var authServiceInstance = new AuthService(User);
+const CommunityService = require("./../services/community-service");
+var communityServiceInstance = new CommunityService(Community);
 
 /**
- * @namespace UserService
- */
-/**
- * Class representing a user service.
- * @extends Service
+ * Service class to handle User manipulations.
+ * @class UserService
  */
 class UserService extends Service {
   constructor(model) {
@@ -57,6 +55,7 @@ class UserService extends Service {
    * @param {String} emailType email type.
    * @param {String} username username of the user.
    * @returns {String} (signed token)
+   * @function
    */
   signToken = (emailType, username) => {
     return jwt.sign(
@@ -66,6 +65,166 @@ class UserService extends Service {
     );
   };
 
+  /**
+   * Subscribe to a subreddit or redditor
+   * @param {String} body body contains the information.
+   * @returns {Boolean} (state)
+   * @function
+   */
+  subscribe = async (body, username) => {
+    const id = body.srName.substring(0, 2);
+    const action = body.action;
+
+    if (id === "t2") {
+      console.log("d");
+      //check the username
+      const result = await authServiceInstance.availableUser(body.srName);
+      console.log(result);
+      if (result.state) {
+        return {
+          state: false,
+          error: "invalid username",
+        };
+      } else {
+        var isFound = false;
+        var followerArr = result.user.followers;
+        for (var i = 0; i &lt; followerArr.length; i++) {
+          if (followerArr[i] === username) {
+            isFound = true;
+            break;
+          }
+        }
+
+        try {
+          if (action === "sub") {
+            if (isFound) {
+              return {
+                state: false,
+                error: "already followed",
+              };
+            }
+            await this.updateOne(
+              { _id: username },
+              { $addToSet: { follows: body.srName } }
+            );
+            await this.updateOne(
+              { _id: body.srName },
+              { $addToSet: { followers: username } }
+            );
+          } else {
+            if (!isFound) {
+              return {
+                state: false,
+                error: "operation failed the user is already not followed",
+              };
+            }
+            await this.updateOne(
+              { _id: username },
+              { $pull: { follows: body.srName } }
+            );
+            await this.updateOne(
+              { _id: body.srName },
+              { $pull: { followers: username } }
+            );
+          }
+        } catch {
+          return {
+            state: false,
+            error: "error",
+          };
+        }
+        return {
+          state: true,
+          error: null,
+        };
+      }
+    } else if (id === "t5") {
+      const result = await communityServiceInstance.availableSubreddit(
+        body.srName
+      );
+      if (result.state) {
+        return {
+          state: false,
+          error: "invalid subreddit",
+        };
+      } else {
+        const user = await authServiceInstance.availableUser(username);
+        if (user.state) {
+          return {
+            state: false,
+            error: "invalid username",
+          };
+        }
+        isFound = false;
+        var memberArr = user.user.member;
+        for (i = 0; i &lt; memberArr.length; i++) {
+          if (memberArr[i].communityId === body.srName) {
+            isFound = true;
+            break;
+          }
+        }
+        try {
+          if (action === "sub") {
+            if (isFound) {
+              return {
+                state: false,
+                error: "already followed",
+              };
+            }
+            await this.updateOne(
+              { _id: username },
+              {
+                $addToSet: {
+                  member: {
+                    communityId: body.srName,
+                    isBanned: false,
+                    isMuted: false,
+                  },
+                },
+              }
+            );
+            await communityServiceInstance.updateOne(
+              { _id: body.srName },
+              {
+                $addToSet: {
+                  members: {
+                    userID: username,
+                    isBanned: false,
+                    isMuted: false,
+                  },
+                },
+              }
+            );
+          } else {
+            if (!isFound) {
+              return {
+                state: false,
+                error: "operation failed the user is already not followed",
+              };
+            }
+            await this.updateOne(
+              { _id: username },
+              { $pull: { member: { communityId: body.srName } } }
+            );
+            await communityServiceInstance.updateOne(
+              { _id: body.srName },
+              { $pull: { members: { userID: username } } }
+            );
+          }
+        } catch (err) {
+          console.log(err);
+          return {
+            state: false,
+            error: "error",
+          };
+        }
+        return {
+          state: true,
+          error: null,
+        };
+      }
+    }
+  };
   getFilteredSubreddits = (subreddits) => {
     return subreddits.map((el) => {
       if (!el.isBanned) {
@@ -104,10 +263,10 @@ class UserService extends Service {
     };
     return addedFilter;
   };
-  getSearchResults = (query) => {
+  getSearchResults = async (query, username) => {
     const searchQuery = query.q;
     delete query.q;
-    return this.getAll(
+    let users = await this.getAll(
       {
         $or: [
           { _id: { $regex: searchQuery, $options: "i" } },
@@ -116,6 +275,18 @@ class UserService extends Service {
       },
       query
     );
+
+    const { follows } = await this.getOne({
+      _id: username,
+      select: "-_id follows",
+    });
+    users = users.map((el) => {
+      el.follow = follows.indexOf(el._id) != -1;
+      delete el.prefs;
+      console.log(el);
+      return el;
+    });
+    return users;
   };
 
   /**
@@ -123,6 +294,7 @@ class UserService extends Service {
    * @param {object} data
    * @param {string} username
    * @param {object} file
+   * @function
    */
   uploadUserPhoto = async (action, username, file) => {
     if (!action)
@@ -140,6 +312,7 @@ class UserService extends Service {
    * @param {string} from
    * @param {string} to
    * @param {boolean} action
+   * @function
    */
   block = async (from, to, action) => {
     if (!to) throw new AppError("No username is provided!", 400);
@@ -170,6 +343,7 @@ class UserService extends Service {
   /**
    * Sends the username to the specified email
    * @param {string} email
+   * @function
    */
   forgotUsername = async (email) => {
     const user = await this.getOne({ email });
@@ -185,6 +359,7 @@ class UserService extends Service {
   /**
    * Sends reset link to specified user by email
    * @param {string} username
+   * @function
    */
   forgotPassword = async (username) => {
     const user = await this.getOne({ _id: username });
@@ -205,13 +380,206 @@ class UserService extends Service {
       throw new AppError("There was an error in sending the mail!", 500);
     }
   };
+  /**
+   * Get comments which is written by the user from database
+   * @param {String} (username)
+   * @returns {Array} Comments
+   * @function
+   */
+  userComments = async (username, query) => {
+    const user = await this.findById(username, "hasComment");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let comments = [];
+    user.hasComment.forEach((el) => {
+      comments.push(el);
+    });
+    const cursor = Comment.find({
+      _id: { $in: comments },
+    });
+    let returnComments = [];
+    for await (const doc of cursor) {
+      returnComments.push(doc);
+    }
+    return returnComments;
+  };
+  /**
+   * Get replies on a comment written by the user from database
+   * @param {String} (username)
+   * @returns {Array} Comments
+   * @function
+   */
+  userCommentReplies = async (username, query) => {
+    const comment = await this.findById(username, "replies");
+    if (!comment) throw new AppError("This comment doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let replies = [];
+    comment.replies.forEach((el) => {
+      replies.push(el);
+    });
+    const cursor = Comment.find({
+      _id: { $in: replies },
+    });
+    let returnReplies = [];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnReplies.push(doc);
+    }
+    return returnReplies;
+  };
+  /**
+   * Get comments on posts of the user from database
+   * @param {String} (username)
+   * @returns {object} comments
+   * @function
+   */
+  userSelfReply = async (username, query) => {
+    const post = await this.findById(username, "postComments");
+    if (!post) throw new AppError("This post doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let comments = [];
+    post.postComments.forEach((el) => {
+      comments.push(el);
+    });
+    const cursor = Comment.find({
+      _id: { $in: comments },
+    });
+    let returnComments = [];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnComments.push(doc);
+    }
+    return returnComments;
+  };
 
+  /**
+   * Get posts which is written by the user from database
+   * @param {String} (username)
+   * @returns {Array} posts
+   * @function
+   */
+  userSubmitted = async (username, query) => {
+    const user = await this.findById(username, "hasPost");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let posts = [];
+    user.hasPost.forEach((el) => {
+      posts.push(el);
+    });
+    const cursor = Post.find({
+      _id: { $in: posts },
+    });
+    let returnPosts = [];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnPosts.push(doc);
+    }
+    return returnPosts;
+  };
+  /**
+   * Get posts which downvoted by the user from database
+   * @param {String} (username)
+   * @returns {object} downVotes
+   * @function
+   */
+  userDownVoted = async (username, query) => {
+    const user = await this.findById(username, "hasVote");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let downVotes = [];
+    user.hasVote.forEach((el) => {
+      if (el.type === -1) {
+        downVotes.push(el.postID);
+      }
+    });
+    const cursor = Post.find({
+      _id: { $in: downVotes },
+    });
+    let returnPosts = [];
+    for await (const doc of cursor) {
+      returnPosts.push(doc);
+    }
+    return returnPosts;
+  };
+  /**
+   * Get posts which upvoted by the user from database
+   * @param {String} (username)
+   * @returns {object} upVotes
+   * @function
+   */
+  userUpVoted = async (username, query) => {
+    const user = await this.findById(username, "hasVote");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    console.log(user);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    let upVotes = [];
+    user.hasVote.forEach((el) => {
+      if (el.type === 1) {
+        upVotes.push(el.postID);
+      }
+    });
+    console.log(upVotes);
+    const cursor = Post.find({
+      _id: { $in: upVotes },
+    });
+    let returnPosts = [];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnPosts.push(doc);
+    } //console.log(returnPosts);
+    return returnPosts;
+  };
+  /**
+   * Get posts where user is being mentioned in from database
+   * @param {String} (username)
+   * @returns {object} mentions
+   * @function
+   */
+  userMentions = async (username, query) => {
+    const user = await this.findById(username, "mentionedInPosts");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    console.log(user);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
+    //console.log(user);
+
+    const cursor = Post.find({
+      _id: { $in: user.mentionedInPosts },
+    });
+    let returnPosts = [];
+    for await (const doc of cursor) {
+      console.log(doc);
+      returnPosts.push(doc);
+    }
+    return returnPosts;
+  };
   /**
    * Resets user password and returns a new token
    * @param {string} token
    * @param {string} newPassword
    * @param {string} confirmedNewPassword
    * @returns {object} object
+   * @function
    */
   resetForgottenPassword = async (token, newPassword, confirmedNewPassword) => {
     // Get user with token
@@ -246,13 +614,13 @@ module.exports = UserService;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="global.html#Service">Service</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#APIfeatures">APIfeatures</a></li><li><a href="global.html#availabeGmailOrFacebook">availabeGmailOrFacebook</a></li><li><a href="global.html#availableEmail">availableEmail</a></li><li><a href="global.html#availableUser">availableUser</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#changePasswordAccType">changePasswordAccType</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li><li><a href="global.html#vote">vote</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserCommentReplies">getUserCommentReplies</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSelfReply">getUserSelfReply</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 23 2022 01:55:47 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sun Dec 04 2022 20:40:38 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

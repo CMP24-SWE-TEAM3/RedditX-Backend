@@ -31,15 +31,52 @@ const Post = require("../models/post-model");
 const Comment = require("../models/comment-model");
 const Community = require("../models/community-model");
 const User = require("../models/user-model");
-const validators = require("./../validate/listing-validators");
 const PostService = require("./../services/post-service");
+// const CommentService = require("./../services/comment-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
-
+const CommentService = require("../services/comment-service");
 var postServiceInstance = new PostService(Post);
+// var commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
+var commentServiceInstance = new CommentService(Comment);
 
+
+/**
+ * Creates a comment 
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+ const addComment = catchAsync(async (req, res, next) => {
+  let newComment = {};
+  try {
+    newComment = await commentServiceInstance.addComment(
+      req.body,
+      req.username
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(201).json(newComment);
+});
+/**
+ * Creates a reply 
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+ const addReply = catchAsync(async (req, res, next) => {
+  let newReply = {};
+  try {
+    newReply = await commentServiceInstance.addReply(
+      req.body,
+      req.username
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(201).json(newReply);
+});
 /**
  * Creates a post and saves the file names to database
  * @param {function} (req, res, next)
@@ -109,176 +146,18 @@ const unsave = catchAsync(async (req, res, next) => {
  */
 const vote = async (req, res) => {
   console.log(req.username);
-  if (req.body.id === undefined || req.body.dir === undefined)
-    return res.status(500).json({
-      status: "invalid id or dir",
-    });
-  var id = req.body.id.substring(0, 2);
-  var dir = req.body.dir;
-  var postIdCasted = req.body.id.substring(3);
-  const check = validators.validateVoteIn(id, dir, postIdCasted);
-  if (!check) {
-    return res.status(500).json({
-      status: "invalid id or dir",
-    });
+  const result = await commentServiceInstance.vote(req.body,req.username);
+  console.log(result);
+  if(result.state){
+    return res.status(200).json({
+      status:result.status
+    })
   }
-  if (id === "t3") {
-    //post
-    const post = await Post.findById(postIdCasted);
-    if (!post) {
-      return res.status(500).json({
-        status: "not found",
-      });
-    }
-    var voters = post.voters;
-    var isFound = false;
-    var index = 0;
-    var voter;
-    for (let z = 0; z &lt; voters.length; z++) {
-      if (voters[z].userID === req.username) {
-        console.log("jj");
-        isFound = true;
-        voter = voters[z];
-        break;
-      }
-      index++;
-    }
-    if (!isFound) {
-      if (dir == 1 || dir == -1) {
-        voters.push({ userID: req.username, voteType: dir });
-      } else if (dir == 0 || dir == 2) {
-        return res.status(500).json({
-          status: "invalid dir",
-        });
-      }
-    } else {
-      if (
-        (dir == 0 &amp;&amp; voter.voteType == 1) ||
-        (dir == 2 &amp;&amp; voter.voteType == -1)
-      ) {
-        voters.splice(index, 1);
-      } else if (
-        (dir == 0 &amp;&amp; voter.voteType == -1) ||
-        (dir == 2 &amp;&amp; voter.voteType == 1)
-      ) {
-        return res.status(500).json({
-          status: "invalid dir",
-        });
-      } else if (
-        (voter.voteType == 1 &amp;&amp; dir == -1) ||
-        (voter.voteType == -1 &amp;&amp; dir == 1)
-      ) {
-        voters[index].voteType = dir;
-      } else if (dir == voter.voteType) {
-        return res.status(200).json({
-          status: "already voted",
-        });
-      }
-    }
-    let votesCount = post.votesCount;
-    let operation;
-    if (dir == 1 || dir == 2) {
-      operation = 1;
-    } else if (dir == 0 || dir == -1) {
-      operation = -1;
-    }
-    Post.findByIdAndUpdate(
-      { _id: postIdCasted },
-      {
-        $set: {
-          votesCount: votesCount + operation,
-          voters: voters,
-        },
-      },
-      { new: true },
-      (err) => {
-        if (err) {
-          return res.status(500).json({
-            status: "failed",
-          });
-        } else {
-          return res.status(200).json({
-            status: "done",
-          });
-        }
-      }
-    );
-  } else if (id === "t1") {
-    //comment or reply
-    const comment = await Comment.findById(postIdCasted);
-    if (!comment) {
-      return res.status(500).json({
-        status: "not found",
-      });
-    }
-    voters = comment.voters;
-    isFound = false;
-    index = 0;
-    voter;
-    for (let z = 0; z &lt; voters.length; z++) {
-      console.log("loop");
-      if (voters[z].userID === req.username) {
-        isFound = true;
-        voter = voters[z];
-        break;
-      }
-      index++;
-    }
-    if (!isFound) {
-      if (dir == 1 || dir == -1) {
-        voters.push({ userID: req.username, voteType: dir });
-      } else if (dir == 0 || dir == 2) {
-        return res.status(500).json({
-          status: "invalid dir",
-        });
-      }
-    } else {
-      if (
-        (dir == 0 &amp;&amp; voter.voteType == 1) ||
-        (dir == 2 &amp;&amp; voter.voteType == -1)
-      ) {
-        voters.splice(index, 1);
-      } else if (
-        (dir == 0 &amp;&amp; voter.voteType == -1) ||
-        (dir == 2 &amp;&amp; voter.voteType == 1)
-      ) {
-        return res.status(500).json({
-          status: "invalid dir",
-        });
-      } else if (
-        (voter.voteType == 1 &amp;&amp; dir == -1) ||
-        (voter.voteType == -1 &amp;&amp; dir == 1)
-      ) {
-        voters[index].voteType = dir;
-      } else if (dir == voter.voteType) {
-        return res.status(200).json({
-          status: "already voted",
-        });
-      }
-    }
-    let votesCount = comment.votesCount;
-    let operation;
-    if (dir == 1 || dir == 2) {
-      operation = 1;
-    } else if (dir == 0 || dir == -1) {
-      operation = -1;
-    }
-    Comment.findByIdAndUpdate(
-      { _id: postIdCasted },
-      { $set: { votesCount: votesCount + operation, voters: voters } },
-      { new: true },
-      (err) => {
-        if (err) {
-          return res.status(500).json({
-            status: "failed",
-          });
-        } else {
-          return res.status(200).json({
-            status: "done",
-          });
-        }
-      }
-    );
+  else{
+    return res.status(500).json({
+      status:result.error
+
+    })
   }
 };
 
@@ -313,6 +192,8 @@ const getPosts = catchAsync(async (req, res) => {
 module.exports = {
   submit,
   save,
+  addComment,
+  addReply,
   unsave,
   getPosts,
   vote,
@@ -327,13 +208,13 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="global.html#Service">Service</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#APIfeatures">APIfeatures</a></li><li><a href="global.html#availabeGmailOrFacebook">availabeGmailOrFacebook</a></li><li><a href="global.html#availableEmail">availableEmail</a></li><li><a href="global.html#availableUser">availableUser</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#changePasswordAccType">changePasswordAccType</a></li><li><a href="global.html#createUser">createUser</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#userAbout">userAbout</a></li><li><a href="global.html#userComments">userComments</a></li><li><a href="global.html#userDownVoted">userDownVoted</a></li><li><a href="global.html#userMe">userMe</a></li><li><a href="global.html#userOverview">userOverview</a></li><li><a href="global.html#userPrefs">userPrefs</a></li><li><a href="global.html#userSubmitted">userSubmitted</a></li><li><a href="global.html#userUpVoted">userUpVoted</a></li><li><a href="global.html#vote">vote</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserCommentReplies">getUserCommentReplies</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSelfReply">getUserSelfReply</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 23 2022 01:55:47 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sun Dec 04 2022 20:40:38 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,29 +1,20 @@
-/**
- * FILE: comment-service
- * description: the services related to comments only
- * created at: 15/11/2022
- * created by: Mohamed Nabil
- * authors: Ahmed Lotfy, Shredan Abdullah, Moaz Mohamed, Mohamed Nabil
- */
-
 const Service = require("./service");
 const AppError = require("./../utils/app-error");
 
 const UserService = require("./../services/user-service");
-const idVaildator=require("../validate/listing-validators").validateObjectId;
+const idVaildator = require("../validate/listing-validators").validateObjectId;
 
 const validators = require("../validate/listing-validators");
 const Post = require("../models/post-model");
-const Comment=require("../models/comment-model");
+const Comment = require("../models/comment-model");
 const User = require("../models/user-model");
 const PostService = require("./post-service");
-
-
 
 var userServiceInstance = new UserService(User);
 var postServiceInstance = new PostService(Post);
 /**
- * @namespace CommentService
+ * Service class to handle Comment manipulations.
+ * @class CommentService
  */
 class CommentService extends Service {
   constructor(model) {
@@ -48,6 +39,7 @@ class CommentService extends Service {
    * @param {string} spamText
    * @param {string} username
    * @returns {object} comment
+   * @function
    */
   spamComment = async (comment, spamType, spamText, username) => {
     if (comment.spams.find((el) => el.userID === username))
@@ -65,6 +57,7 @@ class CommentService extends Service {
    * Saves spam in a comment
    * @param {object} comment
    * @param {object} community
+   * @function
    */
   saveSpammedComment = async (comment, community) => {
     if (
@@ -75,333 +68,324 @@ class CommentService extends Service {
     await comment.save();
   };
 
-
-/**
+  /**
    * Creates a comment and add it to database
    * @param {object} data
    * @param {object} user
    * @returns {object} newComment
+   * @function
    */
- addComment = async (data,username) => {
-  console.log("ay haaaga");
-  const user = await userServiceInstance.findById(username);
-  console.log(user);
-   try{ var post = await postServiceInstance.findById(
-      {_id: data.postID}
-    );}
-    catch{
-      throw new AppError("invailed postID!", 400); 
+  addComment = async (data, username) => {
+    console.log("ay haaaga");
+    const user = await userServiceInstance.findById(username);
+    console.log(user);
+    try {
+      var post = await postServiceInstance.findById({ _id: data.postID });
+    } catch {
+      throw new AppError("invailed postID!", 400);
     }
-   
+
     console.log(post);
-  if (!user) throw new AppError("This user doesn't exist!", 404);
-  const newComment=new Comment({
-    text:data.text,
-    isRoot:true,
-  authorId:username,
-  replyingTo:data.postID,
-  voters: [{userID:username,voteType:1}]
-  });
-  const result= await newComment.save();
-  if (!result) throw new AppError("This comment doesn't created!", 400);
-  user.hasComment.push(result._id);
-  post.postComments.push(result._id);
-  await user.save();
-  await post.save();
-  return result;
-};
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    const newComment = new Comment({
+      text: data.text,
+      isRoot: true,
+      authorId: username,
+      replyingTo: data.postID,
+      voters: [{ userID: username, voteType: 1 }],
+    });
+    const result = await newComment.save();
+    if (!result) throw new AppError("This comment doesn't created!", 400);
+    user.hasComment.push(result._id);
+    post.postComments.push(result._id);
+    await user.save();
+    await post.save();
+    return result;
+  };
 
-/**
- * Creates a reply and add it to database
- * @param {object} data
- * @param {object} user
- * @returns {object} newReply
- */
- addReply = async (data,username) => {
-  if(!idVaildator(data.commentID)){
-    throw new AppError("No commentID is provided!", 400);
-  }
-  const user = await userServiceInstance.findById(username);
-    const comment = await Comment.findById(
-      {_id: data.commentID}
-    );
-  if (!user) throw new AppError("This user doesn't exist!", 404);
-  const newReply=new Comment({
-    text:data.text,
-    isRoot:false,
-  authorId:username,
-  replyingTo:data.commentID,
-  voters: [{userID:username,voteType:1}]
-  });
-  const result= await newReply.save();
-  console.log(username);
-  if (!result) throw new AppError("This reply doesn't created!", 400);
-  user.hasReply.push(result._id);
-  comment.replies.push(result._id);
-  await user.save();
-  await comment.save();
-  return result;
-};
+  /**
+   * Creates a reply and add it to database
+   * @param {object} data
+   * @param {object} user
+   * @returns {object} newReply
+   * @function
+   */
+  addReply = async (data, username) => {
+    if (!idVaildator(data.commentID)) {
+      throw new AppError("No commentID is provided!", 400);
+    }
+    const user = await userServiceInstance.findById(username);
+    const comment = await Comment.findById({ _id: data.commentID });
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    const newReply = new Comment({
+      text: data.text,
+      isRoot: false,
+      authorId: username,
+      replyingTo: data.commentID,
+      voters: [{ userID: username, voteType: 1 }],
+    });
+    const result = await newReply.save();
+    console.log(username);
+    if (!result) throw new AppError("This reply doesn't created!", 400);
+    user.hasReply.push(result._id);
+    comment.replies.push(result._id);
+    await user.save();
+    await comment.save();
+    return result;
+  };
 
-  vote=async(body,username)=>{
+  vote = async (body, username) => {
     if (body.id === undefined || body.dir === undefined)
-    return {
-      state:false,
-      error:"invalid id or dir"
-    }
-    
-  var id = body.id.substring(0, 2);
-  var dir = body.dir;
-  var postIdCasted = body.id.substring(3);
-  const check = validators.validateVoteIn(id, dir, postIdCasted);
-  if (!check) {
-    return {
-      state:false,
-      error:"invalid id or dir"
-    }
-  }
-  if (id === "t3") {
-    //post
-    const post = await postServiceInstance.getOne({_id:postIdCasted});
-    if (!post) {
       return {
-        state:false,
-        error:"not found"
-      }
-     
-    }
-    var voters = post.voters;
-    var isFound = false;
-    var index = 0;
-    var voter;
-    for (let z = 0; z < voters.length; z++) {
-      if (voters[z].userID === username) {
-        console.log("jj");
-        isFound = true;
-        voter = voters[z];
-        break;
-      }
-      index++;
-    }
-    var removeDetector=false;
-      var addDetector=false;
-    if (!isFound) {
-      addDetector=true;
-      if (dir == 1 || dir == -1) {
-        voters.push({ userID: username, voteType: dir });
-      } else if (dir == 0 || dir == 2) {
-        return {
-          state:false,
-          error:"invalid dir"
-        }
-       
-      }
-    } else {
-      
-      if (
-        (dir == 0 && voter.voteType == 1) ||
-        (dir == 2 && voter.voteType == -1)
-      ) {
-        voters.splice(index, 1);
-        removeDetector=true;
-      } else if (
-        (dir == 0 && voter.voteType == -1) ||
-        (dir == 2 && voter.voteType == 1)
-      ) {
-        return {
-          state:false,
-          error:"invalid dir"
-        }
-      } else if (
-        (voter.voteType == 1 && dir == -1) ||
-        (voter.voteType == -1 && dir == 1)
-      ) {
-        removeDetector=true;
-        addDetector=true;
-        voters[index].voteType = dir;
-      } else if (dir == voter.voteType) {
-        return {
-          state:false,
-          error:"already voted"
-        }
-       
-      }
-    }
-    let votesCount = post.votesCount;
-    let operation;
-    if (dir == 1 || dir == 2) {
-      operation = 1;
-    } else if (dir == 0 || dir == -1) {
-      operation = -1;
-    }
-    if(removeDetector&&!addDetector){
-      await User.findOneAndUpdate(           
-        {_id:username}, 
-       {$pull:  {"hasVote":{_id:postIdCasted}}});
-    }
-    else if(!removeDetector&&addDetector){
+        state: false,
+        error: "invalid id or dir",
+      };
 
-      await User.findOneAndUpdate(
-        {_id:username},
-        {$addToSet:{"hasVote":{_id:postIdCasted,type:operation}}});
-    }
-  
-    else if(addDetector&&removeDetector){
-      await User.findOneAndUpdate(           
-        {_id:username}, 
-       {$pull:  {"hasVote":{_id:postIdCasted}}});
-       await User.findOneAndUpdate(
-        {_id:username},
-        {$addToSet:{"hasVote":{_id:postIdCasted,type:operation}}});
-    }
-   await Post.findByIdAndUpdate(
-      { _id: postIdCasted },
-      {
-        $set: {
-          votesCount: votesCount + operation,
-          voters: voters,
-        },
-      },
-      { new: true },
-      (err) => {
-        if (err) {
-          return {
-            state:false,
-            error: "failed",
-
-          }
-         
-        } else {
-          return {
-            state:true,
-            status: "done",
-
-          }
-         
-        }
-      }
-    );
-  } else if (id === "t1") {
-    //comment or reply
-    const comment = await this.getOne({_id:postIdCasted});
-    if (!comment) {
+    var id = body.id.substring(0, 2);
+    var dir = body.dir;
+    var postIdCasted = body.id.substring(3);
+    const check = validators.validateVoteIn(id, dir, postIdCasted);
+    if (!check) {
       return {
-        state:false,
-        error:"not found"
-      }
+        state: false,
+        error: "invalid id or dir",
+      };
     }
-    voters = comment.voters;
-    isFound = false;
-    index = 0;
-    voter;
-    for (let z = 0; z < voters.length; z++) {
-      if (voters[z].userID === username) {
-        isFound = true;
-        voter = voters[z];
-        break;
-      }
-      index++;
-    }
-    console.log(isFound);
-    console.log("a");
-    var removeDetector=false;
-    var addDetector=false;
-    if (!isFound) {
-      addDetector=true;
-
-      if (dir == 1 || dir == -1) {
-        voters.push({ userID: username, voteType: dir });
-      } else if (dir == 0 || dir == 2) {
+    if (id === "t3") {
+      //post
+      const post = await postServiceInstance.getOne({ _id: postIdCasted });
+      if (!post) {
         return {
-          state:false,
-          error:"invalid dir"
+          state: false,
+          error: "not found",
+        };
+      }
+      var voters = post.voters;
+      var isFound = false;
+      var index = 0;
+      var voter;
+      for (let z = 0; z < voters.length; z++) {
+        if (voters[z].userID === username) {
+          console.log("jj");
+          isFound = true;
+          voter = voters[z];
+          break;
+        }
+        index++;
+      }
+      var removeDetector = false;
+      var addDetector = false;
+      if (!isFound) {
+        addDetector = true;
+        if (dir == 1 || dir == -1) {
+          voters.push({ userID: username, voteType: dir });
+        } else if (dir == 0 || dir == 2) {
+          return {
+            state: false,
+            error: "invalid dir",
+          };
+        }
+      } else {
+        if (
+          (dir == 0 && voter.voteType == 1) ||
+          (dir == 2 && voter.voteType == -1)
+        ) {
+          voters.splice(index, 1);
+          removeDetector = true;
+        } else if (
+          (dir == 0 && voter.voteType == -1) ||
+          (dir == 2 && voter.voteType == 1)
+        ) {
+          return {
+            state: false,
+            error: "invalid dir",
+          };
+        } else if (
+          (voter.voteType == 1 && dir == -1) ||
+          (voter.voteType == -1 && dir == 1)
+        ) {
+          removeDetector = true;
+          addDetector = true;
+          voters[index].voteType = dir;
+        } else if (dir == voter.voteType) {
+          return {
+            state: false,
+            error: "already voted",
+          };
         }
       }
-    } else {
-      if (
-        (dir == 0 && voter.voteType == 1) ||
-        (dir == 2 && voter.voteType == -1)
-      ) {
-        voters.splice(index, 1);
-        removeDetector=true;
-
-      } else if (
-        (dir == 0 && voter.voteType == -1) ||
-        (dir == 2 && voter.voteType == 1)
-      ) {
-        return {
-          state:false,
-          error:"invalid dir"
-        }
-      } else if (
-        (voter.voteType == 1 && dir == -1) ||
-        (voter.voteType == -1 && dir == 1)
-      ) {
-        removeDetector=true;
-        addDetector=true;
-        voters[index].voteType = dir;
-      } else if (dir == voter.voteType) {
-        return {
-          state:false,
-          error:"already voted"
-        }
-    
+      let votesCount = post.votesCount;
+      let operation;
+      if (dir == 1 || dir == 2) {
+        operation = 1;
+      } else if (dir == 0 || dir == -1) {
+        operation = -1;
       }
-    }
-    let votesCount = comment.votesCount;
-    let operation;
-    if (dir == 1 || dir == 2) {
-      operation = 1;
-    } else if (dir == 0 || dir == -1) {
-      operation = -1;
-    }
-    console.log("aaa");
-    try{
-      if(removeDetector&&!addDetector){
-        await User.findOneAndUpdate(           
-          {_id:username}, 
-         {$pull:  {"votedComments":{_id:postIdCasted}}});
-      }
-      else if(!removeDetector&&addDetector){
-  
+      if (removeDetector && !addDetector) {
         await User.findOneAndUpdate(
-          {_id:username},
-          {$addToSet:{"votedComments":{_id:postIdCasted,type:operation}}});
+          { _id: username },
+          { $pull: { hasVote: { _id: postIdCasted } } }
+        );
+      } else if (!removeDetector && addDetector) {
+        await User.findOneAndUpdate(
+          { _id: username },
+          { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
+        );
+      } else if (addDetector && removeDetector) {
+        await User.findOneAndUpdate(
+          { _id: username },
+          { $pull: { hasVote: { _id: postIdCasted } } }
+        );
+        await User.findOneAndUpdate(
+          { _id: username },
+          { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
+        );
       }
-    
-      else if(addDetector&&removeDetector){
-        await User.findOneAndUpdate(           
-          {_id:username}, 
-         {$pull:  {"votedComments":{_id:postIdCasted}}});
-         await User.findOneAndUpdate(
-          {_id:username},
-          {$addToSet:{"votedComments":{_id:postIdCasted,type:operation}}});
+      await Post.findByIdAndUpdate(
+        { _id: postIdCasted },
+        {
+          $set: {
+            votesCount: votesCount + operation,
+            voters: voters,
+          },
+        },
+        { new: true },
+        (err) => {
+          if (err) {
+            return {
+              state: false,
+              error: "failed",
+            };
+          } else {
+            return {
+              state: true,
+              status: "done",
+            };
+          }
+        }
+      );
+    } else if (id === "t1") {
+      //comment or reply
+      const comment = await this.getOne({ _id: postIdCasted });
+      if (!comment) {
+        return {
+          state: false,
+          error: "not found",
+        };
       }
-   
-    Comment.findByIdAndUpdate(
-      { _id: postIdCasted },
-      { $set: { votesCount: votesCount + operation, voters: voters } },
-      { new: true },
-      (err) => {
-        
+      voters = comment.voters;
+      isFound = false;
+      index = 0;
+      voter;
+      for (let z = 0; z < voters.length; z++) {
+        if (voters[z].userID === username) {
+          isFound = true;
+          voter = voters[z];
+          break;
+        }
+        index++;
       }
-    );
-   
-      return {
-        state:true,
-        status: "done"
-      }
-    }
-    catch{
-      return {
-        state:false,
-        error: "failed",
+      console.log(isFound);
+      console.log("a");
+      removeDetector = false;
+      addDetector = false;
+      if (!isFound) {
+        addDetector = true;
 
+        if (dir == 1 || dir == -1) {
+          voters.push({ userID: username, voteType: dir });
+        } else if (dir == 0 || dir == 2) {
+          return {
+            state: false,
+            error: "invalid dir",
+          };
+        }
+      } else {
+        if (
+          (dir == 0 && voter.voteType == 1) ||
+          (dir == 2 && voter.voteType == -1)
+        ) {
+          voters.splice(index, 1);
+          removeDetector = true;
+        } else if (
+          (dir == 0 && voter.voteType == -1) ||
+          (dir == 2 && voter.voteType == 1)
+        ) {
+          return {
+            state: false,
+            error: "invalid dir",
+          };
+        } else if (
+          (voter.voteType == 1 && dir == -1) ||
+          (voter.voteType == -1 && dir == 1)
+        ) {
+          removeDetector = true;
+          addDetector = true;
+          voters[index].voteType = dir;
+        } else if (dir == voter.voteType) {
+          return {
+            state: false,
+            error: "already voted",
+          };
+        }
+      }
+      let votesCount = comment.votesCount;
+      let operation;
+      if (dir == 1 || dir == 2) {
+        operation = 1;
+      } else if (dir == 0 || dir == -1) {
+        operation = -1;
+      }
+      console.log("aaa");
+      try {
+        if (removeDetector && !addDetector) {
+          await User.findOneAndUpdate(
+            { _id: username },
+            { $pull: { votedComments: { _id: postIdCasted } } }
+          );
+        } else if (!removeDetector && addDetector) {
+          await User.findOneAndUpdate(
+            { _id: username },
+            {
+              $addToSet: {
+                votedComments: { _id: postIdCasted, type: operation },
+              },
+            }
+          );
+        } else if (addDetector && removeDetector) {
+          await User.findOneAndUpdate(
+            { _id: username },
+            { $pull: { votedComments: { _id: postIdCasted } } }
+          );
+          await User.findOneAndUpdate(
+            { _id: username },
+            {
+              $addToSet: {
+                votedComments: { _id: postIdCasted, type: operation },
+              },
+            }
+          );
+        }
+
+        Comment.findByIdAndUpdate(
+          { _id: postIdCasted },
+          { $set: { votesCount: votesCount + operation, voters: voters } },
+          { new: true },
+          () => {}
+        );
+
+        return {
+          state: true,
+          status: "done",
+        };
+      } catch {
+        return {
+          state: false,
+          error: "failed",
+        };
       }
     }
-    console.log("sad");
-  }
-  }
+  };
 }
 
 module.exports = CommentService;
