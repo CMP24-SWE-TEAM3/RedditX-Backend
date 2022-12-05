@@ -15,7 +15,6 @@ const voteSchema = mongoose.Schema({
   voteType: Number,
 });
 const commentSchema = new mongoose.Schema({
-  
   authorId: {
     type: String,
     ref: "User",
@@ -71,14 +70,6 @@ const commentSchema = new mongoose.Schema({
       type: spamSchema,
     },
   ],
-});
-
-
-commentSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: "replyingTo"
-  });
-  next();
 });
 
 const Comment = mongoose.model("Comment", commentSchema);
