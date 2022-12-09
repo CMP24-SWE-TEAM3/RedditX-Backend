@@ -63,16 +63,18 @@ const setSuggestedSort = async (req, res) => {
       status: "failed",
     });
   }
-  const result=communityServiceInstance.setSuggestedSort(req.body.srName,req.body.setSuggestedSort);
-  if(result.status){
+  const result = communityServiceInstance.setSuggestedSort(
+    req.body.srName,
+    req.body.setSuggestedSort
+  );
+  if (result.status) {
     return res.status(200).json({
-      status:"done"
-    })
+      status: "done",
+    });
   }
   return res.status(500).json({
-    status:"failed"
-  })
-  
+    status: "failed",
+  });
 };
 
 /**

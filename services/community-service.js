@@ -219,12 +219,11 @@ class CommunityService extends Service {
         subreddit: null,
       };
     }
-
-  }
-  setSuggestedSort=async(srName,commentSort)=>{
+  };
+  setSuggestedSort = async (srName, commentSort) => {
     Community.findByIdAndUpdate(
       { _id: srName },
-      { $set: { suggestedCommentSort:commentSort } },
+      { $set: { suggestedCommentSort: commentSort } },
       { new: true },
       (err) => {
         if (err) {
@@ -238,8 +237,7 @@ class CommunityService extends Service {
         }
       }
     );
-  }
-
+  };
 }
 
 module.exports = CommunityService;
