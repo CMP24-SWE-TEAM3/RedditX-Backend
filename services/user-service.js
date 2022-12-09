@@ -149,8 +149,14 @@ class UserService extends Service {
                 $addToSet: {
                   member: {
                     communityId: body.srName,
-                    isBanned: false,
-                    isMuted: false,
+                    isBanned: {
+                      value: false,
+                      date: Date.now(),
+                    },
+                    isMuted: {
+                      value: false,
+                      date: Date.now(),
+                    },
                   },
                 },
               }
@@ -161,8 +167,14 @@ class UserService extends Service {
                 $addToSet: {
                   members: {
                     userID: username,
-                    isBanned: false,
-                    isMuted: false,
+                    isBanned: {
+                      value: false,
+                      date: Date.now(),
+                    },
+                    isMuted: {
+                      value: false,
+                      date: Date.now(),
+                    },
                   },
                 },
               }
@@ -199,7 +211,7 @@ class UserService extends Service {
   };
   getFilteredSubreddits = (subreddits) => {
     return subreddits.map((el) => {
-      if (!el.isBanned) {
+      if (!el.isBanned.value) {
         return el.communityId;
       }
     });

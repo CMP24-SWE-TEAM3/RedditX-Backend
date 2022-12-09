@@ -31,15 +31,13 @@ const postSchema = mongoose.Schema({
     ],
     minLength: [1, "A post title must have more than or equal to 1 character"],
   },
-  text: {
+  textHTML: {
     type: String,
-    required: [true, "A post must have a text!"],
     trim: true, // Remove all the white space in the beginning or end of the field
-    maxLength: [
-      100000,
-      "A post text must have less than or equal to 100000 characters",
-    ],
-    minLength: [1, "A post text must have more than or equal to 1 character"],
+  },
+  textJSON: {
+    type: String,
+    trim: true, // Remove all the white space in the beginning or end of the field
   },
   isDeleted: {
     type: Boolean,

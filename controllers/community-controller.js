@@ -128,17 +128,16 @@ const getSubscribed = catchAsync(async (req, res, next) => {
   });
 });
 /**
- * Get the list of random communities 
+ * Get the list of random communities
  * @param {function} (req, res, next)
  * @returns {object} res
  */
- const getRandomCommunities =async(req,res)=>{
-    const communities=await communityServiceInstance.getRandomCommunities();
-    return res.status(200).json({
-      communities:communities
-    });
-
- } 
+const getRandomCommunities = async (req, res) => {
+  const communities = await communityServiceInstance.getRandomCommunities();
+  return res.status(200).json({
+    communities: communities,
+  });
+};
 
 /**
  * Ban or mute a user within a community
@@ -179,23 +178,30 @@ const banOrMute = catchAsync(async (req, res, next) => {
  */
 const getBanned = catchAsync(async (req, res, next) => {
   var users = undefined;
+  var banned = [];
   try {
-    const memberIDs = await communityServiceInstance.getBannedOrMuted(
-      req.params.subreddit,
-      "isBanned"
-    );
+    const { memberIDs, dates } =
+      await communityServiceInstance.getBannedOrMuted(
+        req.params.subreddit,
+        "isBanned"
+      );
     users = await userServiceInstance.find(
       {
         _id: { $in: memberIDs },
       },
       "avatar about"
     );
+    dates.forEach((date, index) => {
+      var tempBanned = { ...users[index] }._doc;
+      tempBanned.date = date;
+      banned[index] = tempBanned;
+    });
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    users,
+    users: banned,
   });
 });
 
@@ -206,23 +212,30 @@ const getBanned = catchAsync(async (req, res, next) => {
  */
 const getMuted = catchAsync(async (req, res, next) => {
   var users = undefined;
+  var muted = [];
   try {
-    const memberIDs = await communityServiceInstance.getBannedOrMuted(
-      req.params.subreddit,
-      "isMuted"
-    );
+    const { memberIDs, dates } =
+      await communityServiceInstance.getBannedOrMuted(
+        req.params.subreddit,
+        "isMuted"
+      );
     users = await userServiceInstance.find(
       {
         _id: { $in: memberIDs },
       },
       "avatar about"
     );
+    dates.forEach((date, index) => {
+      var tempMuted = { ...users[index] }._doc;
+      tempMuted.date = date;
+      muted[index] = tempMuted;
+    });
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    users,
+    users: muted,
   });
 });
 
@@ -280,5 +293,5 @@ module.exports = {
   getMuted,
   getModerators,
   getCommunityOptions,
-  getRandomCommunities
+  getRandomCommunities,
 };
