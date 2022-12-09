@@ -104,12 +104,12 @@ class CommunityService extends Service {
     community.members.map((el) =>
       el.userID === member
         ? operation === "ban"
-          ? (el.isBanned = true)
+          ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned = false)
+          ? (el.isBanned.value = false)
           : operation === "mute"
-          ? (el.isMuted = true)
-          : (el.isMuted = false)
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     return community;
@@ -128,12 +128,12 @@ class CommunityService extends Service {
     toBeAffected.member.map((el) =>
       el.communityId === community._id
         ? operation === "ban"
-          ? (el.isBanned = true)
+          ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned = false)
+          ? (el.isBanned.value = false)
           : operation === "mute"
-          ? (el.isMuted = true)
-          : (el.isMuted = false)
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     await toBeAffected.save();
@@ -154,10 +154,14 @@ class CommunityService extends Service {
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     let memberIDs = [];
+    let dates = [];
     community.members.forEach((el) => {
-      if (el[type]) memberIDs.push(el.userID);
+      if (el[type].value) {
+        memberIDs.push(el.userID);
+        dates.push(el[type].date);
+      }
     });
-    return memberIDs;
+    return { memberIDs, dates };
   };
 
   /**
@@ -215,6 +219,7 @@ class CommunityService extends Service {
         subreddit: null,
       };
     }
+
 
   }
   
@@ -278,10 +283,12 @@ class CommunityService extends Service {
       return false;
     return true;
   }
-  setSuggestedSort=async(srName,commentSort)=>{
+ 
+  setSuggestedSort = async (srName, commentSort) => {
+
     Community.findByIdAndUpdate(
       { _id: srName },
-      { $set: { suggestedCommentSort:commentSort } },
+      { $set: { suggestedCommentSort: commentSort } },
       { new: true },
       (err) => {
         if (err) {
@@ -295,8 +302,7 @@ class CommunityService extends Service {
         }
       }
     );
-  }
-
+  };
 }
 
 module.exports = CommunityService;

@@ -64,18 +64,25 @@ const communityOptionsSchema = mongoose.Schema({
   },
 });
 
+const isBannedOrMutedSchema = mongoose.Schema({
+  value: {
+    type: Boolean,
+    default: 0,
+  },
+  date: Date,
+});
 const memberSchema = mongoose.Schema({
   userID: {
     type: String,
     ref: "User",
   },
   isMuted: {
-    type: Boolean,
-    default: 0,
+    type: isBannedOrMutedSchema,
+    default: () => ({}),
   },
   isBanned: {
-    type: Boolean,
-    default: 0,
+    type: isBannedOrMutedSchema,
+    default: () => ({}),
   },
 });
 
@@ -129,6 +136,7 @@ const communitySchema = mongoose.Schema({
   },
   createdAt: {
     type: Date,
+
     required: [true, "missing the date of creation of the user"],
     default: Date.now(),
   },
@@ -140,6 +148,7 @@ const communitySchema = mongoose.Schema({
     type: Number,
     default:0
   },
+
   pageViews: [
     {
       type: statsSchema,
