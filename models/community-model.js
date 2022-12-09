@@ -101,7 +101,7 @@ const communitySchema = mongoose.Schema({
   ],
   description: {
     type: String,
-    required: [true, "A community must have a description!"],
+    required: [false, "A community must have a description!"],
     trim: true, // Remove all the white space in the beginning or end of the field
     maxLength: [
       100000,
@@ -127,9 +127,19 @@ const communitySchema = mongoose.Schema({
     type: Boolean,
     default: 0,
   },
-  createdAt: String,
-  rank: Number,
-  trendPoints: Number,
+  createdAt: {
+    type: Date,
+    required: [true, "missing the date of creation of the user"],
+    default: Date.now(),
+  },
+  rank: {
+    type: Number,
+    default:0
+  },
+  trendPoints: {
+    type: Number,
+    default:0
+  },
   pageViews: [
     {
       type: statsSchema,

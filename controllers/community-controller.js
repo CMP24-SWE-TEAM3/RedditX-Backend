@@ -262,6 +262,31 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
   }
   res.status(200).json(communityOptions);
 });
+/**
+ * Get community options of a subreddit
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const createSubreddit= async(req,res,next)=>{
+  if(!communityServiceInstance.creationValidation(req.body)){
+    return res.status(500).json({
+      status:"invalid parameters"
+    });
+  }
+  var user=await userServiceInstance.getOne({_id:req.username});
+  console.log(user);
+  const result=await communityServiceInstance.createSubreddit(req.body,user);
+  console.log(result);
+  if(!result.status){
+    return res.status(500).json({
+      status:result.error
+    });
+  }
+  return res.status(200).json({
+    status:result.response
+  });
+}
+
 
 module.exports = {
   uploadCommunityIcon,
@@ -274,5 +299,6 @@ module.exports = {
   getMuted,
   getModerators,
   getCommunityOptions,
-  getRandomCommunities
+  getRandomCommunities,
+  createSubreddit,
 };
