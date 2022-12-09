@@ -1,16 +1,9 @@
-/**
- * FILE: post-service
- * description: the services related to posts only
- * created at: 15/11/2022
- * created by: Mohamed Nabil
- * authors: Ahmed Lotfy, Shredan Abdullah, Moaz Mohamed, Mohamed Nabil
- */
-
 const Service = require("./service");
 const AppError = require("./../utils/app-error");
 
 /**
- * @namespace PostService
+ * Service class to handle Post manipulations.
+ * @class PostService
  */
 class PostService extends Service {
   constructor(model) {
@@ -70,6 +63,7 @@ class PostService extends Service {
    * User saves a post
    * @param {string} linkID
    * @param {object} user
+   * @function
    */
   save = async (linkID, user) => {
     if (!linkID) throw new AppError("No linkID is provided!", 400);
@@ -83,6 +77,7 @@ class PostService extends Service {
    * User unsaves a post
    * @param {string} linkID
    * @param {object} user
+   * @function
    */
   unsave = async (linkID, user) => {
     if (!linkID) throw new AppError("No linkID is provided!", 400);
@@ -101,6 +96,7 @@ class PostService extends Service {
    * @param {object} user
    * @param {object} community
    * @returns {object} newPost
+   * @function
    */
   submit = async (data, files, user, community) => {
     if (!user) throw new AppError("This user doesn't exist!", 404);
@@ -135,6 +131,7 @@ class PostService extends Service {
    * @param {string} spamText
    * @param {string} username
    * @param {string} community
+   * @function
    */
   spamPost = async (post, spamType, spamText, username, community) => {
     if (post.spammers.find((el) => el.spammerID === username))

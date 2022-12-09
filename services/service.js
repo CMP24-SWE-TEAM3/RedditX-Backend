@@ -1,18 +1,8 @@
-/**
- * FILE: service.js
- * description: the service class that obtains the common services between controllers
- * created at: 15/11/2022
- * created by: Mohamed Nabil
- * authors: Ahmed Lotfy, Moaz Mohamed, Shredan Abdullah, Mohamed Nabil
- */
-
-/**
- * INCLUDES
- */
 const APIfeatures = require("./../utils/api-features");
 
 /**
- * @namespace Service
+ * Service class to handle common database queries.
+ * @class CommentService
  */
 class Service {
   constructor(model) {
@@ -42,10 +32,17 @@ class Service {
     return res;
   };
 
-  updateOne = (query, body, options) => {
-    return this.model.findOneAndUpdate(query, body, options);
+  updateOne = (query, update) => {
+    ///msh 3arfa ab3t elfunction ezay hena
+    return this.model
+      .findOneAndUpdate(query, update, (error, doc) => {
+        if (!error) return doc;
+        else return null;
+        // error: any errors that occurred
+        // doc: the document before updates are applied if `new: false`, or after updates if `new = true`
+      })
+      .clone();
   };
-
 
   findById = (id, select) => {
     if (select && select !== "") return this.model.findById(id).select(select);
@@ -56,7 +53,6 @@ class Service {
     if (select && select !== "") return this.model.find(query).select(select);
     else return this.model.find(query);
   };
-
 
   findByIdAndUpdate = (id, data, options) => {
     return this.model.findByIdAndUpdate(id, data, options);

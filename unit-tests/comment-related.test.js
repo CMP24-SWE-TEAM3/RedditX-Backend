@@ -1,6 +1,9 @@
 /* eslint-disable */
+
 const Comment = require("../models/comment-model");
+const Post = require("../models/post-model");
 const Community = require("../models/community-model");
+const User = require("../models/user-model");
 const CommentService = require("../services/comment-service");
 
 const commentServiceInstance = new CommentService(Comment);

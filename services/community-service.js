@@ -1,23 +1,21 @@
-/**
- * FILE: community-service
- * description: the services related to communities only
- * created at: 18/11/2022
- * created by: Mohamed Nabil
- * authors: Ahmed Lotfy, Shredan Abdullah, Moaz Mohamed, Mohamed Nabil
- */
-
 const Service = require("./service");
 const AppError = require("../utils/app-error");
-const Community=require("../models/community-model");
+const Community = require("../models/community-model");
 
 /**
- * @namespace CommunityService
+ * Service class to handle Community manipulations.
+ * @class CommunityService
  */
 class CommunityService extends Service {
   constructor(model) {
     super(model);
   }
 
+  /**
+   * Get search query results
+   * @param {object} query
+   * @function
+   */
   getSearchResults = (query) => {
     const searchQuery = query.q;
     delete query.q;
@@ -38,6 +36,7 @@ class CommunityService extends Service {
    * @param {string} username
    * @param {string} subreddit
    * @param {string} type
+   * @function
    */
   uploadCommunityPhoto = async (file, username, subreddit, type) => {
     if (!file) throw new AppError("No photo is uploaded!", 400);
@@ -59,6 +58,7 @@ class CommunityService extends Service {
    * @param {object} user
    * @param {string} type
    * @returns {array} communities
+   * @function
    */
   getCommunities = async (user, type) => {
     if (!user) throw new AppError("This user doesn't exist!", 404);
@@ -82,6 +82,7 @@ class CommunityService extends Service {
    * @param {string} member
    * @param {string} operation
    * @returns {object} community
+   * @function
    */
   banOrMuteAtCommunity = async (subreddit, moderator, member, operation) => {
     const community = await this.getOne({
@@ -120,6 +121,7 @@ class CommunityService extends Service {
    * @param {object} community
    * @param {string} operation
    * @returns {object} community
+   * @function
    */
   banOrMuteAtUser = async (toBeAffected, community, operation) => {
     if (!toBeAffected) throw new AppError("This user doesn't exist!", 404);
@@ -143,6 +145,7 @@ class CommunityService extends Service {
    * @param {string} subreddit
    * @param {string} type
    * @returns {Array} memberIDs
+   * @function
    */
   getBannedOrMuted = async (subreddit, type) => {
     const community = await this.getOne({
@@ -161,6 +164,7 @@ class CommunityService extends Service {
    * Get all moderators of a community
    * @param {string} subreddit
    * @returns {Array} moderatorIDs
+   * @function
    */
   getModerators = async (subreddit) => {
     const community = await this.getOne({
@@ -179,6 +183,7 @@ class CommunityService extends Service {
    * Get options of a community
    * @param {string} subreddit
    * @returns {object} communityOptions
+   * @function
    */
   getCommunityOptions = async (subreddit) => {
     const community = await this.getOne({
@@ -188,28 +193,29 @@ class CommunityService extends Service {
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     return community.communityOptions;
   };
-  getRandomCommunities=async()=>{
+
+  getRandomCommunities = async () => {
     const cursor = Community.find();
-    var communities=[];
+    var communities = [];
     for await (const doc of cursor) {
-      communities.push(doc)  ;
+      communities.push(doc);
     }
     return communities;
-  }
-  availableSubreddit=async(subreddit)=>{
-
-    const subre = await this.getOne({_id:subreddit});
+  };
+  availableSubreddit = async (subreddit) => {
+    const subre = await this.getOne({ _id: subreddit });
     if (subre) {
-    return {
+      return {
         state: false,
         subreddit: subre,
-    };
+      };
     } else {
-    return {
+      return {
         state: true,
         subreddit: null,
-    };
+      };
     }
+
   }
   setSuggestedSort=async(srName,commentSort)=>{
     Community.findByIdAndUpdate(
@@ -229,6 +235,7 @@ class CommunityService extends Service {
       }
     );
   }
+
 }
 
 module.exports = CommunityService;

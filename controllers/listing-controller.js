@@ -4,14 +4,51 @@ const Comment = require("../models/comment-model");
 const Community = require("../models/community-model");
 const User = require("../models/user-model");
 const PostService = require("./../services/post-service");
+// const CommentService = require("./../services/comment-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("../services/comment-service");
 var postServiceInstance = new PostService(Post);
+// var commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
 var commentServiceInstance = new CommentService(Comment);
 
+
+/**
+ * Creates a comment 
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+ const addComment = catchAsync(async (req, res, next) => {
+  let newComment = {};
+  try {
+    newComment = await commentServiceInstance.addComment(
+      req.body,
+      req.username
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(201).json(newComment);
+});
+/**
+ * Creates a reply 
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+ const addReply = catchAsync(async (req, res, next) => {
+  let newReply = {};
+  try {
+    newReply = await commentServiceInstance.addReply(
+      req.body,
+      req.username
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(201).json(newReply);
+});
 /**
  * Creates a post and saves the file names to database
  * @param {function} (req, res, next)
@@ -127,6 +164,8 @@ const getPosts = catchAsync(async (req, res) => {
 module.exports = {
   submit,
   save,
+  addComment,
+  addReply,
   unsave,
   getPosts,
   vote,

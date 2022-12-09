@@ -5,20 +5,39 @@ const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
 
-const sharp = require("sharp");
-const availableUser=require("./auth-controller").availableUser;
-
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
-
 
 const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
 const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
 
+/**
+ * Update user email
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const updateEmail = async (req, res) => {
+  if (!req.username || !req.body.email)
+    return res.status(400).json({
+      response: "invaild parameters",
+    });
+  const results = await userServiceInstance.updateOne(
+    { _id: req.username },
+    { email: req.body.email }
+  );
+  if (!results)
+    return res.status(400).json({
+      response: "error",
+    });
+  console.log("ay haga");
+  return res.status(200).json({
+    response: results,
+  });
+};
 /**
  * Saves filename to database
  * @param {function} (req, res, next)
@@ -121,174 +140,63 @@ const spam = catchAsync(async (req, res, next) => {
     message: "Spams are updated successfully",
   });
 });
-
-/**
- * Get user prefs from database
- * @param {String} (username)
- * @returns {object} user
- */
-const userPrefs = async (username) => {
-  const user = await User.findById(username);
-  if (user) {
-    return {
-      test: true,
-      user: user.prefs,
-    };
-  } else {
-    return {
-      test: false,
-      user: null,
-    };
-  }
-};
 /**
  * Get user prefs
  * @param {function} (req,res)
  * @returns {object} res
  */
-const getUserPrefs = async (req, res) => {
-  const data = await userPrefs(req.username);
-  if (data.test) {
-    return res.status(200).json({
-      data: data.user,
-    });
-  } else {
-    return res.status(404).json({
-      response: "username is not found!",
-    });
+const getUserPrefs = catchAsync(async (req, res, next) => {
+  var prefs = undefined;
+  try {
+    const user = await userServiceInstance.findById(req.username);
+    prefs = await communityServiceInstance.userPrefs(user);
+  } catch (err) {
+    return next(err);
   }
-};
-/**
- * Get user me info from database
- * @param {String} (username)
- * @returns {object} user
- */
-const userMe = async (username) => {
-  const user = await User.findById(username);
-  if (user) {
-    const obj = {
-      numComments: user.prefs.commentsNum,
-      threadedMessages: user.prefs.threadedMessages,
-      showLinkFlair: user.prefs.showLinkFlair,
-      countryCode: user.prefs.countryCode,
-      langauge: user.prefs.langauge,
-      over18: user.prefs.over18,
-      defaultCommentSort: user.prefs.defaultCommentSort,
-      showLocationBasedRecommendations:
-        user.prefs.showLocationBasedRecommendations,
-      searchInclude18: user.prefs.searchInclude18,
-      publicVotes: user.prefs.publicVotes,
-      enableFollwers: user.prefs.enableFollwers,
-      liveOrangeRed: user.prefs.liveOrangereds,
-      labelNSFW: user.prefs.labelNSFW,
-      newWindow: user.prefs.showPostInNewWindow,
-      emailPrivateMessage: user.prefs.emailPrivateMessage,
-      emailPostReply: user.prefs.emailPostReply,
-      emailMessages: user.prefs.emailMessages,
-      emailCommentReply: user.prefs.emailCommentReply,
-      emailUpvoteComment: user.prefs.emailUpvoteComment,
-      about: user.about,
-      avatar: user.avatar,
-      userID: user._id,
-      emailUserNewFollwer: user.meReturn.emailUserNewFollwer,
-      emailUpVotePost: user.meReturn.emailUpVotePost,
-      emailUsernameMention: user.meReturn.emailUsernameMention,
-    };
-    return {
-      test: true,
-      user: obj,
-    };
-  } else {
-    return {
-      test: false,
-      user: null,
-    };
-  }
-};
-/**
- * Get user me info
- * @param {function} (req,,res)
- * @returns {object} res
- */
-const getUserMe = async (req, res) => {
-  const data = await userMe(req.username);
-  if (data.test) {
-    return res.status(200).json({
-      data: data.user,
-    });
-  } else {
-    return res.status(404).json({
-      response: "username is not found!",
-    });
-  }
-};
+  res.status(200).json({
+    prefs,
+  });
+});
 
-/**
- * Get user about from database
- * @param {String} (username)
- * @returns {object} user
- */
-const userAbout = async (username) => {
-  const user = await User.findById(username);
-  if (user) {
-    const obj = {
-      prefShowTrending: user.aboutReturn.prefShowTrending,
-      isBlocked: user.aboutReturn.isBlocked,
-      isBanned: user.member.isBanned,
-      isMuted: user.member.isMuted,
-      canCreateSubreddit: user.canCreateSubreddit,
-      isMod: user.aboutReturn.isMuted,
-      over18: user.prefs.over18,
-      hasVerifiedEmail: user.hasVerifiedEmail,
-      createdAt: user.createdAt,
-      inboxCount: user.inboxCount,
-      totalKarma: user.karma,
-      linkKarma: user.postKarma,
-      acceptFollowers: user.aboutReturn.acceptFollowers,
-      commentKarma: user.commentKarma,
-      passwordSet: user.isPasswordSet,
-      email: user.email,
-      about: user.about,
-      avatar: user.avatar,
-      userID: user._id,
-    };
-    return {
-      test: true,
-      user: obj,
-    };
-  } else {
-    return {
-      test: false,
-      user: null,
-    };
-  }
-};
 /**
  * Get user about
  * @param {function} (req,res)
  * @returns {object} res
  */
-const getUserAbout = async (req, res) => {
-  const data = await userAbout(req.params.username);
-  if (data.test) {
-    return res.status(200).json({
-      data: data.user,
-    });
-  } else {
-    return res.status(404).json({
-      response: "username is not found!",
-    });
+const getUserAbout = catchAsync(async (req, res, next) => {
+  var about = undefined;
+  try {
+    const user = await userServiceInstance.findById(req.username);
+    about = await communityServiceInstance.userAbout(user);
+  } catch (err) {
+    return next(err);
   }
+  res.status(200).json({
+    about,
+  });
+});
+
+/**
+ * Get user me info
+ * @param {function} (req,,res)
+ * @returns {object} res
+ */
+const getUserMe = catchAsync(async (req, res, next) => {
+  var meInfo = undefined;
+  try {
+    const user = await userServiceInstance.findById(req.username);
+    meInfo = await communityServiceInstance.userMe(user);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    meInfo,
+  });
+});
+
+const returnResponse = (res, obj, statusCode) => {
+  return res.status(statusCode).json(obj);
 };
-
-const returnResponse=(obj,statusCode)=>{
-  return res.status(statusCode).json(
-    obj
-  );
-}
-
-
-
 
 /**
  * Subscribe to a subreddit or a redditor
@@ -296,39 +204,36 @@ const returnResponse=(obj,statusCode)=>{
  * @returns {object} res
  */
 const subscribe = async (req, res) => {
-    if(!req.body.srName||!req.body.action){
-      return returnResponse({error:"invalid inputs"},400);
-    }
-    console.log(req.body);
-    console.log(req.username);
+  if (!req.body.srName || !req.body.action) {
+    return returnResponse(res, { error: "invalid inputs" }, 400);
+  }
+  console.log(req.body);
+  console.log(req.username);
 
-    const result=await userServiceInstance.subscribe(req.body,req.username);
-    console.log("res",result);
-    if(result.state){
-      return res.status(200).json({
-        "status":"done"
-      });
-    }
-    else{
-      return res.status(404).json({
-        "status":result.error
-
-      });
-    }
-    
-    
+  const result = await userServiceInstance.subscribe(req.body, req.username);
+  console.log("res", result);
+  if (result.state) {
+    return res.status(200).json({
+      status: "done",
+    });
+  } else {
+    return res.status(404).json({
+      status: result.error,
+    });
+  }
 };
-
 
 module.exports = {
   uploadUserPhoto,
   block,
   spam,
 
+  updateEmail,
+
   returnResponse,
 
   getUserMe,
   getUserAbout,
   getUserPrefs,
-  subscribe
+  subscribe,
 };

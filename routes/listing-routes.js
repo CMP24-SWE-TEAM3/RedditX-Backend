@@ -13,6 +13,8 @@ router
   .route("/posts/:criteria")
   .get(possibleAuthCheck, listingController.getPosts);
 
+router.post("/addcomment", authCheck, listingController.addComment);
+router.post("/addreply", authCheck, listingController.addReply);
 router.post("/save", authCheck, listingController.save);
 router.post("/unsave", authCheck, listingController.unsave);
 router.post("/vote", authCheck, listingController.vote);
