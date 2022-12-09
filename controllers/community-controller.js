@@ -63,22 +63,16 @@ const setSuggestedSort = async (req, res) => {
       status: "failed",
     });
   }
-  Community.findByIdAndUpdate(
-    { _id: req.body.srName },
-    { $set: { suggestedCommentSort: req.body.suggestedCommentSort } },
-    { new: true },
-    (err) => {
-      if (err) {
-        return res.status(500).json({
-          status: "failed",
-        });
-      } else {
-        return res.status(200).json({
-          status: "done",
-        });
-      }
-    }
-  );
+  const result=communityServiceInstance.setSuggestedSort(req.body.srName,req.body.setSuggestedSort);
+  if(result.status){
+    return res.status(200).json({
+      status:"done"
+    })
+  }
+  return res.status(500).json({
+    status:"failed"
+  })
+  
 };
 
 /**

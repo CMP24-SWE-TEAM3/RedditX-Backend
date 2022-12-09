@@ -211,6 +211,24 @@ class CommunityService extends Service {
     };
     }
   }
+  setSuggestedSort=async(srName,commentSort)=>{
+    Community.findByIdAndUpdate(
+      { _id: srName },
+      { $set: { suggestedCommentSort:commentSort } },
+      { new: true },
+      (err) => {
+        if (err) {
+          return {
+            status: false,
+          };
+        } else {
+          return {
+            status: true,
+          };
+        }
+      }
+    );
+  }
 }
 
 module.exports = CommunityService;
