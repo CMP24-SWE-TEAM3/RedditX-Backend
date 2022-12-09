@@ -262,6 +262,38 @@ const getModerators = catchAsync(async (req, res, next) => {
 });
 
 /**
+ * Get all members of a subreddit
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getMembers = catchAsync(async (req, res, next) => {
+  var users = undefined;
+  var members = [];
+  try {
+    const { memberIDs, isBannedAndMuted } =
+      await communityServiceInstance.getMembers(req.params.subreddit);
+    users = await userServiceInstance.find(
+      {
+        _id: { $in: memberIDs },
+      },
+      "avatar about"
+    );
+    isBannedAndMuted.forEach((isBannedAndMutedElement, index) => {
+      var temp = { ...users[index] }._doc;
+      temp.isBanned = isBannedAndMutedElement.isBanned;
+      temp.isMuted = isBannedAndMutedElement.isMuted;
+      members[index] = temp;
+    });
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    users: members,
+  });
+});
+
+/**
  * Get community options of a subreddit
  * @param {function} (req, res, next)
  * @returns {object} res
@@ -288,6 +320,7 @@ module.exports = {
   getBanned,
   getMuted,
   getModerators,
+  getMembers,
   getCommunityOptions,
   getRandomCommunities,
 };

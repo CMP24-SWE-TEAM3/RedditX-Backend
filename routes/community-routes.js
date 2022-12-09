@@ -26,7 +26,11 @@ router.post(
   authCheck,
   communityController.setSuggestedSort
 );
-router.get("/random-category", authCheck, communityController.getRandomCommunities);
+router.get(
+  "/random-category",
+  authCheck,
+  communityController.getRandomCommunities
+);
 
 router.get("/mine/moderator", authCheck, communityController.getModerates);
 router.get("/mine/subscriber", authCheck, communityController.getSubscribed);
@@ -51,6 +55,11 @@ router.get(
   "/:subreddit/about/moderators",
   authCheck,
   communityController.getModerators
+);
+router.get(
+  "/:subreddit/about/members",
+  authCheck,
+  communityController.getMembers
 );
 router.get(
   "/:subreddit/about/edit",

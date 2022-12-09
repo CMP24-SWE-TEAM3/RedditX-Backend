@@ -62,7 +62,7 @@ class CommunityService extends Service {
    */
   getCommunities = async (user, type) => {
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    let communityIDs = [];
+    var communityIDs = [];
     user[type].forEach((el) => {
       communityIDs.push(el.communityId);
     });
@@ -90,8 +90,8 @@ class CommunityService extends Service {
       select: "members moderators",
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    let performerFound = false;
-    let toBeAffectedFound = false;
+    var performerFound = false;
+    var toBeAffectedFound = false;
     community.moderators.forEach((el) => {
       if (el.userID === moderator) performerFound = true;
       if (el.userID === member) toBeAffectedFound = true;
@@ -145,6 +145,7 @@ class CommunityService extends Service {
    * @param {string} subreddit
    * @param {string} type
    * @returns {Array} memberIDs
+   * @returns {Array} dates
    * @function
    */
   getBannedOrMuted = async (subreddit, type) => {
@@ -153,8 +154,8 @@ class CommunityService extends Service {
       select: "members",
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    let memberIDs = [];
-    let dates = [];
+    var memberIDs = [];
+    var dates = [];
     community.members.forEach((el) => {
       if (el[type].value) {
         memberIDs.push(el.userID);
@@ -176,11 +177,33 @@ class CommunityService extends Service {
       select: "moderators",
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    let moderatorIDs = [];
+    var moderatorIDs = [];
     community.moderators.forEach((el) => {
       moderatorIDs.push(el.userID);
     });
     return moderatorIDs;
+  };
+
+  /**
+   * Get all members of a community
+   * @param {string} subreddit
+   * @returns {Array} memberIDs
+   * @returns {Array} isBannedAndMuted
+   * @function
+   */
+  getMembers = async (subreddit) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "members",
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    var memberIDs = [];
+    var isBannedAndMuted = [];
+    community.members.forEach((el) => {
+      memberIDs.push(el.userID);
+      isBannedAndMuted.push({ isBanned: el.isBanned, isMuted: el.isMuted });
+    });
+    return { memberIDs, isBannedAndMuted };
   };
 
   /**

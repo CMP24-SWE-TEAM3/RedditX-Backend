@@ -202,8 +202,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -217,7 +221,7 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
           "t2_moazMohamed",
           "ban"
         );
-      expect(updatedCommunity.members[0].isBanned).toBe(true);
+      expect(updatedCommunity.members[0].isBanned.value).toBe(true);
     });
   });
   describe("given a subreddit, moderator, member, operation=unban", () => {
@@ -233,8 +237,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: true,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: true,
+            },
           },
         ],
       });
@@ -248,7 +256,7 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
           "t2_moazMohamed",
           "unban"
         );
-      expect(updatedCommunity.members[0].isBanned).toBe(false);
+      expect(updatedCommunity.members[0].isBanned.value).toBe(false);
     });
   });
   describe("given a subreddit, moderator, member, operation=mute", () => {
@@ -264,8 +272,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -279,7 +291,7 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
           "t2_moazMohamed",
           "mute"
         );
-      expect(updatedCommunity.members[0].isMuted).toBe(true);
+      expect(updatedCommunity.members[0].isMuted.value).toBe(true);
     });
   });
   describe("given a subreddit, moderator, member, operation=unmute", () => {
@@ -295,8 +307,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -310,7 +326,7 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
           "t2_moazMohamed",
           "unmute"
         );
-      expect(updatedCommunity.members[0].isMuted).toBe(false);
+      expect(updatedCommunity.members[0].isMuted.value).toBe(false);
     });
   });
   describe("given an undefined subreddit, moderator, member, operation=unmute", () => {
@@ -326,8 +342,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -352,8 +372,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -387,8 +411,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -420,8 +448,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -430,8 +462,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         member: [
           {
             userID: "t5_imagePro235",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -455,8 +491,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: true,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: true,
+            },
           },
         ],
       });
@@ -465,8 +505,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         member: [
           {
             userID: "t5_imagePro235",
-            isMuted: false,
-            isBanned: true,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: true,
+            },
           },
         ],
       });
@@ -490,8 +534,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -500,8 +548,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         member: [
           {
             userID: "t5_imagePro235",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -525,8 +577,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -535,8 +591,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         member: [
           {
             userID: "t5_imagePro235",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -560,8 +620,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -583,24 +647,32 @@ describe("testing getBannedOrMuted service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: true,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: true,
+              date: "2022-12-09T19:16:16.443Z",
+            },
           },
           {
             userID: "t2_hamada",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      const memberIDs = await communityServiceInstance.getBannedOrMuted(
-        community,
-        "isBanned"
-      );
+      const { memberIDs, dates } =
+        await communityServiceInstance.getBannedOrMuted(community, "isBanned");
       expect(memberIDs[0]).toBe("t2_moazMohamed");
+      expect(dates[0]).toStrictEqual(new Date("2022-12-09T19:16:16.443Z"));
     });
   });
   describe("given a subreddit, type=isMuted", () => {
@@ -610,24 +682,32 @@ describe("testing getBannedOrMuted service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+              date: "2022-12-09T19:16:16.443Z",
+            },
+            isBanned: {
+              value: false,
+            },
           },
           {
             userID: "t2_hamada",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      const memberIDs = await communityServiceInstance.getBannedOrMuted(
-        community,
-        "isMuted"
-      );
+      const { memberIDs, dates } =
+        await communityServiceInstance.getBannedOrMuted(community, "isMuted");
       expect(memberIDs[0]).toBe("t2_moazMohamed");
+      expect(dates[0]).toStrictEqual(new Date("2022-12-09T19:16:16.443Z"));
     });
   });
   describe("given an undefined subreddit, type=isMuted", () => {
@@ -672,6 +752,55 @@ describe("testing getModerators service in community service class", () => {
         .mockReturnValueOnce(community);
       expect(
         communityServiceInstance.getModerators(community)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
+describe("testing getMembers service in community service class", () => {
+  describe("given a subreddit", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        members: [
+          {
+            userID: "t2_hamada",
+            isBanned: {
+              value: true,
+              date: "2022-12-09T19:16:16.443Z",
+            },
+            isMuted: {
+              value: false,
+            },
+          },
+          {
+            userID: "t2_moazMohamed",
+            isBanned: {
+              value: false,
+            },
+            isMuted: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const { memberIDs, isBannedAndMuted } =
+        await communityServiceInstance.getMembers(community);
+      expect(memberIDs[0]).toBe("t2_hamada");
+      expect(isBannedAndMuted[0].isBanned.value).toBe(true);
+    });
+  });
+  describe("given an undefined subreddit", () => {
+    test("should throw an error", async () => {
+      const community = undefined;
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      expect(
+        communityServiceInstance.getMembers(community)
       ).rejects.toThrowError();
     });
   });
