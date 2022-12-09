@@ -278,7 +278,7 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
   res.status(200).json(communityOptions);
 });
 /**
- * Get community options of a subreddit
+ * Create subreddit
  * @param {function} (req, res, next)
  * @returns {object} res
  */
@@ -289,8 +289,31 @@ const createSubreddit= async(req,res,next)=>{
     });
   }
   var user=await userServiceInstance.getOne({_id:req.username});
-  console.log(user);
   const result=await communityServiceInstance.createSubreddit(req.body,user);
+  if(!result.status){
+    return res.status(500).json({
+      status:result.error
+    });
+  }
+  return res.status(200).json({
+    status:result.response
+  });
+}
+/**
+ * Add community rule
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const addCommunityRule= async(req,res,next)=>{
+  console.log(req.body);
+  if(!req.body.srName ||!req.body.rule){
+    return res.status(500).json({
+      status:"invalid parameters"
+    });
+  }
+  var user=await userServiceInstance.getOne({_id:req.username});
+
+  const result=await communityServiceInstance.addCommunityRule(req.body,user);
   console.log(result);
   if(!result.status){
     return res.status(500).json({
@@ -301,7 +324,6 @@ const createSubreddit= async(req,res,next)=>{
     status:result.response
   });
 }
-
 
 module.exports = {
   uploadCommunityIcon,
@@ -315,7 +337,7 @@ module.exports = {
   getModerators,
   getCommunityOptions,
   getRandomCommunities,
-
+  addCommunityRule,
   createSubreddit,
 
 };

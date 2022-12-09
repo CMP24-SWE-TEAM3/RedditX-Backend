@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const communityRuleSchema = mongoose.Schema({
   title: String,
   description: String,
+  reason: String
 });
 
 const FAQSchema = mongoose.Schema({

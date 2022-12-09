@@ -223,6 +223,46 @@ class CommunityService extends Service {
 
   }
   
+  addCommunityRule=async(body,user)=>{
+    const result=await this.availableSubreddit(body.srName);
+    console.log(result);
+    if(result.state){
+      return {
+        status:false,
+        error:"subreddit is not found"
+      }
+    }
+    var isFound=false;
+    const moderators=result.subreddit.moderators;
+    for(let i=0;i<moderators.length;i++){
+      if(moderators[i].userID===user._id){
+        if(moderators[i].role==="creator"){
+          isFound=true;
+          break;
+        }
+      }
+    }
+    if(!isFound){
+      return {
+        status:false,
+        error:"you aren't a creator to this subreddit"
+      }
+    }
+    try{
+      this.updateOne({_id:body.srName}, { $addToSet: { communityRules: body.rule } });
+    }
+    catch{
+      return {
+        status:false,
+        error:"operation failed"
+      }
+    }
+    return {
+      status:true,
+      response:"rule is added successfully"
+    }
+  }
+
   createSubreddit=async(body,user)=>{
     if(!user.canCreateSubreddit){
       return {
