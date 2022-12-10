@@ -1,10 +1,16 @@
 const catchAsync = require("../utils/catch-async");
 const Community = require("./../models/community-model");
+const Comment = require("./../models/comment-model");
+const Post = require("./../models/post-model");
 const User = require("./../models/user-model");
 const CommunityService = require("./../services/community-service");
+const CommentService = require("./../services/comment-service");
+const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 const IdValidator= require("../validate/listing-validators").validateObjectId;
 const communityServiceInstance = new CommunityService(Community);
+const commentServiceInstance = new CommentService(Comment);
+const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
 
 /**
@@ -262,6 +268,38 @@ const getModerators = catchAsync(async (req, res, next) => {
 });
 
 /**
+ * Get all members of a subreddit
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getMembers = catchAsync(async (req, res, next) => {
+  var users = undefined;
+  var members = [];
+  try {
+    const { memberIDs, isBannedAndMuted } =
+      await communityServiceInstance.getMembers(req.params.subreddit);
+    users = await userServiceInstance.find(
+      {
+        _id: { $in: memberIDs },
+      },
+      "avatar about"
+    );
+    isBannedAndMuted.forEach((isBannedAndMutedElement, index) => {
+      var temp = { ...users[index] }._doc;
+      temp.isBanned = isBannedAndMutedElement.isBanned;
+      temp.isMuted = isBannedAndMutedElement.isMuted;
+      members[index] = temp;
+    });
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    users: members,
+  });
+});
+
+/**
  * Get community options of a subreddit
  * @param {function} (req, res, next)
  * @returns {object} res
@@ -282,42 +320,45 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-const createSubreddit= async(req,res,next)=>{
-  if(!communityServiceInstance.creationValidation(req.body)){
+const createSubreddit = async (req, res) => {
+  if (!communityServiceInstance.creationValidation(req.body)) {
     return res.status(500).json({
-      status:"invalid parameters"
+      status: "invalid parameters",
     });
   }
-  var user=await userServiceInstance.getOne({_id:req.username});
-  const result=await communityServiceInstance.createSubreddit(req.body,user);
-  if(!result.status){
+  var user = await userServiceInstance.getOne({ _id: req.username });
+  const result = await communityServiceInstance.createSubreddit(req.body, user);
+  if (!result.status) {
     return res.status(500).json({
-      status:result.error
+      status: result.error,
     });
   }
   return res.status(200).json({
-    status:result.response
+    status: result.response,
   });
-}
+};
 /**
  * Add community rule
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-const addCommunityRule= async(req,res,next)=>{
+const addCommunityRule = async (req, res) => {
   console.log(req.body);
-  if(!req.body.srName ||!req.body.rule){
+  if (!req.body.srName || !req.body.rule) {
     return res.status(500).json({
-      status:"invalid parameters"
+      status: "invalid parameters",
     });
   }
-  var user=await userServiceInstance.getOne({_id:req.username});
+  var user = await userServiceInstance.getOne({ _id: req.username });
 
-  const result=await communityServiceInstance.addCommunityRule(req.body,user);
+  const result = await communityServiceInstance.addCommunityRule(
+    req.body,
+    user
+  );
   console.log(result);
-  if(!result.status){
+  if (!result.status) {
     return res.status(500).json({
-      status:result.error
+      status: result.error,
     });
   }
   return res.status(200).json({
@@ -349,7 +390,81 @@ const editCommunityRule= async(req,res,next)=>{
   return res.status(200).json({
     status:result.response,
   });
-}
+};
+
+/**
+ * Get general information about things like a link, comment or a community
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getGeneralInfo = catchAsync(async (req, res, next) => {
+  var things = [];
+  try {
+    const thingsIDs = communityServiceInstance.getThingsIDs(req.query.id);
+    var result;
+    var prepend = undefined;
+    for (var i = 0; i < thingsIDs.length; i++) {
+      prepend = thingsIDs[i][1] * 1;
+      result =
+        prepend === 1 // t1_ => Comment
+          ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+          : prepend === 3 // t3_ => Post
+          ? await postServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+          : prepend === 5 // t5_ => Community
+          ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
+          : undefined;
+      things.push(result);
+    }
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    things,
+  });
+});
+
+/**
+ * Get members count (joined or left) per day
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getMembersCountPerDay = catchAsync(async (req, res, next) => {
+  var data = [];
+  try {
+    data = await communityServiceInstance.getStats(
+      req.params.subreddit,
+      req.query.type
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    data,
+  });
+});
+
+/**
+ * Get views count per day
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getViewsCountPerDay = catchAsync(async (req, res, next) => {
+  var data = [];
+  try {
+    data = await communityServiceInstance.getStats(
+      req.params.subreddit,
+      "pageViews"
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    data,
+  });
+});
 
 module.exports = {
   uploadCommunityIcon,
@@ -361,10 +476,14 @@ module.exports = {
   getBanned,
   getMuted,
   getModerators,
+  getMembers,
   getCommunityOptions,
   getRandomCommunities,
   addCommunityRule,
   createSubreddit,
   editCommunityRule
 
+  getGeneralInfo,
+  getMembersCountPerDay,
+  getViewsCountPerDay,
 };

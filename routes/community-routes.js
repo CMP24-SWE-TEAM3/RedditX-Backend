@@ -26,7 +26,12 @@ router.post(
   authCheck,
   communityController.setSuggestedSort
 );
-router.get("/random-category", authCheck, communityController.getRandomCommunities);
+router.get(
+  "/random-category",
+  authCheck,
+  communityController.getRandomCommunities
+);
+router.get("/info", authCheck, communityController.getGeneralInfo);
 
 router.get("/mine/moderator", authCheck, communityController.getModerates);
 router.get("/mine/subscriber", authCheck, communityController.getSubscribed);
@@ -70,9 +75,24 @@ router.get(
   communityController.getModerators
 );
 router.get(
+  "/:subreddit/about/members",
+  authCheck,
+  communityController.getMembers
+);
+router.get(
   "/:subreddit/about/edit",
   authCheck,
   communityController.getCommunityOptions
+);
+router.get(
+  "/:subreddit/members-count",
+  authCheck,
+  communityController.getMembersCountPerDay
+);
+router.get(
+  "/:subreddit/page-views",
+  authCheck,
+  communityController.getViewsCountPerDay
 );
 
 module.exports = router;
