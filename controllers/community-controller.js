@@ -1,10 +1,16 @@
 const catchAsync = require("../utils/catch-async");
 const Community = require("./../models/community-model");
+const Comment = require("./../models/comment-model");
+const Post = require("./../models/post-model");
 const User = require("./../models/user-model");
 const CommunityService = require("./../services/community-service");
+const CommentService = require("./../services/comment-service");
+const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 
 const communityServiceInstance = new CommunityService(Community);
+const commentServiceInstance = new CommentService(Comment);
+const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
 
 /**
@@ -310,6 +316,38 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
   res.status(200).json(communityOptions);
 });
 
+/**
+ * Get general information about things like a link, comment or a community
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getGeneralInfo = catchAsync(async (req, res, next) => {
+  var things = [];
+  try {
+    const thingsIDs = communityServiceInstance.getThingsIDs(req.query.id);
+    var result;
+    var prepend = undefined;
+    for (var i = 0; i < thingsIDs.length; i++) {
+      prepend = thingsIDs[i][1] * 1;
+      result =
+        prepend === 1 // t1_ => Comment
+          ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+          : prepend === 3 // t3_ => Post
+          ? await postServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+          : prepend === 5 // t5_ => Community
+          ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
+          : undefined;
+      things.push(result);
+    }
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    things,
+  });
+});
+
 module.exports = {
   uploadCommunityIcon,
   uploadCommunityBanner,
@@ -323,4 +361,5 @@ module.exports = {
   getMembers,
   getCommunityOptions,
   getRandomCommunities,
+  getGeneralInfo,
 };

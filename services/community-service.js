@@ -221,6 +221,17 @@ class CommunityService extends Service {
     return community.communityOptions;
   };
 
+  /**
+   * Get a list of things IDs from comma separated string
+   * @param {string} ids
+   * @returns {Array} thingsIDs
+   * @function
+   */
+  getThingsIDs = (ids) => {
+    if (!ids) throw new AppError("No IDs are provided!", 404);
+    return ids.split(",");
+  };
+
   getRandomCommunities = async () => {
     const cursor = Community.find();
     var communities = [];

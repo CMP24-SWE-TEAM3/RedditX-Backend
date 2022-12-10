@@ -31,6 +31,7 @@ router.get(
   authCheck,
   communityController.getRandomCommunities
 );
+router.get("/info", authCheck, communityController.getGeneralInfo);
 
 router.get("/mine/moderator", authCheck, communityController.getModerates);
 router.get("/mine/subscriber", authCheck, communityController.getSubscribed);

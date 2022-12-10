@@ -836,3 +836,24 @@ describe("testing getCommunityOptions service in community service class", () =>
     });
   });
 });
+
+describe("testing getThingsIDs service in community service class", () => {
+  describe("given a subreddit", () => {
+    test("should not throw an error", async () => {
+      const ids =
+        "t5_imagePro235,t1_636a8816687a4fec0ac7c3fc,t3_639399a76b26f0ddfc9b6d7f,t1_638907ac661b95ab73e85824";
+      const thingsIDs = communityServiceInstance.getThingsIDs(ids);
+      expect(thingsIDs[0]).toBe("t5_imagePro235");
+    });
+  });
+  describe("given undefined ids", () => {
+    test("should throw an error", async () => {
+      const ids = undefined;
+      try {
+        communityServiceInstance.getThingsIDs(ids);
+      } catch (err) {
+        expect(err.message).toBe("No IDs are provided!");
+      }
+    });
+  });
+});
