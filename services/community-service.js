@@ -303,15 +303,10 @@ class CommunityService extends Service {
       description:body.rule.description,
       reason:body.rule.reason,
     });
-    console.log(commRule);
     try{
      comm=await this.updateOne({_id:body.srName}, { $addToSet: { communityRules: commRule } });
 
-    try {
-      this.updateOne(
-        { _id: body.srName },
-        { $addToSet: { communityRules: body.rule } }
-      );
+    
     } catch {
       return {
         status: false,
@@ -324,7 +319,7 @@ class CommunityService extends Service {
       id:commRule._id,
       response:"rule is added successfully"
     };
-  }
+  };
   editCommunityRule=async(body,user)=>{
     const result=await this.availableSubreddit(body.srName);
     console.log(result);
@@ -382,8 +377,8 @@ class CommunityService extends Service {
       status:true,
       response:"rule is edited successfully"
     }
-  }
-
+  };
+  
 
   createSubreddit = async (body, user) => {
     if (!user.canCreateSubreddit) {

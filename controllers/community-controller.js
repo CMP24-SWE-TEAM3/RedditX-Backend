@@ -481,7 +481,7 @@ module.exports = {
   getRandomCommunities,
   addCommunityRule,
   createSubreddit,
-  editCommunityRule
+  editCommunityRule,
 
   getGeneralInfo,
   getMembersCountPerDay,
