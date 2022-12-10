@@ -14,9 +14,8 @@ var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
 var commentServiceInstance = new CommentService(Comment);
 
-
 /**
- * Creates a comment 
+ * Creates a comment
  * @param {function} (req, res, next)
  * @returns {object} res
  */
@@ -33,17 +32,14 @@ const addComment = catchAsync(async (req, res, next) => {
   res.status(201).json(newComment);
 });
 /**
- * Creates a reply 
+ * Creates a reply
  * @param {function} (req, res, next)
  * @returns {object} res
  */
 const addReply = catchAsync(async (req, res, next) => {
   let newReply = {};
   try {
-    newReply = await commentServiceInstance.addReply(
-      req.body,
-      req.username
-    );
+    newReply = await commentServiceInstance.addReply(req.body, req.username);
   } catch (err) {
     return next(err);
   }
@@ -122,14 +118,12 @@ const vote = async (req, res) => {
   console.log(result);
   if (result.state) {
     return res.status(200).json({
-      status: result.status
-    })
-  }
-  else {
+      status: result.status,
+    });
+  } else {
     return res.status(500).json({
-      status: result.error
-
-    })
+      status: result.error,
+    });
   }
 };
 
@@ -162,12 +156,15 @@ const getPosts = catchAsync(async (req, res) => {
 });
 
 const getPostInsights = catchAsync(async (req, res) => {
-  const postInsightsCnt = await postServiceInstance.getOne({ "_id": req.params.post, "select": "-_id insightCnt" });
+  const postInsightsCnt = await postServiceInstance.getOne({
+    _id: req.params.post,
+    select: "-_id insightCnt",
+  });
   return res.status(200).json({
     status: "succeded",
     postInsightsCnt,
   });
-})
+});
 
 module.exports = {
   submit,

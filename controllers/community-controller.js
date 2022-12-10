@@ -7,7 +7,7 @@ const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
-const IdValidator= require("../validate/listing-validators").validateObjectId;
+const IdValidator = require("../validate/listing-validators").validateObjectId;
 const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
 const postServiceInstance = new PostService(Post);
@@ -364,33 +364,41 @@ const addCommunityRule = async (req, res) => {
     });
   }
   return res.status(200).json({
-    status:result.response,
-    id:result.id
+    status: result.response,
+    id: result.id,
   });
-}
+};
 
 /**
  * Edit community rule
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-const editCommunityRule= async(req,res,next)=>{
-  if(!req.body.srName ||!req.body.rule || !req.body.rule.id || !IdValidator(req.body.rule.id)){
+const editCommunityRule = async (req, res) => {
+  if (
+    !req.body.srName ||
+    !req.body.rule ||
+    !req.body.rule.id ||
+    !IdValidator(req.body.rule.id)
+  ) {
     return res.status(500).json({
-      status:"invalid parameters"
+      status: "invalid parameters",
     });
   }
-  var user=await userServiceInstance.getOne({_id:req.username});
+  var user = await userServiceInstance.getOne({ _id: req.username });
 
-  const result=await communityServiceInstance.editCommunityRule(req.body,user);
+  const result = await communityServiceInstance.editCommunityRule(
+    req.body,
+    user
+  );
   console.log(result);
-  if(!result.status){
+  if (!result.status) {
     return res.status(500).json({
-      status:result.error
+      status: result.error,
     });
   }
   return res.status(200).json({
-    status:result.response,
+    status: result.response,
   });
 };
 
