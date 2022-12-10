@@ -232,6 +232,22 @@ class CommunityService extends Service {
     return ids.split(",");
   };
 
+  /**
+   * Get stats of a community
+   * @param {string} subreddit
+   * @param {string} type type of the stats required ("left", "joined", "pageViews")
+   * @returns {object} data
+   * @function
+   */
+  getStats = async (subreddit, type) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: type,
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    return community[type];
+  };
+
   getRandomCommunities = async () => {
     const cursor = Community.find();
     var communities = [];

@@ -67,5 +67,15 @@ router.get(
   authCheck,
   communityController.getCommunityOptions
 );
+router.get(
+  "/:subreddit/members-count",
+  authCheck,
+  communityController.getMembersCountPerDay
+);
+router.get(
+  "/:subreddit/page-views",
+  authCheck,
+  communityController.getViewsCountPerDay
+);
 
 module.exports = router;

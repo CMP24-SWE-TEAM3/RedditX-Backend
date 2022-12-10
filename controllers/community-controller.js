@@ -348,6 +348,48 @@ const getGeneralInfo = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Get members count (joined or left) per day
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getMembersCountPerDay = catchAsync(async (req, res, next) => {
+  var data = [];
+  try {
+    data = await communityServiceInstance.getStats(
+      req.params.subreddit,
+      req.query.type
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    data,
+  });
+});
+
+/**
+ * Get views count per day
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getViewsCountPerDay = catchAsync(async (req, res, next) => {
+  var data = [];
+  try {
+    data = await communityServiceInstance.getStats(
+      req.params.subreddit,
+      "pageViews"
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    data,
+  });
+});
+
 module.exports = {
   uploadCommunityIcon,
   uploadCommunityBanner,
@@ -362,4 +404,6 @@ module.exports = {
   getCommunityOptions,
   getRandomCommunities,
   getGeneralInfo,
+  getMembersCountPerDay,
+  getViewsCountPerDay,
 };

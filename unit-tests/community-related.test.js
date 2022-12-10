@@ -857,3 +857,77 @@ describe("testing getThingsIDs service in community service class", () => {
     });
   });
 });
+
+describe("testing getStats service in community service class", () => {
+  describe("given a subreddit and type=joined", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        joined: [
+          {
+            date: "10/12/2022",
+            count: 5,
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const data = await communityServiceInstance.getStats(community, "joined");
+      expect(data[0].count).toBe(5);
+      expect(data[0].date).toBe("10/12/2022");
+    });
+  });
+  describe("given a subreddit and type=left", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        left: [
+          {
+            date: "10/12/2022",
+            count: 20,
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const data = await communityServiceInstance.getStats(community, "left");
+      expect(data[0].count).toBe(20);
+      expect(data[0].date).toBe("10/12/2022");
+    });
+  });
+  describe("given a subreddit and type=pageViews", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        pageViews: [
+          {
+            date: "10/12/2022",
+            count: 521,
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const data = await communityServiceInstance.getStats(
+        community,
+        "pageViews"
+      );
+      expect(data[0].count).toBe(521);
+      expect(data[0].date).toBe("10/12/2022");
+    });
+  });
+  describe("given an undefined subreddit", () => {
+    test("should throw an error", async () => {
+      const community = undefined;
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      expect(
+        communityServiceInstance.getStats(community)
+      ).rejects.toThrowError();
+    });
+  });
+});

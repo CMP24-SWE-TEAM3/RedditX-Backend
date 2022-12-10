@@ -141,16 +141,22 @@ const communitySchema = mongoose.Schema({
   rank: Number,
   trendPoints: Number,
   pageViews: [
+    // TODO: VERY IMPORTANT: if a user receives a listing from this community, you must search in this array for the today date,
+    // if found it, increment the count, if not, create an object with the today date and make its count = 0
     {
       type: statsSchema,
     },
   ],
   joined: [
+    // TODO: VERY IMPORTANT: if a user subscribes to this community, you must search in this array for the today date,
+    // if found it, increment the count, if not, create an object with the today date and make its count = 0
     {
       type: statsSchema,
     },
   ],
   left: [
+    // TODO: VERY IMPORTANT: if a user leaves this community, you must search in this array for the today date,
+    // if found it, incerement the count, if not, create an object with the today date and make its count = 0
     {
       type: statsSchema,
     },
