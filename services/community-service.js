@@ -1,7 +1,7 @@
 const Service = require("./service");
 const AppError = require("../utils/app-error");
 const Community = require("../models/community-model");
-
+const CommunityRule= require("../models/submodels-model").CommunityRule;
 /**
  * Service class to handle Community manipulations.
  * @class CommunityService
@@ -295,15 +295,21 @@ class CommunityService extends Service {
     }
     if (!isFound) {
       return {
-        status: false,
-        error: "you aren't a creator to this subreddit",
+
+        status:false,
+        error:"you aren't a creator to this subreddit"
       };
     }
-    try {
-      this.updateOne(
-        { _id: body.srName },
-        { $addToSet: { communityRules: body.rule } }
-      );
+    var comm;
+    const commRule=new CommunityRule({
+      title:body.rule.title,
+      description:body.rule.description,
+      reason:body.rule.reason,
+    });
+    try{
+     comm=await this.updateOne({_id:body.srName}, { $addToSet: { communityRules: commRule } });
+
+    
     } catch {
       return {
         status: false,
@@ -311,10 +317,71 @@ class CommunityService extends Service {
       };
     }
     return {
-      status: true,
-      response: "rule is added successfully",
+
+      status:true,
+      id:commRule._id,
+      response:"rule is added successfully"
     };
   };
+  editCommunityRule=async(body,user)=>{
+    const result=await this.availableSubreddit(body.srName);
+    console.log(result);
+    if(result.state){
+      return {
+        status:false,
+        error:"subreddit is not found"
+      }
+    }
+    var isFound=false;
+    const moderators=result.subreddit.moderators;
+    for(let i=0;i<moderators.length;i++){
+      if(moderators[i].userID===user._id){
+        if(moderators[i].role==="creator"){
+          isFound=true;
+          break;
+        }
+      }
+    }
+    if(!isFound){
+      return {
+        status:false,
+        error:"you aren't a creator to this subreddit"
+      }
+    }
+    var ruleIsFound=false;
+    var communityRules=result.subreddit.communityRules;
+    for(let i=0;i<communityRules.length;i++){
+      console.log(communityRules[i]._id.toString());
+      if(communityRules[i]._id.toString()==body.rule.id){
+        ruleIsFound=true;
+        communityRules[i].title=body.rule.title;
+        communityRules[i].description=body.rule.description;
+        communityRules[i].reason=body.rule.reason;
+      }
+    }
+    if(!ruleIsFound){
+      return {
+        status:false,
+        error:"invalid rule id"
+      }
+    }
+    var comm;
+
+    try{
+     comm=await this.updateOne({_id:body.srName}, { $set: { communityRules: communityRules } });
+    }
+    catch{
+      return {
+        status:false,
+        error:"operation failed"
+      }
+    }
+    return {
+      status:true,
+      response:"rule is edited successfully"
+    }
+  };
+  
 
   createSubreddit = async (body, user) => {
     if (!user.canCreateSubreddit) {

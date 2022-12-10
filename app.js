@@ -16,6 +16,7 @@ const authRouter = require("./routes/auth-routes");
 const searchRouter = require("./routes/search-routes");
 const notificationRouter = require("./routes/notification-routes");
 const postRouter = require("./routes/post-system-routes");
+const notRouter=require("./routes/push-notification-routes");
 const AppError = require("./utils/app-error");
 
 const app = express();
@@ -97,6 +98,8 @@ app.use(express.json({ limit: "10kb" }));
 
 // ROUTES
 app.use("/api/auth", authRouter);
+app.use("/not", notRouter);
+
 app.use("/api/user", userRouter);
 app.use("/api/r", communityRouter);
 app.use("/api/listing", listingRouter);

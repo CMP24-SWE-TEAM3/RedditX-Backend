@@ -63,6 +63,11 @@ router.post(
   authCheck,
   communityController.addCommunityRule
 );
+router.post(
+  "/edit-community-rule",
+  authCheck,
+  communityController.editCommunityRule
+);
 router.get("/:subreddit/about/muted", authCheck, communityController.getMuted);
 router.get(
   "/:subreddit/about/moderators",
