@@ -270,6 +270,113 @@ class CommunityService extends Service {
       };
     }
   };
+
+  addCommunityRule = async (body, user) => {
+    const result = await this.availableSubreddit(body.srName);
+    console.log(result);
+    if (result.state) {
+      return {
+        status: false,
+        error: "subreddit is not found",
+      };
+    }
+    var isFound = false;
+    const moderators = result.subreddit.moderators;
+    for (let i = 0; i < moderators.length; i++) {
+      if (moderators[i].userID === user._id) {
+        if (moderators[i].role === "creator") {
+          isFound = true;
+          break;
+        }
+      }
+    }
+    if (!isFound) {
+      return {
+        status: false,
+        error: "you aren't a creator to this subreddit",
+      };
+    }
+    try {
+      this.updateOne(
+        { _id: body.srName },
+        { $addToSet: { communityRules: body.rule } }
+      );
+    } catch {
+      return {
+        status: false,
+        error: "operation failed",
+      };
+    }
+    return {
+      status: true,
+      response: "rule is added successfully",
+    };
+  };
+
+  createSubreddit = async (body, user) => {
+    if (!user.canCreateSubreddit) {
+      return {
+        status: false,
+        error: "this user cannot create subreddit",
+      };
+    }
+    const result = await this.availableSubreddit(body.name);
+    console.log(result);
+    if (!result.state) {
+      return {
+        status: false,
+        error: "subreddit is already made",
+      };
+    }
+    const moderator = {
+      userID: user._id,
+      role: "creator",
+    };
+    var mods = [moderator];
+    const new_community = {
+      _id: body.name,
+      privacyType: body.type,
+      over18: body.over18,
+      moderators: mods,
+    };
+    const doc = await this.insert(new_community);
+    console.log(doc);
+    const userModerator = {
+      communityId: body.name,
+      role: "creator",
+    };
+    const userMember = {
+      communityId: body.name,
+      isMuted: false,
+      isBanned: false,
+    };
+    try {
+      user.moderators.push(userModerator);
+      user.member.push(userMember);
+      const x = await user.save();
+      console.log(x);
+    } catch {
+      return {
+        status: false,
+        error: "operation failed",
+      };
+    }
+    return {
+      status: true,
+      response: "subreddit created successfully",
+    };
+  };
+  creationValidation = async (body) => {
+    if (
+      !body.name ||
+      body.name.substring(0, 2) !== "t2" ||
+      !body.type ||
+      !body.over18
+    )
+      return false;
+    return true;
+  };
+
   setSuggestedSort = async (srName, commentSort) => {
     Community.findByIdAndUpdate(
       { _id: srName },

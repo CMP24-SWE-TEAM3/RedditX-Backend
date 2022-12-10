@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const communityRuleSchema = mongoose.Schema({
   title: String,
   description: String,
+  reason: String
 });
 
 const FAQSchema = mongoose.Schema({
@@ -108,7 +109,7 @@ const communitySchema = mongoose.Schema({
   ],
   description: {
     type: String,
-    required: [true, "A community must have a description!"],
+    required: [false, "A community must have a description!"],
     trim: true, // Remove all the white space in the beginning or end of the field
     maxLength: [
       100000,
@@ -136,10 +137,19 @@ const communitySchema = mongoose.Schema({
   },
   createdAt: {
     type: Date,
+
+    required: [true, "missing the date of creation of the user"],
     default: Date.now(),
   },
-  rank: Number,
-  trendPoints: Number,
+  rank: {
+    type: Number,
+    default:0
+  },
+  trendPoints: {
+    type: Number,
+    default:0
+  },
+
   pageViews: [
     // TODO: VERY IMPORTANT: if a user receives a listing from this community, you must search in this array for the today date,
     // if found it, increment the count, if not, create an object with the today date and make its count = 0

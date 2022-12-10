@@ -315,6 +315,56 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
   }
   res.status(200).json(communityOptions);
 });
+/**
+ * Create subreddit
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const createSubreddit = async (req, res) => {
+  if (!communityServiceInstance.creationValidation(req.body)) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+  var user = await userServiceInstance.getOne({ _id: req.username });
+  const result = await communityServiceInstance.createSubreddit(req.body, user);
+  if (!result.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: result.response,
+  });
+};
+/**
+ * Add community rule
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const addCommunityRule = async (req, res) => {
+  console.log(req.body);
+  if (!req.body.srName || !req.body.rule) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+  var user = await userServiceInstance.getOne({ _id: req.username });
+
+  const result = await communityServiceInstance.addCommunityRule(
+    req.body,
+    user
+  );
+  console.log(result);
+  if (!result.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: result.response,
+  });
+};
 
 /**
  * Get general information about things like a link, comment or a community
@@ -403,6 +453,9 @@ module.exports = {
   getMembers,
   getCommunityOptions,
   getRandomCommunities,
+  addCommunityRule,
+  createSubreddit,
+
   getGeneralInfo,
   getMembersCountPerDay,
   getViewsCountPerDay,
