@@ -3,7 +3,7 @@ const Community = require("./../models/community-model");
 const User = require("./../models/user-model");
 const CommunityService = require("./../services/community-service");
 const UserService = require("./../services/user-service");
-
+const IdValidator= require("../validate/listing-validators").validateObjectId;
 const communityServiceInstance = new CommunityService(Community);
 const userServiceInstance = new UserService(User);
 
@@ -321,7 +321,33 @@ const addCommunityRule= async(req,res,next)=>{
     });
   }
   return res.status(200).json({
-    status:result.response
+    status:result.response,
+    id:result.id
+  });
+}
+
+/**
+ * Edit community rule
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const editCommunityRule= async(req,res,next)=>{
+  if(!req.body.srName ||!req.body.rule || !req.body.rule.id || !IdValidator(req.body.rule.id)){
+    return res.status(500).json({
+      status:"invalid parameters"
+    });
+  }
+  var user=await userServiceInstance.getOne({_id:req.username});
+
+  const result=await communityServiceInstance.editCommunityRule(req.body,user);
+  console.log(result);
+  if(!result.status){
+    return res.status(500).json({
+      status:result.error
+    });
+  }
+  return res.status(200).json({
+    status:result.response,
   });
 }
 
@@ -339,5 +365,6 @@ module.exports = {
   getRandomCommunities,
   addCommunityRule,
   createSubreddit,
+  editCommunityRule
 
 };
