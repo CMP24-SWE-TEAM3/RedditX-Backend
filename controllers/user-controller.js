@@ -33,7 +33,6 @@ const updateEmail = async (req, res) => {
     return res.status(400).json({
       response: "error",
     });
-  console.log("ay haga");
   return res.status(200).json({
     response: results,
   });
@@ -44,8 +43,9 @@ const updateEmail = async (req, res) => {
  * @returns {object} res
  */
 const uploadUserPhoto = catchAsync(async (req, res, next) => {
+  var avatar = undefined;
   try {
-    await userServiceInstance.uploadUserPhoto(
+    avatar = await userServiceInstance.uploadUserPhoto(
       req.body.action,
       req.username,
       req.file
@@ -55,7 +55,7 @@ const uploadUserPhoto = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Avatar is updated successfully",
+    avatar,
   });
 });
 

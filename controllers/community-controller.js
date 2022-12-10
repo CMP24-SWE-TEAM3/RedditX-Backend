@@ -19,8 +19,9 @@ const userServiceInstance = new UserService(User);
  * @returns {object} res
  */
 const uploadCommunityIcon = catchAsync(async (req, res, next) => {
+  var icon = undefined;
   try {
-    await communityServiceInstance.uploadCommunityPhoto(
+    icon = await communityServiceInstance.uploadCommunityPhoto(
       req.file,
       req.username,
       req.params.subreddit,
@@ -31,7 +32,7 @@ const uploadCommunityIcon = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Icon is updated successfully",
+    icon,
   });
 });
 
@@ -41,8 +42,9 @@ const uploadCommunityIcon = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const uploadCommunityBanner = catchAsync(async (req, res, next) => {
+  var banner = undefined;
   try {
-    await communityServiceInstance.uploadCommunityPhoto(
+    banner = await communityServiceInstance.uploadCommunityPhoto(
       req.file,
       req.username,
       req.params.subreddit,
@@ -53,7 +55,7 @@ const uploadCommunityBanner = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Banner is updated successfully",
+    banner,
   });
 });
 

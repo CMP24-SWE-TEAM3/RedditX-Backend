@@ -250,7 +250,7 @@ class UserService extends Service {
   getSearchResults = async (query, username) => {
     const searchQuery = query.q;
     delete query.q;
-    let users = await this.getAll(
+    var users = await this.getAll(
       {
         $or: [
           { _id: { $regex: searchQuery, $options: "i" } },
@@ -278,17 +278,19 @@ class UserService extends Service {
    * @param {object} data
    * @param {string} username
    * @param {object} file
+   * @returns {string} avatar Name of the file
    * @function
    */
   uploadUserPhoto = async (action, username, file) => {
     if (!action)
       throw new AppError("No attachment or action is provided!", 400);
-    let avatar = "default.jpg";
+    var avatar = "default.jpg";
     if (action === "upload") {
       if (!file) throw new AppError("No photo is uploaded!", 400);
       avatar = file.filename;
     }
     await this.findByIdAndUpdate(username, { avatar }, { runValidators: true });
+    return avatar;
   };
 
   /**
@@ -377,14 +379,14 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let comments = [];
+    var comments = [];
     user.hasComment.forEach((el) => {
       comments.push(el);
     });
     const cursor = Comment.find({
       _id: { $in: comments },
     });
-    let returnComments = [];
+    var returnComments = [];
     for await (const doc of cursor) {
       returnComments.push(doc);
     }
@@ -403,14 +405,14 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let replies = [];
+    var replies = [];
     comment.replies.forEach((el) => {
       replies.push(el);
     });
     const cursor = Comment.find({
       _id: { $in: replies },
     });
-    let returnReplies = [];
+    var returnReplies = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnReplies.push(doc);
@@ -430,14 +432,14 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let comments = [];
+    var comments = [];
     post.postComments.forEach((el) => {
       comments.push(el);
     });
     const cursor = Comment.find({
       _id: { $in: comments },
     });
-    let returnComments = [];
+    var returnComments = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnComments.push(doc);
@@ -458,14 +460,14 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let posts = [];
+    var posts = [];
     user.hasPost.forEach((el) => {
       posts.push(el);
     });
     const cursor = Post.find({
       _id: { $in: posts },
     });
-    let returnPosts = [];
+    var returnPosts = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnPosts.push(doc);
@@ -485,7 +487,7 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let downVotes = [];
+    var downVotes = [];
     user.hasVote.forEach((el) => {
       if (el.type === -1) {
         downVotes.push(el.postID);
@@ -494,7 +496,7 @@ class UserService extends Service {
     const cursor = Post.find({
       _id: { $in: downVotes },
     });
-    let returnPosts = [];
+    var returnPosts = [];
     for await (const doc of cursor) {
       returnPosts.push(doc);
     }
@@ -514,7 +516,7 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let upVotes = [];
+    var upVotes = [];
     user.hasVote.forEach((el) => {
       if (el.type === 1) {
         upVotes.push(el.postID);
@@ -524,7 +526,7 @@ class UserService extends Service {
     const cursor = Post.find({
       _id: { $in: upVotes },
     });
-    let returnPosts = [];
+    var returnPosts = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnPosts.push(doc);
@@ -550,7 +552,7 @@ class UserService extends Service {
     const cursor = Post.find({
       _id: { $in: user.mentionedInPosts },
     });
-    let returnPosts = [];
+    var returnPosts = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnPosts.push(doc);

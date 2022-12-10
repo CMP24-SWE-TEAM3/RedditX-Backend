@@ -35,7 +35,8 @@ class CommunityService extends Service {
    * @param {object} file
    * @param {string} username
    * @param {string} subreddit
-   * @param {string} type
+   * @param {string} type icon ot banner
+   * @returns {string} filename Name of the file
    * @function
    */
   uploadCommunityPhoto = async (file, username, subreddit, type) => {
@@ -49,8 +50,10 @@ class CommunityService extends Service {
       !community.moderators.find((moderator) => moderator.userID === username)
     )
       throw new AppError("You are not a moderator of this subreddit!", 401);
-    community[type] = file.filename;
+    const filename = file.filename;
+    community[type] = filename;
     await community.save();
+    return filename;
   };
 
   /**

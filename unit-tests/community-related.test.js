@@ -21,14 +21,13 @@ describe("testing uploadCommunityPhoto service in community service class", () =
         .fn()
         .mockReturnValueOnce(community);
       Community.prototype.save = jest.fn().mockImplementation(() => {});
-      expect(
-        communityServiceInstance.uploadCommunityPhoto(
-          { filename: "photo.jpg" },
-          "t2_moazMohamed",
-          "t5_imagePro235",
-          "icon"
-        )
-      ).resolves.not.toThrowError();
+      const icon = await communityServiceInstance.uploadCommunityPhoto(
+        { filename: "photo.jpg" },
+        "t2_moazMohamed",
+        "t5_imagePro235",
+        "icon"
+      );
+      expect(icon).toBe("photo.jpg");
     });
   });
   describe("given a file, username, community, type=banner", () => {
@@ -46,14 +45,13 @@ describe("testing uploadCommunityPhoto service in community service class", () =
         .fn()
         .mockReturnValueOnce(community);
       Community.prototype.save = jest.fn().mockImplementation(() => {});
-      expect(
-        communityServiceInstance.uploadCommunityPhoto(
-          { filename: "photo.jpg" },
-          "t2_moazMohamed",
-          "t5_imagePro235",
-          "banner"
-        )
-      ).resolves.not.toThrowError();
+      const banner = await communityServiceInstance.uploadCommunityPhoto(
+        { filename: "photo.jpg" },
+        "t2_moazMohamed",
+        "t5_imagePro235",
+        "banner"
+      );
+      expect(banner).toBe("photo.jpg");
     });
   });
   describe("given a file, username, community, type=icon, with user not in moderators", () => {
