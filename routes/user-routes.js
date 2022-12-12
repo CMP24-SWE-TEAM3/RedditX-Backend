@@ -23,7 +23,7 @@ router.get("/:username/about", userController.getUserAbout);
 router.post("/block-user", authCheck, userController.block);
 router.post("/spam", authCheck, userController.spam);
 
-router.post("/updateEmail", possibleAuthCheck, userController.updateEmail);
+router.post("/update-email", possibleAuthCheck, userController.updateEmail);
 
 router.get("/comment/:username", profileController.getUserComments);
 router.get("/submitted/:username", profileController.getUserSubmitted);
