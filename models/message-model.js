@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 const messageSchema = mongoose.Schema({
-  messageID: {
-    type: String,
-    required: [true, "A message must have an id!"],
-  },
+  // _id: {
+  //   type: String,
+  //   required: [true, "A message must have an id!"],
+  // },
   fromID: String,
   toID: String,
   isDeleted: {
@@ -13,7 +13,7 @@ const messageSchema = mongoose.Schema({
   },
   unread_status: {
     type: Boolean,
-    default: 0,
+    default: 1,
   },
   subject: {
     type: String,
@@ -27,6 +27,10 @@ const messageSchema = mongoose.Schema({
       1,
       "A subject text must have more than or equal to 1 character",
     ],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
   },
   text: {
     type: String,
@@ -66,48 +70,48 @@ const commuitySchema = mongoose.Schema({
   toID: String,
 });
 
-const messageItemSchema = mongoose.Schema({
-  messageID: {
-    type: String,
-    required: [true, "A message must have an id!"],
-  },
-  message: messageSchema,
-  isRead: {
-    type: Boolean,
-    default: 0,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-  },
-  spamCount: Number,
-  notification: [
-    {
-      type: notificationSchema,
-    },
-  ],
-  users: [
-    {
-      type: userSchema,
-    },
-  ],
-  spams: [
-    {
-      type: spamLinkItemSchema,
-    },
-  ],
-  commuinties: [
-    {
-      type: commuitySchema,
-    },
-  ],
-  messages: [
-    {
-      type: messageItemSchema,
-    },
-  ],
-});
+// const messageItemSchema = mongoose.Schema({
+//   messageID: {
+//     type: String,
+//     required: [true, "A message must have an id!"],
+//   },
+//   message: messageSchema,
+//   isRead: {
+//     type: Boolean,
+//     default: 0,
+//   },
+//   createdAt: {
+//     type: Date,
+//     default: Date.now(),
+//   },
+//   spamCount: Number,
+//   notification: [
+//     {
+//       type: notificationSchema,
+//     },
+//   ],
+//   users: [
+//     {
+//       type: userSchema,
+//     },
+//   ],
+//   spams: [
+//     {
+//       type: spamLinkItemSchema,
+//     },
+//   ],
+//   commuinties: [
+//     {
+//       type: commuitySchema,
+//     },
+//   ],
+//   messages: [
+//     {
+//       type: messageItemSchema,
+//     },
+//   ],
+// });
 
-const Message = mongoose.model("Message", messageItemSchema);
+const Message = mongoose.model("Message", messageSchema);
 
 module.exports = Message;
