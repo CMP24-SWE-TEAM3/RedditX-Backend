@@ -16,6 +16,78 @@ const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
 
 /**
+ * Get user followers
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const followers=async(req,res,next)=>{
+  console.log(req.username);
+  if(!req.username){
+    return res.status(500).json({
+      response:"error providing username"
+    });
+  }
+  const result=await userServiceInstance.getFollowers(req.username);
+  return res.status(200).json({
+    response:"done",
+    followers:result.followers
+});
+}
+/**
+ * Get user interests
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const getInterests=async(req,res,next)=>{
+  console.log(req.username);
+  if(!req.username){
+    return res.status(500).json({
+      response:"error providing username"
+    });
+  }
+  const result=await userServiceInstance.getInterests(req.username);
+ 
+  if(result.status){
+    return res.status(200).json({
+      response:"done",
+      categories:result.categories
+    });
+  }
+  else{
+    return res.status(500).json({
+      response:"operation failed"
+    });
+  }
+ 
+}
+
+/**
+ * Add user interests
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const addInterests=async(req,res,next)=>{
+  console.log(req.username);
+  if(!req.username|| !req.body.categories){
+    return res.status(500).json({
+      response:"error providing username"
+    });
+  }
+  const result=await userServiceInstance.addInterests(req.username,req.body.categories);
+  if(result.status){
+    return res.status(200).json({
+      response:"done", 
+    });
+  }
+  else{
+    return res.status(500).json({
+      response:"operation failed"
+    });
+  }
+ 
+}
+
+/**
  * Update user email
  * @param {function} (req, res)
  * @returns {object} res
@@ -236,4 +308,7 @@ module.exports = {
   getUserAbout,
   getUserPrefs,
   subscribe,
+  followers,
+  getInterests,
+  addInterests
 };

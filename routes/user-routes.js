@@ -19,6 +19,9 @@ router.get("/me/prefs", authCheck, userController.getUserPrefs);
 router.get("/me", authCheck, userController.getUserMe);
 
 router.get("/:username/about", userController.getUserAbout);
+router.get("/me/followers",authCheck, userController.followers);
+router.get("/me/interests",authCheck, userController.getInterests);
+router.post("/me/interests",authCheck, userController.addInterests);
 
 router.post("/block-user", authCheck, userController.block);
 router.post("/spam", authCheck, userController.spam);
