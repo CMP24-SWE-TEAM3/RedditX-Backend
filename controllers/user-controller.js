@@ -16,6 +16,28 @@ const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
 
 /**
+ * Get user followers
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const followers=async(req,res,next)=>{
+  console.log(req.username);
+  if(!req.username){
+    return res.status(500).json({
+      response:"error providing username"
+    });
+  }
+  const result=await userServiceInstance.getFollowers(req.username);
+  return res.status(200).json({
+    repsonse:"done",
+    followers:result.followers
+  });
+ 
+
+}
+
+
+/**
  * Update user email
  * @param {function} (req, res)
  * @returns {object} res
@@ -236,4 +258,5 @@ module.exports = {
   getUserAbout,
   getUserPrefs,
   subscribe,
+  followers
 };

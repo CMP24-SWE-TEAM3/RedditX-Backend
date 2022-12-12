@@ -37,6 +37,28 @@ class UserService extends Service {
     );
   };
 
+ /**
+   *  Get followers of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getFollowers=async(username)=>{
+    const followers_user=await this.getOne({_id:username}).select("followers");
+    const followersIds=followers_user.followers;
+    
+    const followers=await this.find({
+      _id: { $in: followersIds },
+    }).select("about avatar _id");
+
+    return {
+      status:true,
+      followers:followers
+    };
+
+
+  }
+
   /**
    * Subscribe to a subreddit or redditor
    * @param {String} body body contains the information.
