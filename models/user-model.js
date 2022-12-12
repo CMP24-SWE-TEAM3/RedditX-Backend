@@ -294,6 +294,12 @@ const userSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  messages: [
+    {
+      type: String /*mongoose.Schema.ObjectId,*/,
+      ref: "Message",
+    },
+  ],
   friendRequestFromMe: [
     {
       type: String,
