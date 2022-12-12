@@ -55,8 +55,51 @@ class UserService extends Service {
       status:true,
       followers:followers
     };
+  }
+  /**
+   *  Get interests of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getInterests=async(username)=>{
+    var categories_user;
+    try{
+       categories_user=await this.getOne({_id:username});
+    }
+    catch{
+      return {
+        status:false
+      }
+    }
+    const categories=categories_user.categories;
+    return {
+      status:true,
+      categories:categories
+    };
+  }
 
-
+  /**
+   *  Add interests of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  addInterests=async(username,categories)=>{
+    var categories_user;
+    try{
+       categories_user=await this.updateOne({_id:username},{categories:categories});
+    }
+    catch{
+      return {
+        status:false
+      }
+    }
+    console.log(categories_user);
+    return {
+      status:true,
+     
+    };
   }
 
   /**
