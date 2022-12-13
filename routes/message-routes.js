@@ -7,4 +7,7 @@ const router = express.Router();
 router.post("/compose",authCheck ,messageController.compose);
 
 
+router.post("/del",authCheck ,messageController.deleteMessage);
+
+
 module.exports = router;
