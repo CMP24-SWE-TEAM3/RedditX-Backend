@@ -8,6 +8,10 @@ router.post("/compose",authCheck ,messageController.compose);
 
 
 router.post("/del",authCheck ,messageController.deleteMessage);
+router.post("/unread",authCheck ,messageController.unreadMessage);
 
+
+router.get("/sent",authCheck ,messageController.sentMessages);
+router.get("/inbox",authCheck ,messageController.inboxMessages);
 
 module.exports = router;
