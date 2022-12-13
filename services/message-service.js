@@ -31,7 +31,7 @@ class MessageService extends Service {
    composeMessage=async(body)=>{
     var message;
     try{
-     message= await this.insert({"text":body.text,"subject":body.subject,"fromID":body.fromID})
+     message= await this.insert({"text":body.text,"subject":body.subject,"fromID":body.fromID,"toID":body.toID})
     }
     catch{
       return {
@@ -45,7 +45,7 @@ class MessageService extends Service {
         id:message._id.toString()
     }
     }
-     /**
+   /**
    * Delete a message
    * @param {object} body
    * @returns {object} state
@@ -73,6 +73,89 @@ class MessageService extends Service {
     return {
         status:true,
         id:message._id.toString()
+    }
+    }
+
+     /**
+   * unread a message
+   * @param {object} body
+   * @returns {object} state
+   * @function
+   */
+   unreadMessage=async(body)=>{
+    var message;
+    const existCheck=await this.getOne({_id:body.msgID});
+    console.log(existCheck);
+    if(!existCheck){
+      return {
+        status:false,
+        error:"invalid msgID"
+      }
+    }
+    if(existCheck.unread_status){
+      return {
+        status:false,
+        error:"already unread"
+      }
+    }
+    try{
+     message= await this.updateOne({_id:body.msgID},{unread_status:true})
+    }
+    catch{
+      return {
+        status:false,
+        error:"operation failed"
+      }
+    }
+    return {
+        status:true,
+        id:message._id.toString()
+    }
+    }
+    /**
+   * Get all messages sent by user
+   * @param {object} username
+   * @returns {object} state
+   * @function
+   */
+   sentMessages=async(username)=>{
+    var messages;
+    
+    try{
+     messages= await this.find({fromID:username,isDeleted:false});
+    }
+    catch{
+      return {
+        status:false,
+        error:"operation failed"
+      }
+    }
+    return {
+        status:true,
+        messages:messages
+    }
+    }
+      /**
+   * Get all messages sent by user
+   * @param {object} username
+   * @returns {object} state
+   * @function
+   */
+   inboxMessages=async(username)=>{
+    var messages;
+    
+    try{
+     messages= await this.find({toID:username,isDeleted:false});
+    }
+    catch{
+      return {
+        status:false,
+        error:"operation failed"
+      }
+    }
+    return {
+        status:true,
+        messages:messages
     }
     }
 }
