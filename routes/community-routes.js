@@ -31,6 +31,10 @@ router.get(
   authCheck,
   communityController.getRandomCommunities
 );
+router.get(
+  "/:subreddit",
+  communityController.getCommunityAbout
+);
 router.get("/info", authCheck, communityController.getGeneralInfo);
 
 router.get("/mine/moderator", authCheck, communityController.getModerates);

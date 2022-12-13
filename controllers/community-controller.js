@@ -403,6 +403,38 @@ const editCommunityRule = async (req, res) => {
 };
 
 /**
+ * Get community about
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getCommunityAbout = async (req, res) => {
+  console.log(req.params);
+  if (
+   !req.params['subreddit']
+  ) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+
+  const result = await communityServiceInstance.availableSubreddit(
+    req.params['subreddit']
+  );
+  console.log(result);
+  if (result.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: "done",
+    communityRules: result.subreddit.communityRules,
+    moderators:result.subreddit.moderators
+  });
+};
+
+
+/**
  * Get general information about things like a link, comment or a community
  * @param {function} (req, res, next)
  * @returns {object} res
@@ -492,7 +524,7 @@ module.exports = {
   addCommunityRule,
   createSubreddit,
   editCommunityRule,
-
+  getCommunityAbout,
   getGeneralInfo,
   getMembersCountPerDay,
   getViewsCountPerDay,
