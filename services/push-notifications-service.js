@@ -8,8 +8,8 @@ var FCM = new fcm(certPath);
 
 
 /**
- * Service class to handle Authentication manipulations.
- * @class AuthService
+ * Service class to send notifications.
+ * @class PushNotificationsService
  */
 class PushNotificationsService extends Service {
   constructor(model) {
