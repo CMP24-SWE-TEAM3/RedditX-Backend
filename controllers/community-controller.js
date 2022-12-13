@@ -409,16 +409,14 @@ const editCommunityRule = async (req, res) => {
  */
 const getCommunityAbout = async (req, res) => {
   console.log(req.params);
-  if (
-   !req.params['subreddit']
-  ) {
+  if (!req.params["subreddit"]) {
     return res.status(500).json({
       status: "invalid parameters",
     });
   }
 
   const result = await communityServiceInstance.availableSubreddit(
-    req.params['subreddit']
+    req.params["subreddit"]
   );
   console.log(result);
   if (result.status) {
@@ -429,10 +427,9 @@ const getCommunityAbout = async (req, res) => {
   return res.status(200).json({
     status: "done",
     communityRules: result.subreddit.communityRules,
-    moderators:result.subreddit.moderators
+    moderators: result.subreddit.moderators,
   });
 };
-
 
 /**
  * Get general information about things like a link, comment or a community
@@ -508,6 +505,33 @@ const getViewsCountPerDay = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Kick a user within a community
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const kickUser = catchAsync(async (req, res, next) => {
+  var community = undefined;
+  try {
+    community = await communityServiceInstance.kickAtCommunity(
+      req.params.subreddit,
+      req.username,
+      req.body.userID
+    );
+    const toBeKicked = await userServiceInstance.getOne({
+      _id: req.body.userID,
+      select: "member",
+    });
+    await communityServiceInstance.kickAtUser(toBeKicked, community);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Operation is done successfully",
+  });
+});
+
 module.exports = {
   uploadCommunityIcon,
   uploadCommunityBanner,
@@ -528,4 +552,5 @@ module.exports = {
   getGeneralInfo,
   getMembersCountPerDay,
   getViewsCountPerDay,
+  kickUser,
 };

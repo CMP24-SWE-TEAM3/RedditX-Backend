@@ -100,6 +100,7 @@ class CommunityService extends Service {
       if (el.userID === member) toBeAffectedFound = true;
     });
     if (!performerFound || toBeAffectedFound)
+      // if tobeAffectedFound, it means that you are going to ban or mute a moderator, which is not valid behavior
       throw new AppError(
         "You cannot make this operation this user in this subreddit!",
         400
@@ -140,6 +141,56 @@ class CommunityService extends Service {
         : el
     );
     await toBeAffected.save();
+    await community.save();
+  };
+
+  /**
+   * Kick a user within a community
+   * @param {string} subreddit
+   * @param {string} moderator
+   * @param {string} member
+   * @returns {object} community
+   * @function
+   */
+  kickAtCommunity = async (subreddit, moderator, member) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "members moderators",
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    var performerFound = false;
+    var toBeKickedFound = false;
+    community.moderators.forEach((el) => {
+      if (el.userID === moderator) performerFound = true;
+      if (el.userID === member) toBeKickedFound = true;
+    });
+    if (!performerFound || toBeKickedFound)
+      // if tobeKickedFound, it means that you are going to kick a moderator, which is not in this API
+      throw new AppError(
+        "You cannot make this operation this user in this subreddit!",
+        400
+      );
+    community.members.splice(
+      community.members.findIndex((el) => el.userID === member),
+      1
+    );
+    return community;
+  };
+
+  /**
+   * Saves the kick at the user side
+   * @param {object} toBeKicked
+   * @param {object} community
+   * @returns {object} community
+   * @function
+   */
+  kickAtUser = async (toBeKicked, community) => {
+    if (!toBeKicked) throw new AppError("This user doesn't exist!", 404);
+    toBeKicked.member.splice(
+      toBeKicked.member.findIndex((el) => el.communityId === community._id),
+      1
+    );
+    await toBeKicked.save();
     await community.save();
   };
 
