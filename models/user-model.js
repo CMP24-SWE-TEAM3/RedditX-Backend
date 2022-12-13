@@ -102,26 +102,18 @@ const userPrefsSchema = new mongoose.Schema({
   },
 });
 
-const isBannedOrMutedSchema = mongoose.Schema({
-  value: {
-    type: Boolean,
-    default: 0,
-  },
-  date: Date,
-});
-
 const memberSchema = new mongoose.Schema({
   communityId: {
     type: String /*mongoose.Schema.ObjectId,*/,
     ref: "Community",
   },
   isMuted: {
-    type: isBannedOrMutedSchema,
-    default: () => ({}),
+    type: Boolean,
+    default: false,
   },
   isBanned: {
-    type: isBannedOrMutedSchema,
-    default: () => ({}),
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -302,6 +294,12 @@ const userSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  messages: [
+    {
+      type: String /*mongoose.Schema.ObjectId,*/,
+      ref: "Message",
+    },
+  ],
   friendRequestFromMe: [
     {
       type: String,
@@ -356,7 +354,7 @@ const userSchema = new mongoose.Schema({
    ***************************************/
   categories: [
     {
-      type: mongoose.Schema.ObjectId,
+      type: String
       // ref:'Category'
     },
   ],
@@ -427,6 +425,7 @@ const userSchema = new mongoose.Schema({
       ref: "Comment",
     },
   ],
+  
 });
 
 userSchema.methods.createPasswordResetToken = async function () {

@@ -28,6 +28,7 @@
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^6.5.2",
     "express-session": "^1.17.3",
+    "fcm-node": "^1.6.1",
     "fcm-notification": "^2.0.0",
     "firebase-admin": "^11.3.0",
     "google-auth-library": "^8.6.0",

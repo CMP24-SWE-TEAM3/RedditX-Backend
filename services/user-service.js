@@ -37,6 +37,71 @@ class UserService extends Service {
     );
   };
 
+ /**
+   *  Get followers of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getFollowers=async(username)=>{
+    const followers_user=await this.getOne({_id:username}).select("followers");
+    const followersIds=followers_user.followers;
+    
+    const followers=await this.find({
+      _id: { $in: followersIds },
+    }).select("about avatar _id");
+
+    return {
+      status:true,
+      followers:followers
+    };
+  }
+  /**
+   *  Get interests of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getInterests=async(username)=>{
+    var categories_user;
+    try{
+       categories_user=await this.getOne({_id:username});
+    }
+    catch{
+      return {
+        status:false
+      }
+    }
+    const categories=categories_user.categories;
+    return {
+      status:true,
+      categories:categories
+    };
+  }
+
+  /**
+   *  Add interests of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  addInterests=async(username,categories)=>{
+    var categories_user;
+    try{
+       categories_user=await this.updateOne({_id:username},{categories:categories});
+    }
+    catch{
+      return {
+        status:false
+      }
+    }
+    console.log(categories_user);
+    return {
+      status:true,
+     
+    };
+  }
+
   /**
    * Subscribe to a subreddit or redditor
    * @param {String} body body contains the information.
