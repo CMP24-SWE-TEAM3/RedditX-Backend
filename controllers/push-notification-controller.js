@@ -3,7 +3,7 @@
 // var serviceAccount = require("../config/push-notification-key.json");
 // const certPath = admin.credential.cert(serviceAccount);
 // var FCM = new fcm(certPath);
-var FCM= require("fcm-node");
+var FCM= require("fcm-notification");
 var serverKey="AAAACtO-eHI:APA91bHnUqhHvt4m4VVze_vWDgvZaHDLh8y3uE3w0W22iMgRUaQT5dTCrgX-GWgpdhl6dzeJRITsEzLMFCyDMYgLdRF1SrU9syhXG3WjIkvGn-vkcG2rQU-M546foPnGouZBd3on9hae";
 var fcm=new FCM(serverKey);
 const sendPushNotification = (req, res) => {
@@ -18,7 +18,7 @@ const sendPushNotification = (req, res) => {
         orderId: "123456",
         orderDate: "2022-12-15",
       },
-      token:"d5VAWCvtRGW5Kxnm1Weu9i:APA91bH-RnKahx0oQfe527BRm5ZvTSCfJr_vUbzyWSaeckEaIzTICS5QlUHM4hMCsyWgTQ927aWK5UUZIfL6tqo3vClNl5ezO8QtWbWGy6_JwZx67wBL1yEDX33EoPXTdsdSZqSH-eGT",
+      token: req.body.fcm_token
     };
     fcm.send(message, function (err) {
       if (err) {
