@@ -34,13 +34,14 @@ router.get("/overview/:username", profileController.getUserOverview);
 router.get("/upvoted/:username", profileController.getUserUpVoted);
 router.get("/downvoted/:username", profileController.getUserDownVoted);
 
-
 router.get("/userMentions/:username", profileController.getUserMentions);
-router.get("/userCommentReplies/:username", profileController.getUserCommentReplies);
+router.get(
+  "/userCommentReplies/:username",
+  profileController.getUserCommentReplies
+);
 router.get("/userSelfReply/:username", profileController.getUserSelfReply);
 
-
 router.post("/subscribe", authCheck, userController.subscribe);
-router.post('/update', authCheck, userController.updateInfo);
+router.post("/update", authCheck, userController.updateInfo);
 
 module.exports = router;

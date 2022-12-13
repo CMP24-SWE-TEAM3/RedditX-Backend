@@ -637,6 +637,218 @@ describe("testing banOrMuteAtUser service in community service class", () => {
   });
 });
 
+describe("testing kickAtCommunity service in community service class", () => {
+  describe("given a subreddit, moderator, member", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const updatedCommunity = await communityServiceInstance.kickAtCommunity(
+        "t5_imagePro235",
+        "t2_hamada",
+        "t2_moazMohamed"
+      );
+      expect(updatedCommunity.members.length).toBe(0);
+    });
+  });
+  describe("given an undefined subreddit, moderator, member", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(undefined);
+      expect(
+        communityServiceInstance.kickAtCommunity(
+          "t5_imagePro235",
+          "t2_hamada",
+          "t2_moazMohamed"
+        )
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, not a moderator, member", () => {
+    test("should throw an error", async () => {
+      var community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      expect(
+        communityServiceInstance.banOrMuteAtCommunity(
+          "t5_imagePro235",
+          "t2_hamada",
+          "t2_moazMohamed"
+        )
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, moderator, member that is moderator", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+          {
+            userID: "t2_moazMohamed",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      expect(
+        communityServiceInstance.banOrMuteAtCommunity(
+          "t5_imagePro235",
+          "t2_hamada",
+          "t2_moazMohamed"
+        )
+      ).rejects.toThrowError();
+    });
+  });
+});
+describe("testing kickAtUser service in community service class", () => {
+  describe("given a toBeKicked, community", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      const member = new User({
+        _id: "t2_moazMohamed",
+        member: [
+          {
+            userID: "t5_imagePro235",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      Community.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.banOrMuteAtUser(member, community)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an undefined toBeKicked, community", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      const member = undefined;
+      Community.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.kickAtUser(member, community)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
 describe("testing getBannedOrMuted service in community service class", () => {
   describe("given a subreddit, type=isBanned", () => {
     test("should not throw an error", async () => {

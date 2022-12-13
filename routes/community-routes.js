@@ -31,10 +31,9 @@ router.get(
   authCheck,
   communityController.getRandomCommunities
 );
-router.get(
-  "/:subreddit",
-  communityController.getCommunityAbout
-);
+
+router.post("/:subreddit/kick-member", authCheck, communityController.kickUser);
+
 router.get("/info", authCheck, communityController.getGeneralInfo);
 
 router.get("/mine/moderator", authCheck, communityController.getModerates);
@@ -59,14 +58,8 @@ router.post(
   "/create-subreddit",
   authCheck,
   communityController.createSubreddit
-
-
 );
-router.post(
-  "/community-rule",
-  authCheck,
-  communityController.addCommunityRule
-);
+router.post("/community-rule", authCheck, communityController.addCommunityRule);
 router.post(
   "/edit-community-rule",
   authCheck,
@@ -99,7 +92,9 @@ router.get(
   communityController.getViewsCountPerDay
 );
 
+router.get("/:subreddit", communityController.getCommunityAbout);
 router
   .route('/r/:subreddit/api/flair-list')
   .get(authCheck, communityController.getFlairs);
+
 module.exports = router;
