@@ -59,7 +59,7 @@ router.post(
   "/create-subreddit",
   authCheck,
   communityController.createSubreddit
-  
+
 
 );
 router.post(
@@ -99,4 +99,7 @@ router.get(
   communityController.getViewsCountPerDay
 );
 
+router
+  .route('/r/:subreddit/api/flair-list')
+  .get(authCheck, communityController.getFlairs);
 module.exports = router;

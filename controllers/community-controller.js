@@ -410,7 +410,7 @@ const editCommunityRule = async (req, res) => {
 const getCommunityAbout = async (req, res) => {
   console.log(req.params);
   if (
-   !req.params['subreddit']
+    !req.params['subreddit']
   ) {
     return res.status(500).json({
       status: "invalid parameters",
@@ -429,7 +429,7 @@ const getCommunityAbout = async (req, res) => {
   return res.status(200).json({
     status: "done",
     communityRules: result.subreddit.communityRules,
-    moderators:result.subreddit.moderators
+    moderators: result.subreddit.moderators
   });
 };
 
@@ -451,10 +451,10 @@ const getGeneralInfo = catchAsync(async (req, res, next) => {
         prepend === 1 // t1_ => Comment
           ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
           : prepend === 3 // t3_ => Post
-          ? await postServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
-          : prepend === 5 // t5_ => Community
-          ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
-          : undefined;
+            ? await postServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+            : prepend === 5 // t5_ => Community
+              ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
+              : undefined;
       things.push(result);
     }
   } catch (err) {
@@ -508,6 +508,30 @@ const getViewsCountPerDay = catchAsync(async (req, res, next) => {
   });
 });
 
+const getFlairs = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  //[3]-> get the flairs list
+  flairs = await communityServiceInstance.getOne({ '_id': req.params.subreddit, 'select': '-_id flairList' });
+  res.status(200).json({
+    status: 'succeeded',
+    flairs: flairs.flairList,
+  })
+});
+
 module.exports = {
   uploadCommunityIcon,
   uploadCommunityBanner,
@@ -528,4 +552,5 @@ module.exports = {
   getGeneralInfo,
   getMembersCountPerDay,
   getViewsCountPerDay,
+  getFlairs,
 };
