@@ -1,11 +1,11 @@
-// var admin = require("firebase-admin");
-// var fcm = require("fcm-notification");
-// var serviceAccount = require("../config/push-notification-key.json");
-// const certPath = admin.credential.cert(serviceAccount);
-// var FCM = new fcm(certPath);
-var FCM= require("fcm-notification");
-var serverKey="AAAACtO-eHI:APA91bHnUqhHvt4m4VVze_vWDgvZaHDLh8y3uE3w0W22iMgRUaQT5dTCrgX-GWgpdhl6dzeJRITsEzLMFCyDMYgLdRF1SrU9syhXG3WjIkvGn-vkcG2rQU-M546foPnGouZBd3on9hae";
-var fcm=new FCM(serverKey);
+var admin = require("firebase-admin");
+var fcm = require("fcm-notification");
+var serviceAccount = require("../config/push-notification-key.json");
+const certPath = admin.credential.cert(serviceAccount);
+var FCM = new fcm(certPath);
+// var FCM= require("fcm-notification");
+// var serverKey="AAAACtO-eHI:APA91bHnUqhHvt4m4VVze_vWDgvZaHDLh8y3uE3w0W22iMgRUaQT5dTCrgX-GWgpdhl6dzeJRITsEzLMFCyDMYgLdRF1SrU9syhXG3WjIkvGn-vkcG2rQU-M546foPnGouZBd3on9hae";
+// var fcm=new FCM(serverKey);
 const sendPushNotification = (req, res) => {
   console.log(req.body.fcm_token);
   try {
@@ -20,7 +20,7 @@ const sendPushNotification = (req, res) => {
       },
       token: req.body.fcm_token
     };
-    fcm.send(message, function (err) {
+    FCM.send(message, function (err) {
       if (err) {
         return res.status(500).send({
           message: err,
