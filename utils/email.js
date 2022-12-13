@@ -6,14 +6,14 @@ module.exports = class Email {
     this.to = user.email;
     this.name = user._id.slice(3);
     this.url = url;
-    this.from = `Admin 1 <${process.env.EMAIL_FROM}>`;
+    this.from = `Reddit Administration <${process.env.EMAIL_FROM}>`;
   }
   newTransport() {
     return nodemailer.createTransport({
-      service: "Gmail",
+      service: "Outlook",
       auth: {
         user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD, // App password in gmail
+        pass: process.env.EMAIL_PASSWORD,
       },
       tls: { rejectUnauthorized: false },
     });

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const communityRuleSchema = mongoose.Schema({
   title: String,
   description: String,
-  reason: String
+  reason: String,
 });
 
 const FAQSchema = mongoose.Schema({
@@ -32,22 +32,26 @@ const statsSchema = mongoose.Schema({
 });
 
 const communityOptionsSchema = mongoose.Schema({
+  enableSpoilerTag: {
+    type: Boolean,
+    default: true,
+  },
   emailUsernameMention: {
     type: Boolean,
-    default: 1,
+    default: true,
   },
   nsfw: {
     type: Boolean,
-    default: 0,
+    default: false,
   },
   welcomeMessage: String,
   allowImgAndLinksUploads: {
     type: Boolean,
-    default: 1,
+    default: true,
   },
   allowMultipleImagePerPost: {
     type: Boolean,
-    default: 1,
+    default: true,
   },
   suggestedCommentSort: {
     type: String,
@@ -68,7 +72,7 @@ const communityOptionsSchema = mongoose.Schema({
 const isBannedOrMutedSchema = mongoose.Schema({
   value: {
     type: Boolean,
-    default: 0,
+    default: false,
   },
   date: Date,
 });
@@ -133,7 +137,7 @@ const communitySchema = mongoose.Schema({
   ],
   isDeleted: {
     type: Boolean,
-    default: 0,
+    default: false,
   },
   createdAt: {
     type: Date,
@@ -143,11 +147,11 @@ const communitySchema = mongoose.Schema({
   },
   rank: {
     type: Number,
-    default:0
+    default: 0,
   },
   trendPoints: {
     type: Number,
-    default:0
+    default: 0,
   },
 
   pageViews: [

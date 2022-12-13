@@ -218,10 +218,14 @@ class CommunityService extends Service {
   getCommunityOptions = async (subreddit) => {
     const community = await this.getOne({
       _id: subreddit,
-      select: "communityOptions",
+      select: "communityOptions description category categories",
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    return community.communityOptions;
+    var allOptions = { ...community.communityOptions }._doc;
+    allOptions.description = community.description;
+    allOptions.category = community.category;
+    allOptions.categories = community.categories;
+    return allOptions;
   };
 
   /**
