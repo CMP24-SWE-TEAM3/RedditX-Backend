@@ -20,72 +20,71 @@ const commentServiceInstance = new CommentService(Comment);
  * @param {function} (req, res)
  * @returns {object} res
  */
-const followers=async(req,res,next)=>{
+const followers = async (req, res) => {
   console.log(req.username);
-  if(!req.username){
+  if (!req.username) {
     return res.status(500).json({
-      response:"error providing username"
+      response: "error providing username",
     });
   }
-  const result=await userServiceInstance.getFollowers(req.username);
+  const result = await userServiceInstance.getFollowers(req.username);
   return res.status(200).json({
-    response:"done",
-    followers:result.followers
-});
-}
+    response: "done",
+    followers: result.followers,
+  });
+};
 /**
  * Get user interests
  * @param {function} (req, res)
  * @returns {object} res
  */
-const getInterests=async(req,res,next)=>{
+const getInterests = async (req, res) => {
   console.log(req.username);
-  if(!req.username){
+  if (!req.username) {
     return res.status(500).json({
-      response:"error providing username"
+      response: "error providing username",
     });
   }
-  const result=await userServiceInstance.getInterests(req.username);
- 
-  if(result.status){
+  const result = await userServiceInstance.getInterests(req.username);
+
+  if (result.status) {
     return res.status(200).json({
-      response:"done",
-      categories:result.categories
+      response: "done",
+      categories: result.categories,
     });
-  }
-  else{
+  } else {
     return res.status(500).json({
-      response:"operation failed"
+      response: "operation failed",
     });
   }
- 
-}
+};
 
 /**
  * Add user interests
  * @param {function} (req, res)
  * @returns {object} res
  */
-const addInterests=async(req,res,next)=>{
+const addInterests = async (req, res) => {
   console.log(req.username);
-  if(!req.username|| !req.body.categories){
+  if (!req.username || !req.body.categories) {
     return res.status(500).json({
-      response:"error providing username"
+      response: "error providing username",
     });
   }
-  const result=await userServiceInstance.addInterests(req.username,req.body.categories);
-  if(result.status){
+  const result = await userServiceInstance.addInterests(
+    req.username,
+    req.body.categories
+  );
+  if (result.status) {
     return res.status(200).json({
-      response:"done", 
+      response: "done",
     });
-  }
-  else{
+  } else {
     return res.status(500).json({
-      response:"operation failed"
+      response: "operation failed",
     });
   }
- 
-}
+};
 
 /**
  * Update user email
@@ -295,6 +294,31 @@ const subscribe = async (req, res) => {
   }
 };
 
+const updateInfo = catchAsync(async (req, res) => {
+  const type = req.body.type;
+  const permittedChangedVariables = [
+    "gender",
+    "about",
+    "phoneNumber",
+    "name",
+    "email",
+  ];
+  if (!permittedChangedVariables.includes(type)) {
+    res.status(400).json({
+      status: "failed",
+      message: "wrong entered type",
+    });
+  }
+
+  //[TODO]: we must check if the new name or email is available in case of changing email and name
+  var update = {};
+  update[type + ""] = req.body.value;
+  userServiceInstance.updateOne({ _id: req.username }, update);
+  res.status(200).json({
+    status: "succeeded",
+  });
+});
+
 module.exports = {
   uploadUserPhoto,
   block,
@@ -310,5 +334,6 @@ module.exports = {
   subscribe,
   followers,
   getInterests,
-  addInterests
+  addInterests,
+  updateInfo,
 };

@@ -33,7 +33,7 @@ router.get(
 );
 router.get("/:subreddit", communityController.getCommunityAbout);
 
-router.post("/:subreddit/kick-member", communityController.kickUser);
+router.post("/:subreddit/kick-member", authCheck, communityController.kickUser);
 
 router.get("/info", authCheck, communityController.getGeneralInfo);
 
