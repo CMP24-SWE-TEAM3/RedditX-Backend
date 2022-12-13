@@ -31,7 +31,6 @@ router.get(
   authCheck,
   communityController.getRandomCommunities
 );
-router.get("/:subreddit", communityController.getCommunityAbout);
 
 router.post("/:subreddit/kick-member", authCheck, communityController.kickUser);
 
@@ -92,5 +91,7 @@ router.get(
   authCheck,
   communityController.getViewsCountPerDay
 );
+
+router.get("/:subreddit", communityController.getCommunityAbout);
 
 module.exports = router;
