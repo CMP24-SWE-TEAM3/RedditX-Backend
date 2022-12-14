@@ -107,7 +107,6 @@ app.use("/api/r", communityRouter);
 app.use("/api/listing", listingRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/notification", notificationRouter);
-app.use("/bolbol", bolbolRouter);
 app.use("/api", postRouter);
 app.all("*", (req, res, next) => {
   return next(
