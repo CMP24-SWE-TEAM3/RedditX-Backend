@@ -516,7 +516,35 @@ class CommunityService extends Service {
         }
       }
     );
+  }
+
+  removeModeratorInvitation = async (subreddit, user) => {
+    await this.updateOne({ '_id': subreddit }, {
+      $pullAll: {
+        'invitedModerators': [{ '_id': user }]
+      }
+    });
+  }
+
+  addModerator = async (subreddit, user) => {
+    await this.updateOne({ '_id': subreddit }, {
+      $addToSet: {
+        'moderators': {
+          $each: [{
+            'userID': user,
+            'role': 'moderator'
+          }]
+        }
+      }
+    });
   };
+
+  removeSrBanner = async (subreddit) => {
+    await this.updateOne({ '_id': subreddit }, { 'banner': 'default.jpg' });
+  }
+  removeSrIcon = async (subreddit) => {
+    await this.updateOne({ '_id': subreddit }, { 'icon': 'default.jpg' });
+  }
 }
 
 module.exports = CommunityService;

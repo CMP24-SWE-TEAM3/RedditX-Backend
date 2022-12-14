@@ -1,3 +1,4 @@
+const { populate } = require("../models/post-model");
 const APIfeatures = require("./../utils/api-features");
 
 /**
@@ -20,11 +21,19 @@ class Service {
 
   getOne = (query) => {
     let fields = "";
+    let populate = "";
     if (query.select) {
       fields = query.select;
       delete query.select;
     }
+    if (query.populate) {
+      populate = query.populate;
+      delete query.populate;
+    }
     const res = this.model.findOne(query);
+    if (populate) {
+      res.populate(populate);
+    }
     if (fields) {
       const result = res.select(fields);
       return result;
@@ -32,10 +41,10 @@ class Service {
     return res;
   };
 
-  updateOne = (query, update) => {
+  updateOne = (query, update, options = {}) => {
     ///msh 3arfa ab3t elfunction ezay hena
     return this.model
-      .findOneAndUpdate(query, update, (error, doc) => {
+      .findOneAndUpdate(query, update, options, (error, doc) => {
         if (!error) return doc;
         else return null;
         // error: any errors that occurred

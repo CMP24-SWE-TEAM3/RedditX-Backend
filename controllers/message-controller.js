@@ -76,9 +76,102 @@ const deleteMessage=async(req,res,next)=>{
  
 } 
 
+/**
+ * Unread message
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const unreadMessage=async(req,res,next)=>{
+  console.log(req.username);
+  console.log(req.body);
+  if(!req.username||!req.body.msgID||!IdValidator(req.body.msgID)){
+      return res.status(500).json({
+          response:"invalid parameters"
+        });
+  }
 
+
+  const result=await messageServiceInstance.unreadMessage(req.body);
+  console.log(result);
+  if(result.status){
+    return res.status(200).json({
+      response:"done",
+      id:result.id
+    });
+  }
+  else{
+    return res.status(500).json({
+      response:"operation failed",
+      error:result.error
+    });
+  }
+ 
+}
+
+ /**
+ * Get all messages sent by user
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+ const sentMessages=async(req,res,next)=>{
+  
+  if(!req.username){
+      return res.status(500).json({
+          response:"invalid parameters"
+        });
+  }
+
+
+  const result=await messageServiceInstance.sentMessages(req.username);
+  if(result.status){
+    return res.status(200).json({
+      response:"done",
+      messages:result.messages
+    });
+  }
+  else{
+    return res.status(500).json({
+      response:"operation failed",
+      error:result.error
+    });
+  }
+ 
+} 
+
+ /**
+ * Get user inbox messages
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+ const inboxMessages=async(req,res,next)=>{
+  
+  if(!req.username){
+      return res.status(500).json({
+          response:"invalid parameters"
+        });
+  }
+
+
+  const result=await messageServiceInstance.inboxMessages(req.username);
+  if(result.status){
+    return res.status(200).json({
+      response:"done",
+      messages:result.messages
+    });
+  }
+  else{
+    return res.status(500).json({
+      response:"operation failed",
+      error:result.error
+    });
+  }
+ 
+} 
 module.exports = {
     compose,
-    deleteMessage
+    deleteMessage,
+    sentMessages,
+    inboxMessages,
+    unreadMessage
   };
   
