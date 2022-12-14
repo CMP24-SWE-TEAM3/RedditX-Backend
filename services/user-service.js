@@ -535,7 +535,6 @@ class UserService extends Service {
     });
     var returnPosts = [];
     for await (const doc of cursor) {
-      console.log(doc);
       returnPosts.push(doc);
     }
     return returnPosts;
