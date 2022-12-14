@@ -106,7 +106,9 @@ const getUserComments = catchAsync(async (req, res, next) => {
   console.log(req.params);
   var posts;
   try {
+
      posts = await userServiceInstance.userSubmitted(
+
       req.params.username,
       req.query
     );

@@ -1,13 +1,18 @@
 const catchAsync = require("../utils/catch-async");
+const AppError = require("../utils/app-error");
+const Post = require("./../models/post-model");
+const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
 const Comment = require("./../models/comment-model");
 const Post = require("./../models/post-model");
 const User = require("./../models/user-model");
+
 const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 const IdValidator = require("../validate/listing-validators").validateObjectId;
+
 const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
 const postServiceInstance = new PostService(Post);
@@ -454,6 +459,7 @@ const getGeneralInfo = catchAsync(async (req, res, next) => {
               ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
               : undefined;
       things.push(result);
+
     }
   } catch (err) {
     return next(err);
@@ -688,6 +694,7 @@ const addFlair = catchAsync(async (req, res, next) => {
     status: 'succeeded',
   });
 })
+
 
 module.exports = {
   uploadCommunityIcon,
