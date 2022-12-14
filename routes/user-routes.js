@@ -37,6 +37,11 @@ router.get("/userCommentReplies/:username", profileController.getUserCommentRepl
 router.get("/userSelfReply/:username", profileController.getUserSelfReply);
 
 
-router.post("/subscribe",authCheck,userController.subscribe);
+router.post("/subscribe", authCheck, userController.subscribe);
 
+router.post('/update', authCheck, userController.updateInfo);
+
+router
+  .route('/me/friends')
+  .get(authCheck, userController.getAllFriends);
 module.exports = router;

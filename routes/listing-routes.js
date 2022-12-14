@@ -1,5 +1,6 @@
 const express = require("express");
 const listingController = require("../controllers/listing-controller");
+const commentController = require('../controllers/comment-controller');
 const startUploadingFiles = require("../utils/upload-array-photos");
 const possibleAuthCheck = require("../middlewares/possible-auth-check");
 const authCheck = require("../middlewares/auth-check");
@@ -24,5 +25,9 @@ router.post(
   startUploadingFiles,
   listingController.submit
 );
+
+router
+  .route('/show-comment')
+  .post(authCheck, commentController.showComment);
 
 module.exports = router;

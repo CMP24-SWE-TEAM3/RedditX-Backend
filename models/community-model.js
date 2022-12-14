@@ -166,6 +166,12 @@ const communitySchema = mongoose.Schema({
   ],
   category: String,
   categories: [String],
+  invitedModerators: [
+    {
+      type: String,
+      ref: 'User'
+    }
+  ]
 });
 
 const Community = mongoose.model("Community", communitySchema);

@@ -11,6 +11,7 @@ const Community = require("../models/community-model");
 const AuthService = require("./../services/auth-service");
 var authServiceInstance = new AuthService(User);
 const CommunityService = require("./../services/community-service");
+const { doc } = require("prettier");
 var communityServiceInstance = new CommunityService(Community);
 
 /**
@@ -573,6 +574,43 @@ class UserService extends Service {
     const newToken = await this.signToken("bare email", user._id);
     return { token: newToken, id: user._id };
   };
-}
 
+  isParticipantInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ "_id": user, "select": 'member' })).member;
+    subreddits = subreddits.map(el => el.communityId);
+    return subreddits.includes(subreddit);
+  }
+
+  isModeratorInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ "_id": user, "select": 'moderators' })).moderators;
+    console.log(subreddits);
+    subreddits = subreddits.map(el => el.communityId);
+    return subreddits.includes(subreddit);
+  }
+
+  muteOrBanUserInSubreddit = async (subreddit, user, type) => {
+    if (type == 'ban') {
+      this.updateOne({ _id: user, 'member.communityId': subreddit }, { 'member.$.isBanned': true });
+    }
+    else if (type == 'mute') {
+      this.updateOne({ _id: user, 'member.communityId': subreddit }, { 'member.$.isMuted': true });
+    }
+  }
+
+  addSubredditModeration = async (subreddit, user) => {
+    await this.updateOne({ _id: user }, {
+      $addToSet: {
+        moderators: {
+          $each: [
+            {
+              communityId: subreddit,
+              role: 'moderator',
+            }
+          ]
+        }
+      }
+    });
+
+  }
+}
 module.exports = UserService;

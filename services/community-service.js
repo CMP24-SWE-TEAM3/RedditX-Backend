@@ -106,10 +106,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? (el.isBanned = true)
           : operation === "unban"
-          ? (el.isBanned = false)
-          : operation === "mute"
-          ? (el.isMuted = true)
-          : (el.isMuted = false)
+            ? (el.isBanned = false)
+            : operation === "mute"
+              ? (el.isMuted = true)
+              : (el.isMuted = false)
         : el
     );
     return community;
@@ -130,10 +130,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? (el.isBanned = true)
           : operation === "unban"
-          ? (el.isBanned = false)
-          : operation === "mute"
-          ? (el.isMuted = true)
-          : (el.isMuted = false)
+            ? (el.isBanned = false)
+            : operation === "mute"
+              ? (el.isMuted = true)
+              : (el.isMuted = false)
         : el
     );
     await toBeAffected.save();
@@ -217,10 +217,10 @@ class CommunityService extends Service {
     }
 
   }
-  setSuggestedSort=async(srName,commentSort)=>{
+  setSuggestedSort = async (srName, commentSort) => {
     Community.findByIdAndUpdate(
       { _id: srName },
-      { $set: { suggestedCommentSort:commentSort } },
+      { $set: { suggestedCommentSort: commentSort } },
       { new: true },
       (err) => {
         if (err) {
@@ -236,6 +236,33 @@ class CommunityService extends Service {
     );
   }
 
+  removeModeratorInvitation = async (subreddit, user) => {
+    await this.updateOne({ '_id': subreddit }, {
+      $pullAll: {
+        'invitedModerators': [{ '_id': user }]
+      }
+    });
+  }
+
+  addModerator = async (subreddit, user) => {
+    await this.updateOne({ '_id': subreddit }, {
+      $addToSet: {
+        'moderators': {
+          $each: [{
+            'userID': user,
+            'role': 'moderator'
+          }]
+        }
+      }
+    });
+  };
+
+  removeSrBanner = async (subreddit) => {
+    await this.updateOne({ '_id': subreddit }, { 'banner': 'default.jpg' });
+  }
+  removeSrIcon = async (subreddit) => {
+    await this.updateOne({ '_id': subreddit }, { 'icon': 'default.jpg' });
+  }
 }
 
 module.exports = CommunityService;
