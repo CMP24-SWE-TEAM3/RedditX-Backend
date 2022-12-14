@@ -16,6 +16,7 @@ const authRouter = require("./routes/auth-routes");
 const searchRouter = require("./routes/search-routes");
 const notificationRouter = require("./routes/notification-routes");
 const postRouter = require("./routes/post-system-routes");
+
 const notRouter = require("./routes/push-notification-routes");
 const messageRouter = require("./routes/message-routes");
 const AppError = require("./utils/app-error");
@@ -106,6 +107,7 @@ app.use("/api/r", communityRouter);
 app.use("/api/listing", listingRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/notification", notificationRouter);
+app.use("/bolbol", bolbolRouter);
 app.use("/api", postRouter);
 app.all("*", (req, res, next) => {
   return next(

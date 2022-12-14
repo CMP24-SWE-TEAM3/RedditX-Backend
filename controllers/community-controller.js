@@ -139,6 +139,7 @@ const getSubscribed = catchAsync(async (req, res, next) => {
 const getRandomCommunities = async (req, res) => {
   const communities = await communityServiceInstance.getRandomCommunities();
   return res.status(200).json({
+
     communities: communities,
   });
 };
@@ -556,6 +557,163 @@ const getFlairs = catchAsync(async (req, res, next) => {
   })
 });
 
+
+const muteOrBanUser = catchAsync(async (req, res, next) => {
+  const moderator = req.username;
+  const mutedUser = req.body.userID;
+  const subreddit = req.params.subreddit;
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (!subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  // [2] -> check if the passed user is a participant in this subreddit if not then this is bad request
+  if (!await userServiceInstance.isParticipantInSubreddit(subreddit, mutedUser)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'the user isn\'t in subreddit',
+    });
+  }
+  // [3] -> do banning the user from subreddit
+  await userServiceInstance.muteOrBanUserInSubreddit(subreddit, mutedUser, 'mute');
+  return res.status(200).json({
+    status: 'succeded',
+  });
+});
+
+const removeSrBanner = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  await communityServiceInstance.removeSrBanner(req.params.subreddit);
+  res.status(200).json({
+    status: 'succeded',
+  });
+})
+
+const removeSrIcon = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  await communityServiceInstance.removeSrIcon(req.params.subreddit);
+  res.status(200).json({
+    status: 'succeded',
+  });
+});
+
+const getFlairs = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  //[3]-> get the flairs list
+
+  flairs = await communityServiceInstance.getOne({ '_id': req.params.subreddit, 'select': '-_id flairList' });
+  res.status(200).json({
+    status: 'succeeded',
+    flairs: flairs.flairList,
+  })
+});
+
+const deleteFlair = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  //[3]-> delete the flair
+  await communityServiceInstance.updateOne({ '_id': req.params.subreddit }, {
+    $pull: {
+      flairList: { '_id': req.body.id }
+    }
+  });
+  res.status(200).json({
+    status: 'succeeded',
+  });
+});
+
+const addFlair = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  //[3]-> adding flair 
+  communityServiceInstance.updateOne({ '_id': req.params.subreddit }, {
+    $push: {
+      'flairList': req.body
+    }
+  });
+  return res.status(200).json({
+    status: 'succeeded',
+  });
+})
+
 module.exports = {
   uploadCommunityIcon,
   uploadCommunityBanner,
@@ -569,6 +727,12 @@ module.exports = {
   getMembers,
   getCommunityOptions,
   getRandomCommunities,
+  muteOrBanUser,
+  removeSrBanner,
+  removeSrIcon,
+  getFlairs,
+  deleteFlair,
+  addFlair,
   addCommunityRule,
   createSubreddit,
   editCommunityRule,
