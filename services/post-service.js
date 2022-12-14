@@ -114,7 +114,7 @@ class PostService extends Service {
         const memberOf = user.member.find(
           (el) => el.communityId === community._id
         );
-        if (!memberOf || memberOf.isMuted || memberOf.isBanned)
+        if (!memberOf || memberOf.isMuted.value || memberOf.isBanned.value)
           throw new AppError("You cannot submit a post to this subreddit", 400);
       }
     }

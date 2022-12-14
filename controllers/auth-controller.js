@@ -1,9 +1,6 @@
 const User = require("../models/user-model");
-const bcrypt = require("bcryptjs");
-const decodeJwt = require("./google-facebook-oAuth");
-const randomUsername = require("../utils/random-username");
 
-const AuthService = require('./../services/auth-service');
+const AuthService = require("./../services/auth-service");
 
 var authServiceInstance = new AuthService(User);
 
@@ -11,11 +8,6 @@ const catchAsync = require("../utils/catch-async");
 const UserService = require("./../services/user-service");
 
 const userServiceInstance = new UserService(User);
-
-
-
-
-
 
 // /**
 //  * Check whether google account or facebook account is in database or not (route)
@@ -35,8 +27,6 @@ const userServiceInstance = new UserService(User);
 //   }
 // };
 
-
-
 /**
  * Check whether username is in database or not (route)
  * @param {Object} req request that contains the username.
@@ -46,12 +36,11 @@ const userServiceInstance = new UserService(User);
 const availableUsername = async (req, res) => {
   const data = await authServiceInstance.availableUser(req.query.username);
   if (data.state) {
-    return res.status(200).json({response: "Available"});
+    return res.status(200).json({ response: "Available" });
   } else {
-    return res.status(404).json({response: "Not Available"});
+    return res.status(404).json({ response: "Not Available" });
   }
 };
-
 
 /**
  * Signup (route)
@@ -59,22 +48,19 @@ const availableUsername = async (req, res) => {
  * @returns {object} {token,expiresIn,username} or {error}
  */
 const signup = async (req, res) => {
-
-   const result=await authServiceInstance.signup(req.body);
-   console.log(result);
-   if(result.state){
+  const result = await authServiceInstance.signup(req.body);
+  console.log(result);
+  if (result.state) {
     return res.status(200).json({
-    
       token: result.token, //token,
       expiresIn: result.expiresIn,
       username: result.username,
-    })
-   }
-   else{
+    });
+  } else {
     return res.status(404).json({
-      error:result.error
-    })
-   }
+      error: result.error,
+    });
+  }
 };
 
 /**
@@ -85,21 +71,18 @@ const signup = async (req, res) => {
  */
 
 const login = async (req, res) => {
-  
-  const result=await authServiceInstance.login(req.body);
-  if(result.state){
+  const result = await authServiceInstance.login(req.body);
+  if (result.state) {
     return res.status(200).json({
-    
       token: result.token, //token,
       expiresIn: result.expiresIn,
       username: result.username,
-    })
-   }
-   else{
+    });
+  } else {
     return res.status(404).json({
-      error:result.error
-    })
-   }
+      error: result.error,
+    });
+  }
 };
 
 const forgotPassword = catchAsync(async (req, res, next) => {

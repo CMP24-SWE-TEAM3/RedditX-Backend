@@ -74,7 +74,7 @@ class Service {
   deleteMany = (query) => {
     this.model.deleteMany(query);
   };
-
+  
   insert = (data) => {
     return this.model.create(data);
   };

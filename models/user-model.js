@@ -102,18 +102,26 @@ const userPrefsSchema = new mongoose.Schema({
   },
 });
 
+const isBannedOrMutedSchema = mongoose.Schema({
+  value: {
+    type: Boolean,
+    default: false,
+  },
+  date: Date,
+});
+
 const memberSchema = new mongoose.Schema({
   communityId: {
     type: String /*mongoose.Schema.ObjectId,*/,
     ref: "Community",
   },
   isMuted: {
-    type: Boolean,
-    default: false,
+    type: isBannedOrMutedSchema,
+    default: () => ({}),
   },
   isBanned: {
-    type: Boolean,
-    default: false,
+    type: isBannedOrMutedSchema,
+    default: () => ({}),
   },
 });
 
@@ -294,6 +302,12 @@ const userSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  messages: [
+    {
+      type: String /*mongoose.Schema.ObjectId,*/,
+      ref: "Message",
+    },
+  ],
   friendRequestFromMe: [
     {
       type: String,
@@ -348,7 +362,7 @@ const userSchema = new mongoose.Schema({
    ***************************************/
   categories: [
     {
-      type: mongoose.Schema.ObjectId,
+      type: String,
       // ref:'Category'
     },
   ],

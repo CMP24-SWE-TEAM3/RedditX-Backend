@@ -16,6 +16,77 @@ const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
 
 /**
+ * Get user followers
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const followers = async (req, res) => {
+  console.log(req.username);
+  if (!req.username) {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const result = await userServiceInstance.getFollowers(req.username);
+  return res.status(200).json({
+    response: "done",
+    followers: result.followers,
+  });
+};
+/**
+ * Get user interests
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const getInterests = async (req, res) => {
+  console.log(req.username);
+  if (!req.username) {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const result = await userServiceInstance.getInterests(req.username);
+
+  if (result.status) {
+    return res.status(200).json({
+      response: "done",
+      categories: result.categories,
+    });
+  } else {
+    return res.status(500).json({
+      response: "operation failed",
+    });
+  }
+};
+
+/**
+ * Add user interests
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const addInterests = async (req, res) => {
+  console.log(req.username);
+  if (!req.username || !req.body.categories) {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const result = await userServiceInstance.addInterests(
+    req.username,
+    req.body.categories
+  );
+  if (result.status) {
+    return res.status(200).json({
+      response: "done",
+    });
+  } else {
+    return res.status(500).json({
+      response: "operation failed",
+    });
+  }
+};
+
+/**
  * Update user email
  * @param {function} (req, res)
  * @returns {object} res
@@ -33,7 +104,6 @@ const updateEmail = async (req, res) => {
     return res.status(400).json({
       response: "error",
     });
-  console.log("ay haga");
   return res.status(200).json({
     response: results,
   });
@@ -44,8 +114,9 @@ const updateEmail = async (req, res) => {
  * @returns {object} res
  */
 const uploadUserPhoto = catchAsync(async (req, res, next) => {
+  var avatar = undefined;
   try {
-    await userServiceInstance.uploadUserPhoto(
+    avatar = await userServiceInstance.uploadUserPhoto(
       req.body.action,
       req.username,
       req.file
@@ -55,7 +126,7 @@ const uploadUserPhoto = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Avatar is updated successfully",
+    avatar,
   });
 });
 
@@ -299,7 +370,6 @@ const updateInfo = catchAsync(async (req, res, next) => {
       message: 'wrong entered type'
     });
   }
-
   //[TODO]: we must check if the new name or email is available in case of changing email and name
   update = {};
   update[type + ''] = req.body.value;
@@ -340,7 +410,6 @@ const leaveModeratorOfSubredddit = catchAsync(async (req, res, next) => {
     status: 'succeded',
   });
 })
-
 module.exports = {
   uploadUserPhoto,
   block,
@@ -359,4 +428,8 @@ module.exports = {
   acceptModeratorInvite,
   updateInfo,
   leaveModeratorOfSubredddit
+  followers,
+  getInterests,
+  addInterests,
+  updateInfo,
 };
