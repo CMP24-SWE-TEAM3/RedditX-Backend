@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const communityRuleSchema = mongoose.Schema({
   title: String,
   description: String,
+  reason: String,
 });
 
 const FAQSchema = mongoose.Schema({
@@ -31,22 +32,26 @@ const statsSchema = mongoose.Schema({
 });
 
 const communityOptionsSchema = mongoose.Schema({
+  enableSpoilerTag: {
+    type: Boolean,
+    default: true,
+  },
   emailUsernameMention: {
     type: Boolean,
-    default: 1,
+    default: true,
   },
   nsfw: {
     type: Boolean,
-    default: 0,
+    default: false,
   },
   welcomeMessage: String,
   allowImgAndLinksUploads: {
     type: Boolean,
-    default: 1,
+    default: true,
   },
   allowMultipleImagePerPost: {
     type: Boolean,
-    default: 1,
+    default: true,
   },
   suggestedCommentSort: {
     type: String,
@@ -64,18 +69,25 @@ const communityOptionsSchema = mongoose.Schema({
   },
 });
 
+const isBannedOrMutedSchema = mongoose.Schema({
+  value: {
+    type: Boolean,
+    default: false,
+  },
+  date: Date,
+});
 const memberSchema = mongoose.Schema({
   userID: {
     type: String,
     ref: "User",
   },
   isMuted: {
-    type: Boolean,
-    default: 0,
+    type: isBannedOrMutedSchema,
+    default: () => ({}),
   },
   isBanned: {
-    type: Boolean,
-    default: 0,
+    type: isBannedOrMutedSchema,
+    default: () => ({}),
   },
 });
 
@@ -101,7 +113,7 @@ const communitySchema = mongoose.Schema({
   ],
   description: {
     type: String,
-    required: [true, "A community must have a description!"],
+    required: [false, "A community must have a description!"],
     trim: true, // Remove all the white space in the beginning or end of the field
     maxLength: [
       100000,
@@ -125,22 +137,40 @@ const communitySchema = mongoose.Schema({
   ],
   isDeleted: {
     type: Boolean,
+    default: false,
+  },
+  createdAt: {
+    type: Date,
+
+    required: [true, "missing the date of creation of the user"],
+    default: Date.now(),
+  },
+  rank: {
+    type: Number,
     default: 0,
   },
-  createdAt: String,
-  rank: Number,
-  trendPoints: Number,
+  trendPoints: {
+    type: Number,
+    default: 0,
+  },
+
   pageViews: [
+    // TODO: VERY IMPORTANT: if a user receives a listing from this community, you must search in this array for the today date,
+    // if found it, increment the count, if not, create an object with the today date and make its count = 0
     {
       type: statsSchema,
     },
   ],
   joined: [
+    // TODO: VERY IMPORTANT: if a user subscribes to this community, you must search in this array for the today date,
+    // if found it, increment the count, if not, create an object with the today date and make its count = 0
     {
       type: statsSchema,
     },
   ],
   left: [
+    // TODO: VERY IMPORTANT: if a user leaves this community, you must search in this array for the today date,
+    // if found it, incerement the count, if not, create an object with the today date and make its count = 0
     {
       type: statsSchema,
     },
@@ -166,6 +196,12 @@ const communitySchema = mongoose.Schema({
   ],
   category: String,
   categories: [String],
+  invitedModerators: [
+    {
+      type: String,
+      ref: 'User'
+    }
+  ]
 });
 
 const Community = mongoose.model("Community", communitySchema);

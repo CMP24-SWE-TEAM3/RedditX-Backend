@@ -366,7 +366,7 @@ class CommentService extends Service {
           { _id: postIdCasted },
           { $set: { votesCount: votesCount + operation, voters: voters } },
           { new: true },
-          () => {}
+          () => { }
         );
 
         return {
@@ -381,6 +381,7 @@ class CommentService extends Service {
       }
     }
   };
+
  /**
    * User delete a comment
    * @param {string} linkID
@@ -392,6 +393,16 @@ class CommentService extends Service {
   comment.isDeleted = true;
   await comment.save();
 };
+
+
+  checkUser = async (user, comment) => {
+    console.log();
+    return (await (this.getOne({ '_id': comment, 'select': 'authorId' })))['authorId'] === user;
+  };
+
+  showComment = async (comment) => {
+    await this.updateOne({ "_id": comment }, { 'isCollapsed': false });
+  }
 }
 
 module.exports = CommentService;

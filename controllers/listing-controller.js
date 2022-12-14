@@ -14,7 +14,6 @@ var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
 var commentServiceInstance = new CommentService(Comment);
 
-
 /**
  * Update user text
  * @param {function} (req, res)
@@ -188,7 +187,7 @@ const markNsfw = catchAsync(async (req, res, next) => {
  * @param {function} (req, res, next)
  * @returns {object} res
  */
- const addComment = catchAsync(async (req, res, next) => {
+const addComment = catchAsync(async (req, res, next) => {
   let newComment = {};
   try {
     newComment = await commentServiceInstance.addComment(
@@ -201,17 +200,14 @@ const markNsfw = catchAsync(async (req, res, next) => {
   res.status(201).json(newComment);
 });
 /**
- * Creates a reply 
+ * Creates a reply
  * @param {function} (req, res, next)
  * @returns {object} res
  */
- const addReply = catchAsync(async (req, res, next) => {
+const addReply = catchAsync(async (req, res, next) => {
   let newReply = {};
   try {
-    newReply = await commentServiceInstance.addReply(
-      req.body,
-      req.username
-    );
+    newReply = await commentServiceInstance.addReply(req.body, req.username);
   } catch (err) {
     return next(err);
   }
@@ -286,16 +282,16 @@ const unsave = catchAsync(async (req, res, next) => {
  */
 const vote = async (req, res) => {
   console.log(req.username);
-  const result = await commentServiceInstance.vote(req.body,req.username);
+  const result = await commentServiceInstance.vote(req.body, req.username);
   console.log(result);
-  if(result.state){
+  if (result.state) {
     return res.status(200).json({
-      status:result.status
+
+      status: result.status,
     });
-  }
-  else{
+  } else {
     return res.status(500).json({
-      status:result.error
+      status: result.error,
 
     });
   }
@@ -364,6 +360,17 @@ const unhide = catchAsync(async (req, res, next) => {
   });
 });
 
+const getPostInsights = catchAsync(async (req, res) => {
+  const postInsightsCnt = await postServiceInstance.getOne({
+    _id: req.params.post,
+    select: "-_id insightCnt",
+  });
+  return res.status(200).json({
+    status: "succeded",
+    postInsightsCnt,
+  });
+});
+
 module.exports = {
   submit,
   save,
@@ -371,6 +378,7 @@ module.exports = {
   addReply,
   unsave,
   getPosts,
+  getPostInsights,
   vote,
   editUserText,
   hide,

@@ -3,17 +3,19 @@ const AppError = require("../utils/app-error");
 const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
+const Comment = require("./../models/comment-model");
+const Post = require("./../models/post-model");
 const User = require("./../models/user-model");
-const PostService = require("./../services/post-service");
-const UserService = require("./../services/user-service");
+
 const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
-
-const postServiceInstance = new PostService(Post);
-
-const commentServiceInstance = new CommentService(Comment);
+const PostService = require("./../services/post-service");
+const UserService = require("./../services/user-service");
+const IdValidator = require("../validate/listing-validators").validateObjectId;
 
 const communityServiceInstance = new CommunityService(Community);
+const commentServiceInstance = new CommentService(Comment);
+const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
 
 /**
@@ -22,8 +24,9 @@ const userServiceInstance = new UserService(User);
  * @returns {object} res
  */
 const uploadCommunityIcon = catchAsync(async (req, res, next) => {
+  var icon = undefined;
   try {
-    await communityServiceInstance.uploadCommunityPhoto(
+    icon = await communityServiceInstance.uploadCommunityPhoto(
       req.file,
       req.username,
       req.params.subreddit,
@@ -34,7 +37,7 @@ const uploadCommunityIcon = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Icon is updated successfully",
+    icon,
   });
 });
 
@@ -44,8 +47,9 @@ const uploadCommunityIcon = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const uploadCommunityBanner = catchAsync(async (req, res, next) => {
+  var banner = undefined;
   try {
-    await communityServiceInstance.uploadCommunityPhoto(
+    banner = await communityServiceInstance.uploadCommunityPhoto(
       req.file,
       req.username,
       req.params.subreddit,
@@ -56,7 +60,7 @@ const uploadCommunityBanner = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Banner is updated successfully",
+    banner,
   });
 });
 
@@ -72,22 +76,18 @@ const setSuggestedSort = async (req, res) => {
       status: "failed",
     });
   }
-  Community.findByIdAndUpdate(
-    { _id: req.body.srName },
-    { $set: { suggestedCommentSort: req.body.suggestedCommentSort } },
-    { new: true },
-    (err) => {
-      if (err) {
-        return res.status(500).json({
-          status: "failed",
-        });
-      } else {
-        return res.status(200).json({
-          status: "done",
-        });
-      }
-    }
+  const result = communityServiceInstance.setSuggestedSort(
+    req.body.srName,
+    req.body.setSuggestedSort
   );
+  if (result.status) {
+    return res.status(200).json({
+      status: "done",
+    });
+  }
+  return res.status(500).json({
+    status: "failed",
+  });
 };
 
 /**
@@ -137,17 +137,17 @@ const getSubscribed = catchAsync(async (req, res, next) => {
   });
 });
 /**
- * Get the list of random communities 
+ * Get the list of random communities
  * @param {function} (req, res, next)
  * @returns {object} res
  */
- const getRandomCommunities =async(req,res)=>{
-    const communities=await communityServiceInstance.getRandomCommunities();
-    return res.status(200).json({
-      communities:communities
-    });
+const getRandomCommunities = async (req, res) => {
+  const communities = await communityServiceInstance.getRandomCommunities();
+  return res.status(200).json({
 
- } ;
+    communities: communities,
+  });
+};
 
 /**
  * Ban or mute a user within a community
@@ -188,23 +188,30 @@ const banOrMute = catchAsync(async (req, res, next) => {
  */
 const getBanned = catchAsync(async (req, res, next) => {
   var users = undefined;
+  var banned = [];
   try {
-    const memberIDs = await communityServiceInstance.getBannedOrMuted(
-      req.params.subreddit,
-      "isBanned"
-    );
+    const { memberIDs, dates } =
+      await communityServiceInstance.getBannedOrMuted(
+        req.params.subreddit,
+        "isBanned"
+      );
     users = await userServiceInstance.find(
       {
         _id: { $in: memberIDs },
       },
       "avatar about"
     );
+    dates.forEach((date, index) => {
+      var tempBanned = { ...users[index] }._doc;
+      tempBanned.date = date;
+      banned[index] = tempBanned;
+    });
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    users,
+    users: banned,
   });
 });
 
@@ -215,23 +222,30 @@ const getBanned = catchAsync(async (req, res, next) => {
  */
 const getMuted = catchAsync(async (req, res, next) => {
   var users = undefined;
+  var muted = [];
   try {
-    const memberIDs = await communityServiceInstance.getBannedOrMuted(
-      req.params.subreddit,
-      "isMuted"
-    );
+    const { memberIDs, dates } =
+      await communityServiceInstance.getBannedOrMuted(
+        req.params.subreddit,
+        "isMuted"
+      );
     users = await userServiceInstance.find(
       {
         _id: { $in: memberIDs },
       },
       "avatar about"
     );
+    dates.forEach((date, index) => {
+      var tempMuted = { ...users[index] }._doc;
+      tempMuted.date = date;
+      muted[index] = tempMuted;
+    });
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    users,
+    users: muted,
   });
 });
 
@@ -262,6 +276,38 @@ const getModerators = catchAsync(async (req, res, next) => {
 });
 
 /**
+ * Get all members of a subreddit
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getMembers = catchAsync(async (req, res, next) => {
+  var users = undefined;
+  var members = [];
+  try {
+    const { memberIDs, isBannedAndMuted } =
+      await communityServiceInstance.getMembers(req.params.subreddit);
+    users = await userServiceInstance.find(
+      {
+        _id: { $in: memberIDs },
+      },
+      "avatar about"
+    );
+    isBannedAndMuted.forEach((isBannedAndMutedElement, index) => {
+      var temp = { ...users[index] }._doc;
+      temp.isBanned = isBannedAndMutedElement.isBanned;
+      temp.isMuted = isBannedAndMutedElement.isMuted;
+      members[index] = temp;
+    });
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    users: members,
+  });
+});
+
+/**
  * Get community options of a subreddit
  * @param {function} (req, res, next)
  * @returns {object} res
@@ -278,62 +324,377 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
   res.status(200).json(communityOptions);
 });
 /**
- * Spams a post or a comment
+ * Create subreddit
  * @param {function} (req, res, next)
  * @returns {object} res
  */
- const spam = catchAsync(async (req, res, next) => {
-  if (!req.body.linkID)
-    return next(new AppError("No linkID is provided!", 400));
-  var community = undefined;
+const createSubreddit = async (req, res) => {
+  if (!communityServiceInstance.creationValidation(req.body)) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+  var user = await userServiceInstance.getOne({ _id: req.username });
+  const result = await communityServiceInstance.createSubreddit(req.body, user);
+  if (!result.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: result.response,
+  });
+};
+/**
+ * Add community rule
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const addCommunityRule = async (req, res) => {
+  console.log(req.body);
+  if (!req.body.srName || !req.body.rule) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+  var user = await userServiceInstance.getOne({ _id: req.username });
+
+  const result = await communityServiceInstance.addCommunityRule(
+    req.body,
+    user
+  );
+  console.log(result);
+  if (!result.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: result.response,
+    id: result.id,
+  });
+};
+
+/**
+ * Edit community rule
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const editCommunityRule = async (req, res) => {
+  if (
+    !req.body.srName ||
+    !req.body.rule ||
+    !req.body.rule.id ||
+    !IdValidator(req.body.rule.id)
+  ) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+  var user = await userServiceInstance.getOne({ _id: req.username });
+
+  const result = await communityServiceInstance.editCommunityRule(
+    req.body,
+    user
+  );
+  console.log(result);
+  if (!result.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: result.response,
+  });
+};
+
+/**
+ * Get community about
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getCommunityAbout = async (req, res) => {
+  console.log(req.params);
+  if (!req.params["subreddit"]) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+
+  const result = await communityServiceInstance.availableSubreddit(
+    req.params["subreddit"]
+  );
+  console.log(result);
+  if (result.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: "done",
+    communityRules: result.subreddit.communityRules,
+    moderators: result.subreddit.moderators,
+  });
+};
+
+/**
+ * Get general information about things like a link, comment or a community
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getGeneralInfo = catchAsync(async (req, res, next) => {
+  var things = [];
   try {
-    if (req.body.linkID[1] === "3") {
-      // Spam a post
-      const post = await postServiceInstance.getOne({
-        _id: req.body.linkID.slice(3),
-      });
-      if (!post) return new AppError("This post doesn't exist!", 404);
-      if (post.communityID !== undefined && post.communityID !== "")
-        community = await communityServiceInstance.getOne({
-          _id: post.communityID,
-        });
-        communityServiceInstance.markAsSpoiler(
-        community,
-        req.username,
-        post
-      );
-    } else {
-      // Spam a comment
-      var comment = await commentServiceInstance.getOne({
-        _id: req.body.linkID.slice(3),
-      });
-      if (!comment)
-        return next(new AppError("This comment doesn't exist!", 404));
-      comment = await commentServiceInstance.spamComment(
-        comment,
-        req.body.spamType,
-        req.body.spamText,
-        req.username
-      );
-      const post = await postServiceInstance.getOne({
-        _id: comment.replyingTo,
-        select: "communityID",
-      });
-      if (post && post.communityID !== undefined && post.communityID !== "")
-        community = await communityServiceInstance.getOne({
-          _id: post.communityID,
-          select: "communityOptions",
-        });
-      await commentServiceInstance.saveSpammedComment(comment, community);
+    const thingsIDs = communityServiceInstance.getThingsIDs(req.query.id);
+    var result;
+    var prepend = undefined;
+    for (var i = 0; i < thingsIDs.length; i++) {
+      prepend = thingsIDs[i][1] * 1;
+      result =
+        prepend === 1 // t1_ => Comment
+          ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+          : prepend === 3 // t3_ => Post
+            ? await postServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+            : prepend === 5 // t5_ => Community
+              ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
+              : undefined;
+      things.push(result);
+
     }
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    message: "Spams are updated successfully",
+    things,
   });
 });
+
+/**
+ * Get members count (joined or left) per day
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getMembersCountPerDay = catchAsync(async (req, res, next) => {
+  var data = [];
+  try {
+    data = await communityServiceInstance.getStats(
+      req.params.subreddit,
+      req.query.type
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    data,
+  });
+});
+
+/**
+ * Get views count per day
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getViewsCountPerDay = catchAsync(async (req, res, next) => {
+  var data = [];
+  try {
+    data = await communityServiceInstance.getStats(
+      req.params.subreddit,
+      "pageViews"
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    data,
+  });
+});
+
+/**
+ * Kick a user within a community
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const kickUser = catchAsync(async (req, res, next) => {
+  var community = undefined;
+  try {
+    community = await communityServiceInstance.kickAtCommunity(
+      req.params.subreddit,
+      req.username,
+      req.body.userID
+    );
+    const toBeKicked = await userServiceInstance.getOne({
+      _id: req.body.userID,
+      select: "member",
+    });
+    await communityServiceInstance.kickAtUser(toBeKicked, community);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Operation is done successfully",
+  });
+});
+
+const muteOrBanUser = catchAsync(async (req, res, next) => {
+  const moderator = req.username;
+  const mutedUser = req.body.userID;
+  const subreddit = req.params.subreddit;
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (!subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  // [2] -> check if the passed user is a participant in this subreddit if not then this is bad request
+  if (!await userServiceInstance.isParticipantInSubreddit(subreddit, mutedUser)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'the user isn\'t in subreddit',
+    });
+  }
+  // [3] -> do banning the user from subreddit
+  await userServiceInstance.muteOrBanUserInSubreddit(subreddit, mutedUser, 'mute');
+  return res.status(200).json({
+    status: 'succeded',
+  });
+});
+
+const removeSrBanner = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  await communityServiceInstance.removeSrBanner(req.params.subreddit);
+  res.status(200).json({
+    status: 'succeded',
+  });
+})
+
+const removeSrIcon = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  await communityServiceInstance.removeSrIcon(req.params.subreddit);
+  res.status(200).json({
+    status: 'succeded',
+  });
+});
+
+const getFlairs = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+//   // [2] -> check if user isn't moderator in subreddit
+//   if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+//     return res.status(400).json({
+//       status: 'failed',
+//       message: 'you aren\'t moderator in this subreddit',
+//     });
+//   }
+  //[3]-> get the flairs list
+
+  flairs = await communityServiceInstance.getOne({ '_id': req.params.subreddit, 'select': '-_id flairList' });
+  res.status(200).json({
+    status: 'succeeded',
+    flairs: flairs.flairList,
+  })
+});
+
+const deleteFlair = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  //[3]-> delete the flair
+  await communityServiceInstance.updateOne({ '_id': req.params.subreddit }, {
+    $pull: {
+      flairList: { '_id': req.body.id }
+    }
+  });
+  res.status(200).json({
+    status: 'succeeded',
+  });
+});
+
+const addFlair = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  //[3]-> adding flair 
+  communityServiceInstance.updateOne({ '_id': req.params.subreddit }, {
+    $push: {
+      'flairList': req.body
+    }
+  });
+  return res.status(200).json({
+    status: 'succeeded',
+  });
+})
+
 
 module.exports = {
   uploadCommunityIcon,
@@ -345,8 +706,21 @@ module.exports = {
   getBanned,
   getMuted,
   getModerators,
+  getMembers,
   getCommunityOptions,
   getRandomCommunities,
-  spam,
-
+  muteOrBanUser,
+  removeSrBanner,
+  removeSrIcon,
+  getFlairs,
+  deleteFlair,
+  addFlair,
+  addCommunityRule,
+  createSubreddit,
+  editCommunityRule,
+  getCommunityAbout,
+  getGeneralInfo,
+  getMembersCountPerDay,
+  getViewsCountPerDay,
+  kickUser,
 };
