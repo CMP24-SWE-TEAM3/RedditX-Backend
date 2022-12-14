@@ -619,13 +619,13 @@ const getFlairs = catchAsync(async (req, res, next) => {
       message: 'not found this subreddit',
     })
   }
-  // [2] -> check if user isn't moderator in subreddit
-  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
-    return res.status(400).json({
-      status: 'failed',
-      message: 'you aren\'t moderator in this subreddit',
-    });
-  }
+//   // [2] -> check if user isn't moderator in subreddit
+//   if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+//     return res.status(400).json({
+//       status: 'failed',
+//       message: 'you aren\'t moderator in this subreddit',
+//     });
+//   }
   //[3]-> get the flairs list
 
   flairs = await communityServiceInstance.getOne({ '_id': req.params.subreddit, 'select': '-_id flairList' });
