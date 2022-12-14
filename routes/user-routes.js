@@ -19,11 +19,16 @@ router.get("/me/saved-posts", authCheck, userController.getUserSavedPosts);
 router.get("/me/prefs", authCheck, userController.getUserPrefs);
 router.get("/me", authCheck, userController.getUserMe);
 router.get("/:username/about", userController.getUserAbout);
+router.get("/me/followers", authCheck, userController.followers);
+router.get("/me/interests", authCheck, userController.getInterests);
+router.post("/me/interests", authCheck, userController.addInterests);
 
 router.post("/block-user", authCheck, userController.block);
 router.post("/spam", authCheck, userController.spam);
 
-router.patch("/updateEmail", possibleAuthCheck, userController.updateEmail);
+
+router.post("/update-email", possibleAuthCheck, userController.updateEmail);
+
 
 router.get("/:username/comment", profileController.getUserComments);
 router.get("/:username/submitted", profileController.getUserSubmitted);
@@ -37,6 +42,11 @@ router.get("/:username/userCommentReplies", profileController.getUserCommentRepl
 router.get("/:username/userSelfReply", profileController.getUserSelfReply);
 
 
-router.post("/subscribe",authCheck,userController.subscribe);
 
+router.post("/subscribe", authCheck, userController.subscribe);
+router.post("/update", authCheck, userController.updateInfo);
+
+router
+  .route('/me/friends')
+  .get(authCheck, userController.getAllFriends);
 module.exports = router;

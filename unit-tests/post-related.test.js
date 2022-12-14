@@ -11,7 +11,10 @@ describe("testing submit service in post service class", () => {
   describe("given a text, title, attachments (files), user, and community", () => {
     test("should respond with a valid post object", async () => {
       const data = {
-        text: "This is a post textThis is a post textThis is a post textThis is a post textThis is",
+        textHTML:
+          "This is a post textThis is a post textThis is a post textThis is a post textThis is",
+        textJSON:
+          "This is a post textThis is a post textThis is a post textThis is a post textThis is",
         title: "This is a post title",
       };
       const files = [
@@ -27,8 +30,12 @@ describe("testing submit service in post service class", () => {
         member: [
           {
             communityId: "t5_imagePro235",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -56,7 +63,10 @@ describe("testing submit service in post service class", () => {
   describe("given a private community and a not member user", () => {
     test("should respond with an error", async () => {
       const data = {
-        text: "This is a post textThis is a post textThis is a post textThis is a post textThis is",
+        textHTML:
+          "This is a post textThis is a post textThis is a post textThis is a post textThis is",
+        textJSON:
+          "This is a post textThis is a post textThis is a post textThis is a post textThis is",
         title: "This is a post title",
       };
       const files = [

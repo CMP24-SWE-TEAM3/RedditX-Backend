@@ -21,14 +21,13 @@ describe("testing uploadCommunityPhoto service in community service class", () =
         .fn()
         .mockReturnValueOnce(community);
       Community.prototype.save = jest.fn().mockImplementation(() => {});
-      expect(
-        communityServiceInstance.uploadCommunityPhoto(
-          { filename: "photo.jpg" },
-          "t2_moazMohamed",
-          "t5_imagePro235",
-          "icon"
-        )
-      ).resolves.not.toThrowError();
+      const icon = await communityServiceInstance.uploadCommunityPhoto(
+        { filename: "photo.jpg" },
+        "t2_moazMohamed",
+        "t5_imagePro235",
+        "icon"
+      );
+      expect(icon).toBe("photo.jpg");
     });
   });
   describe("given a file, username, community, type=banner", () => {
@@ -46,14 +45,13 @@ describe("testing uploadCommunityPhoto service in community service class", () =
         .fn()
         .mockReturnValueOnce(community);
       Community.prototype.save = jest.fn().mockImplementation(() => {});
-      expect(
-        communityServiceInstance.uploadCommunityPhoto(
-          { filename: "photo.jpg" },
-          "t2_moazMohamed",
-          "t5_imagePro235",
-          "banner"
-        )
-      ).resolves.not.toThrowError();
+      const banner = await communityServiceInstance.uploadCommunityPhoto(
+        { filename: "photo.jpg" },
+        "t2_moazMohamed",
+        "t5_imagePro235",
+        "banner"
+      );
+      expect(banner).toBe("photo.jpg");
     });
   });
   describe("given a file, username, community, type=icon, with user not in moderators", () => {
@@ -202,8 +200,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -217,7 +219,7 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
           "t2_moazMohamed",
           "ban"
         );
-      expect(updatedCommunity.members[0].isBanned).toBe(true);
+      expect(updatedCommunity.members[0].isBanned.value).toBe(true);
     });
   });
   describe("given a subreddit, moderator, member, operation=unban", () => {
@@ -233,8 +235,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: true,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: true,
+            },
           },
         ],
       });
@@ -248,7 +254,7 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
           "t2_moazMohamed",
           "unban"
         );
-      expect(updatedCommunity.members[0].isBanned).toBe(false);
+      expect(updatedCommunity.members[0].isBanned.value).toBe(false);
     });
   });
   describe("given a subreddit, moderator, member, operation=mute", () => {
@@ -264,8 +270,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -279,7 +289,7 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
           "t2_moazMohamed",
           "mute"
         );
-      expect(updatedCommunity.members[0].isMuted).toBe(true);
+      expect(updatedCommunity.members[0].isMuted.value).toBe(true);
     });
   });
   describe("given a subreddit, moderator, member, operation=unmute", () => {
@@ -295,8 +305,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -310,7 +324,7 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
           "t2_moazMohamed",
           "unmute"
         );
-      expect(updatedCommunity.members[0].isMuted).toBe(false);
+      expect(updatedCommunity.members[0].isMuted.value).toBe(false);
     });
   });
   describe("given an undefined subreddit, moderator, member, operation=unmute", () => {
@@ -326,8 +340,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -352,8 +370,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -387,8 +409,12 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -420,8 +446,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -430,8 +460,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         member: [
           {
             userID: "t5_imagePro235",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -455,8 +489,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: true,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: true,
+            },
           },
         ],
       });
@@ -465,8 +503,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         member: [
           {
             userID: "t5_imagePro235",
-            isMuted: false,
-            isBanned: true,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: true,
+            },
           },
         ],
       });
@@ -490,8 +532,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -500,8 +546,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         member: [
           {
             userID: "t5_imagePro235",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -525,8 +575,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -535,8 +589,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         member: [
           {
             userID: "t5_imagePro235",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -560,8 +618,12 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
@@ -575,6 +637,218 @@ describe("testing banOrMuteAtUser service in community service class", () => {
   });
 });
 
+describe("testing kickAtCommunity service in community service class", () => {
+  describe("given a subreddit, moderator, member", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const updatedCommunity = await communityServiceInstance.kickAtCommunity(
+        "t5_imagePro235",
+        "t2_hamada",
+        "t2_moazMohamed"
+      );
+      expect(updatedCommunity.members.length).toBe(0);
+    });
+  });
+  describe("given an undefined subreddit, moderator, member", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(undefined);
+      expect(
+        communityServiceInstance.kickAtCommunity(
+          "t5_imagePro235",
+          "t2_hamada",
+          "t2_moazMohamed"
+        )
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, not a moderator, member", () => {
+    test("should throw an error", async () => {
+      var community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      expect(
+        communityServiceInstance.banOrMuteAtCommunity(
+          "t5_imagePro235",
+          "t2_hamada",
+          "t2_moazMohamed"
+        )
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, moderator, member that is moderator", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+          {
+            userID: "t2_moazMohamed",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      expect(
+        communityServiceInstance.banOrMuteAtCommunity(
+          "t5_imagePro235",
+          "t2_hamada",
+          "t2_moazMohamed"
+        )
+      ).rejects.toThrowError();
+    });
+  });
+});
+describe("testing kickAtUser service in community service class", () => {
+  describe("given a toBeKicked, community", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      const member = new User({
+        _id: "t2_moazMohamed",
+        member: [
+          {
+            userID: "t5_imagePro235",
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      Community.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.banOrMuteAtUser(member, community)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an undefined toBeKicked, community", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+        members: [
+          {
+            userID: "t2_moazMohamed",
+            isMuted: {
+              value: true,
+            },
+            isBanned: {
+              value: false,
+            },
+          },
+        ],
+      });
+      const member = undefined;
+      Community.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.kickAtUser(member, community)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
 describe("testing getBannedOrMuted service in community service class", () => {
   describe("given a subreddit, type=isBanned", () => {
     test("should not throw an error", async () => {
@@ -583,24 +857,32 @@ describe("testing getBannedOrMuted service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: false,
-            isBanned: true,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: true,
+              date: "2022-12-09T19:16:16.443Z",
+            },
           },
           {
             userID: "t2_hamada",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      const memberIDs = await communityServiceInstance.getBannedOrMuted(
-        community,
-        "isBanned"
-      );
+      const { memberIDs, dates } =
+        await communityServiceInstance.getBannedOrMuted(community, "isBanned");
       expect(memberIDs[0]).toBe("t2_moazMohamed");
+      expect(dates[0]).toStrictEqual(new Date("2022-12-09T19:16:16.443Z"));
     });
   });
   describe("given a subreddit, type=isMuted", () => {
@@ -610,24 +892,32 @@ describe("testing getBannedOrMuted service in community service class", () => {
         members: [
           {
             userID: "t2_moazMohamed",
-            isMuted: true,
-            isBanned: false,
+            isMuted: {
+              value: true,
+              date: "2022-12-09T19:16:16.443Z",
+            },
+            isBanned: {
+              value: false,
+            },
           },
           {
             userID: "t2_hamada",
-            isMuted: false,
-            isBanned: false,
+            isMuted: {
+              value: false,
+            },
+            isBanned: {
+              value: false,
+            },
           },
         ],
       });
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      const memberIDs = await communityServiceInstance.getBannedOrMuted(
-        community,
-        "isMuted"
-      );
+      const { memberIDs, dates } =
+        await communityServiceInstance.getBannedOrMuted(community, "isMuted");
       expect(memberIDs[0]).toBe("t2_moazMohamed");
+      expect(dates[0]).toStrictEqual(new Date("2022-12-09T19:16:16.443Z"));
     });
   });
   describe("given an undefined subreddit, type=isMuted", () => {
@@ -677,6 +967,55 @@ describe("testing getModerators service in community service class", () => {
   });
 });
 
+describe("testing getMembers service in community service class", () => {
+  describe("given a subreddit", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        members: [
+          {
+            userID: "t2_hamada",
+            isBanned: {
+              value: true,
+              date: "2022-12-09T19:16:16.443Z",
+            },
+            isMuted: {
+              value: false,
+            },
+          },
+          {
+            userID: "t2_moazMohamed",
+            isBanned: {
+              value: false,
+            },
+            isMuted: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const { memberIDs, isBannedAndMuted } =
+        await communityServiceInstance.getMembers(community);
+      expect(memberIDs[0]).toBe("t2_hamada");
+      expect(isBannedAndMuted[0].isBanned.value).toBe(true);
+    });
+  });
+  describe("given an undefined subreddit", () => {
+    test("should throw an error", async () => {
+      const community = undefined;
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      expect(
+        communityServiceInstance.getMembers(community)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
 describe("testing getCommunityOptions service in community service class", () => {
   describe("given a subreddit", () => {
     test("should not throw an error", async () => {
@@ -703,6 +1042,101 @@ describe("testing getCommunityOptions service in community service class", () =>
         .mockReturnValueOnce(community);
       expect(
         communityServiceInstance.getCommunityOptions(community)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
+describe("testing getThingsIDs service in community service class", () => {
+  describe("given a subreddit", () => {
+    test("should not throw an error", async () => {
+      const ids =
+        "t5_imagePro235,t1_636a8816687a4fec0ac7c3fc,t3_639399a76b26f0ddfc9b6d7f,t1_638907ac661b95ab73e85824";
+      const thingsIDs = communityServiceInstance.getThingsIDs(ids);
+      expect(thingsIDs[0]).toBe("t5_imagePro235");
+    });
+  });
+  describe("given undefined ids", () => {
+    test("should throw an error", async () => {
+      const ids = undefined;
+      try {
+        communityServiceInstance.getThingsIDs(ids);
+      } catch (err) {
+        expect(err.message).toBe("No IDs are provided!");
+      }
+    });
+  });
+});
+
+describe("testing getStats service in community service class", () => {
+  describe("given a subreddit and type=joined", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        joined: [
+          {
+            date: "10/12/2022",
+            count: 5,
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const data = await communityServiceInstance.getStats(community, "joined");
+      expect(data[0].count).toBe(5);
+      expect(data[0].date).toBe("10/12/2022");
+    });
+  });
+  describe("given a subreddit and type=left", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        left: [
+          {
+            date: "10/12/2022",
+            count: 20,
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const data = await communityServiceInstance.getStats(community, "left");
+      expect(data[0].count).toBe(20);
+      expect(data[0].date).toBe("10/12/2022");
+    });
+  });
+  describe("given a subreddit and type=pageViews", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        pageViews: [
+          {
+            date: "10/12/2022",
+            count: 521,
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const data = await communityServiceInstance.getStats(
+        community,
+        "pageViews"
+      );
+      expect(data[0].count).toBe(521);
+      expect(data[0].date).toBe("10/12/2022");
+    });
+  });
+  describe("given an undefined subreddit", () => {
+    test("should throw an error", async () => {
+      const community = undefined;
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      expect(
+        communityServiceInstance.getStats(community)
       ).rejects.toThrowError();
     });
   });

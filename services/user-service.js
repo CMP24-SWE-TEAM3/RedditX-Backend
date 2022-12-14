@@ -11,6 +11,7 @@ const Community = require("../models/community-model");
 const AuthService = require("./../services/auth-service");
 var authServiceInstance = new AuthService(User);
 const CommunityService = require("./../services/community-service");
+const { doc } = require("prettier");
 var communityServiceInstance = new CommunityService(Community);
 
 /**
@@ -36,6 +37,71 @@ class UserService extends Service {
       { expiresIn: "120h" }
     );
   };
+
+ /**
+   *  Get followers of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getFollowers=async(username)=>{
+    const followers_user=await this.getOne({_id:username}).select("followers");
+    const followersIds=followers_user.followers;
+    
+    const followers=await this.find({
+      _id: { $in: followersIds },
+    }).select("about avatar _id");
+
+    return {
+      status:true,
+      followers:followers
+    };
+  }
+  /**
+   *  Get interests of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getInterests=async(username)=>{
+    var categories_user;
+    try{
+       categories_user=await this.getOne({_id:username});
+    }
+    catch{
+      return {
+        status:false
+      }
+    }
+    const categories=categories_user.categories;
+    return {
+      status:true,
+      categories:categories
+    };
+  }
+
+  /**
+   *  Add interests of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  addInterests=async(username,categories)=>{
+    var categories_user;
+    try{
+       categories_user=await this.updateOne({_id:username},{categories:categories});
+    }
+    catch{
+      return {
+        status:false
+      }
+    }
+    console.log(categories_user);
+    return {
+      status:true,
+     
+    };
+  }
 
   /**
    * Subscribe to a subreddit or redditor
@@ -149,8 +215,14 @@ class UserService extends Service {
                 $addToSet: {
                   member: {
                     communityId: body.srName,
-                    isBanned: false,
-                    isMuted: false,
+                    isBanned: {
+                      value: false,
+                      date: Date.now(),
+                    },
+                    isMuted: {
+                      value: false,
+                      date: Date.now(),
+                    },
                   },
                 },
               }
@@ -161,8 +233,14 @@ class UserService extends Service {
                 $addToSet: {
                   members: {
                     userID: username,
-                    isBanned: false,
-                    isMuted: false,
+                    isBanned: {
+                      value: false,
+                      date: Date.now(),
+                    },
+                    isMuted: {
+                      value: false,
+                      date: Date.now(),
+                    },
                   },
                 },
               }
@@ -199,7 +277,7 @@ class UserService extends Service {
   };
   getFilteredSubreddits = (subreddits) => {
     return subreddits.map((el) => {
-      if (!el.isBanned) {
+      if (!el.isBanned.value) {
         return el.communityId;
       }
     });
@@ -238,7 +316,7 @@ class UserService extends Service {
   getSearchResults = async (query, username) => {
     const searchQuery = query.q;
     delete query.q;
-    let users = await this.getAll(
+    var users = await this.getAll(
       {
         $or: [
           { _id: { $regex: searchQuery, $options: "i" } },
@@ -266,17 +344,19 @@ class UserService extends Service {
    * @param {object} data
    * @param {string} username
    * @param {object} file
+   * @returns {string} avatar Name of the file
    * @function
    */
   uploadUserPhoto = async (action, username, file) => {
     if (!action)
       throw new AppError("No attachment or action is provided!", 400);
-    let avatar = "default.jpg";
+    var avatar = "default.jpg";
     if (action === "upload") {
       if (!file) throw new AppError("No photo is uploaded!", 400);
       avatar = file.filename;
     }
     await this.findByIdAndUpdate(username, { avatar }, { runValidators: true });
+    return avatar;
   };
 
   /**
@@ -365,14 +445,14 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let comments = [];
+    var comments = [];
     user.hasComment.forEach((el) => {
       comments.push(el);
     });
     const cursor = Comment.find({
       _id: { $in: comments },
     });
-    let returnComments = [];
+    var returnComments = [];
     for await (const doc of cursor) {
       returnComments.push(doc);
     }
@@ -391,14 +471,14 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let replies = [];
+    var replies = [];
     comment.replies.forEach((el) => {
       replies.push(el);
     });
     const cursor = Comment.find({
       _id: { $in: replies },
     });
-    let returnReplies = [];
+    var returnReplies = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnReplies.push(doc);
@@ -418,14 +498,14 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let comments = [];
+    var comments = [];
     post.postComments.forEach((el) => {
       comments.push(el);
     });
     const cursor = Comment.find({
       _id: { $in: comments },
     });
-    let returnComments = [];
+    var returnComments = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnComments.push(doc);
@@ -446,16 +526,15 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let posts = [];
+    var posts = [];
     user.hasPost.forEach((el) => {
       posts.push(el);
     });
     const cursor = Post.find({
       _id: { $in: posts },
     });
-    let returnPosts = [];
+    var returnPosts = [];
     for await (const doc of cursor) {
-      console.log(doc);
       returnPosts.push(doc);
     }
     return returnPosts;
@@ -473,7 +552,7 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let downVotes = [];
+    var downVotes = [];
     user.hasVote.forEach((el) => {
       if (el.type === -1) {
         downVotes.push(el.postID);
@@ -482,7 +561,7 @@ class UserService extends Service {
     const cursor = Post.find({
       _id: { $in: downVotes },
     });
-    let returnPosts = [];
+    var returnPosts = [];
     for await (const doc of cursor) {
       returnPosts.push(doc);
     }
@@ -502,7 +581,7 @@ class UserService extends Service {
     if (!query.limit) {
       query.limit = "10";
     }
-    let upVotes = [];
+    var upVotes = [];
     user.hasVote.forEach((el) => {
       if (el.type === 1) {
         upVotes.push(el.postID);
@@ -512,7 +591,7 @@ class UserService extends Service {
     const cursor = Post.find({
       _id: { $in: upVotes },
     });
-    let returnPosts = [];
+    var returnPosts = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnPosts.push(doc);
@@ -538,7 +617,7 @@ class UserService extends Service {
     const cursor = Post.find({
       _id: { $in: user.mentionedInPosts },
     });
-    let returnPosts = [];
+    var returnPosts = [];
     for await (const doc of cursor) {
       console.log(doc);
       returnPosts.push(doc);
@@ -720,6 +799,43 @@ userPrefs=async(username)=>{
     const newToken = await this.signToken("bare email", user._id);
     return { token: newToken, id: user._id };
   };
-}
 
+  isParticipantInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ "_id": user, "select": 'member' })).member;
+    subreddits = subreddits.map(el => el.communityId);
+    return subreddits.includes(subreddit);
+  }
+
+  isModeratorInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ "_id": user, "select": 'moderators' })).moderators;
+    console.log(subreddits);
+    subreddits = subreddits.map(el => el.communityId);
+    return subreddits.includes(subreddit);
+  }
+
+  muteOrBanUserInSubreddit = async (subreddit, user, type) => {
+    if (type == 'ban') {
+      this.updateOne({ _id: user, 'member.communityId': subreddit }, { 'member.$.isBanned': true });
+    }
+    else if (type == 'mute') {
+      this.updateOne({ _id: user, 'member.communityId': subreddit }, { 'member.$.isMuted': true });
+    }
+  }
+
+  addSubredditModeration = async (subreddit, user) => {
+    await this.updateOne({ _id: user }, {
+      $addToSet: {
+        moderators: {
+          $each: [
+            {
+              communityId: subreddit,
+              role: 'moderator',
+            }
+          ]
+        }
+      }
+    });
+
+  }
+}
 module.exports = UserService;

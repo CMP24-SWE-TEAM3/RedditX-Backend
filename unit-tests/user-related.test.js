@@ -11,11 +11,14 @@ describe("testing uploadUserPhoto service in user service class", () => {
       userServiceInstance.findByIdAndUpdate = jest
         .fn()
         .mockImplementationOnce(() => {});
-      expect(
-        userServiceInstance.uploadUserPhoto("upload", "t2_moazMohamed", {
+      const avatar = await userServiceInstance.uploadUserPhoto(
+        "upload",
+        "t2_moazMohamed",
+        {
           filename: "photo.jpg",
-        })
-      ).resolves.not.toThrowError();
+        }
+      );
+      expect(avatar).toBe("photo.jpg");
     });
   });
   describe("given a data with action=upload, username, and not a file", () => {
@@ -37,9 +40,11 @@ describe("testing uploadUserPhoto service in user service class", () => {
       userServiceInstance.findByIdAndUpdate = jest
         .fn()
         .mockImplementationOnce(() => {});
-      expect(
-        userServiceInstance.uploadUserPhoto("delete", "t2_moazMohamed")
-      ).resolves.not.toThrowError();
+      const avatar = await userServiceInstance.uploadUserPhoto(
+        "delete",
+        "t2_moazMohamed"
+      );
+      expect(avatar).toBe("default.jpg");
     });
   });
   describe("given a data with undefined action, username, and file", () => {

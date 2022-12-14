@@ -15,6 +15,10 @@ const listingRouter = require("./routes/listing-routes");
 const authRouter = require("./routes/auth-routes");
 const searchRouter = require("./routes/search-routes");
 const notificationRouter = require("./routes/notification-routes");
+const postRouter = require("./routes/post-system-routes");
+
+const notRouter = require("./routes/push-notification-routes");
+const messageRouter = require("./routes/message-routes");
 const AppError = require("./utils/app-error");
 
 const app = express();
@@ -84,8 +88,8 @@ app.use((req, res, next) => {
 
 // Limit requests from sam IP address
 const limiter = rateLimit({
-  max: 1000,
-  windowMs: 60 * 60 * 1000, // Ms: milliseconds, this will allow the same IP address to perform only 1000 request per hour
+  max: 1000000,
+  windowMs: 60 * 60 * 1000, // Ms: milliseconds, this will allow the same IP address to perform only 1000000 request per hour
   message:
     "Too many requests from this IP address, please try again in an hour!",
 });
@@ -96,11 +100,14 @@ app.use(express.json({ limit: "10kb" }));
 
 // ROUTES
 app.use("/api/auth", authRouter);
+app.use("/not", notRouter);
+app.use("/api/message", messageRouter);
 app.use("/api/user", userRouter);
 app.use("/api/r", communityRouter);
 app.use("/api/listing", listingRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/notification", notificationRouter);
+app.use("/api", postRouter);
 app.all("*", (req, res, next) => {
   return next(
     new AppError(`Can't find ${req.originalUrl} on this server`, 404)

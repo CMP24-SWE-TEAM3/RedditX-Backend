@@ -16,6 +16,77 @@ const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
 
 /**
+ * Get user followers
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const followers = async (req, res) => {
+  console.log(req.username);
+  if (!req.username) {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const result = await userServiceInstance.getFollowers(req.username);
+  return res.status(200).json({
+    response: "done",
+    followers: result.followers,
+  });
+};
+/**
+ * Get user interests
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const getInterests = async (req, res) => {
+  console.log(req.username);
+  if (!req.username) {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const result = await userServiceInstance.getInterests(req.username);
+
+  if (result.status) {
+    return res.status(200).json({
+      response: "done",
+      categories: result.categories,
+    });
+  } else {
+    return res.status(500).json({
+      response: "operation failed",
+    });
+  }
+};
+
+/**
+ * Add user interests
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const addInterests = async (req, res) => {
+  console.log(req.username);
+  if (!req.username || !req.body.categories) {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const result = await userServiceInstance.addInterests(
+    req.username,
+    req.body.categories
+  );
+  if (result.status) {
+    return res.status(200).json({
+      response: "done",
+    });
+  } else {
+    return res.status(500).json({
+      response: "operation failed",
+    });
+  }
+};
+
+/**
  * Update user email
  * @param {function} (req, res)
  * @returns {object} res
@@ -48,8 +119,9 @@ const updateEmail = async (req, res) => {
  * @returns {object} res
  */
 const uploadUserPhoto = catchAsync(async (req, res, next) => {
+  var avatar = undefined;
   try {
-    await userServiceInstance.uploadUserPhoto(
+    avatar = await userServiceInstance.uploadUserPhoto(
       req.body.action,
       req.username,
       req.file
@@ -59,7 +131,7 @@ const uploadUserPhoto = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Avatar is updated successfully",
+    avatar,
   });
 });
 
@@ -238,6 +310,122 @@ const subscribe = async (req, res) => {
   }
 };
 
+const friendRequest = catchAsync((req, res, next) => {
+  if (req.body.type === 'friend') {
+    userServiceInstance.addFriend(req.name);
+  } else if (req.body.type === 'moderator_invite') {
+    userServiceInstance.inviteModerator(req.name);
+  } else {
+    return res.status(400).json({
+      status: "failed",
+      message: "invalid type"
+    })
+  }
+  return res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const getAllFriends = catchAsync(async (req, res, next) => {
+  const friends = await userServiceInstance.getOne({
+    '_id': req.username,
+    'select': '-_id friend',
+    'populate': {
+      'path': 'friend',
+      'select': 'avatar about _id'
+    }
+  });
+  res.status(200).json({
+    status: "succeeded",
+    friends
+  });
+});
+
+
+const acceptModeratorInvite = catchAsync(async (req, res, next) => {
+  //[1]-> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2]-> check if the user has been invited to be moderator
+  if (!subreddit.subreddit.invitedModerators.includes(req.username)) {
+    return res.status(401).json({
+      status: 'failed',
+      message: 'you aren\'t invited to this subreddit'
+    })
+  }
+  // [3]-> accept the invitation
+  //[1] -> update the subreddit invitedModerators
+  await communityServiceInstance.removeModeratorInvitation(req.params.subreddit, req.username);
+  //[2] -> update the relation of the user moderators
+  await userServiceInstance.addSubredditModeration(req.params.subreddit, req.username);
+  //[3] -> update the subreddit moderators 
+  await communityServiceInstance.addModerator(req.params.subreddit, req.username);
+  res.status(200).json({
+    status: 'succeded'
+  })
+});
+
+
+const updateInfo = catchAsync(async (req, res, next) => {
+  const type = req.body.type;
+  const permittedChangedVariables = [
+    'gender',
+    'about',
+    'phoneNumber',
+    'name',
+    'email'
+  ]
+  if (!permittedChangedVariables.includes(type)) {
+    res.status(400).json({
+      status: 'failed',
+      message: 'wrong entered type'
+    });
+  }
+  //[TODO]: we must check if the new name or email is available in case of changing email and name
+  update = {};
+  update[type + ''] = req.body.value;
+  userServiceInstance.updateOne({ '_id': req.username }, update);
+  res.status(200).json({
+    status: 'succeeded'
+  });
+});
+
+const leaveModeratorOfSubredddit = catchAsync(async (req, res, next) => {
+  //[1]-> check the existence of the moderator
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  //[3]-> do leaving the subreddit
+  await userServiceInstance.updateOne({ '_id': req.username }, {
+    $pull: {
+      'moderators': { 'communityId': req.params.subreddit }
+    }
+  });
+  await communityServiceInstance.updateOne({ '_id': req.params.subreddit }, {
+    $pull: {
+      'moderators': { 'userID': req.username }
+    }
+  });
+  return res.status(200).json({
+    status: 'succeded',
+  });
+})
 module.exports = {
   uploadUserPhoto,
   block,
@@ -251,5 +439,15 @@ module.exports = {
   getUserAbout,
   getUserPrefs,
   subscribe,
+
   getUserSavedPosts
+  friendRequest,
+  getAllFriends,
+  acceptModeratorInvite,
+  updateInfo,
+  leaveModeratorOfSubredddit,
+  followers,
+  getInterests,
+  addInterests,
+  updateInfo,
 };

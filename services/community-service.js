@@ -1,10 +1,14 @@
 const Service = require("./service");
 const AppError = require("../utils/app-error");
 const Community = require("../models/community-model");
+
 const Post = require("../models/post-model");
 const PostService = require("./post-service");
 
 var postServiceInstance = new PostService(Post);
+
+const CommunityRule = require("../models/submodels-model").CommunityRule;
+
 /**
  * Service class to handle Community manipulations.
  * @class CommunityService
@@ -38,7 +42,8 @@ class CommunityService extends Service {
    * @param {object} file
    * @param {string} username
    * @param {string} subreddit
-   * @param {string} type
+   * @param {string} type icon ot banner
+   * @returns {string} filename Name of the file
    * @function
    */
   uploadCommunityPhoto = async (file, username, subreddit, type) => {
@@ -52,8 +57,10 @@ class CommunityService extends Service {
       !community.moderators.find((moderator) => moderator.userID === username)
     )
       throw new AppError("You are not a moderator of this subreddit!", 401);
-    community[type] = file.filename;
+    const filename = file.filename;
+    community[type] = filename;
     await community.save();
+    return filename;
   };
 
   /**
@@ -65,7 +72,7 @@ class CommunityService extends Service {
    */
   getCommunities = async (user, type) => {
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    let communityIDs = [];
+    var communityIDs = [];
     user[type].forEach((el) => {
       communityIDs.push(el.communityId);
     });
@@ -93,13 +100,14 @@ class CommunityService extends Service {
       select: "members moderators",
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    let performerFound = false;
-    let toBeAffectedFound = false;
+    var performerFound = false;
+    var toBeAffectedFound = false;
     community.moderators.forEach((el) => {
       if (el.userID === moderator) performerFound = true;
       if (el.userID === member) toBeAffectedFound = true;
     });
     if (!performerFound || toBeAffectedFound)
+      // if tobeAffectedFound, it means that you are going to ban or mute a moderator, which is not valid behavior
       throw new AppError(
         "You cannot make this operation this user in this subreddit!",
         400
@@ -107,12 +115,12 @@ class CommunityService extends Service {
     community.members.map((el) =>
       el.userID === member
         ? operation === "ban"
-          ? (el.isBanned = true)
+          ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned = false)
+          ? (el.isBanned.value = false)
           : operation === "mute"
-          ? (el.isMuted = true)
-          : (el.isMuted = false)
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     return community;
@@ -131,15 +139,65 @@ class CommunityService extends Service {
     toBeAffected.member.map((el) =>
       el.communityId === community._id
         ? operation === "ban"
-          ? (el.isBanned = true)
+          ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned = false)
+          ? (el.isBanned.value = false)
           : operation === "mute"
-          ? (el.isMuted = true)
-          : (el.isMuted = false)
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     await toBeAffected.save();
+    await community.save();
+  };
+
+  /**
+   * Kick a user within a community
+   * @param {string} subreddit
+   * @param {string} moderator
+   * @param {string} member
+   * @returns {object} community
+   * @function
+   */
+  kickAtCommunity = async (subreddit, moderator, member) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "members moderators",
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    var performerFound = false;
+    var toBeKickedFound = false;
+    community.moderators.forEach((el) => {
+      if (el.userID === moderator) performerFound = true;
+      if (el.userID === member) toBeKickedFound = true;
+    });
+    if (!performerFound || toBeKickedFound)
+      // if tobeKickedFound, it means that you are going to kick a moderator, which is not in this API
+      throw new AppError(
+        "You cannot make this operation this user in this subreddit!",
+        400
+      );
+    community.members.splice(
+      community.members.findIndex((el) => el.userID === member),
+      1
+    );
+    return community;
+  };
+
+  /**
+   * Saves the kick at the user side
+   * @param {object} toBeKicked
+   * @param {object} community
+   * @returns {object} community
+   * @function
+   */
+  kickAtUser = async (toBeKicked, community) => {
+    if (!toBeKicked) throw new AppError("This user doesn't exist!", 404);
+    toBeKicked.member.splice(
+      toBeKicked.member.findIndex((el) => el.communityId === community._id),
+      1
+    );
+    await toBeKicked.save();
     await community.save();
   };
 
@@ -148,6 +206,7 @@ class CommunityService extends Service {
    * @param {string} subreddit
    * @param {string} type
    * @returns {Array} memberIDs
+   * @returns {Array} dates
    * @function
    */
   getBannedOrMuted = async (subreddit, type) => {
@@ -156,11 +215,15 @@ class CommunityService extends Service {
       select: "members",
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    let memberIDs = [];
+    var memberIDs = [];
+    var dates = [];
     community.members.forEach((el) => {
-      if (el[type]) memberIDs.push(el.userID);
+      if (el[type].value) {
+        memberIDs.push(el.userID);
+        dates.push(el[type].date);
+      }
     });
-    return memberIDs;
+    return { memberIDs, dates };
   };
 
   /**
@@ -175,11 +238,33 @@ class CommunityService extends Service {
       select: "moderators",
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    let moderatorIDs = [];
+    var moderatorIDs = [];
     community.moderators.forEach((el) => {
       moderatorIDs.push(el.userID);
     });
     return moderatorIDs;
+  };
+
+  /**
+   * Get all members of a community
+   * @param {string} subreddit
+   * @returns {Array} memberIDs
+   * @returns {Array} isBannedAndMuted
+   * @function
+   */
+  getMembers = async (subreddit) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "members",
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    var memberIDs = [];
+    var isBannedAndMuted = [];
+    community.members.forEach((el) => {
+      memberIDs.push(el.userID);
+      isBannedAndMuted.push({ isBanned: el.isBanned, isMuted: el.isMuted });
+    });
+    return { memberIDs, isBannedAndMuted };
   };
 
   /**
@@ -191,10 +276,41 @@ class CommunityService extends Service {
   getCommunityOptions = async (subreddit) => {
     const community = await this.getOne({
       _id: subreddit,
-      select: "communityOptions",
+      select: "communityOptions description category categories",
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    return community.communityOptions;
+    var allOptions = { ...community.communityOptions }._doc;
+    allOptions.description = community.description;
+    allOptions.category = community.category;
+    allOptions.categories = community.categories;
+    return allOptions;
+  };
+
+  /**
+   * Get a list of things IDs from comma separated string
+   * @param {string} ids
+   * @returns {Array} thingsIDs
+   * @function
+   */
+  getThingsIDs = (ids) => {
+    if (!ids) throw new AppError("No IDs are provided!", 404);
+    return ids.split(",");
+  };
+
+  /**
+   * Get stats of a community
+   * @param {string} subreddit
+   * @param {string} type type of the stats required ("left", "joined", "pageViews")
+   * @returns {object} data
+   * @function
+   */
+  getStats = async (subreddit, type) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: type,
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    return community[type];
   };
 
   getRandomCommunities = async () => {
@@ -219,6 +335,7 @@ class CommunityService extends Service {
       };
     }
   };
+
    /**
    * mark post in a commuity as spoiler
    * @param {string} subreddit
@@ -402,6 +519,224 @@ class CommunityService extends Service {
         }
       await post.save();
     };
+
+
+  addCommunityRule = async (body, user) => {
+    const result = await this.availableSubreddit(body.srName);
+    console.log(result);
+    if (result.state) {
+      return {
+        status: false,
+        error: "subreddit is not found",
+      };
+    }
+    var isFound = false;
+    const moderators = result.subreddit.moderators;
+    for (let i = 0; i < moderators.length; i++) {
+      if (moderators[i].userID === user._id) {
+        if (moderators[i].role === "creator") {
+          isFound = true;
+          break;
+        }
+      }
+    }
+    if (!isFound) {
+      return {
+        status: false,
+        error: "you aren't a creator to this subreddit",
+      };
+    }
+    const commRule = new CommunityRule({
+      title: body.rule.title,
+      description: body.rule.description,
+      reason: body.rule.reason,
+    });
+    try {
+      await this.updateOne(
+        { _id: body.srName },
+        { $addToSet: { communityRules: commRule } }
+      );
+    } catch {
+      return {
+        status: false,
+        error: "operation failed",
+      };
+    }
+    return {
+      status: true,
+      id: commRule._id,
+      response: "rule is added successfully",
+    };
+  };
+  editCommunityRule = async (body, user) => {
+    const result = await this.availableSubreddit(body.srName);
+    console.log(result);
+    if (result.state) {
+      return {
+        status: false,
+        error: "subreddit is not found",
+      };
+    }
+    var isFound = false;
+    const moderators = result.subreddit.moderators;
+    for (let i = 0; i < moderators.length; i++) {
+      if (moderators[i].userID === user._id) {
+        if (moderators[i].role === "creator") {
+          isFound = true;
+          break;
+        }
+      }
+    }
+    if (!isFound) {
+      return {
+        status: false,
+        error: "you aren't a creator to this subreddit",
+      };
+    }
+    var ruleIsFound = false;
+    var communityRules = result.subreddit.communityRules;
+    for (let i = 0; i < communityRules.length; i++) {
+      console.log(communityRules[i]._id.toString());
+      if (communityRules[i]._id.toString() == body.rule.id) {
+        ruleIsFound = true;
+        communityRules[i].title = body.rule.title;
+        communityRules[i].description = body.rule.description;
+        communityRules[i].reason = body.rule.reason;
+      }
+    }
+    if (!ruleIsFound) {
+      return {
+        status: false,
+        error: "invalid rule id",
+      };
+    }
+    try {
+      await this.updateOne(
+        { _id: body.srName },
+        { $set: { communityRules: communityRules } }
+      );
+    } catch {
+      return {
+        status: false,
+        error: "operation failed",
+      };
+    }
+    return {
+      status: true,
+      response: "rule is edited successfully",
+    };
+  };
+
+  createSubreddit = async (body, user) => {
+    if (!user.canCreateSubreddit) {
+      return {
+        status: false,
+        error: "this user cannot create subreddit",
+      };
+    }
+    const result = await this.availableSubreddit(body.name);
+    console.log(result);
+    if (!result.state) {
+      return {
+        status: false,
+        error: "subreddit is already made",
+      };
+    }
+    const moderator = {
+      userID: user._id,
+      role: "creator",
+    };
+    var mods = [moderator];
+    const new_community = {
+      _id: body.name,
+      privacyType: body.type,
+      over18: body.over18,
+      moderators: mods,
+    };
+    const doc = await this.insert(new_community);
+    console.log(doc);
+    const userModerator = {
+      communityId: body.name,
+      role: "creator",
+    };
+    const userMember = {
+      communityId: body.name,
+      isMuted: false,
+      isBanned: false,
+    };
+    try {
+      user.moderators.push(userModerator);
+      user.member.push(userMember);
+      const x = await user.save();
+      console.log(x);
+    } catch {
+      return {
+        status: false,
+        error: "operation failed",
+      };
+    }
+    return {
+      status: true,
+      response: "subreddit created successfully",
+    };
+  };
+  creationValidation = async (body) => {
+    if (
+      !body.name ||
+      body.name.substring(0, 2) !== "t2" ||
+      !body.type ||
+      !body.over18
+    )
+      return false;
+    return true;
+  };
+
+  setSuggestedSort = async (srName, commentSort) => {
+    Community.findByIdAndUpdate(
+      { _id: srName },
+      { $set: { suggestedCommentSort: commentSort } },
+      { new: true },
+      (err) => {
+        if (err) {
+          return {
+            status: false,
+          };
+        } else {
+          return {
+            status: true,
+          };
+        }
+      }
+    );
+  }
+
+  removeModeratorInvitation = async (subreddit, user) => {
+    await this.updateOne({ '_id': subreddit }, {
+      $pullAll: {
+        'invitedModerators': [{ '_id': user }]
+      }
+    });
+  }
+
+  addModerator = async (subreddit, user) => {
+    await this.updateOne({ '_id': subreddit }, {
+      $addToSet: {
+        'moderators': {
+          $each: [{
+            'userID': user,
+            'role': 'moderator'
+          }]
+        }
+      }
+    });
+  };
+
+  removeSrBanner = async (subreddit) => {
+    await this.updateOne({ '_id': subreddit }, { 'banner': 'default.jpg' });
+  }
+  removeSrIcon = async (subreddit) => {
+    await this.updateOne({ '_id': subreddit }, { 'icon': 'default.jpg' });
+  }
 }
 
 module.exports = CommunityService;
