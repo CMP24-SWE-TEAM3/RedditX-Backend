@@ -104,7 +104,7 @@ const getUserComments = catchAsync(async (req, res, next) => {
  */
  const getUserSubmitted = catchAsync(async (req, res, next) => {
   try {
-    var posts =  userServiceInstance.userSubmitted(
+    var posts = await userServiceInstance.userSubmitted(
       req.params.username,
       req.query
     );

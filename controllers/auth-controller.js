@@ -1,9 +1,6 @@
 const User = require("../models/user-model");
-const bcrypt = require("bcryptjs");
-const decodeJwt = require("./google-facebook-oAuth");
-const randomUsername = require("../utils/random-username");
 
-const AuthService = require('./../services/auth-service');
+const AuthService = require("./../services/auth-service");
 
 var authServiceInstance = new AuthService(User);
 
@@ -68,12 +65,12 @@ const signup = async (req, res) => {
       token: result.token, //token,
       expiresIn: result.expiresIn,
       username: result.username,
-    })
+    });
    }
    else{
     return res.status(404).json({
       error:result.error
-    })
+    });
    }
 };
 
@@ -93,12 +90,12 @@ const login = async (req, res) => {
       token: result.token, //token,
       expiresIn: result.expiresIn,
       username: result.username,
-    })
+    });
    }
    else{
     return res.status(404).json({
       error:result.error
-    })
+    });
    }
 };
 
@@ -143,6 +140,21 @@ const resetForgottenPassword = catchAsync(async (req, res, next) => {
     username: data.id,
   });
 });
+const resetUserPassword = catchAsync(async (req, res, next) => {
+  try {
+     await userServiceInstance.resetPassword(
+      req.body.currentPassword,
+      req.body.newPassword,
+      req.body.confirmedNewPassword
+    );
+  } catch (err) {
+    return next(err);
+  }
+  return res.status(200).json({
+    status: "success",
+    message: "Password is reset"
+  });
+});
 
 module.exports = {
   availableUsername,
@@ -150,4 +162,5 @@ module.exports = {
   login,
   forgotPassword,
   resetForgottenPassword,
+  resetUserPassword,
 };

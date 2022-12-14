@@ -151,6 +151,47 @@ class PostService extends Service {
     }
     await post.save();
   };
+ /**
+   * User hides a post
+   * @param {string} linkID
+   * @param {object} user
+   * @function
+   */
+ hide = async (linkID, user) => {
+  if (!linkID) throw new AppError("No linkID is provided!", 400);
+  if (!user) throw new AppError("This user doesn't exist!", 404);
+  if (user.hiddenPosts.find((el) => el.toString() === linkID.slice(3))) return;
+  user.hiddenPosts.push(linkID.slice(3));
+  await user.save();
+};
+
+/**
+ * User unhides a post
+ * @param {string} linkID
+ * @param {object} user
+ * @function
+ */
+unhide = async (linkID, user) => {
+  if (!linkID) throw new AppError("No linkID is provided!", 400);
+  if (!user) throw new AppError("This user doesn't exist!", 404);
+  user.hiddenPosts.splice(
+    user.hiddenPosts.findIndex((el) => el === linkID.slice(3)),
+    1
+  );
+  await user.save();
+};
+ /**
+   * User delete a post
+   * @param {string} linkID
+   * @function
+   */
+ deletePost = async (linkID) => {
+  const post = await this.getOne({_id: linkID });
+  if (!post) throw new AppError("linkID doesn't exist!", 404);
+  post.isDeleted = true;
+  await post.save();
+};
+
 }
 
 module.exports = PostService;

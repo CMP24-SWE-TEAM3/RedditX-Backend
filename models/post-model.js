@@ -50,6 +50,10 @@ const postSchema = mongoose.Schema({
     type: Boolean,
     default: 0,
   },
+  locked: {
+    type: Boolean,
+    default: 0,
+  },
   type: {
     type: String,
     enum: ["link", "image", "linkWithImage"],

@@ -29,6 +29,17 @@ class NotificationService extends Service {
     const notifications = await this.getAll(filter, query);
     return notifications;
   };
+/**
+   * User delete a notification
+   * @param {string} notificationID
+   * @function
+   */
+deleteNotification = async (notificationID) => {
+  const notification = await this.getOne({_id: notificationID });
+  if (!notification) throw new AppError("notification doesn't exist!", 404);
+  notification.isDeleted = true;
+  await notification.save();
+};
 }
 
 module.exports = NotificationService;

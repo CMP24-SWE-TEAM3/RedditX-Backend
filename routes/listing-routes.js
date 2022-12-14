@@ -12,17 +12,37 @@ router
 router
   .route("/posts/:criteria")
   .get(possibleAuthCheck, listingController.getPosts);
-
+  router.post("/edit-user-text", listingController.editUserText);
 router.post("/addcomment", authCheck, listingController.addComment);
 router.post("/addreply", authCheck, listingController.addReply);
 router.post("/save", authCheck, listingController.save);
 router.post("/unsave", authCheck, listingController.unsave);
+router.post("/hide", authCheck, listingController.hide);
+router.post("/unhide", authCheck, listingController.unhide);
+router.post("/lock", authCheck, listingController.markLocked);
+router.post("/unlock", authCheck, listingController.markUnLocked);
+router.post("/del", authCheck, listingController.deleteLink);
 router.post("/vote", authCheck, listingController.vote);
 router.post(
   "/submit",
   authCheck,
   startUploadingFiles,
   listingController.submit
+);
+router.post(
+  "/:subreddit/mark-nsfw",
+  authCheck,
+  listingController.markNsfw
+);
+router.post(
+  "/:subreddit/unspoiler",
+  authCheck,
+  listingController.markUnSpoiler
+);
+router.post(
+  "/:subreddit/spoiler",
+  authCheck,
+  listingController.markSpoiler
 );
 
 module.exports = router;

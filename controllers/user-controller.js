@@ -21,6 +21,8 @@ const commentServiceInstance = new CommentService(Comment);
  * @returns {object} res
  */
 const updateEmail = async (req, res) => {
+  const user = await userServiceInstance.findById(req.username);
+  if(user){
   if (!req.username || !req.body.email)
     return res.status(400).json({
       response: "invaild parameters",
@@ -33,9 +35,11 @@ const updateEmail = async (req, res) => {
     return res.status(400).json({
       response: "error",
     });
-  console.log("ay haga");
   return res.status(200).json({
     response: results,
+  });}
+  return res.status(400).json({
+    response: "error",
   });
 };
 /**
@@ -141,6 +145,23 @@ const spam = catchAsync(async (req, res, next) => {
   });
 });
 /**
+ * Get posts where is saved by the user
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const getUserSavedPosts = catchAsync(async (req, res, next) => {
+  var posts = undefined;
+  try {
+    const user = await userServiceInstance.findById(req.username);
+    posts = await userServiceInstance.userSavedPosts(user,req.query);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    posts
+  });
+});
+/**
  * Get user prefs
  * @param {function} (req,res)
  * @returns {object} res
@@ -149,12 +170,12 @@ const getUserPrefs = catchAsync(async (req, res, next) => {
   var prefs = undefined;
   try {
     const user = await userServiceInstance.findById(req.username);
-    prefs = await communityServiceInstance.userPrefs(user);
+    prefs = await userServiceInstance.userPrefs(user);
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    prefs,
+    prefs
   });
 });
 
@@ -166,13 +187,13 @@ const getUserPrefs = catchAsync(async (req, res, next) => {
 const getUserAbout = catchAsync(async (req, res, next) => {
   var about = undefined;
   try {
-    const user = await userServiceInstance.findById(req.username);
-    about = await communityServiceInstance.userAbout(user);
+    const user = await userServiceInstance.findById(req.params.username);
+    about = await userServiceInstance.userAbout(user);
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    about,
+    about
   });
 });
 
@@ -185,12 +206,12 @@ const getUserMe = catchAsync(async (req, res, next) => {
   var meInfo = undefined;
   try {
     const user = await userServiceInstance.findById(req.username);
-    meInfo = await communityServiceInstance.userMe(user);
+    meInfo = await userServiceInstance.userMe(user);
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    meInfo,
+    meInfo
   });
 });
 
@@ -207,11 +228,8 @@ const subscribe = async (req, res) => {
   if (!req.body.srName || !req.body.action) {
     return returnResponse(res, { error: "invalid inputs" }, 400);
   }
-  console.log(req.body);
-  console.log(req.username);
 
   const result = await userServiceInstance.subscribe(req.body, req.username);
-  console.log("res", result);
   if (result.state) {
     return res.status(200).json({
       status: "done",
@@ -236,4 +254,5 @@ module.exports = {
   getUserAbout,
   getUserPrefs,
   subscribe,
+  getUserSavedPosts
 };
