@@ -54,6 +54,7 @@ router.post(
   authCheck,
   communityController.banOrMute
 );
+router.get("/:subreddit/about/muted", authCheck, communityController.getMuted);
 router.post(
   "/create-subreddit",
   authCheck,
@@ -65,7 +66,6 @@ router.post(
   authCheck,
   communityController.editCommunityRule
 );
-router.get("/:subreddit/about/muted", authCheck, communityController.getMuted);
 router.get(
   "/:subreddit/about/moderators",
   authCheck,
