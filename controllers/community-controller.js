@@ -533,30 +533,6 @@ const kickUser = catchAsync(async (req, res, next) => {
   });
 });
 
-const getFlairs = catchAsync(async (req, res, next) => {
-  // [1] -> check existence of subreddit
-  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
-  if (subreddit.state) {
-    return res.status(404).json({
-      status: 'failed',
-      message: 'not found this subreddit',
-    })
-  }
-  // [2] -> check if user isn't moderator in subreddit
-  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
-    return res.status(400).json({
-      status: 'failed',
-      message: 'you aren\'t moderator in this subreddit',
-    });
-  }
-  //[3]-> get the flairs list
-  flairs = await communityServiceInstance.getOne({ '_id': req.params.subreddit, 'select': '-_id flairList' });
-  res.status(200).json({
-    status: 'succeeded',
-    flairs: flairs.flairList,
-  })
-});
-
 const muteOrBanUser = catchAsync(async (req, res, next) => {
   const moderator = req.username;
   const mutedUser = req.body.userID;
@@ -740,5 +716,4 @@ module.exports = {
   getMembersCountPerDay,
   getViewsCountPerDay,
   kickUser,
-  getFlairs,
 };

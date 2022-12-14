@@ -427,7 +427,7 @@ module.exports = {
   getAllFriends,
   acceptModeratorInvite,
   updateInfo,
-  leaveModeratorOfSubredddit
+  leaveModeratorOfSubredddit,
   followers,
   getInterests,
   addInterests,
