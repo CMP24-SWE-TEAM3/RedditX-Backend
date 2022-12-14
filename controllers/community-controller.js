@@ -263,7 +263,6 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
   res.status(200).json(communityOptions);
 });
 
-
 const muteOrBanUser = catchAsync(async (req, res, next) => {
   const moderator = req.username;
   const mutedUser = req.body.userID;
