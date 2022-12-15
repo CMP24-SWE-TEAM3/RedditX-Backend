@@ -115,7 +115,6 @@ const getUserComments = catchAsync(async (req, res, next) => {
   } catch (err) {
     return next(err);
   }
-  console.log(posts);
   res.status(200).json({
     posts
   });
