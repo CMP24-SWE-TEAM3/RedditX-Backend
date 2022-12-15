@@ -140,6 +140,28 @@ class MessageService extends Service {
     };
   };
   /**
+   * Get all messages
+   * @param {object} username
+   * @returns {object} state
+   * @function
+   */
+  allMessages = async (username) => {
+    var messages;
+
+    try {
+      messages = await this.getAll();
+    } catch {
+      return {
+        status: false,
+        error: "operation failed",
+      };
+    }
+    return {
+      status: true,
+      messages: messages,
+    };
+  };
+  /**
    * Get all messages sent by user
    * @param {object} username
    * @returns {object} state

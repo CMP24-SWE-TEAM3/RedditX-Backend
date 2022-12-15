@@ -124,7 +124,6 @@ class CommentService extends Service {
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newReply.save();
-    console.log(username);
     if (!result) throw new AppError("This reply doesn't created!", 400);
     user.hasReply.push(result._id);
     comment.replies.push(result._id);
@@ -384,6 +383,18 @@ class CommentService extends Service {
         };
       }
     }
+  };
+
+  /**
+   * User delete a comment
+   * @param {string} linkID
+   * @function
+   */
+  deleteComment = async (linkID) => {
+    const comment = await this.getOne({ _id: linkID });
+    if (!comment) throw new AppError("linkID doesn't exist!", 404);
+    comment.isDeleted = true;
+    await comment.save();
   };
 
   checkUser = async (user, comment) => {
