@@ -411,17 +411,27 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const createSubreddit = async (req, res) => {
-  if (!communityServiceInstance.creationValidation(req.body)) {
+  console.log(req.body);
+  const check=await communityServiceInstance.creationValidation(req.body);
+  console.log(check);
+  if (!check) {
     return res.status(500).json({
       status: "invalid parameters",
     });
   }
   var user = await userServiceInstance.getOne({ _id: req.username });
+  
   const result = await communityServiceInstance.createSubreddit(req.body, user);
-  if (!result.status) {
+  const updateUser=await userServiceInstance.addUserToComm(user,req.body.name);
+  if (!result.status||!updateUser.status) {
+    if(!result.errorType)
+      return res.status(200).json({
+        status: result.error,
+      });
     return res.status(500).json({
-      status: result.error,
+        status: result.error,
     });
+        
   }
   return res.status(200).json({
     status: result.response,

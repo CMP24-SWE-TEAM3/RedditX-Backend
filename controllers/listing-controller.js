@@ -14,7 +14,7 @@ var postServiceInstance = new PostService(Post);
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
 var commentServiceInstance = new CommentService(Comment);
-
+const idValidator = require("../validate/listing-validators").validateObjectId;
 /**
  * Update user text
  * @param {function} (req, res)
@@ -391,6 +391,33 @@ const getPostInsights = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * Follow post
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const followPost = async (req, res) => {
+  if (
+    !req.body.linkID ||
+    req.body.action === null ||
+    !idValidator(req.body.linkID)
+  ) {
+    return res.status(500).json({
+      response: "invalid parameters",
+    });
+  }
+  const result = await postServiceInstance.followPost(req.body, req.username);
+  if (result.status) {
+    return res.status(200).json({
+      response: "done",
+    });
+  } else {
+    return res.status(500).json({
+      response: "operation failed",
+      error: result.error,
+    });
+  }
+};
 module.exports = {
   submit,
   save,
@@ -409,4 +436,5 @@ module.exports = {
   markSpoiler,
   markUnLocked,
   markLocked,
+  followPost,
 };

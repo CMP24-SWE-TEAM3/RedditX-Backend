@@ -85,35 +85,74 @@ const addInterests = async (req, res) => {
     });
   }
 };
+/**
+ * Update user prefs
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const editUserPrefs = catchAsync(async (req, res, next) => {
+  var results = undefined;
+  try {
+     const user = await userServiceInstance.findById(req.username);
+  if(user){
+ results = await userServiceInstance.updateOne(
+    {numComments: req.body.numComments},
+    { threadedMessages: req.body.threadedMessages},
+    { showLinkFlair: req.body.showLinkFlair},
+    { threadedMessages: req.body.threadedMessages},
+    { countryCode: req.body.countryCode},
+    { emailCommentReply: req.body.emailCommentReply},
+    { emailUpvoteComment: req.body.emailUpvoteComment},
+    { emailMessages: req.body.emailMessages},
+    { emailUnsubscribeAll: req.body.emailUnsubscribeAll},
+    { emailUpvotePost: req.body.emailUpvotePost},
+    { emailUsernameMention: req.body.emailUsernameMention},
+    { emailUserNewFollower: req.body.emailUserNewFollower},
+    { emailPrivateMessage: req.body.emailPrivateMessage},
+    { over18: req.body.over18},
+    { newwindow: req.body.newwindow},
+    { labelNsfw: req.body.labelNsfw},
+    { liveOrangeReds: req.body.liveOrangeReds},
+    { markMessageRead: req.body.markMessageRead},
+    { enableFollwers: req.body.enableFollwers},
+    { publicVotes: req.body.publicVotes},
+    { showLocationBasedRecommendations: req.body.showLocationBasedRecommendations },
+    { searchIncludeOver18: req.body.searchIncludeOver18},
+    { defaultCommentSort: req.body.defaultCommentSort},
+    { langauge: req.body.langauge}
+  );}
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    results,
+  });
+});
 
 /**
  * Update user email
- * @param {function} (req, res)
+ * @param {function} (req, res, next)
  * @returns {object} res
  */
-const updateEmail = async (req, res) => {
-  const user = await userServiceInstance.findById(req.username);
-  if (user) {
-    if (!req.username || !req.body.email)
-      return res.status(400).json({
-        response: "invaild parameters",
-      });
-    const results = await userServiceInstance.updateOne(
-      { _id: req.username },
-      { email: req.body.email }
-    );
-    if (!results)
-      return res.status(400).json({
-        response: "error",
-      });
-    return res.status(200).json({
-      response: results,
-    });
+const updateEmail = catchAsync(async (req, res, next) => {
+  var results = undefined;
+  try {
+     const user = await userServiceInstance.findById(req.username);
+  if(user){
+ results = await userServiceInstance.updateOne(
+    { _id: req.username },
+    { email: req.body.email }
+  );}
+  } catch (err) {
+    return next(err);
   }
-  return res.status(400).json({
-    response: "error",
+  res.status(200).json({
+    status: "success",
+    results,
   });
-};
+});
+
 /**
  * Saves filename to database
  * @param {function} (req, res, next)
@@ -453,7 +492,9 @@ module.exports = {
   getUserMe,
   getUserAbout,
   getUserPrefs,
+  editUserPrefs,
   subscribe,
+
   getUserSavedPosts,
   friendRequest,
   getAllFriends,

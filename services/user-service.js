@@ -626,6 +626,46 @@ class UserService extends Service {
     return returnPosts;
   };
   /**
+   * Add user to community
+   * @param {String} (username)
+   * @param {String} (communityID)
+   * @returns {object} mentions
+   * @function
+   */
+  addUserToComm = async (user, communityID) => {
+    const userModerator = {
+      communityId: communityID,
+      role: "creator",
+    };
+    const userMember = {
+      communityId: communityID,
+      isMuted: {
+        value:false,
+      },
+      isBanned:{
+        value:false,
+      },
+    };
+    const modarr=user.moderators;
+    modarr.push(userModerator);
+    const memarr=user.member;
+    memarr.push(userMember);
+    try{
+      const x=await this.updateOne({_id:user._id},{moderators:modarr,member:memarr});
+     console.log(x);
+     }
+     catch{
+      console.log("dd");
+       return {
+         status: false,
+         error: "operation failed",
+       };
+     }
+     return {
+      status: true,
+      };
+  };
+  /**
    * Get posts where is saved by the user in from database
    * @param {String} (username)
    * @returns {object} saved posts
@@ -660,6 +700,7 @@ class UserService extends Service {
     const user = await User.findById(username);
     if (user) {
       const obj = {
+        followerCount:user.followers.length,
         prefShowTrending: user.aboutReturn.prefShowTrending,
         isBlocked: user.aboutReturn.isBlocked,
         isBanned: user.member.isBanned,
@@ -754,28 +795,23 @@ class UserService extends Service {
     }
   };
   /**
-   * Resets user password
-   * @param {string} currentPassword
-   * @param {string} newPassword
-   * @param {string} confirmedNewPassword
-   * @function
-   */
-  resetPassword = async (
-    username,
-    currentPassword,
-    newPassword,
-    confirmedNewPassword
-  ) => {
-    const user = await this.getOne({ _id: username });
-    if (!user) throw new AppError("user is invalid or expired!", 400);
-    if (confirmedNewPassword !== newPassword)
-      throw new AppError("Password is not equal to confirmed password!", 400);
-    const result = await bcrypt.compareSync(currentPassword, user.password);
-    if (!result) throw new AppError("this password is not correct!", 400);
-    const hash = await bcrypt.hash(newPassword, 10);
-    user.password = hash;
-    await user.save();
-  };
+ * Get user prefs from database
+ * @param {String} (username)
+ * @returns {object} user
+ */
+userPrefs=async(username)=>{
+  const user = await User.findById(username);
+  if (user) {
+    return {
+      user: user.prefs,
+    };
+  }
+  else {
+    return {
+      user: null,
+    };
+  }
+};
   /**
    * Resets user password and returns a new token
    * @param {string} token
