@@ -222,6 +222,7 @@ followPost=async(body,username)=>{
   }
   if((!isFound&&!body.action)){
     return {
+    
       status:false,
       error:"user already not followed this post"
     }
