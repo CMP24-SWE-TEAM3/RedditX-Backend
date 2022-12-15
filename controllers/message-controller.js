@@ -167,11 +167,70 @@ const unreadMessage=async(req,res,next)=>{
   }
  
 } 
+/**
+ * Get all messages
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const allMessages=async(req,res,next)=>{
+  
+  if(!req.username){
+      return res.status(500).json({
+          response:"invalid parameters"
+        });
+  }
+
+
+  const result=await messageServiceInstance.allMessages(req.username);
+  if(result.status){
+    return res.status(200).json({
+      response:"done",
+      messages:result.messages
+    });
+  }
+  else{
+    return res.status(500).json({
+      response:"operation failed",
+      error:result.error
+    });
+  }
+ 
+}
+/**
+ * Read all messages
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const readAllMessages=async(req,res,next)=>{
+  
+  if(!req.username){
+      return res.status(500).json({
+          response:"invalid parameters"
+        });
+  }
+
+
+  const result=await messageServiceInstance.allMessages(req.username);
+  if(result.status){
+    return res.status(200).json({
+      response:"done",
+    });
+  }
+  else{
+    return res.status(500).json({
+      response:"operation failed",
+      error:result.error
+    });
+  }
+ 
+} 
 module.exports = {
     compose,
     deleteMessage,
     sentMessages,
     inboxMessages,
-    unreadMessage
+    unreadMessage,
+    allMessages,
+    readAllMessages
   };
   

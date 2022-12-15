@@ -74,7 +74,11 @@ const isBannedOrMutedSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  date: Date,
+  date: {
+    
+  type:  Date,
+  default: Date.now
+  },
 });
 const memberSchema = mongoose.Schema({
   userID: {
@@ -199,9 +203,9 @@ const communitySchema = mongoose.Schema({
   invitedModerators: [
     {
       type: String,
-      ref: 'User'
-    }
-  ]
+      ref: "User",
+    },
+  ],
 });
 
 const Community = mongoose.model("Community", communitySchema);

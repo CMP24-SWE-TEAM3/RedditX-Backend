@@ -217,7 +217,7 @@ const spam = catchAsync(async (req, res, next) => {
           _id: post.communityID,
           select: "communityOptions",
         });
-      postServiceInstance.spamPost(
+      await postServiceInstance.spamPost(
         post,
         req.body.spamType,
         req.body.spamText,
@@ -237,15 +237,10 @@ const spam = catchAsync(async (req, res, next) => {
         req.body.spamText,
         req.username
       );
-      const post = await postServiceInstance.getOne({
-        _id: comment.replyingTo,
-        select: "communityID",
+      community = await communityServiceInstance.getOne({
+        _id: comment.communityID,
+        select: "communityOptions",
       });
-      if (post && post.communityID !== undefined && post.communityID !== "")
-        community = await communityServiceInstance.getOne({
-          _id: post.communityID,
-          select: "communityOptions",
-        });
       await commentServiceInstance.saveSpammedComment(comment, community);
     }
   } catch (err) {
@@ -256,6 +251,7 @@ const spam = catchAsync(async (req, res, next) => {
     message: "Spams are updated successfully",
   });
 });
+
 /**
  * Get posts where is saved by the user
  * @param {function} (req,res)
@@ -265,12 +261,12 @@ const getUserSavedPosts = catchAsync(async (req, res, next) => {
   var posts = undefined;
   try {
     const user = await userServiceInstance.findById(req.username);
-    posts = await userServiceInstance.userSavedPosts(user,req.query);
+    posts = await userServiceInstance.userSavedPosts(user, req.query);
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    posts
+    posts,
   });
 });
 /**
@@ -286,7 +282,7 @@ const getUserPrefs = catchAsync(async (req, res, next) => {
     return next(err);
   }
   res.status(200).json({
-    prefs
+    prefs,
   });
 });
 
@@ -303,7 +299,7 @@ const getUserAbout = catchAsync(async (req, res, next) => {
     return next(err);
   }
   res.status(200).json({
-    about
+    about,
   });
 });
 
@@ -320,7 +316,7 @@ const getUserMe = catchAsync(async (req, res, next) => {
     return next(err);
   }
   res.status(200).json({
-    meInfo
+    meInfo,
   });
 });
 
@@ -350,131 +346,149 @@ const subscribe = async (req, res) => {
   }
 };
 
-const friendRequest = catchAsync((req, res, next) => {
-  if (req.body.type === 'friend') {
+const friendRequest = catchAsync((req, res) => {
+  if (req.body.type === "friend") {
     userServiceInstance.addFriend(req.name);
-  } else if (req.body.type === 'moderator_invite') {
+  } else if (req.body.type === "moderator_invite") {
     userServiceInstance.inviteModerator(req.name);
   } else {
     return res.status(400).json({
       status: "failed",
-      message: "invalid type"
-    })
+      message: "invalid type",
+    });
   }
   return res.status(200).json({
     status: "succeeded",
   });
 });
 
-const getAllFriends = catchAsync(async (req, res, next) => {
+const getAllFriends = catchAsync(async (req, res) => {
   const friends = await userServiceInstance.getOne({
-    '_id': req.username,
-    'select': '-_id friend',
-    'populate': {
-      'path': 'friend',
-      'select': 'avatar about _id'
-    }
+    _id: req.username,
+    select: "-_id friend",
+    populate: {
+      path: "friend",
+      select: "avatar about _id",
+    },
   });
   res.status(200).json({
     status: "succeeded",
-    friends
+    friends,
   });
 });
 
-
-const acceptModeratorInvite = catchAsync(async (req, res, next) => {
+const acceptModeratorInvite = catchAsync(async (req, res) => {
   //[1]-> check existence of subreddit
-  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
-  if (subreddit.state) {
+  var subredditReturned = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subredditReturned.state) {
     return res.status(404).json({
-      status: 'failed',
-      message: 'not found this subreddit',
-    })
+      status: "failed",
+      message: "not found this subreddit",
+    });
   }
+  var subreddit = subredditReturned.subreddit;
   // [2]-> check if the user has been invited to be moderator
-  if (!subreddit.subreddit.invitedModerators.includes(req.username)) {
+  if (!subreddit.invitedModerators.includes(req.username)) {
     return res.status(401).json({
-      status: 'failed',
-      message: 'you aren\'t invited to this subreddit'
-    })
+      status: "failed",
+      message: "you aren't invited to this subreddit",
+    });
   }
   // [3]-> accept the invitation
   //[1] -> update the subreddit invitedModerators
-  await communityServiceInstance.removeModeratorInvitation(req.params.subreddit, req.username);
+  subreddit = await communityServiceInstance.removeModeratorInvitation(
+    subreddit,
+    req.username
+  );
+  var user = await userServiceInstance.getOne({
+    _id: req.username,
+    select: "moderators",
+  });
   //[2] -> update the relation of the user moderators
-  await userServiceInstance.addSubredditModeration(req.params.subreddit, req.username);
-  //[3] -> update the subreddit moderators 
-  await communityServiceInstance.addModerator(req.params.subreddit, req.username);
+  await userServiceInstance.addSubredditModeration(req.params.subreddit, user);
+  //[3] -> update the subreddit moderators
+  await communityServiceInstance.addModerator(subreddit, req.username);
   res.status(200).json({
-    status: 'succeded'
-  })
+    status: "success",
+  });
 });
 
-
-const updateInfo = catchAsync(async (req, res, next) => {
+const updateInfo = catchAsync(async (req, res) => {
   const type = req.body.type;
   const permittedChangedVariables = [
-    'gender',
-    'about',
-    'phoneNumber',
-    'name',
-    'email'
-  ]
+    "gender",
+    "about",
+    "phoneNumber",
+    "name",
+    "email",
+  ];
   if (!permittedChangedVariables.includes(type)) {
     res.status(400).json({
-      status: 'failed',
-      message: 'wrong entered type'
+      status: "failed",
+      message: "wrong entered type",
     });
   }
   //[TODO]: we must check if the new name or email is available in case of changing email and name
-  update = {};
-  update[type + ''] = req.body.value;
-  userServiceInstance.updateOne({ '_id': req.username }, update);
+  var update = {};
+  update[type + ""] = req.body.value;
+  userServiceInstance.updateOne({ _id: req.username }, update);
   res.status(200).json({
-    status: 'succeeded'
+    status: "succeeded",
   });
 });
 
-const leaveModeratorOfSubredddit = catchAsync(async (req, res, next) => {
+const leaveModeratorOfSubredddit = catchAsync(async (req, res) => {
   //[1]-> check the existence of the moderator
-  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  const subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
   if (subreddit.state) {
     return res.status(404).json({
-      status: 'failed',
-      message: 'not found this subreddit',
-    })
+      status: "failed",
+      message: "not found this subreddit",
+    });
   }
   // [2] -> check if user isn't moderator in subreddit
-  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
     return res.status(400).json({
-      status: 'failed',
-      message: 'you aren\'t moderator in this subreddit',
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
     });
   }
   //[3]-> do leaving the subreddit
-  await userServiceInstance.updateOne({ '_id': req.username }, {
-    $pull: {
-      'moderators': { 'communityId': req.params.subreddit }
+  await userServiceInstance.updateOne(
+    { _id: req.username },
+    {
+      $pull: {
+        moderators: { communityId: req.params.subreddit },
+      },
     }
-  });
-  await communityServiceInstance.updateOne({ '_id': req.params.subreddit }, {
-    $pull: {
-      'moderators': { 'userID': req.username }
+  );
+  await communityServiceInstance.updateOne(
+    { _id: req.params.subreddit },
+    {
+      $pull: {
+        moderators: { userID: req.username },
+      },
     }
-  });
+  );
   return res.status(200).json({
-    status: 'succeded',
+    status: "succeded",
   });
-})
+});
 module.exports = {
   uploadUserPhoto,
   block,
   spam,
-
   updateEmail,
-
   returnResponse,
-
   getUserMe,
   getUserAbout,
   getUserPrefs,
@@ -490,5 +504,4 @@ module.exports = {
   followers,
   getInterests,
   addInterests,
-  updateInfo,
 };
