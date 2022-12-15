@@ -19,7 +19,6 @@ const showComment = catchAsync(async (req, res, next) => {
         status: 'succeded',
     });
 });
-
 module.exports = {
     showComment,
 };

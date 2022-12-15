@@ -17,6 +17,7 @@ router.post(
 );
 router.get("/me/saved-posts", authCheck, userController.getUserSavedPosts);
 router.get("/me/prefs", authCheck, userController.getUserPrefs);
+router.patch("/me/prefs", authCheck, userController.editUserPrefs);
 router.get("/me", authCheck, userController.getUserMe);
 router.get("/:username/about", userController.getUserAbout);
 router.get("/me/followers", authCheck, userController.followers);

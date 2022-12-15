@@ -64,7 +64,6 @@ const signup = async (req, res) => {
   }
 
 };
-
 /**
  * Login (route)
  * @param {Object} req req must contain the correct data.
@@ -130,7 +129,7 @@ const resetForgottenPassword = catchAsync(async (req, res, next) => {
 });
 const resetUserPassword = catchAsync(async (req, res, next) => {
   try {
-     await userServiceInstance.resetPassword(
+     await authServiceInstance.resetPassword(
       req.username,
       req.body.currentPassword,
       req.body.newPassword,
