@@ -9,6 +9,8 @@ module.exports = class Email {
     this.from = `Reddit Administration <${process.env.EMAIL_FROM}>`;
   }
   newTransport() {
+    console.log("EMAIL_USERNAME: ", process.env.EMAIL_USERNAME);
+    console.log("EMAIL_PASSWORD: ", process.env.EMAIL_PASSWORD);
     return nodemailer.createTransport({
       service: "Outlook",
       auth: {
