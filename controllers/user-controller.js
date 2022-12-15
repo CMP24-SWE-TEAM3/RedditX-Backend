@@ -178,7 +178,7 @@ const spam = catchAsync(async (req, res, next) => {
           _id: post.communityID,
           select: "communityOptions",
         });
-      postServiceInstance.spamPost(
+      await postServiceInstance.spamPost(
         post,
         req.body.spamType,
         req.body.spamText,
@@ -198,15 +198,10 @@ const spam = catchAsync(async (req, res, next) => {
         req.body.spamText,
         req.username
       );
-      const post = await postServiceInstance.getOne({
-        _id: comment.replyingTo,
-        select: "communityID",
+      community = await communityServiceInstance.getOne({
+        _id: comment.communityID,
+        select: "communityOptions",
       });
-      if (post && post.communityID !== undefined && post.communityID !== "")
-        community = await communityServiceInstance.getOne({
-          _id: post.communityID,
-          select: "communityOptions",
-        });
       await commentServiceInstance.saveSpammedComment(comment, community);
     }
   } catch (err) {
@@ -217,6 +212,7 @@ const spam = catchAsync(async (req, res, next) => {
     message: "Spams are updated successfully",
   });
 });
+
 /**
  * Get posts where is saved by the user
  * @param {function} (req,res)

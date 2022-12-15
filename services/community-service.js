@@ -287,6 +287,21 @@ class CommunityService extends Service {
   };
 
   /**
+   * Remove a spam from list of spams of a post or a comment
+   * @param {object} link
+   * @param {string} spamID
+   * @param {string} commentOrPostField
+   * @function
+   */
+  removeSpam = async (link, spamID, commentOrPost) => {
+    link[commentOrPost].splice(
+      link[commentOrPost].findIndex((el) => el._id === spamID),
+      1
+    );
+    await link.save();
+  };
+
+  /**
    * Get a list of things IDs from comma separated string
    * @param {string} ids
    * @returns {Array} thingsIDs
@@ -336,79 +351,65 @@ class CommunityService extends Service {
     }
   };
 
-   /**
+  /**
    * mark post in a commuity as spoiler
    * @param {string} subreddit
    * @param {string} moderator
    * @param {string} link
    * @function
    */
-    markAsSpoiler = async (subreddit, moderator,link) => {
-      const community = await this.getOne({
-        _id: subreddit,
-        select: "moderators",
-      });
-      if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-      let performerFound = false;
-      community.moderators.forEach((el) => {
-        if (el.userID === moderator) performerFound = true;
-      });
-      if (!performerFound)
-        throw new AppError(
-          "You cannot make this operation!",
-          400
-        );
-      const post = await postServiceInstance.findById(link);
-      if (!post) throw new AppError("This post doesn't exist!", 404);
-      let linkID = false;
-      if (post.communityID === link) linkID = true;
-    if (!linkID)
-      throw new AppError(
-        "this post is not in this subreddit!",
-        400
-      );
+  markAsSpoiler = async (subreddit, moderator, link) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "moderators",
+    });
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    let performerFound = false;
+    community.moderators.forEach((el) => {
+      if (el.userID === moderator) performerFound = true;
+    });
+    if (!performerFound)
+      throw new AppError("You cannot make this operation!", 400);
+    const post = await postServiceInstance.findById(link);
+    if (!post) throw new AppError("This post doesn't exist!", 404);
+    let linkID = false;
+    if (post.communityID === link) linkID = true;
+    if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
     if (!post.spoiler) {
-         post.spoiler = true;
-        }
-      await post.save();
-    };
-     /**
+      post.spoiler = true;
+    }
+    await post.save();
+  };
+  /**
    * mark post in a commuity as unspoiler
    * @param {string} subreddit
    * @param {string} moderator
    * @param {string} link
    * @function
    */
-      markAsUnSpoiler = async (subreddit, moderator,link) => {
-        const community = await this.getOne({
-          _id: subreddit,
-          select: "moderators",
-        });
-        const post = await postServiceInstance.findById(link);
-        if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-        if (!post) throw new AppError("This post doesn't exist!", 404);
-        let performerFound = false;
-        community.moderators.forEach((el) => {
-          if (el.userID === moderator) performerFound = true;
-        });
-        if (!performerFound)
-          throw new AppError(
-            "You cannot make this operation!",
-            400
-          );
-          let linkID = false;
-      if (post.communityID === link) linkID = true;
-    if (!linkID)
-      throw new AppError(
-        "this post is not in this subreddit!",
-        400
-      );
-          if (post.spoiler) {
-              post.spoiler = false;
-          }
-        await post.save();
-      };
-     /**
+  markAsUnSpoiler = async (subreddit, moderator, link) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "moderators",
+    });
+    const post = await postServiceInstance.findById(link);
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    if (!post) throw new AppError("This post doesn't exist!", 404);
+    let performerFound = false;
+    community.moderators.forEach((el) => {
+      if (el.userID === moderator) performerFound = true;
+    });
+    if (!performerFound)
+      throw new AppError("You cannot make this operation!", 400);
+    let linkID = false;
+    if (post.communityID === link) linkID = true;
+    if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
+    if (post.spoiler) {
+      post.spoiler = false;
+    }
+    await post.save();
+  };
+  /**
    * mark post in a commuity as nsfw
    * @param {string} subreddit
    * @param {string} moderator
@@ -416,110 +417,87 @@ class CommunityService extends Service {
    *  @param {string} action
    * @function
    */
-      markAsNsfw = async (subreddit, moderator,link,action) => {
-        const community = await this.getOne({
-          _id: subreddit,
-          select: "moderators",
-        });
-        const post = await postServiceInstance.findById(link);
-        if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-        if (!post) throw new AppError("This post doesn't exist!", 404);
-        let performerFound = false;
-        community.moderators.forEach((el) => {
-          if (el.userID === moderator) performerFound = true;
-        });
-        if (!performerFound)
-          throw new AppError(
-            "You cannot make this operation!",
-            400
-          );
-       let linkID = false;
+  markAsNsfw = async (subreddit, moderator, link, action) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "moderators",
+    });
+    const post = await postServiceInstance.findById(link);
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    if (!post) throw new AppError("This post doesn't exist!", 404);
+    let performerFound = false;
+    community.moderators.forEach((el) => {
+      if (el.userID === moderator) performerFound = true;
+    });
+    if (!performerFound)
+      throw new AppError("You cannot make this operation!", 400);
+    let linkID = false;
     if (post.communityID === link) linkID = true;
-    if (!linkID)
-      throw new AppError(
-        "this post is not in this subreddit!",
-        400
-      );
-          if (action==="mark") {
-              post.nsfw = true;
-          }
-          else if (action=="unmark") post.nsfw = false;
-        await post.save();
-      };
-    
-     /**
+    if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
+    if (action === "mark") {
+      post.nsfw = true;
+    } else if (action == "unmark") post.nsfw = false;
+    await post.save();
+  };
+
+  /**
    * mark post in a commuity as unlocked
    * @param {string} subreddit
    * @param {string} moderator
    * @param {string} link
    * @function
    */
-     markAsUnLocked = async (subreddit, moderator,link) => {
-      const community = await this.getOne({
-        _id: subreddit,
-        select: "moderators",
-      });
-      const post = await postServiceInstance.findById(link);
-      if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-      if (!post) throw new AppError("This post doesn't exist!", 404);
-      let performerFound = false;
-      community.moderators.forEach((el) => {
-        if (el.userID === moderator) performerFound = true;
-      });
-      if (!performerFound)
-        throw new AppError(
-          "You cannot make this operation!",
-          400
-        );
-        let linkID = false;
+  markAsUnLocked = async (subreddit, moderator, link) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "moderators",
+    });
+    const post = await postServiceInstance.findById(link);
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    if (!post) throw new AppError("This post doesn't exist!", 404);
+    let performerFound = false;
+    community.moderators.forEach((el) => {
+      if (el.userID === moderator) performerFound = true;
+    });
+    if (!performerFound)
+      throw new AppError("You cannot make this operation!", 400);
+    let linkID = false;
     if (post.communityID === link) linkID = true;
-  if (!linkID)
-    throw new AppError(
-      "this post is not in this subreddit!",
-      400
-    );
-        if (post.locked) {
-            post.locked = false;
-        }
-      await post.save();
-    };
-     /**
+    if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
+    if (post.locked) {
+      post.locked = false;
+    }
+    await post.save();
+  };
+  /**
    * mark post in a commuity as locked
    * @param {string} subreddit
    * @param {string} moderator
    * @param {string} link
    * @function
    */
-     markAsLocked = async (subreddit, moderator,link) => {
-      const community = await this.getOne({
-        _id: subreddit,
-        select: "moderators",
-      });
-      const post = await postServiceInstance.findById(link);
-      if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-      if (!post) throw new AppError("This post doesn't exist!", 404);
-      let performerFound = false;
-      community.moderators.forEach((el) => {
-        if (el.userID === moderator) performerFound = true;
-      });
-      if (!performerFound)
-        throw new AppError(
-          "You cannot make this operation!",
-          400
-        );
-        let linkID = false;
+  markAsLocked = async (subreddit, moderator, link) => {
+    const community = await this.getOne({
+      _id: subreddit,
+      select: "moderators",
+    });
+    const post = await postServiceInstance.findById(link);
+    if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    if (!post) throw new AppError("This post doesn't exist!", 404);
+    let performerFound = false;
+    community.moderators.forEach((el) => {
+      if (el.userID === moderator) performerFound = true;
+    });
+    if (!performerFound)
+      throw new AppError("You cannot make this operation!", 400);
+    let linkID = false;
     if (post.communityID === link) linkID = true;
-  if (!linkID)
-    throw new AppError(
-      "this post is not in this subreddit!",
-      400
-    );
-        if (!post.locked) {
-            post.locked = true;
-        }
-      await post.save();
-    };
-
+    if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
+    if (!post.locked) {
+      post.locked = true;
+    }
+    await post.save();
+  };
 
   addCommunityRule = async (body, user) => {
     const result = await this.availableSubreddit(body.srName);

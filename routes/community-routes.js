@@ -63,8 +63,12 @@ router.get(
   "/:subreddit/about/spammed",
   authCheck,
   communityController.getSpammed
-); /*
-router.post("/:subreddit/about/spammed", authCheck, communityController.getMuted);*/
+);
+router.patch(
+  "/:subreddit/about/spammed",
+  authCheck,
+  communityController.removeSpam
+);
 router.get(
   "/:subreddit/about/edited",
   authCheck,
@@ -145,6 +149,5 @@ router
 router
   .route("/:subreddit/api/flair")
   .post(authCheck, communityController.addFlair);
-
 
 module.exports = router;
