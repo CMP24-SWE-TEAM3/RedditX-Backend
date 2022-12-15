@@ -1001,9 +1001,8 @@ describe("testing getModerators service in community service class", () => {
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      const moderatorIDs = await communityServiceInstance.getModerators(
-        community
-      );
+      const { moderatorIDs, crator } =
+        await communityServiceInstance.getModerators(community);
       expect(moderatorIDs[0]).toBe("t2_hamada");
     });
   });

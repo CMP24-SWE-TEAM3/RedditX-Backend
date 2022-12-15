@@ -328,17 +328,25 @@ const getSpammed = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const getModerators = catchAsync(async (req, res, next) => {
-  var users = undefined;
+  var usersReturned = undefined;
+  var users = [];
   try {
-    const moderatorIDs = await communityServiceInstance.getModerators(
-      req.params.subreddit
-    );
-    users = await userServiceInstance.find(
+    const { moderatorIDs, creatorID } =
+      await communityServiceInstance.getModerators(req.params.subreddit);
+    usersReturned = await userServiceInstance.find(
       {
         _id: { $in: moderatorIDs },
       },
       "avatar about"
     );
+    var temp = undefined;
+    usersReturned.forEach((el, index) => {
+      temp = { ...el }._doc;
+      if (el._id === creatorID) temp.role = "creator";
+      else temp.role = "moderator";
+      users[index] = temp;
+    });
+    console.log(users);
   } catch (err) {
     return next(err);
   }

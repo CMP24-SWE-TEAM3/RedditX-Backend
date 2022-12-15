@@ -229,7 +229,7 @@ class CommunityService extends Service {
   /**
    * Get all moderators of a community
    * @param {string} subreddit
-   * @returns {Array} moderatorIDs
+   * @returns {object} {moderatorIDs, creatorID}
    * @function
    */
   getModerators = async (subreddit) => {
@@ -238,11 +238,17 @@ class CommunityService extends Service {
       select: "moderators",
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
+    const creator =
+      community.moderators[
+        community.moderators.findIndex((el) => el.role === "creator")
+      ];
+    var creatorID = undefined;
+    if (creator) creatorID = creator.userID;
     var moderatorIDs = [];
     community.moderators.forEach((el) => {
       moderatorIDs.push(el.userID);
     });
-    return moderatorIDs;
+    return { moderatorIDs, creatorID };
   };
 
   /**
