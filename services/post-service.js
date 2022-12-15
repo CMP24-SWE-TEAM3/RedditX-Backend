@@ -192,6 +192,62 @@ unhide = async (linkID, user) => {
   await post.save();
 };
 
+/**
+   * Follow post
+   * @param {string} body contain linkID and action
+   * @param {string} username username of the user
+   * @returns {object} state
+   * @function
+   */
+followPost=async(body,username)=>{
+  const post =await this.getOne({_id:body.linkID});
+
+  var isFound=false;
+  var index=-1;
+  for(let i=0;i<post.followers.length;i++){
+      if(post.followers[i]===username){
+        isFound=true;
+        index=i;
+        break;
+      }
+  }
+  console.log(isFound);
+  console.log(body.action);
+  console.log(index);
+  if((isFound&&body.action)){
+    return {
+      status:false,
+      error:"user already followed this post"
+    }
+  }
+  if((!isFound&&!body.action)){
+    return {
+      status:false,
+      error:"user already not followed this post"
+    }
+  }
+  try{
+    var arr;
+    if(!body.action){
+      post.followers.splice(index,1);
+    }else{
+      post.followers.push(username);
+      
+    }
+    arr=post.followers;
+    await this.updateOne({_id:body.linkID},{followers:arr});
+  }
+  catch{
+    return {
+      status:false,
+      error:"operation failed"
+    }
+  }
+  return {
+    status:true
+  }
+}
+
 }
 
 module.exports = PostService;
