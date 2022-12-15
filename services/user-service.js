@@ -56,7 +56,7 @@ class UserService extends Service {
       status:true,
       followers:followers
     };
-  }
+  };
   /**
    *  Get interests of me
    * @param {String} username my username .
@@ -66,19 +66,20 @@ class UserService extends Service {
   getInterests=async(username)=>{
     var categories_user;
     try{
-       categories_user=await this.getOne({_id:username});
+       
+      categories_user=await this.getOne({_id:username});
     }
     catch{
       return {
         status:false
-      }
+      };
     }
     const categories=categories_user.categories;
     return {
       status:true,
       categories:categories
     };
-  }
+  };
 
   /**
    *  Add interests of me
@@ -89,19 +90,19 @@ class UserService extends Service {
   addInterests=async(username,categories)=>{
     var categories_user;
     try{
-       categories_user=await this.updateOne({_id:username},{categories:categories});
+      
+      categories_user=await this.updateOne({_id:username},{categories:categories});
     }
     catch{
       return {
         status:false
-      }
+      };
     }
     console.log(categories_user);
     return {
       status:true,
-     
-    };
-  }
+     };
+  };
 
   /**
    * Subscribe to a subreddit or redditor
@@ -755,17 +756,18 @@ userPrefs=async(username)=>{
   }
 };
  /**
-   * Resets user password and returns a new token
+   * Resets user password 
    * @param {string} currentPassword
    * @param {string} newPassword
    * @param {string} confirmedNewPassword
    * @function
    */
- resetPassword = async (currentPassword, newPassword, confirmedNewPassword) => {
-  const user = await this.getOne({password: currentPassword});
+ resetPassword = async (username,currentPassword, newPassword, confirmedNewPassword) => {
+  const user = await this.getOne({_id: username});
   if (!user) throw new AppError("user is invalid or expired!", 400);
-  if (confirmedNewPassword !== newPassword)
-    throw new AppError("Password is not equal to confirmed password!", 400);
+  if (confirmedNewPassword !== newPassword) throw new AppError("Password is not equal to confirmed password!", 400);
+  const result = await bcrypt.compareSync(currentPassword, user.password);
+  if(!result) throw new AppError("this password is not correct!", 400);
   const hash = await bcrypt.hash(newPassword, 10);
   user.password = hash;
   await user.save();
