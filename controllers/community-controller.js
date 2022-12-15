@@ -424,9 +424,14 @@ const createSubreddit = async (req, res) => {
   const result = await communityServiceInstance.createSubreddit(req.body, user);
   const updateUser=await userServiceInstance.addUserToComm(user,req.body.name);
   if (!result.status||!updateUser.status) {
+    if(!result.errorType)
+      return res.status(200).json({
+        status: result.error,
+      });
     return res.status(500).json({
-      status: result.error,
+        status: result.error,
     });
+        
   }
   return res.status(200).json({
     status: result.response,

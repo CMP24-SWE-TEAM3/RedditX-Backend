@@ -622,6 +622,7 @@ class CommunityService extends Service {
     const result = await this.availableSubreddit(body.name);
     if (!result.state) {
       return {
+        errorType:0,
         status: false,
         error: "subreddit is already made",
       };
@@ -658,6 +659,8 @@ class CommunityService extends Service {
    catch{
     console.log("d");
     return {
+      errorType:1,
+
       status: false,
       error: "operation failed",
     };
