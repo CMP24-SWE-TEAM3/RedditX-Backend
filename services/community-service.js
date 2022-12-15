@@ -491,7 +491,7 @@ class CommunityService extends Service {
   creationValidation = async (body) => {
     if (
       !body.name ||
-      body.name.substring(0, 2) !== "t2" ||
+      body.name.substring(0, 2) !== "t5" ||
       !body.type ||
       !body.over18
     )
