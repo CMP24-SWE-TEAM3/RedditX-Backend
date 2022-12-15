@@ -671,7 +671,7 @@ class CommunityService extends Service {
       !body.name ||
       body.name.substring(0, 2) !== "t5" ||
       !body.type ||
-      !body.over18
+      body.over18===null
     )
       return false;
     return true;
