@@ -411,7 +411,10 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const createSubreddit = async (req, res) => {
-  if (!communityServiceInstance.creationValidation(req.body)) {
+  console.log(req.body);
+  const check=await communityServiceInstance.creationValidation(req.body);
+  console.log(check);
+  if (!check) {
     return res.status(500).json({
       status: "invalid parameters",
     });
