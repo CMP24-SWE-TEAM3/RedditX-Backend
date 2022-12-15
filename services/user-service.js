@@ -430,6 +430,7 @@ class UserService extends Service {
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
       await user.save({ validateBeforeSave: false });
+      console.log("ERROR IN SENDING MAIL!!!", err);
       throw new AppError("There was an error in sending the mail!", 500);
     }
   };
@@ -640,30 +641,32 @@ class UserService extends Service {
     const userMember = {
       communityId: communityID,
       isMuted: {
-        value:false,
+        value: false,
       },
-      isBanned:{
-        value:false,
+      isBanned: {
+        value: false,
       },
     };
-    const modarr=user.moderators;
+    const modarr = user.moderators;
     modarr.push(userModerator);
-    const memarr=user.member;
+    const memarr = user.member;
     memarr.push(userMember);
-    try{
-      const x=await this.updateOne({_id:user._id},{moderators:modarr,member:memarr});
-     console.log(x);
-     }
-     catch{
+    try {
+      const x = await this.updateOne(
+        { _id: user._id },
+        { moderators: modarr, member: memarr }
+      );
+      console.log(x);
+    } catch {
       console.log("dd");
-       return {
-         status: false,
-         error: "operation failed",
-       };
-     }
-     return {
-      status: true,
+      return {
+        status: false,
+        error: "operation failed",
       };
+    }
+    return {
+      status: true,
+    };
   };
   /**
    * Get posts where is saved by the user in from database
@@ -700,7 +703,7 @@ class UserService extends Service {
     const user = await User.findById(username);
     if (user) {
       const obj = {
-        followerCount:user.followers.length,
+        followerCount: user.followers.length,
         prefShowTrending: user.aboutReturn.prefShowTrending,
         isBlocked: user.aboutReturn.isBlocked,
         isBanned: user.member.isBanned,
@@ -794,24 +797,7 @@ class UserService extends Service {
       };
     }
   };
-  /**
- * Get user prefs from database
- * @param {String} (username)
- * @returns {object} user
- */
-userPrefs=async(username)=>{
-  const user = await User.findById(username);
-  if (user) {
-    return {
-      user: user.prefs,
-    };
-  }
-  else {
-    return {
-      user: null,
-    };
-  }
-};
+
   /**
    * Resets user password and returns a new token
    * @param {string} token
