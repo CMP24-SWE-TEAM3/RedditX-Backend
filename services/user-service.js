@@ -626,6 +626,46 @@ class UserService extends Service {
     return returnPosts;
   };
   /**
+   * Add user to community
+   * @param {String} (username)
+   * @param {String} (communityID)
+   * @returns {object} mentions
+   * @function
+   */
+  addUserToComm = async (user, communityID) => {
+    const userModerator = {
+      communityId: communityID,
+      role: "creator",
+    };
+    const userMember = {
+      communityId: communityID,
+      isMuted: {
+        value:false,
+      },
+      isBanned:{
+        value:false,
+      },
+    };
+    const modarr=user.moderators;
+    modarr.push(userModerator);
+    const memarr=user.member;
+    memarr.push(userMember);
+    try{
+      const x=await this.updateOne({_id:user._id},{moderators:modarr,member:memarr});
+     console.log(x);
+     }
+     catch{
+      console.log("dd");
+       return {
+         status: false,
+         error: "operation failed",
+       };
+     }
+     return {
+      status: true,
+      };
+  };
+  /**
    * Get posts where is saved by the user in from database
    * @param {String} (username)
    * @returns {object} saved posts
