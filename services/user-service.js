@@ -11,7 +11,6 @@ const Community = require("../models/community-model");
 const AuthService = require("./../services/auth-service");
 var authServiceInstance = new AuthService(User);
 const CommunityService = require("./../services/community-service");
-const { doc } = require("prettier");
 var communityServiceInstance = new CommunityService(Community);
 
 /**
@@ -38,47 +37,48 @@ class UserService extends Service {
     );
   };
 
- /**
+  /**
    *  Get followers of me
    * @param {String} username my username .
    * @returns {Boolean} (state)
    * @function
    */
-  getFollowers=async(username)=>{
-    const followers_user=await this.getOne({_id:username}).select("followers");
-    const followersIds=followers_user.followers;
-    
-    const followers=await this.find({
+  getFollowers = async (username) => {
+    const followers_user = await this.getOne({ _id: username }).select(
+      "followers"
+    );
+    const followersIds = followers_user.followers;
+
+    const followers = await this.find({
       _id: { $in: followersIds },
     }).select("about avatar _id");
 
     return {
-      status:true,
-      followers:followers
+      status: true,
+      followers: followers,
     };
-  }
+  };
   /**
    *  Get interests of me
    * @param {String} username my username .
    * @returns {Boolean} (state)
    * @function
    */
-  getInterests=async(username)=>{
+  getInterests = async (username) => {
     var categories_user;
-    try{
-       categories_user=await this.getOne({_id:username});
-    }
-    catch{
+    try {
+      categories_user = await this.getOne({ _id: username });
+    } catch {
       return {
-        status:false
-      }
+        status: false,
+      };
     }
-    const categories=categories_user.categories;
+    const categories = categories_user.categories;
     return {
-      status:true,
-      categories:categories
+      status: true,
+      categories: categories,
     };
-  }
+  };
 
   /**
    *  Add interests of me
@@ -86,22 +86,23 @@ class UserService extends Service {
    * @returns {Boolean} (state)
    * @function
    */
-  addInterests=async(username,categories)=>{
+  addInterests = async (username, categories) => {
     var categories_user;
-    try{
-       categories_user=await this.updateOne({_id:username},{categories:categories});
-    }
-    catch{
+    try {
+      categories_user = await this.updateOne(
+        { _id: username },
+        { categories: categories }
+      );
+    } catch {
       return {
-        status:false
-      }
+        status: false,
+      };
     }
     console.log(categories_user);
     return {
-      status:true,
-     
+      status: true,
     };
-  }
+  };
 
   /**
    * Subscribe to a subreddit or redditor
@@ -655,41 +656,49 @@ class UserService extends Service {
   };
 
   isParticipantInSubreddit = async (subreddit, user) => {
-    let subreddits = (await this.getOne({ "_id": user, "select": 'member' })).member;
-    subreddits = subreddits.map(el => el.communityId);
+    let subreddits = (await this.getOne({ _id: user, select: "member" }))
+      .member;
+    subreddits = subreddits.map((el) => el.communityId);
     return subreddits.includes(subreddit);
-  }
+  };
 
   isModeratorInSubreddit = async (subreddit, user) => {
-    let subreddits = (await this.getOne({ "_id": user, "select": 'moderators' })).moderators;
-    console.log(subreddits);
-    subreddits = subreddits.map(el => el.communityId);
+    let subreddits = (await this.getOne({ _id: user, select: "moderators" }))
+      .moderators;
+    subreddits = subreddits.map((el) => el.communityId);
     return subreddits.includes(subreddit);
-  }
+  };
 
   muteOrBanUserInSubreddit = async (subreddit, user, type) => {
-    if (type == 'ban') {
-      this.updateOne({ _id: user, 'member.communityId': subreddit }, { 'member.$.isBanned': true });
+    if (type == "ban") {
+      this.updateOne(
+        { _id: user, "member.communityId": subreddit },
+        { "member.$.isBanned": true }
+      );
+    } else if (type == "mute") {
+      this.updateOne(
+        { _id: user, "member.communityId": subreddit },
+        { "member.$.isMuted": true }
+      );
     }
-    else if (type == 'mute') {
-      this.updateOne({ _id: user, 'member.communityId': subreddit }, { 'member.$.isMuted': true });
-    }
-  }
+  };
 
   addSubredditModeration = async (subreddit, user) => {
-    await this.updateOne({ _id: user }, {
-      $addToSet: {
-        moderators: {
-          $each: [
-            {
-              communityId: subreddit,
-              role: 'moderator',
-            }
-          ]
-        }
+    await this.updateOne(
+      { _id: user },
+      {
+        $addToSet: {
+          moderators: {
+            $each: [
+              {
+                communityId: subreddit,
+                role: "moderator",
+              },
+            ],
+          },
+        },
       }
-    });
-
-  }
+    );
+  };
 }
 module.exports = UserService;

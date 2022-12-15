@@ -1,4 +1,3 @@
-const { populate } = require("../models/post-model");
 const APIfeatures = require("./../utils/api-features");
 
 /**
@@ -74,7 +73,7 @@ class Service {
   deleteMany = (query) => {
     this.model.deleteMany(query);
   };
-  
+
   insert = (data) => {
     return this.model.create(data);
   };

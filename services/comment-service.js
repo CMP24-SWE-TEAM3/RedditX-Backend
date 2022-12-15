@@ -76,22 +76,20 @@ class CommentService extends Service {
    * @function
    */
   addComment = async (data, username) => {
-    console.log("ay haaaga");
     const user = await userServiceInstance.findById(username);
-    console.log(user);
+    var post = undefined;
     try {
-      var post = await postServiceInstance.findById({ _id: data.postID });
+      post = await postServiceInstance.findById({ _id: data.postID });
     } catch {
       throw new AppError("invailed postID!", 400);
     }
-
-    console.log(post);
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newComment = new Comment({
       text: data.text,
       isRoot: true,
       authorId: username,
       replyingTo: data.postID,
+      communityID: post.communityID,
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newComment.save();
@@ -122,6 +120,7 @@ class CommentService extends Service {
       isRoot: false,
       authorId: username,
       replyingTo: data.commentID,
+      communityID: comment.communityID,
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newReply.save();
@@ -371,7 +370,7 @@ class CommentService extends Service {
           { _id: postIdCasted },
           { $set: { votesCount: votesCount + operation, voters: voters } },
           { new: true },
-          () => { }
+          () => {}
         );
 
         return {
@@ -389,12 +388,15 @@ class CommentService extends Service {
 
   checkUser = async (user, comment) => {
     console.log();
-    return (await (this.getOne({ '_id': comment, 'select': 'authorId' })))['authorId'] === user;
+    return (
+      (await this.getOne({ _id: comment, select: "authorId" }))["authorId"] ===
+      user
+    );
   };
 
   showComment = async (comment) => {
-    await this.updateOne({ "_id": comment }, { 'isCollapsed': false });
-  }
+    await this.updateOne({ _id: comment }, { isCollapsed: false });
+  };
 }
 
 module.exports = CommentService;

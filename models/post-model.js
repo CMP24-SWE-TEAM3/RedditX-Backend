@@ -77,6 +77,9 @@ const postSchema = mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  editedAt: {
+    type: Date,
+  },
   followers: [
     {
       type: String,

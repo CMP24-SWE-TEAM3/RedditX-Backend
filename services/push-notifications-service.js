@@ -1,11 +1,9 @@
 var admin = require("firebase-admin");
 var fcm = require("fcm-notification");
 var serviceAccount = require("../config/push-notification-key.json");
-const { async } = require("@firebase/util");
 const certPath = admin.credential.cert(serviceAccount);
 var FCM = new fcm(certPath);
-
-
+const Service = require("./service");
 
 /**
  * Service class to send notifications.
@@ -15,27 +13,27 @@ class PushNotificationsService extends Service {
   constructor(model) {
     super(model);
   }
-  
-  sendNotification=async(message)=>{
+
+  sendNotification = async (message) => {
     FCM.send(message, function (err) {
       if (err) {
-       return {
-        status:false,
+        return {
+          status: false,
           message: err,
         };
       } else {
         return {
-          status:true,
+          status: true,
           message: "notification sent",
         };
       }
     });
-  }
-  newFollowerNotification=async(receiverFcmToken,followerUsername)=>{
+  };
+  newFollowerNotification = async (receiverFcmToken, followerUsername) => {
     try {
       let message = {
         notification: {
-          title: `You have a new follower`,
+          title: "You have a new follower",
           body: `${followerUsername} has followed you`,
         },
         data: {
@@ -44,168 +42,170 @@ class PushNotificationsService extends Service {
         },
         token: receiverFcmToken,
       };
-      const result=await this.sendNotification(message);
-      if(result.status){
+      const result = await this.sendNotification(message);
+      if (result.status) {
         return {
-          status:true
-        }
-      }
-      else{
+          status: true,
+        };
+      } else {
         return {
-          status:false
-        }
+          status: false,
+        };
       }
-     
     } catch (err) {
       console.log(err);
     }
-  }
-  upvotePostNotification=async(receiverFcmToken,upvotedUsername,postID)=>{
+  };
+  upvotePostNotification = async (
+    receiverFcmToken,
+    upvotedUsername,
+    postID
+  ) => {
     try {
       let message = {
         notification: {
-          title: `You have a new upvote`,
+          title: "You have a new upvote",
           body: `${upvotedUsername} upvoted on your post`,
         },
         data: {
           postID: `${postID}`,
-        
         },
         token: receiverFcmToken,
       };
-      const result=await this.sendNotification(message);
-      if(result.status){
+      const result = await this.sendNotification(message);
+      if (result.status) {
         return {
-          status:true
-        }
-      }
-      else{
+          status: true,
+        };
+      } else {
         return {
-          status:false
-        }
+          status: false,
+        };
       }
-     
     } catch (err) {
       console.log(err);
     }
-  }
-  upvoteCommentNotification=async(receiverFcmToken,upvotedUsername,commentID)=>{
+  };
+  upvoteCommentNotification = async (
+    receiverFcmToken,
+    upvotedUsername,
+    commentID
+  ) => {
     try {
       let message = {
         notification: {
-          title: `You have a new upvote`,
+          title: "You have a new upvote",
           body: `${upvotedUsername} upvoted on your comment`,
         },
         data: {
           commentID: `${commentID}`,
-        
         },
         token: receiverFcmToken,
       };
-      const result=await this.sendNotification(message);
-      if(result.status){
+      const result = await this.sendNotification(message);
+      if (result.status) {
         return {
-          status:true
-        }
-      }
-      else{
+          status: true,
+        };
+      } else {
         return {
-          status:false
-        }
+          status: false,
+        };
       }
-     
     } catch (err) {
       console.log(err);
     }
-  }
-  
-  mentionNotification=async(receiverFcmToken,actionUsername,commentID)=>{
+  };
+
+  mentionNotification = async (receiverFcmToken, actionUsername, commentID) => {
     try {
       let message = {
         notification: {
-          title: `You have a new mention`,
+          title: "You have a new mention",
           body: `${actionUsername} mention you on a comment`,
         },
         data: {
           commentID: `${commentID}`,
-        
         },
         token: receiverFcmToken,
       };
-      const result=await this.sendNotification(message);
-      if(result.status){
+      const result = await this.sendNotification(message);
+      if (result.status) {
         return {
-          status:true
-        }
-      }
-      else{
+          status: true,
+        };
+      } else {
         return {
-          status:false
-        }
+          status: false,
+        };
       }
-     
     } catch (err) {
       console.log(err);
     }
-  }
-  replytoPostNotification=async(receiverFcmToken,actionUsername,commentID,postID)=>{
+  };
+  replytoPostNotification = async (
+    receiverFcmToken,
+    actionUsername,
+    commentID,
+    postID
+  ) => {
     try {
       let message = {
         notification: {
-          title: `You have a new reply to your post`,
+          title: "You have a new reply to your post",
           body: `${actionUsername} has replied to your post`,
         },
         data: {
           commentID: `${commentID}`,
-          postID: `${postID}`
+          postID: `${postID}`,
         },
         token: receiverFcmToken,
       };
-      const result=await this.sendNotification(message);
-      if(result.status){
+      const result = await this.sendNotification(message);
+      if (result.status) {
         return {
-          status:true
-        }
-      }
-      else{
+          status: true,
+        };
+      } else {
         return {
-          status:false
-        }
+          status: false,
+        };
       }
-     
     } catch (err) {
       console.log(err);
     }
-  }
-  replytoCommentNotification=async(receiverFcmToken,actionUsername,commentID,replyID)=>{
+  };
+  replytoCommentNotification = async (
+    receiverFcmToken,
+    actionUsername,
+    commentID,
+    replyID
+  ) => {
     try {
       let message = {
         notification: {
-          title: `You have a new reply to your comment`,
+          title: "You have a new reply to your comment",
           body: `${actionUsername} has replied to your comment`,
         },
         data: {
           commentID: `${commentID}`,
-          replyID: `${replyID}`
+          replyID: `${replyID}`,
         },
         token: receiverFcmToken,
       };
-      const result=await this.sendNotification(message);
-      if(result.status){
+      const result = await this.sendNotification(message);
+      if (result.status) {
         return {
-          status:true
-        }
-      }
-      else{
+          status: true,
+        };
+      } else {
         return {
-          status:false
-        }
+          status: false,
+        };
       }
-     
     } catch (err) {
       console.log(err);
     }
-  }
-
-}  
+  };
+}
 module.exports = PushNotificationsService;
