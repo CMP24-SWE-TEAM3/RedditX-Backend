@@ -8,6 +8,7 @@ const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("../services/comment-service");
+const AppError = require("../utils/app-error");
 var postServiceInstance = new PostService(Post);
 // var commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
@@ -19,29 +20,50 @@ var commentServiceInstance = new CommentService(Comment);
  * @param {function} (req, res)
  * @returns {object} res
  */
- const editUserText = async (req, res) => {
-  if (!req.body.linkID || !req.body.text)
+const editUserText = async (req, res, next) => {
+  if (!req.body.linkID)
     return res.status(400).json({
       response: "invaild parameters",
     });
-    if (req.body.linkID[1] === "3"){
-  const results = await postServiceInstance.updateOne(
-    { _id: req.body.linkID},
-    { text: req.body.text},
-    { editedAt: Date.now()}
-  );
-  if (!results)
-    return res.status(400).json({
-      response: "error",
+  const linkID = req.body.linkID;
+  delete req.body.linkID;
+  req.body.editedAt = Date.now();
+  if (linkID[1] === "3") {
+    if (
+      (
+        await postServiceInstance.getOne({
+          _id: linkID.slice(3),
+          select: "userID",
+        })
+      ).userID._id !== req.username
+    )
+      return next(new AppError("You are not the author of this post!", 400));
+    const results = await postServiceInstance.updateOne(
+      { _id: linkID.slice(3) },
+      req.body,
+      { new: true }
+    );
+    if (!results)
+      return res.status(400).json({
+        response: "error",
+      });
+    return res.status(200).json({
+      response: results,
     });
-  return res.status(200).json({
-    response: results,
-  });}
-  else if (req.body.linkID[1] === "1") {
+  } else if (linkID[1] === "1") {
+    if (
+      (
+        await commentServiceInstance.getOne({
+          _id: linkID.slice(3),
+          select: "authorId",
+        })
+      ).authorId !== req.username
+    )
+      return next(new AppError("You are not the author of this comment!", 400));
     const results = await commentServiceInstance.updateOne(
-      { _id: req.body.linkID},
-      { text: req.body.text},
-      { editedAt: Date.now()}
+      { _id: linkID.slice(3) },
+      req.body,
+      { new: true }
     );
     if (!results)
       return res.status(400).json({
@@ -58,32 +80,32 @@ var commentServiceInstance = new CommentService(Comment);
  * @returns {object} res
  */
 const deleteLink = catchAsync(async (req, res, next) => {
-  if (req.body.linkID[1] === "3"){
-  try {
-    await postServiceInstance.deletePost(req.body.linkID);
-  } catch (err) {
-    return next(err);
+  if (req.body.linkID[1] === "3") {
+    try {
+      await postServiceInstance.deletePost(req.body.linkID);
+    } catch (err) {
+      return next(err);
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Post is deleted successfully",
+    });
+  } else if (req.body.linkID[1] === "1") {
+    try {
+      await commentServiceInstance.deleteComment(req.body.linkID);
+    } catch (err) {
+      return next(err);
+    }
+    res.status(200).json({
+      status: "success",
+      message: "comment is deleted successfully",
+    });
   }
-  res.status(200).json({
-    status: "success",
-    message: "Post is deleted successfully",
-  });
-}else if (req.body.linkID[1] === "1") {
-  try {
-    await commentServiceInstance.deleteComment(req.body.linkID);
-  } catch (err) {
-    return next(err);
-  }
-  res.status(200).json({
-    status: "success",
-    message: "comment is deleted successfully",
-  });
-}
 });
 /**
  * mark post in a commuity as spoiler
  * @param {function} (req, res, next)
- * @returns {object} res 
+ * @returns {object} res
  */
 const markSpoiler = catchAsync(async (req, res, next) => {
   try {
@@ -104,67 +126,67 @@ const markSpoiler = catchAsync(async (req, res, next) => {
 /**
  * mark post in a commuity as unlocked
  * @param {function} (req, res, next)
- * @returns {object} res 
+ * @returns {object} res
  */
 const markUnLocked = catchAsync(async (req, res, next) => {
   try {
     await communityServiceInstance.markAsUnLocked(
       req.params.subreddit,
       req.username,
-      req.body.linkID,
+      req.body.linkID
     );
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    message: "Link is unlocked"
+    message: "Link is unlocked",
   });
 });
 /**
  * mark post in a commuity as locked
  * @param {function} (req, res, next)
- * @returns {object} res 
+ * @returns {object} res
  */
 const markLocked = catchAsync(async (req, res, next) => {
   try {
     await communityServiceInstance.markAsLocked(
       req.params.subreddit,
       req.username,
-      req.body.linkID,
+      req.body.linkID
     );
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    message: "Link is locked"
+    message: "Link is locked",
   });
 });
 /**
  * mark post in a commuity as unspoiler
  * @param {function} (req, res, next)
- * @returns {object} res 
+ * @returns {object} res
  */
 const markUnSpoiler = catchAsync(async (req, res, next) => {
   try {
     await communityServiceInstance.markAsUnSpoiler(
       req.params.subreddit,
       req.username,
-      req.body.linkID,
+      req.body.linkID
     );
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    message: "Link is unspoiler"
+    message: "Link is unspoiler",
   });
 });
 /**
  * mark post in a commuity as nsfw
  * @param {function} (req, res, next)
- * @returns {object} res 
+ * @returns {object} res
  */
 const markNsfw = catchAsync(async (req, res, next) => {
   try {
@@ -183,7 +205,7 @@ const markNsfw = catchAsync(async (req, res, next) => {
   });
 });
 /**
- * Creates a comment 
+ * Creates a comment
  * @param {function} (req, res, next)
  * @returns {object} res
  */
@@ -286,13 +308,11 @@ const vote = async (req, res) => {
   console.log(result);
   if (result.state) {
     return res.status(200).json({
-
       status: result.status,
     });
   } else {
     return res.status(500).json({
       status: result.error,
-
     });
   }
 };
@@ -388,5 +408,5 @@ module.exports = {
   markUnSpoiler,
   markSpoiler,
   markUnLocked,
-  markLocked
+  markLocked,
 };

@@ -13,7 +13,8 @@ describe("testing spamComment service in comment service class", () => {
     test("should not throw an error", async () => {
       var comment = new Comment({
         _id: "4564",
-        text: "hdfhdfh",
+        textHTML: "hdfhdfh",
+        textJSON: "hdfhdfh",
         spams: [],
         spamCount: 19,
       });
@@ -31,7 +32,8 @@ describe("testing spamComment service in comment service class", () => {
     test("should throw an error", async () => {
       var comment = new Comment({
         _id: "4564",
-        text: "hdfhdfh",
+        textHTML: "hdfhdfh",
+        textJSON: "hdfhdfh",
         spams: [
           { userID: "t2_moazHassan", type: "Hateful Speeach", text: "jbkjvkj" },
         ],
@@ -54,7 +56,8 @@ describe("testing saveSpammedComment service in comment service class", () => {
     test("should not throw an error", async () => {
       var comment = new Comment({
         _id: "4564",
-        text: "hdfhdfh",
+        textHTML: "hdfhdfh",
+        textJSON: "hdfhdfh",
         spams: [],
         spamCount: 19,
       });
@@ -74,7 +77,8 @@ describe("testing saveSpammedComment service in comment service class", () => {
     test("should not throw an error", async () => {
       var comment = new Comment({
         _id: "4564",
-        text: "hdfhdfh",
+        textHTML: "hdfhdfh",
+        textJSON: "hdfhdfh",
         spams: [],
         spamCount: 21,
       });

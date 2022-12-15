@@ -13,7 +13,7 @@ router
 router
   .route("/posts/:criteria")
   .get(possibleAuthCheck, listingController.getPosts);
-  router.post("/edit-user-text", listingController.editUserText);
+router.post("/edit-user-text", authCheck, listingController.editUserText);
 router.post("/addcomment", authCheck, listingController.addComment);
 router.post("/addreply", authCheck, listingController.addReply);
 router.post("/save", authCheck, listingController.save);
@@ -30,21 +30,13 @@ router.post(
   startUploadingFiles,
   listingController.submit
 );
-router.post(
-  "/:subreddit/mark-nsfw",
-  authCheck,
-  listingController.markNsfw
-);
+router.post("/:subreddit/mark-nsfw", authCheck, listingController.markNsfw);
 router.post(
   "/:subreddit/unspoiler",
   authCheck,
   listingController.markUnSpoiler
 );
-router.post(
-  "/:subreddit/spoiler",
-  authCheck,
-  listingController.markSpoiler
-);
+router.post("/:subreddit/spoiler", authCheck, listingController.markSpoiler);
 
 router.route("/show-comment").post(authCheck, commentController.showComment);
 

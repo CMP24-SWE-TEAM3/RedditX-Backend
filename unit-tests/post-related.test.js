@@ -190,7 +190,8 @@ describe("testing spamPost service in post service class", () => {
       const post = new Post({
         _id: "4564",
         title: "mnlknn",
-        text: "hdfhdfh",
+        textHTML: "hdfhdfh",
+        textJSON: "hdfhdfh",
         spammers: [],
         spamCount: 19,
       });
@@ -217,7 +218,8 @@ describe("testing spamPost service in post service class", () => {
       const post = new Post({
         _id: "4564",
         title: "mnlknn",
-        text: "hdfhdfh",
+        textHTML: "hdfhdfh",
+        textJSON: "hdfhdfh",
         spammers: [],
         spamCount: 20,
       });
@@ -244,7 +246,8 @@ describe("testing spamPost service in post service class", () => {
       const post = new Post({
         _id: "4564",
         title: "mnlknn",
-        text: "hdfhdfh",
+        textHTML: "hdfhdfh",
+        textJSON: "hdfhdfh",
         spammers: [
           {
             spammerID: "t2_moazHassan",
