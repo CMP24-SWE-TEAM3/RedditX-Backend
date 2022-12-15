@@ -819,20 +819,6 @@ class UserService extends Service {
     return subreddits.includes(subreddit);
   };
 
-  muteOrBanUserInSubreddit = async (subreddit, user, type) => {
-    if (type == "ban") {
-      this.updateOne(
-        { _id: user, "member.communityId": subreddit },
-        { "member.$.isBanned": true }
-      );
-    } else if (type == "mute") {
-      this.updateOne(
-        { _id: user, "member.communityId": subreddit },
-        { "member.$.isMuted": true }
-      );
-    }
-  };
-
   addSubredditModeration = async (subreddit, user) => {
     await this.updateOne(
       { _id: user },

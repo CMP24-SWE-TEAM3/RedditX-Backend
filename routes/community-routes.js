@@ -3,8 +3,6 @@ const communityController = require("../controllers/community-controller");
 const startUploadSinglePhoto = require("../utils/upload-single-photo");
 const resizeCommunityPhoto = require("./../middlewares/resize-community-photo");
 const authCheck = require("../middlewares/auth-check");
-const addBan = require("./../middlewares/add-mute-ban").addBan;
-const addMute = require("./../middlewares/add-mute-ban").addMute;
 
 const userController = require("./../controllers/user-controller");
 
@@ -119,13 +117,6 @@ router
 router
   .route("/:subreddit/accept-moderator-invite")
   .post(authCheck, userController.acceptModeratorInvite);
-
-router
-  .route("/:subreddit/about/muted")
-  .post(authCheck, addMute, communityController.muteOrBanUser);
-router
-  .route("/:subreddit/about/banned")
-  .post(authCheck, addBan, communityController.muteOrBanUser);
 
 router
   .route("/:subreddit/leave-moderator")

@@ -367,6 +367,7 @@ const getMembers = catchAsync(async (req, res, next) => {
     );
     isBannedAndMuted.forEach((isBannedAndMutedElement, index) => {
       var temp = { ...users[index] }._doc;
+      if (temp === undefined) temp = {};
       temp.isBanned = isBannedAndMutedElement.isBanned;
       temp.isMuted = isBannedAndMutedElement.isMuted;
       members[index] = temp;
@@ -611,47 +612,6 @@ const kickUser = catchAsync(async (req, res, next) => {
   });
 });
 
-const muteOrBanUser = catchAsync(async (req, res) => {
-  const mutedUser = req.body.userID;
-  // [1] -> check existence of subreddit
-  const subreddit = await communityServiceInstance.availableSubreddit(
-    req.params.subreddit
-  );
-  if (!subreddit.state) {
-    return res.status(404).json({
-      status: "failed",
-      message: "not found this subreddit",
-    });
-  }
-  // [2] -> check if user isn't moderator in subreddit
-  if (
-    !(await userServiceInstance.isModeratorInSubreddit(subreddit, req.username))
-  ) {
-    return res.status(400).json({
-      status: "failed",
-      message: "you aren't moderator in this subreddit",
-    });
-  }
-  // [2] -> check if the passed user is a participant in this subreddit if not then this is bad request
-  if (
-    !(await userServiceInstance.isParticipantInSubreddit(subreddit, mutedUser))
-  ) {
-    return res.status(400).json({
-      status: "failed",
-      message: "the user isn't in subreddit",
-    });
-  }
-  // [3] -> do banning the user from subreddit
-  await userServiceInstance.muteOrBanUserInSubreddit(
-    subreddit,
-    mutedUser,
-    "mute"
-  );
-  return res.status(200).json({
-    status: "succeded",
-  });
-});
-
 const removeSrBanner = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   const subreddit = await communityServiceInstance.availableSubreddit(
@@ -892,7 +852,6 @@ module.exports = {
   getMembers,
   getCommunityOptions,
   getRandomCommunities,
-  muteOrBanUser,
   removeSrBanner,
   removeSrIcon,
   getFlairs,
