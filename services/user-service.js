@@ -56,7 +56,7 @@ class UserService extends Service {
       status:true,
       followers:followers
     };
-  }
+  };
   /**
    *  Get interests of me
    * @param {String} username my username .
@@ -66,19 +66,20 @@ class UserService extends Service {
   getInterests=async(username)=>{
     var categories_user;
     try{
-       categories_user=await this.getOne({_id:username});
+       
+      categories_user=await this.getOne({_id:username});
     }
     catch{
       return {
         status:false
-      }
+      };
     }
     const categories=categories_user.categories;
     return {
       status:true,
       categories:categories
     };
-  }
+  };
 
   /**
    *  Add interests of me
@@ -89,19 +90,19 @@ class UserService extends Service {
   addInterests=async(username,categories)=>{
     var categories_user;
     try{
-       categories_user=await this.updateOne({_id:username},{categories:categories});
+      
+      categories_user=await this.updateOne({_id:username},{categories:categories});
     }
     catch{
       return {
         status:false
-      }
+      };
     }
     console.log(categories_user);
     return {
       status:true,
-     
-    };
-  }
+     };
+  };
 
   /**
    * Subscribe to a subreddit or redditor
