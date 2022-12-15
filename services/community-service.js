@@ -343,7 +343,7 @@ class CommunityService extends Service {
     return communities;
   };
   availableSubreddit = async (subreddit) => {
-    const subre = await this.getOne({ _id: subreddit });
+    var subre = await this.getOne({ _id: subreddit });
     if (subre) {
       return {
         state: false,
@@ -695,32 +695,18 @@ class CommunityService extends Service {
   };
 
   removeModeratorInvitation = async (subreddit, user) => {
-    await this.updateOne(
-      { _id: subreddit },
-      {
-        $pullAll: {
-          invitedModerators: [{ _id: user }],
-        },
-      }
+    subreddit.invitedModerators.splice(
+      subreddit.invitedModerators.findIndex((el) => el === user),
+      1
     );
+    return subreddit;
   };
 
   addModerator = async (subreddit, user) => {
-    await this.updateOne(
-      { _id: subreddit },
-      {
-        $addToSet: {
-          moderators: {
-            $each: [
-              {
-                userID: user,
-                role: "moderator",
-              },
-            ],
-          },
-        },
-      }
-    );
+    if (!subreddit.moderators.find((el) => el.userID === user)) {
+      subreddit.moderators.push({ userID: user, role: "moderator" });
+      await subreddit.save();
+    }
   };
 
   removeSrBanner = async (subreddit) => {

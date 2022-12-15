@@ -820,21 +820,10 @@ class UserService extends Service {
   };
 
   addSubredditModeration = async (subreddit, user) => {
-    await this.updateOne(
-      { _id: user },
-      {
-        $addToSet: {
-          moderators: {
-            $each: [
-              {
-                communityId: subreddit,
-                role: "moderator",
-              },
-            ],
-          },
-        },
-      }
-    );
+    if (!user.moderators.find((el) => el.communityId === subreddit)) {
+      user.moderators.push({ communityId: subreddit, role: "moderator" });
+      await user.save();
+    }
   };
 }
 module.exports = UserService;

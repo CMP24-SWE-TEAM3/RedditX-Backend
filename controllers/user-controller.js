@@ -340,17 +340,18 @@ const getAllFriends = catchAsync(async (req, res) => {
 
 const acceptModeratorInvite = catchAsync(async (req, res) => {
   //[1]-> check existence of subreddit
-  const subreddit = await communityServiceInstance.availableSubreddit(
+  var subredditReturned = await communityServiceInstance.availableSubreddit(
     req.params.subreddit
   );
-  if (subreddit.state) {
+  if (subredditReturned.state) {
     return res.status(404).json({
       status: "failed",
       message: "not found this subreddit",
     });
   }
+  var subreddit = subredditReturned.subreddit;
   // [2]-> check if the user has been invited to be moderator
-  if (!subreddit.subreddit.invitedModerators.includes(req.username)) {
+  if (!subreddit.invitedModerators.includes(req.username)) {
     return res.status(401).json({
       status: "failed",
       message: "you aren't invited to this subreddit",
@@ -358,22 +359,20 @@ const acceptModeratorInvite = catchAsync(async (req, res) => {
   }
   // [3]-> accept the invitation
   //[1] -> update the subreddit invitedModerators
-  await communityServiceInstance.removeModeratorInvitation(
-    req.params.subreddit,
+  subreddit = await communityServiceInstance.removeModeratorInvitation(
+    subreddit,
     req.username
   );
+  var user = await userServiceInstance.getOne({
+    _id: req.username,
+    select: "moderators",
+  });
   //[2] -> update the relation of the user moderators
-  await userServiceInstance.addSubredditModeration(
-    req.params.subreddit,
-    req.username
-  );
+  await userServiceInstance.addSubredditModeration(req.params.subreddit, user);
   //[3] -> update the subreddit moderators
-  await communityServiceInstance.addModerator(
-    req.params.subreddit,
-    req.username
-  );
+  await communityServiceInstance.addModerator(subreddit, req.username);
   res.status(200).json({
-    status: "succeded",
+    status: "success",
   });
 });
 
