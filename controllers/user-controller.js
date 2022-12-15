@@ -238,8 +238,7 @@ const getUserSavedPosts = catchAsync(async (req, res, next) => {
 const getUserPrefs = catchAsync(async (req, res, next) => {
   var prefs = undefined;
   try {
-    const user = await userServiceInstance.findById(req.username);
-    prefs = await userServiceInstance.userPrefs(user);
+    prefs = await userServiceInstance.userPrefs(req.username);
   } catch (err) {
     return next(err);
   }
@@ -256,8 +255,7 @@ const getUserPrefs = catchAsync(async (req, res, next) => {
 const getUserAbout = catchAsync(async (req, res, next) => {
   var about = undefined;
   try {
-    const user = await userServiceInstance.findById(req.params.username);
-    about = await userServiceInstance.userAbout(user);
+    about = await userServiceInstance.userAbout(req.params.username);
   } catch (err) {
     return next(err);
   }
@@ -274,8 +272,7 @@ const getUserAbout = catchAsync(async (req, res, next) => {
 const getUserMe = catchAsync(async (req, res, next) => {
   var meInfo = undefined;
   try {
-    const user = await userServiceInstance.findById(req.username);
-    meInfo = await userServiceInstance.userMe(user);
+    meInfo = await userServiceInstance.userMe(req.username);
   } catch (err) {
     return next(err);
   }

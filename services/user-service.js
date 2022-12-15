@@ -652,125 +652,130 @@ class UserService extends Service {
     return returnPosts;
   };
   /**
- * Get user about from database
- * @param {String} (username)
- * @returns {object} user
- */
-userAbout=async(username)=>{
-  const user = await User.findById(username);
-   if (user) {
-   const obj={ 
-     prefShowTrending: user.aboutReturn.prefShowTrending,
-     isBlocked: user.aboutReturn.isBlocked,
-     isBanned: user.member.isBanned,
-     isMuted: user.member.isMuted,
-     canCreateSubreddit: user.canCreateSubreddit,
-     isMod: user.aboutReturn.isMuted,
-     over18: user.prefs.over18,
-     hasVerifiedEmail: user.hasVerifiedEmail,
-     createdAt: user.createdAt,
-     inboxCount: user.inboxCount,
-     totalKarma: user.karma,
-     linkKarma: user.postKarma,
-     acceptFollowers: user.aboutReturn.acceptFollowers,
-     commentKarma: user.commentKarma,
-     passwordSet: user.isPasswordSet,
-     email: user.email,
-     about: user.about,
-     avatar: user.avatar,
-     userID: user._id,
-   };
-     return {
-       user: obj,
-     };
-   }
-   else {
-     return {
-       user: null,
-     };
-   }
-   };
-  /**
- * Get user me info from database
- * @param {String} (username)
- * @returns {object} user
- */
-userMe=async(username)=>{
-  const user = await User.findById(username);
-  if (user) {
-  const obj={ 
-  numComments: user.prefs.commentsNum,
-  threadedMessages: user.prefs.threadedMessages,
-  showLinkFlair: user.prefs.showLinkFlair,
-  countryCode: user.prefs.countryCode,
-  langauge: user.prefs.langauge,
-  over18: user.prefs.over18,
-  defaultCommentSort: user.prefs.defaultCommentSort,
-  showLocationBasedRecommendations: user.prefs.showLocationBasedRecommendations,
-  searchInclude18: user.prefs.searchInclude18,
-  publicVotes: user.prefs.publicVotes,
-  enableFollwers: user.prefs.enableFollwers,
-  liveOrangeRed: user.prefs.liveOrangereds,
-  labelNSFW: user.prefs.labelNSFW,
-  newWindow: user.prefs.showPostInNewWindow,
-  emailPrivateMessage: user.prefs.emailPrivateMessage,
-  emailPostReply: user.prefs.emailPostReply,
-  emailMessages: user.prefs.emailMessages,
-  emailCommentReply: user.prefs.emailCommentReply,
-  emailUpvoteComment: user.prefs.emailUpvoteComment,
-  about: user.about,
-  avatar: user.avatar,
-  userID: user._id,
-  emailUserNewFollwer: user.meReturn.emailUserNewFollwer,
-  emailUpVotePost: user.meReturn.emailUpVotePost,
-  emailUsernameMention: user.meReturn.emailUsernameMention,
-};
-  return {
-    user: obj,
-  };
-}
-else {
-  return {
-    user: null,
-  };
-}
+   * Get user about from database
+   * @param {String} (username)
+   * @returns {object} user
+   */
+  userAbout = async (username) => {
+    const user = await User.findById(username);
+    if (user) {
+      const obj = {
+        prefShowTrending: user.aboutReturn.prefShowTrending,
+        isBlocked: user.aboutReturn.isBlocked,
+        isBanned: user.member.isBanned,
+        isMuted: user.member.isMuted,
+        canCreateSubreddit: user.canCreateSubreddit,
+        isMod: user.aboutReturn.isMuted,
+        over18: user.prefs.over18,
+        hasVerifiedEmail: user.hasVerifiedEmail,
+        createdAt: user.createdAt,
+        inboxCount: user.inboxCount,
+        totalKarma: user.karma,
+        linkKarma: user.postKarma,
+        acceptFollowers: user.aboutReturn.acceptFollowers,
+        commentKarma: user.commentKarma,
+        passwordSet: user.isPasswordSet,
+        email: user.email,
+        about: user.about,
+        avatar: user.avatar,
+        userID: user._id,
+      };
+      return {
+        user: obj,
+      };
+    } else {
+      return {
+        user: null,
+      };
+    }
   };
   /**
- * Get user prefs from database
- * @param {String} (username)
- * @returns {object} user
- */
-userPrefs=async(username)=>{
-  const user = await User.findById(username);
-  if (user) {
-    return {
-      test:true,
-      user: user.prefs,
-    };
-  }
-  else {
-    return {
-      test:false,
-      user: null,
-    };
-  }
-};
- /**
-   * Resets user password and returns a new token
+   * Get user me info from database
+   * @param {String} (username)
+   * @returns {object} user
+   */
+  userMe = async (username) => {
+    const user = await User.findById(username);
+    if (user) {
+      const obj = {
+        numComments: user.prefs.commentsNum,
+        threadedMessages: user.prefs.threadedMessages,
+        showLinkFlair: user.prefs.showLinkFlair,
+        countryCode: user.prefs.countryCode,
+        langauge: user.prefs.langauge,
+        over18: user.prefs.over18,
+        defaultCommentSort: user.prefs.defaultCommentSort,
+        showLocationBasedRecommendations:
+          user.prefs.showLocationBasedRecommendations,
+        searchInclude18: user.prefs.searchInclude18,
+        publicVotes: user.prefs.publicVotes,
+        enableFollwers: user.prefs.enableFollwers,
+        liveOrangeRed: user.prefs.liveOrangereds,
+        labelNSFW: user.prefs.labelNSFW,
+        newWindow: user.prefs.showPostInNewWindow,
+        emailPrivateMessage: user.prefs.emailPrivateMessage,
+        emailPostReply: user.prefs.emailPostReply,
+        emailMessages: user.prefs.emailMessages,
+        emailCommentReply: user.prefs.emailCommentReply,
+        emailUpvoteComment: user.prefs.emailUpvoteComment,
+        about: user.about,
+        avatar: user.avatar,
+        userID: user._id,
+        emailUserNewFollwer: user.meReturn.emailUserNewFollwer,
+        emailUpVotePost: user.meReturn.emailUpVotePost,
+        emailUsernameMention: user.meReturn.emailUsernameMention,
+      };
+      return {
+        user: obj,
+      };
+    } else {
+      return {
+        user: null,
+      };
+    }
+  };
+  /**
+   * Get user prefs from database
+   * @param {String} (username)
+   * @returns {object} user
+   */
+  userPrefs = async (username) => {
+    const user = await User.findById(username);
+    if (user) {
+      return {
+        test: true,
+        user: user.prefs,
+      };
+    } else {
+      return {
+        test: false,
+        user: null,
+      };
+    }
+  };
+  /**
+   * Resets user password
    * @param {string} currentPassword
    * @param {string} newPassword
    * @param {string} confirmedNewPassword
    * @function
    */
- resetPassword = async (currentPassword, newPassword, confirmedNewPassword) => {
-  const user = await this.getOne({password: currentPassword});
-  if (!user) throw new AppError("user is invalid or expired!", 400);
-  if (confirmedNewPassword !== newPassword)
-    throw new AppError("Password is not equal to confirmed password!", 400);
-  const hash = await bcrypt.hash(newPassword, 10);
-  user.password = hash;
-  await user.save();
-};
+  resetPassword = async (
+    username,
+    currentPassword,
+    newPassword,
+    confirmedNewPassword
+  ) => {
+    const user = await this.getOne({ _id: username });
+    if (!user) throw new AppError("user is invalid or expired!", 400);
+    if (confirmedNewPassword !== newPassword)
+      throw new AppError("Password is not equal to confirmed password!", 400);
+    const result = await bcrypt.compareSync(currentPassword, user.password);
+    if (!result) throw new AppError("this password is not correct!", 400);
+    const hash = await bcrypt.hash(newPassword, 10);
+    user.password = hash;
+    await user.save();
+  };
   /**
    * Resets user password and returns a new token
    * @param {string} token
