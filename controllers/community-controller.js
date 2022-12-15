@@ -414,14 +414,16 @@ const createSubreddit = async (req, res) => {
   console.log(req.body);
   const check=await communityServiceInstance.creationValidation(req.body);
   console.log(check);
-  if (!check.state) {
+  if (!check) {
     return res.status(500).json({
       status: "invalid parameters",
     });
   }
   var user = await userServiceInstance.getOne({ _id: req.username });
+  
   const result = await communityServiceInstance.createSubreddit(req.body, user);
-  if (!result.status) {
+  const updateUser=await userServiceInstance.addUserToComm(user,req.body.name);
+  if (!result.status||!updateUser.status) {
     return res.status(500).json({
       status: result.error,
     });
