@@ -700,6 +700,7 @@ class UserService extends Service {
     const user = await User.findById(username);
     if (user) {
       const obj = {
+        followerCount:user.followers.length,
         prefShowTrending: user.aboutReturn.prefShowTrending,
         isBlocked: user.aboutReturn.isBlocked,
         isBanned: user.member.isBanned,
