@@ -430,7 +430,6 @@ class UserService extends Service {
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
       await user.save({ validateBeforeSave: false });
-      console.log("ERROR IN SENDING MAIL!!!", err);
       throw new AppError("There was an error in sending the mail!", 500);
     }
   };
