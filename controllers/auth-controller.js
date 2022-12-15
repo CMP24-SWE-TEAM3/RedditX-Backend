@@ -56,11 +56,13 @@ const signup = async (req, res) => {
       expiresIn: result.expiresIn,
       username: result.username,
     });
+
   } else {
     return res.status(404).json({
       error: result.error,
     });
   }
+
 };
 
 /**
@@ -126,6 +128,22 @@ const resetForgottenPassword = catchAsync(async (req, res, next) => {
     username: data.id,
   });
 });
+const resetUserPassword = catchAsync(async (req, res, next) => {
+  try {
+     await userServiceInstance.resetPassword(
+      req.username,
+      req.body.currentPassword,
+      req.body.newPassword,
+      req.body.confirmedNewPassword
+    );
+  } catch (err) {
+    return next(err);
+  }
+  return res.status(200).json({
+    status: "success",
+    message: "Password is reset"
+  });
+});
 
 module.exports = {
   availableUsername,
@@ -133,4 +151,5 @@ module.exports = {
   login,
   forgotPassword,
   resetForgottenPassword,
+  resetUserPassword,
 };

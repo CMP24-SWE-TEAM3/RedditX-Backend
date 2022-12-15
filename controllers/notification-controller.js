@@ -30,7 +30,24 @@ const getNotifications = catchAsync(async (req, res, next) => {
     notifications,
   });
 });
+/**
+ * User delete a notification
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const deleteUserNotification = catchAsync(async (req, res, next) => {
+  try {
+    await notificationServiceInstance.deleteNotification(req.body.notificationID);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Post is deleted successfully",
+  });
+});
 
 module.exports = {
   getNotifications,
+  deleteUserNotification
 };

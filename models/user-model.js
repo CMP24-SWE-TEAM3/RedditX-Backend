@@ -398,6 +398,12 @@ const userSchema = new mongoose.Schema({
       ref: "Post",
     },
   ],
+  hiddenPosts: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "Post",
+    },
+  ],
   savedPosts: [
     {
       type: mongoose.Schema.ObjectId,

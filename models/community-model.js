@@ -199,9 +199,9 @@ const communitySchema = mongoose.Schema({
   invitedModerators: [
     {
       type: String,
-      ref: 'User'
-    }
-  ]
+      ref: "User",
+    },
+  ],
 });
 
 const Community = mongoose.model("Community", communitySchema);

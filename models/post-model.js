@@ -48,6 +48,10 @@ const postSchema = mongoose.Schema({
     type: Boolean,
     default: 0,
   },
+  locked: {
+    type: Boolean,
+    default: 0,
+  },
   type: {
     type: String,
     enum: ["link", "image", "linkWithImage"],
@@ -76,6 +80,9 @@ const postSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+  },
+  editedAt: {
+    type: Date,
   },
   followers: [
     {

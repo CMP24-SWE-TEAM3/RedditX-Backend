@@ -15,12 +15,12 @@ class MessageService extends Service {
    * @returns {object} boolean
    * @function
    */
-  validateMessage=async(body)=>{
-    if(!body.subject||!body.text||!body.fromID||!body.toID){
-        return false;
+  validateMessage = async (body) => {
+    if (!body.subject || !body.text || !body.fromID || !body.toID) {
+      return false;
     }
     return true;
-  }
+  };
 
   /**
    * Creates a message
@@ -28,159 +28,161 @@ class MessageService extends Service {
    * @returns {object} state
    * @function
    */
-   composeMessage=async(body)=>{
+  composeMessage = async (body) => {
     var message;
-    try{
-     message= await this.insert({"text":body.text,"subject":body.subject,"fromID":body.fromID,"toID":body.toID})
-    }
-    catch{
+    try {
+      message = await this.insert({
+        text: body.text,
+        subject: body.subject,
+        fromID: body.fromID,
+        toID: body.toID,
+      });
+    } catch {
       return {
-        status:false,
-        error:"operation failed"
-      }
+        status: false,
+        error: "operation failed",
+      };
     }
     console.log(message);
     return {
-        status:true,
-        id:message._id.toString()
-    }
-    }
-   /**
+      status: true,
+      id: message._id.toString(),
+    };
+  };
+  /**
    * Delete a message
    * @param {object} body
    * @returns {object} state
    * @function
    */
-   deleteMessage=async(body)=>{
+  deleteMessage = async (body) => {
     var message;
-    const existCheck=await this.getOne({_id:body.msgID});
-    if(!existCheck){
+    const existCheck = await this.getOne({ _id: body.msgID });
+    if (!existCheck) {
       return {
-        status:false,
-        error:"invalid msgID"
-      }
+        status: false,
+        error: "invalid msgID",
+      };
     }
-    try{
-     message= await this.updateOne({_id:body.msgID},{isDeleted:true})
-    }
-    catch{
+    try {
+      message = await this.updateOne({ _id: body.msgID }, { isDeleted: true });
+    } catch {
       return {
-        status:false,
-        error:"operation failed"
-      }
+        status: false,
+        error: "operation failed",
+      };
     }
     console.log(message);
     return {
-        status:true,
-        id:message._id.toString()
-    }
-    }
+      status: true,
+      id: message._id.toString(),
+    };
+  };
 
-     /**
+  /**
    * unread a message
    * @param {object} body
    * @returns {object} state
    * @function
    */
-   unreadMessage=async(body)=>{
+  unreadMessage = async (body) => {
     var message;
-    const existCheck=await this.getOne({_id:body.msgID});
+    const existCheck = await this.getOne({ _id: body.msgID });
     console.log(existCheck);
-    if(!existCheck){
+    if (!existCheck) {
       return {
-        status:false,
-        error:"invalid msgID"
-      }
+        status: false,
+        error: "invalid msgID",
+      };
     }
-    if(existCheck.unread_status){
+    if (existCheck.unread_status) {
       return {
-        status:false,
-        error:"already unread"
-      }
+        status: false,
+        error: "already unread",
+      };
     }
-    try{
-     message= await this.updateOne({_id:body.msgID},{unread_status:true})
-    }
-    catch{
+    try {
+      message = await this.updateOne(
+        { _id: body.msgID },
+        { unread_status: true }
+      );
+    } catch {
       return {
-        status:false,
-        error:"operation failed"
-      }
+        status: false,
+        error: "operation failed",
+      };
     }
     return {
-        status:true,
-        id:message._id.toString()
-    }
-    }
-    /**
+      status: true,
+      id: message._id.toString(),
+    };
+  };
+  /**
    * Get all messages sent by user
    * @param {object} username
    * @returns {object} state
    * @function
    */
-   sentMessages=async(username)=>{
+  sentMessages = async (username) => {
     var messages;
-    
-    try{
-     messages= await this.find({fromID:username,isDeleted:false});
-    }
-    catch{
+
+    try {
+      messages = await this.find({ fromID: username, isDeleted: false });
+    } catch {
       return {
-        status:false,
-        error:"operation failed"
-      }
+        status: false,
+        error: "operation failed",
+      };
     }
     return {
-        status:true,
-        messages:messages
-    }
-    }
-     /**
-   * Get all messages 
+      status: true,
+      messages: messages,
+    };
+  };
+  /**
+   * Get all messages
    * @param {object} username
    * @returns {object} state
    * @function
    */
-   allMessages=async(username)=>{
+  allMessages = async (username) => {
     var messages;
-    
-    try{
-     messages= await this.getAll();
-    }
-    catch{
+
+    try {
+      messages = await this.getAll();
+    } catch {
       return {
-        status:false,
-        error:"operation failed"
-      }
+        status: false,
+        error: "operation failed",
+      };
     }
     return {
-        status:true,
-        messages:messages
-    }
-    }
-      /**
+      status: true,
+      messages: messages,
+    };
+  };
+  /**
    * Get all messages sent by user
    * @param {object} username
    * @returns {object} state
    * @function
    */
-   inboxMessages=async(username)=>{
+  inboxMessages = async (username) => {
     var messages;
-    
-    try{
-     messages= await this.find({toID:username,isDeleted:false});
-    }
-    catch{
+
+    try {
+      messages = await this.find({ toID: username, isDeleted: false });
+    } catch {
       return {
-        status:false,
-        error:"operation failed"
-      }
+        status: false,
+        error: "operation failed",
+      };
     }
     return {
-        status:true,
-        messages:messages
-    }
-    }
+      status: true,
+      messages: messages,
+    };
+  };
 }
 
 module.exports = MessageService;
