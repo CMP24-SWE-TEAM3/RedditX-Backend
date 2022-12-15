@@ -414,7 +414,7 @@ const createSubreddit = async (req, res) => {
   console.log(req.body);
   const check=await communityServiceInstance.creationValidation(req.body);
   console.log(check);
-  if (!check) {
+  if (!check.state) {
     return res.status(500).json({
       status: "invalid parameters",
     });
