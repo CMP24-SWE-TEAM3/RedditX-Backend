@@ -119,6 +119,7 @@ describe("testing uploadCommunityPhoto service in community service class", () =
     });
   });
 });
+
 describe("testing getCommunities service in community service class", () => {
   var community = new Community({
     _id: "t5_imagePro235",
@@ -434,6 +435,7 @@ describe("testing banOrMuteAtCommunity service in community service class", () =
     });
   });
 });
+
 describe("testing banOrMuteAtUser service in community service class", () => {
   describe("given a toBeAffected, community, operation=ban", () => {
     test("should not throw an error", async () => {
@@ -775,6 +777,7 @@ describe("testing kickAtCommunity service in community service class", () => {
     });
   });
 });
+
 describe("testing kickAtUser service in community service class", () => {
   describe("given a toBeKicked, community", () => {
     test("should not throw an error", async () => {
@@ -855,7 +858,7 @@ describe("testing removeSpam service in community service class", () => {
   describe("given a link, spamID, commentOrPostField=spammers", () => {
     test("should not throw an error", async () => {
       const post = new Post({
-        _id: "t3_637becd453fc9fc3d423a1d4",
+        _id: "637becd453fc9fc3d423a1d4",
         spammers: [
           {
             spammerID: "t2_hamada",
@@ -933,7 +936,10 @@ describe("testing getBannedOrMuted service in community service class", () => {
         .fn()
         .mockReturnValueOnce(community);
       const { memberIDs, dates } =
-        await communityServiceInstance.getBannedOrMuted(community, "isBanned");
+        await communityServiceInstance.getBannedOrMuted(
+          "t5_imagePro235",
+          "isBanned"
+        );
       expect(memberIDs[0]).toBe("t2_moazMohamed");
       expect(dates[0]).toStrictEqual(new Date("2022-12-09T19:16:16.443Z"));
     });
@@ -968,7 +974,10 @@ describe("testing getBannedOrMuted service in community service class", () => {
         .fn()
         .mockReturnValueOnce(community);
       const { memberIDs, dates } =
-        await communityServiceInstance.getBannedOrMuted(community, "isMuted");
+        await communityServiceInstance.getBannedOrMuted(
+          "t5_imagePro235",
+          "isMuted"
+        );
       expect(memberIDs[0]).toBe("t2_moazMohamed");
       expect(dates[0]).toStrictEqual(new Date("2022-12-09T19:16:16.443Z"));
     });
@@ -980,7 +989,7 @@ describe("testing getBannedOrMuted service in community service class", () => {
         .fn()
         .mockReturnValueOnce(community);
       expect(
-        communityServiceInstance.getBannedOrMuted(community, "isMuted")
+        communityServiceInstance.getBannedOrMuted("t5_imagePro235", "isMuted")
       ).rejects.toThrowError();
     });
   });
@@ -1002,7 +1011,7 @@ describe("testing getModerators service in community service class", () => {
         .fn()
         .mockReturnValueOnce(community);
       const { moderatorIDs, crator } =
-        await communityServiceInstance.getModerators(community);
+        await communityServiceInstance.getModerators("t5_imagePro235");
       expect(moderatorIDs[0]).toBe("t2_hamada");
     });
   });
@@ -1013,7 +1022,7 @@ describe("testing getModerators service in community service class", () => {
         .fn()
         .mockReturnValueOnce(community);
       expect(
-        communityServiceInstance.getModerators(community)
+        communityServiceInstance.getModerators("t5_imagePro235")
       ).rejects.toThrowError();
     });
   });
@@ -1050,7 +1059,7 @@ describe("testing getMembers service in community service class", () => {
         .fn()
         .mockReturnValueOnce(community);
       const { memberIDs, isBannedAndMuted } =
-        await communityServiceInstance.getMembers(community);
+        await communityServiceInstance.getMembers("t5_imagePro235");
       expect(memberIDs[0]).toBe("t2_hamada");
       expect(isBannedAndMuted[0].isBanned.value).toBe(true);
     });
@@ -1062,7 +1071,7 @@ describe("testing getMembers service in community service class", () => {
         .fn()
         .mockReturnValueOnce(community);
       expect(
-        communityServiceInstance.getMembers(community)
+        communityServiceInstance.getMembers("t5_imagePro235")
       ).rejects.toThrowError();
     });
   });
@@ -1081,7 +1090,7 @@ describe("testing getCommunityOptions service in community service class", () =>
         .fn()
         .mockReturnValueOnce(community);
       const options = await communityServiceInstance.getCommunityOptions(
-        community
+        "t5_imagePro235"
       );
       expect(options.privacyType).toBe("public");
     });
@@ -1093,7 +1102,7 @@ describe("testing getCommunityOptions service in community service class", () =>
         .fn()
         .mockReturnValueOnce(community);
       expect(
-        communityServiceInstance.getCommunityOptions(community)
+        communityServiceInstance.getCommunityOptions("t5_imagePro235")
       ).rejects.toThrowError();
     });
   });
@@ -1135,7 +1144,10 @@ describe("testing getStats service in community service class", () => {
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      const data = await communityServiceInstance.getStats(community, "joined");
+      const data = await communityServiceInstance.getStats(
+        "t5_imagePro235",
+        "joined"
+      );
       expect(data[0].count).toBe(5);
       expect(data[0].date).toBe("10/12/2022");
     });
@@ -1154,7 +1166,10 @@ describe("testing getStats service in community service class", () => {
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      const data = await communityServiceInstance.getStats(community, "left");
+      const data = await communityServiceInstance.getStats(
+        "t5_imagePro235",
+        "left"
+      );
       expect(data[0].count).toBe(20);
       expect(data[0].date).toBe("10/12/2022");
     });
@@ -1174,7 +1189,7 @@ describe("testing getStats service in community service class", () => {
         .fn()
         .mockReturnValueOnce(community);
       const data = await communityServiceInstance.getStats(
-        community,
+        "t5_imagePro235",
         "pageViews"
       );
       expect(data[0].count).toBe(521);
@@ -1188,7 +1203,7 @@ describe("testing getStats service in community service class", () => {
         .fn()
         .mockReturnValueOnce(community);
       expect(
-        communityServiceInstance.getStats(community)
+        communityServiceInstance.getStats("t5_imagePro235")
       ).rejects.toThrowError();
     });
   });

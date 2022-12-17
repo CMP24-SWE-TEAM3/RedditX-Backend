@@ -412,7 +412,7 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
  */
 const createSubreddit = async (req, res) => {
   console.log(req.body);
-  const check=await communityServiceInstance.creationValidation(req.body);
+  const check = await communityServiceInstance.creationValidation(req.body);
   console.log(check);
   if (!check) {
     return res.status(500).json({
@@ -420,18 +420,20 @@ const createSubreddit = async (req, res) => {
     });
   }
   var user = await userServiceInstance.getOne({ _id: req.username });
-  
+
   const result = await communityServiceInstance.createSubreddit(req.body, user);
-  const updateUser=await userServiceInstance.addUserToComm(user,req.body.name);
-  if (!result.status||!updateUser.status) {
-    if(!result.errorType)
+  const updateUser = await userServiceInstance.addUserToComm(
+    user,
+    req.body.name
+  );
+  if (!result.status || !updateUser.status) {
+    if (!result.errorType)
       return res.status(200).json({
         status: result.error,
       });
     return res.status(500).json({
-        status: result.error,
+      status: result.error,
     });
-        
   }
   return res.status(200).json({
     status: result.response,
@@ -807,7 +809,6 @@ const removeSpam = catchAsync(async (req, res, next) => {
         _id: req.body.linkID.slice(3),
         select: "spammers",
       });
-      console.log(post);
       if (!post) return new AppError("This post doesn't exist!", 404);
       const subreddit = await communityServiceInstance.getOne({
         _id: req.params.subreddit,

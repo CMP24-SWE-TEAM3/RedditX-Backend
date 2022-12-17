@@ -211,7 +211,10 @@ const userSchema = new mongoose.Schema({
     default: false,
     select: false,
   },
-  avatar: String,
+  avatar: {
+    type: String,
+    default: "default.jpg",
+  },
   email: {
     type: String,
     required: [true, "Please provide your email"],
