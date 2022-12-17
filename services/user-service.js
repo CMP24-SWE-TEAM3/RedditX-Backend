@@ -796,6 +796,30 @@ class UserService extends Service {
       };
     }
   };
+  /**
+   * Resets user password
+   * @param {string} currentPassword
+   * @param {string} newPassword
+   * @param {string} confirmedNewPassword
+   * @function
+   */
+  resetPassword = async (
+    username,
+    currentPassword,
+    newPassword,
+    confirmedNewPassword
+  ) => {
+    const user = await this.getOne({ _id: username });
+    if (!user) throw new AppError("user is invalid or expired!", 400);
+    if (confirmedNewPassword !== newPassword)
+      throw new AppError("Password is not equal to confirmed password!", 400);
+    const result = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!result) throw new AppError("this password is not correct!", 400);
+    const hash = await bcrypt.hash(newPassword, 10);
+    user.password = hash;
+    await user.save();
+  };
 
   /**
    * Resets user password and returns a new token
