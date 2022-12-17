@@ -1,5 +1,6 @@
 const express = require("express");
 const authController = require("../controllers/auth-controller");
+const authCheck = require("../middlewares/auth-check");
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.post(
   authController.resetForgottenPassword
 );
 router.patch(
-  "/reset-password", authController.resetUserPassword
+  "/reset-password",authCheck ,authController.resetUserPassword
 );
 
 
