@@ -811,7 +811,8 @@ class UserService extends Service {
     if (!user) throw new AppError("user is invalid or expired!", 400);
     if (confirmedNewPassword !== newPassword)
       throw new AppError("Password is not equal to confirmed password!", 400);
-    const result = await bcrypt.compareSync(currentPassword, user.password);
+    const result = await bcrypt.compare(currentPassword, user.password);
+    
     if (!result) throw new AppError("this password is not correct!", 400);
     const hash = await bcrypt.hash(newPassword, 10);
     user.password = hash;
