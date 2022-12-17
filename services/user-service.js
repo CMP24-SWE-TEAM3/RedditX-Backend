@@ -640,30 +640,32 @@ class UserService extends Service {
     const userMember = {
       communityId: communityID,
       isMuted: {
-        value:false,
+        value: false,
       },
-      isBanned:{
-        value:false,
+      isBanned: {
+        value: false,
       },
     };
-    const modarr=user.moderators;
+    const modarr = user.moderators;
     modarr.push(userModerator);
-    const memarr=user.member;
+    const memarr = user.member;
     memarr.push(userMember);
-    try{
-      const x=await this.updateOne({_id:user._id},{moderators:modarr,member:memarr});
-     console.log(x);
-     }
-     catch{
+    try {
+      const x = await this.updateOne(
+        { _id: user._id },
+        { moderators: modarr, member: memarr }
+      );
+      console.log(x);
+    } catch {
       console.log("dd");
-       return {
-         status: false,
-         error: "operation failed",
-       };
-     }
-     return {
-      status: true,
+      return {
+        status: false,
+        error: "operation failed",
       };
+    }
+    return {
+      status: true,
+    };
   };
   /**
    * Get posts where is saved by the user in from database
@@ -700,7 +702,7 @@ class UserService extends Service {
     const user = await User.findById(username);
     if (user) {
       const obj = {
-        followerCount:user.followers.length,
+        followerCount: user.followers.length,
         prefShowTrending: user.aboutReturn.prefShowTrending,
         isBlocked: user.aboutReturn.isBlocked,
         isBanned: user.member.isBanned,
@@ -818,6 +820,7 @@ class UserService extends Service {
     user.password = hash;
     await user.save();
   };
+
   /**
    * Resets user password and returns a new token
    * @param {string} token
@@ -862,21 +865,10 @@ class UserService extends Service {
   };
 
   addSubredditModeration = async (subreddit, user) => {
-    await this.updateOne(
-      { _id: user },
-      {
-        $addToSet: {
-          moderators: {
-            $each: [
-              {
-                communityId: subreddit,
-                role: "moderator",
-              },
-            ],
-          },
-        },
-      }
-    );
+    if (!user.moderators.find((el) => el.communityId === subreddit)) {
+      user.moderators.push({ communityId: subreddit, role: "moderator" });
+      await user.save();
+    }
   };
 }
 module.exports = UserService;
