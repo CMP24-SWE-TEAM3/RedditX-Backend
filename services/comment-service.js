@@ -166,7 +166,6 @@ class CommentService extends Service {
       var voter;
       for (let z = 0; z < voters.length; z++) {
         if (voters[z].userID === username) {
-          console.log("jj");
           isFound = true;
           voter = voters[z];
           break;
