@@ -15,7 +15,7 @@ const flairSchema = mongoose.Schema({
   flairID: String,
   flairText: {
     type: String,
-    default: 'defaultString'
+    default: "defaultString",
   },
   flairTextColor: {
     type: String,
@@ -218,6 +218,5 @@ const communitySchema = mongoose.Schema({
 });
 
 const Community = mongoose.model("Community", communitySchema);
-
 
 module.exports = Community;
