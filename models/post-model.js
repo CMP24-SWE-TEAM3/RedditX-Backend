@@ -158,6 +158,10 @@ postSchema.pre(/^find/, function (next) {
     path: "userID",
     select: "_id avatar",
   });
+  this.populate({
+    path: 'communityID',
+    select: 'icon'
+  })
   next();
 });
 
