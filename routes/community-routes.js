@@ -138,7 +138,24 @@ router
   .post(authCheck, communityController.deleteFlair);
 
 router
-  .route("/:subreddit/api/flair")
+  .route('/:subreddit/flair')
   .post(authCheck, communityController.addFlair);
+
+router
+  .route('/:subreddit/site-admin')
+  .post(authCheck, communityController.configureSubreddit);
+
+
+router
+  .route('/approve')
+  .post(authCheck, communityController.approveLink);
+
+router
+  .route('/remove')
+  .post(authCheck, communityController.removeLink);
+
+router
+  .route('/kick-moderator')
+  .post(authCheck, communityController.kickModerator);
 
 module.exports = router;

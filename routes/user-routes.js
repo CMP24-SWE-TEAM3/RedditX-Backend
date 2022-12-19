@@ -48,5 +48,15 @@ router.get("/:username/userSelfReply", profileController.getUserSelfReply);
 router.post("/subscribe", authCheck, userController.subscribe);
 router.post("/update", authCheck, userController.updateInfo);
 
-router.route("/me/friends").get(authCheck, userController.getAllFriends);
+router
+  .route('/me/friends')
+  .get(authCheck, userController.getAllFriends);
+
+router
+  .route('/me/friends/:username')
+  .get(authCheck, userController.getUserInfo)
+
+router
+  .route('/friend')
+  .post(authCheck, userController.friendRequest)
 module.exports = router;

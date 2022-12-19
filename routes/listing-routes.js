@@ -7,11 +7,7 @@ const authCheck = require("../middlewares/auth-check");
 const addSubreddit = require("./../middlewares/append-subreddit");
 const router = express.Router();
 
-router.post(
-  "/follow-post",
-  authCheck,
-  listingController.followPost
-);
+router.post("/follow-post", authCheck, listingController.followPost);
 router
   .route("/posts/r/:subreddit/:criteria")
   .get(possibleAuthCheck, addSubreddit, listingController.getPosts);
@@ -45,4 +41,12 @@ router.post("/:subreddit/spoiler", authCheck, listingController.markSpoiler);
 
 router.route("/show-comment").post(authCheck, commentController.showComment);
 
+router
+  .route("/insights-count/:post")
+  .get(/*authCheck,*/ listingController.getPostInsights);
+
+
+router
+  .route("/insights_count/:post")
+  .get(authCheck, listingController.getPostInsights);
 module.exports = router;

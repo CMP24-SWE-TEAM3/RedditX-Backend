@@ -53,7 +53,7 @@ class PostService extends Service {
     delete query.q;
     return this.getAll(
       {
-        $or: [{ text: { $regex: searchQuery, $options: "i" } }],
+        $or: [{ textHTML: { $regex: searchQuery, $options: "i" } }],
       },
       query
     );
@@ -151,103 +151,115 @@ class PostService extends Service {
     }
     await post.save();
   };
- /**
-   * User hides a post
+
+  approvePost = async (post) => {
+    post.isDeleted = false;
+    post.spammers = [];
+    post.spamCount = 0;
+    await post.save();
+  }
+
+  removePost = async (post) => {
+    post.isDeleted = true;
+    await post.save();
+  }
+  /**
+    * User hides a post
+    * @param {string} linkID
+    * @param {object} user
+    * @function
+    */
+  hide = async (linkID, user) => {
+    if (!linkID) throw new AppError("No linkID is provided!", 400);
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    if (user.hiddenPosts.find((el) => el.toString() === linkID.slice(3))) return;
+    user.hiddenPosts.push(linkID.slice(3));
+    await user.save();
+  };
+
+  /**
+   * User unhides a post
    * @param {string} linkID
    * @param {object} user
    * @function
    */
- hide = async (linkID, user) => {
-  if (!linkID) throw new AppError("No linkID is provided!", 400);
-  if (!user) throw new AppError("This user doesn't exist!", 404);
-  if (user.hiddenPosts.find((el) => el.toString() === linkID.slice(3))) return;
-  user.hiddenPosts.push(linkID.slice(3));
-  await user.save();
-};
+  unhide = async (linkID, user) => {
+    if (!linkID) throw new AppError("No linkID is provided!", 400);
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    user.hiddenPosts.splice(
+      user.hiddenPosts.findIndex((el) => el === linkID.slice(3)),
+      1
+    );
+    await user.save();
+  };
+  /**
+    * User delete a post
+    * @param {string} linkID
+    * @function
+    */
+  deletePost = async (linkID) => {
+    const post = await this.getOne({ _id: linkID });
+    if (!post) throw new AppError("linkID doesn't exist!", 404);
+    post.isDeleted = true;
+    await post.save();
+  };
 
-/**
- * User unhides a post
- * @param {string} linkID
- * @param {object} user
- * @function
- */
-unhide = async (linkID, user) => {
-  if (!linkID) throw new AppError("No linkID is provided!", 400);
-  if (!user) throw new AppError("This user doesn't exist!", 404);
-  user.hiddenPosts.splice(
-    user.hiddenPosts.findIndex((el) => el === linkID.slice(3)),
-    1
-  );
-  await user.save();
-};
- /**
-   * User delete a post
-   * @param {string} linkID
-   * @function
-   */
- deletePost = async (linkID) => {
-  const post = await this.getOne({_id: linkID });
-  if (!post) throw new AppError("linkID doesn't exist!", 404);
-  post.isDeleted = true;
-  await post.save();
-};
+  /**
+     * Follow post
+     * @param {string} body contain linkID and action
+     * @param {string} username username of the user
+     * @returns {object} state
+     * @function
+     */
+  followPost = async (body, username) => {
+    const post = await this.getOne({ _id: body.linkID });
 
-/**
-   * Follow post
-   * @param {string} body contain linkID and action
-   * @param {string} username username of the user
-   * @returns {object} state
-   * @function
-   */
-followPost=async(body,username)=>{
-  const post =await this.getOne({_id:body.linkID});
-
-  var isFound=false;
-  var index=-1;
-  for(let i=0;i<post.followers.length;i++){
-      if(post.followers[i]===username){
-        isFound=true;
-        index=i;
+    var isFound = false;
+    var index = -1;
+    for (let i = 0; i < post.followers.length; i++) {
+      if (post.followers[i] === username) {
+        isFound = true;
+        index = i;
         break;
       }
-  }
-  console.log(isFound);
-  console.log(body.action);
-  console.log(index);
-  if((isFound&&body.action)){
+    }
+    console.log(isFound);
+    console.log(body.action);
+    console.log(index);
+    if ((isFound && body.action)) {
+      return {
+        status: false,
+        error: "user already followed this post"
+      }
+    }
+    if ((!isFound && !body.action)) {
+      return {
+
+        status: false,
+        error: "user already not followed this post"
+      }
+    }
+    try {
+      var arr;
+      if (!body.action) {
+        post.followers.splice(index, 1);
+      } else {
+        post.followers.push(username);
+
+      }
+      arr = post.followers;
+      await this.updateOne({ _id: body.linkID }, { followers: arr });
+    }
+    catch {
+      return {
+        status: false,
+        error: "operation failed"
+      }
+    }
     return {
-      status:false,
-      error:"user already followed this post"
+      status: true
     }
   }
-  if((!isFound&&!body.action)){
-    return {
-    
-      status:false,
-      error:"user already not followed this post"
-    }
-  }
-  try{
-    var arr;
-    if(!body.action){
-      post.followers.splice(index,1);
-    }else{
-      post.followers.push(username);
-      
-    }
-    arr=post.followers;
-    await this.updateOne({_id:body.linkID},{followers:arr});
-  }
-  catch{
-    return {
-      status:false,
-      error:"operation failed"
-    }
-  }
-  return {
-    status:true
-  }
-}
 
 }
 
