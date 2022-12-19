@@ -749,8 +749,9 @@ const deleteFlair = catchAsync(async (req, res) => {
     { _id: req.params.subreddit }
   );
 
-  document.flairList = document.flairList.filter(el => { el._id != req.body.id });
+  document.flairList = document.flairList.filter(el => el._id != req.body.id);
   await document.save();
+
   res.status(200).json({
     status: "succeeded",
   });
