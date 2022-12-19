@@ -105,6 +105,7 @@ app.use("/api/r", communityRouter);
 app.use("/api/listing", listingRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/notification", notificationRouter);
+app.use("/api", postRouter);
 app.all("*", (req, res, next) => {
   return next(
     new AppError(`Can't find ${req.originalUrl} on this server`, 404)
