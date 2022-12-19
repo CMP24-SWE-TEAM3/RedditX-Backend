@@ -520,7 +520,7 @@ const getCommunityAbout = async (req, res) => {
     req.params["subreddit"]
   );
   console.log(result);
-  if (result.status) {
+  if (result.state) {
     return res.status(500).json({
       status: result.error,
     });
