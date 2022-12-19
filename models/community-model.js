@@ -217,6 +217,20 @@ const communitySchema = mongoose.Schema({
   ],
 });
 
+communitySchema.post(/^find/, async function (doc, next) {
+  let filterOfDays = {};
+  let filterOfMonths = {};
+  filterOfDays[`pageViewsPerDay.${new Date().getDay()}`] = 1;
+  filterOfMonths[`pageViewsPerMonth.${new Date().getMonth()}`] = 1;
+  await Community.updateMany(this.getFilter(), {
+    $inc: filterOfDays
+  });
+  await Community.updateMany(this.getFilter(), {
+    $inc: filterOfMonths
+  });
+  next();
+});
+
 const Community = mongoose.model("Community", communitySchema);
 
 module.exports = Community;
