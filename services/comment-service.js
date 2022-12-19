@@ -85,7 +85,8 @@ class CommentService extends Service {
     }
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newComment = new Comment({
-      text: data.text,
+      textHTML: data.textHTML,
+      textJSON: data.textJSON,
       isRoot: true,
       authorId: username,
       replyingTo: data.postID,
@@ -116,7 +117,8 @@ class CommentService extends Service {
     const comment = await Comment.findById({ _id: data.commentID });
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newReply = new Comment({
-      text: data.text,
+      textHTML: data.textHTML,
+      textJSON: data.textJSON,
       isRoot: false,
       authorId: username,
       replyingTo: data.commentID,

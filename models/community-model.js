@@ -75,9 +75,8 @@ const isBannedOrMutedSchema = mongoose.Schema({
     default: false,
   },
   date: {
-    
-  type:  Date,
-  default: Date.now
+    type: Date,
+    default: Date.now,
   },
 });
 const memberSchema = mongoose.Schema({

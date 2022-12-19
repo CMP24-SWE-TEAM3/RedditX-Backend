@@ -41,7 +41,6 @@ class Service {
   };
 
   updateOne = (query, update, options = {}) => {
-    ///msh 3arfa ab3t elfunction ezay hena
     return this.model
       .findOneAndUpdate(query, update, options, (error, doc) => {
         if (!error) return doc;
