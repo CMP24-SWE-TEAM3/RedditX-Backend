@@ -423,15 +423,15 @@ const createSubreddit = async (req, res) => {
   var user = await userServiceInstance.getOne({ _id: req.username });
 
   const result = await communityServiceInstance.createSubreddit(req.body, user);
-  const updateUser = await userServiceInstance.addUserToComm(
-    user,
-    req.body.name
-  );
-  if (!result.status || !updateUser.status) {
-    if (!result.errorType)
-      return res.status(200).json({
-        status: result.error,
-      });
+  if(!result.status){
+    return res.status(200).json({
+      status: result.error,
+    });
+  }
+  const updateUser=await userServiceInstance.addUserToComm(user,req.body.name);
+  if (!updateUser.status) {
+    
+
     return res.status(500).json({
       status: result.error,
     });
