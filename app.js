@@ -22,6 +22,7 @@ const AppError = require("./utils/app-error");
 const app = express();
 
 app.use(function (req, res, next) {
+  console.log(req.originalUrl);   //  for debugging
   res.setHeader("Access-Control-Allow-Credentials", true);
   next();
 });
