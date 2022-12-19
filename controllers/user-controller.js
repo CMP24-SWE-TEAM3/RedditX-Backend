@@ -31,6 +31,11 @@ const followers = async (req, res) => {
     });
   }
   const result = await userServiceInstance.getFollowers(req.username);
+  if(!result.status){
+    return res.status(500).json({
+      status:"operation failed"
+    })
+  }
   return res.status(200).json({
     response: "done",
     followers: result.followers,
@@ -333,6 +338,24 @@ const returnResponse = (res, obj, statusCode) => {
 };
 
 /**
+ * Get followers of specific user
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const getFollowersOfUser=async(req,res)=>{
+  const result=await userServiceInstance.getFollowersOfUser(req.body.userID);
+  if(!result.status){
+    return res.status(500).json({
+      status:"operation failed"
+    })
+  }
+  return res.status(200).json({
+    response: "done",
+    followers: result.followers,
+  });
+}
+
+/**
  * Subscribe to a subreddit or a redditor
  * @param {function} (req,res)
  * @returns {object} res
@@ -596,6 +619,9 @@ module.exports = {
   getUserPrefs,
   editUserPrefs,
   subscribe,
+
+  getFollowersOfUser,
+
   getUserSavedPosts,
   friendRequest,
   getAllFriends,
