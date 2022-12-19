@@ -15,7 +15,7 @@ const flairSchema = mongoose.Schema({
   flairID: String,
   flairText: {
     type: String,
-    default: 'defaultString'
+    default: "defaultString",
   },
   flairTextColor: {
     type: String,
@@ -31,11 +31,6 @@ const flairSchema = mongoose.Schema({
     type: Boolean,
     default: 0,
   },
-});
-
-const statsSchema = mongoose.Schema({
-  date: String, // "1/1/2022"
-  count: Number,
 });
 
 const communityOptionsSchema = mongoose.Schema({
@@ -169,28 +164,30 @@ const communitySchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
-
-  pageViews: [
-    // TODO: VERY IMPORTANT: if a user receives a listing from this community, you must search in this array for the today date,
-    // if found it, increment the count, if not, create an object with the today date and make its count = 0
-    {
-      type: statsSchema,
-    },
-  ],
-  joined: [
-    // TODO: VERY IMPORTANT: if a user subscribes to this community, you must search in this array for the today date,
-    // if found it, increment the count, if not, create an object with the today date and make its count = 0
-    {
-      type: statsSchema,
-    },
-  ],
-  left: [
-    // TODO: VERY IMPORTANT: if a user leaves this community, you must search in this array for the today date,
-    // if found it, incerement the count, if not, create an object with the today date and make its count = 0
-    {
-      type: statsSchema,
-    },
-  ],
+  pageViewsPerDay: {
+    type: Array,
+    default: [0, 0, 0, 0, 0, 0, 0],
+  }, // [0, 0, 0, 0, 0, 0, 0] 0 => sunday, 6 => saturday
+  pageViewsPerMonth: {
+    type: Array,
+    default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 6 => december
+  joinedPerDay: {
+    type: Array,
+    default: [0, 0, 0, 0, 0, 0, 0],
+  }, // [0, 0, 0, 0, 0, 0, 0] 0 => sunday, 6 => saturday
+  joinedPerMonth: {
+    type: Array,
+    default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 6 => december
+  leftPerDay: {
+    type: Array,
+    default: [0, 0, 0, 0, 0, 0, 0],
+  }, // [0, 0, 0, 0, 0, 0, 0] 0 => sunday, 6 => saturday
+  leftPerMonth: {
+    type: Array,
+    default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 6 => december
   flairList: [
     {
       type: flairSchema,
@@ -221,6 +218,5 @@ const communitySchema = mongoose.Schema({
 });
 
 const Community = mongoose.model("Community", communitySchema);
-
 
 module.exports = Community;

@@ -4,16 +4,19 @@ const User = require("./../models/user-model");
 const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
+const Notification=require("../models/notification-model");
 
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
+const NotificationService=require("../services/notification-service");
 
 const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
 const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
+const notificationServiceInstance= new NotificationService(Notification);
 
 /**
  * Get user followers
@@ -341,10 +344,26 @@ const subscribe = async (req, res) => {
 
   const result = await userServiceInstance.subscribe(req.body, req.username);
   if (result.state) {
+    if(req.body.srName.substring(0, 2)==="t2" && req.body.action==="sub"){
+     const notificationSaver=await notificationServiceInstance.createFollowerNotification(req.username,result.avatar);
+    if(!notificationSaver.status){
+      return res.status(404).json({
+        status: "Error happened while saving notification in db",
+      });
+    }
+    const saveToUser=await userServiceInstance.saveNOtificationOfUser(notificationSaver.id,req.body.srName);
+    if(!saveToUser.status){
+      return res.status(404).json({
+        status: "Error happened while saving notification in db",
+      });
+    }
+    }
     return res.status(200).json({
       status: "done",
     });
   } else {
+    
+
     return res.status(404).json({
       status: result.error,
     });

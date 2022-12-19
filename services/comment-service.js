@@ -1,15 +1,12 @@
 const Service = require("./service");
 const AppError = require("./../utils/app-error");
-
 const UserService = require("./../services/user-service");
 const idVaildator = require("../validate/listing-validators").validateObjectId;
-
 const validators = require("../validate/listing-validators");
 const Post = require("../models/post-model");
 const Comment = require("../models/comment-model");
 const User = require("../models/user-model");
 const PostService = require("./post-service");
-
 var userServiceInstance = new UserService(User);
 var postServiceInstance = new PostService(Post);
 /**
@@ -81,7 +78,7 @@ class CommentService extends Service {
     try {
       post = await postServiceInstance.findById({ _id: data.postID });
     } catch {
-      throw new AppError("invailed postID!", 400);
+      throw new AppError("invalid postID!", 400);
     }
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newComment = new Comment({
@@ -133,7 +130,13 @@ class CommentService extends Service {
     await comment.save();
     return result;
   };
-
+  /**
+   * Vote over a post or comment(reply)
+   * @param {object} body
+   * @param {String} username
+   * @returns {object} state
+   * @function
+   */
   vote = async (body, username) => {
     if (body.id === undefined || body.dir === undefined)
       return {
@@ -397,6 +400,8 @@ class CommentService extends Service {
     comment.isDeleted = true;
     await comment.save();
   };
+
+  
 
   checkUser = async (user, comment) => {
     console.log();
