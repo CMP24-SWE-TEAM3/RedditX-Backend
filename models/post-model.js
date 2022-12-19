@@ -161,13 +161,13 @@ postSchema.pre(/^find/, function (next) {
   next();
 });
 
-postSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: "communityID",
-    select: "_id",
-  });
-  next();
-});
+// postSchema.pre(/^find/, function (next) {
+//   this.populate({
+//     path: "communityID",
+//     select: "_id",
+//   });
+//   next();
+// });
 
 const Post = mongoose.model("Post", postSchema);
 
