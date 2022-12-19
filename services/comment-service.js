@@ -1,15 +1,12 @@
 const Service = require("./service");
 const AppError = require("./../utils/app-error");
-
 const UserService = require("./../services/user-service");
 const idVaildator = require("../validate/listing-validators").validateObjectId;
-
 const validators = require("../validate/listing-validators");
 const Post = require("../models/post-model");
 const Comment = require("../models/comment-model");
 const User = require("../models/user-model");
 const PostService = require("./post-service");
-
 var userServiceInstance = new UserService(User);
 var postServiceInstance = new PostService(Post);
 /**

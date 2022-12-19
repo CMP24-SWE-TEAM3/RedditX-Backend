@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const decodeJwt = require("../controllers/google-facebook-oAuth");
 const randomUsername = require("../utils/random-username");
 const User = require("../models/user-model");
+const AppError = require("../utils/app-error");
 
 /**
  * Service class to handle Authentication manipulations.
@@ -317,23 +318,29 @@ class AuthService extends Service {
     return type == "facebook" || type == "gmail" ? "1" : password;
   };
   /**
-   * Resets user password 
+   * Resets user password
    *  @param {string} username
    * @param {string} currentPassword
    * @param {string} newPassword
    * @param {string} confirmedNewPassword
    * @function
    */
- resetPassword = async (username,currentPassword, newPassword, confirmedNewPassword) => {
-  const user = await this.getOne({_id: username});
-  if (!user) throw new AppError("user is invalid or expired!", 400);
-  if (confirmedNewPassword !== newPassword) throw new AppError("Password is not equal to confirmed password!", 400);
-  const result = await bcrypt.compareSync(currentPassword, user.password);
-  if(!result) throw new AppError("this password is not correct!", 400);
-  const hash = await bcrypt.hash(newPassword, 10);
-  user.password = hash;
-  await user.save();
-};
+  resetPassword = async (
+    username,
+    currentPassword,
+    newPassword,
+    confirmedNewPassword
+  ) => {
+    const user = await this.getOne({ _id: username });
+    if (!user) throw new AppError("user is invalid or expired!", 400);
+    if (confirmedNewPassword !== newPassword)
+      throw new AppError("Password is not equal to confirmed password!", 400);
+    const result = await bcrypt.compareSync(currentPassword, user.password);
+    if (!result) throw new AppError("this password is not correct!", 400);
+    const hash = await bcrypt.hash(newPassword, 10);
+    user.password = hash;
+    await user.save();
+  };
 }
 
 module.exports = AuthService;

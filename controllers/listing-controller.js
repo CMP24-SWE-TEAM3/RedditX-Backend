@@ -303,9 +303,7 @@ const unsave = catchAsync(async (req, res, next) => {
  * @returns {String} status whether failed or not.
  */
 const vote = async (req, res) => {
-  console.log(req.username);
   const result = await commentServiceInstance.vote(req.body, req.username);
-  console.log(result);
   if (result.state) {
     return res.status(200).json({
       status: result.status,

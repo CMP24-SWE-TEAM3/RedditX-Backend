@@ -49,20 +49,17 @@ const availableUsername = async (req, res) => {
  */
 const signup = async (req, res) => {
   const result = await authServiceInstance.signup(req.body);
-  console.log(result);
   if (result.state) {
     return res.status(200).json({
       token: result.token, //token,
       expiresIn: result.expiresIn,
       username: result.username,
     });
-
   } else {
     return res.status(404).json({
       error: result.error,
     });
   }
-
 };
 /**
  * Login (route)
@@ -132,7 +129,7 @@ const resetUserPassword = catchAsync(async (req, res, next) => {
   console.log(req.username);
 
   try {
-     await authServiceInstance.resetPassword(
+    await authServiceInstance.resetPassword(
       req.username,
       req.body.currentPassword,
       req.body.newPassword,
@@ -143,7 +140,7 @@ const resetUserPassword = catchAsync(async (req, res, next) => {
   }
   return res.status(200).json({
     status: "success",
-    message: "Password is reset"
+    message: "Password is reset",
   });
 });
 

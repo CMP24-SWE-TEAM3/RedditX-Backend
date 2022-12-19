@@ -149,7 +149,12 @@ class MessageService extends Service {
     var messages;
 
     try {
-      messages = await this.find({ '$or': [ { 'toID': username , 'fromID' : {$ne : username} }, { 'fromID': username, 'toID' : {$ne : username} } ] });
+      messages = await this.find({
+        $or: [
+          { toID: username, fromID: { $ne: username } },
+          { fromID: username, toID: { $ne: username } },
+        ],
+      });
       console.log(messages);
     } catch {
       return {
@@ -192,10 +197,8 @@ class MessageService extends Service {
    * @function
    */
   readAllMessages = async (username) => {
-    var messages;
-
     try {
-      messages = await this.updateOne({ toID: username, unread_status: false });
+      await this.updateOne({ toID: username, unread_status: false });
     } catch {
       return {
         status: false,

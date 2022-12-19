@@ -1,12 +1,9 @@
 const Service = require("./service");
 const AppError = require("../utils/app-error");
 const Community = require("../models/community-model");
-
 const Post = require("../models/post-model");
 const PostService = require("./post-service");
-
 var postServiceInstance = new PostService(Post);
-
 const CommunityRule = require("../models/submodels-model").CommunityRule;
 
 /**
