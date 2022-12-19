@@ -96,34 +96,38 @@ const addInterests = async (req, res) => {
 const editUserPrefs = catchAsync(async (req, res, next) => {
   var results = undefined;
   try {
-     const user = await userServiceInstance.findById(req.username);
-  if(user){
- results = await userServiceInstance.updateOne(
-    {numComments: req.body.numComments},
-    { threadedMessages: req.body.threadedMessages},
-    { showLinkFlair: req.body.showLinkFlair},
-    { threadedMessages: req.body.threadedMessages},
-    { countryCode: req.body.countryCode},
-    { emailCommentReply: req.body.emailCommentReply},
-    { emailUpvoteComment: req.body.emailUpvoteComment},
-    { emailMessages: req.body.emailMessages},
-    { emailUnsubscribeAll: req.body.emailUnsubscribeAll},
-    { emailUpvotePost: req.body.emailUpvotePost},
-    { emailUsernameMention: req.body.emailUsernameMention},
-    { emailUserNewFollower: req.body.emailUserNewFollower},
-    { emailPrivateMessage: req.body.emailPrivateMessage},
-    { over18: req.body.over18},
-    { newwindow: req.body.newwindow},
-    { labelNsfw: req.body.labelNsfw},
-    { liveOrangeReds: req.body.liveOrangeReds},
-    { markMessageRead: req.body.markMessageRead},
-    { enableFollwers: req.body.enableFollwers},
-    { publicVotes: req.body.publicVotes},
-    { showLocationBasedRecommendations: req.body.showLocationBasedRecommendations },
-    { searchIncludeOver18: req.body.searchIncludeOver18},
-    { defaultCommentSort: req.body.defaultCommentSort},
-    { langauge: req.body.langauge}
-  );}
+    const user = await userServiceInstance.findById(req.username);
+    if (user) {
+      results = await userServiceInstance.updateOne(
+        { numComments: req.body.numComments },
+        { threadedMessages: req.body.threadedMessages },
+        { showLinkFlair: req.body.showLinkFlair },
+        { threadedMessages: req.body.threadedMessages },
+        { countryCode: req.body.countryCode },
+        { emailCommentReply: req.body.emailCommentReply },
+        { emailUpvoteComment: req.body.emailUpvoteComment },
+        { emailMessages: req.body.emailMessages },
+        { emailUnsubscribeAll: req.body.emailUnsubscribeAll },
+        { emailUpvotePost: req.body.emailUpvotePost },
+        { emailUsernameMention: req.body.emailUsernameMention },
+        { emailUserNewFollower: req.body.emailUserNewFollower },
+        { emailPrivateMessage: req.body.emailPrivateMessage },
+        { over18: req.body.over18 },
+        { newwindow: req.body.newwindow },
+        { labelNsfw: req.body.labelNsfw },
+        { liveOrangeReds: req.body.liveOrangeReds },
+        { markMessageRead: req.body.markMessageRead },
+        { enableFollwers: req.body.enableFollwers },
+        { publicVotes: req.body.publicVotes },
+        {
+          showLocationBasedRecommendations:
+            req.body.showLocationBasedRecommendations,
+        },
+        { searchIncludeOver18: req.body.searchIncludeOver18 },
+        { defaultCommentSort: req.body.defaultCommentSort },
+        { langauge: req.body.langauge }
+      );
+    }
   } catch (err) {
     return next(err);
   }
@@ -141,12 +145,13 @@ const editUserPrefs = catchAsync(async (req, res, next) => {
 const updateEmail = catchAsync(async (req, res, next) => {
   var results = undefined;
   try {
-     const user = await userServiceInstance.findById(req.username);
-  if(user){
- results = await userServiceInstance.updateOne(
-    { _id: req.username },
-    { email: req.body.email }
-  );}
+    const user = await userServiceInstance.findById(req.username);
+    if (user) {
+      results = await userServiceInstance.updateOne(
+        { _id: req.username },
+        { email: req.body.email }
+      );
+    }
   } catch (err) {
     return next(err);
   }
@@ -365,23 +370,84 @@ const subscribe = async (req, res) => {
   }
 };
 
-const friendRequest = catchAsync((req, res) => {
-  if (req.body.type === "friend") {
-    userServiceInstance.addFriend(req.name);
-  } else if (req.body.type === "moderator_invite") {
-    userServiceInstance.inviteModerator(req.name);
+const friendRequest = catchAsync(async (req, res, next) => {
+  if (req.body.type === 'friend') {
+    userServiceInstance.addFriend(req.username, req.body.userID);
+  } else if (req.body.type === 'moderator_invite') {
+    //[1]-> check the existence of the moderator
+    subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+    if (subreddit.state) {
+      return res.status(404).json({
+        status: 'failed',
+        message: 'not found this subreddit',
+      })
+    }
+    // [2] -> check if user isn't moderator in subreddit
+    if (!await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.username)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: 'you aren\'t moderator in this subreddit',
+      });
+    }
+    //check that invited moderator isn't moderator
+    if (await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.body.userID)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: 'this user is already moderator',
+      });
+    }
+    await communityServiceInstance.inviteModerator(req.body.communityID, req.body.userID);
   } else {
     return res.status(400).json({
       status: "failed",
-      message: "invalid type",
-    });
+      message: "invalid type"
+    })
   }
   return res.status(200).json({
     status: "succeeded",
   });
 });
 
-const getAllFriends = catchAsync(async (req, res) => {
+const unFriendRequest = catchAsync(async (req, res, next) => {
+  if (req.body.type === 'friend') {
+    userServiceInstance.deleteFriend(req.username, req.body.userID);
+  } else if (req.body.type === 'moderator_deinvite') {
+    //[1]-> check the existence of the moderator
+    subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+    if (subreddit.state) {
+      return res.status(404).json({
+        status: 'failed',
+        message: 'not found this subreddit',
+      })
+    }
+    // [2] -> check if user isn't moderator in subreddit
+    if (!await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.username)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: 'you aren\'t moderator in this subreddit',
+      });
+    }
+    //check that other user is invited
+    if (await userServiceInstance.isInvited(req.body.communityID, req.body.userID)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: 'this user is already moderator',
+      });
+    }
+    await communityServiceInstance.inviteModerator(req.body.communityID, req.body.userID);
+
+  } else {
+    return res.status(400).json({
+      status: "failed",
+      message: "invalid type"
+    })
+  }
+  return res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const getAllFriends = catchAsync(async (req, res, next) => {
   const friends = await userServiceInstance.getOne({
     _id: req.username,
     select: "-_id friend",
@@ -501,7 +567,24 @@ const leaveModeratorOfSubredddit = catchAsync(async (req, res) => {
   return res.status(200).json({
     status: "succeded",
   });
-});
+})
+
+const getUserInfo = catchAsync(async (req, res, next) => {
+  const user = await userServiceInstance.getOne({ _id: req.params.username, select: 'avatar _id about' });
+  if (!user) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this user'
+    });
+  }
+  else {
+    return res.status(200).json({
+      about: user.about,
+      id: user._id,
+      avatar: user.avatar,
+    });
+  }
+})
 module.exports = {
   uploadUserPhoto,
   block,
@@ -513,7 +596,6 @@ module.exports = {
   getUserPrefs,
   editUserPrefs,
   subscribe,
-
   getUserSavedPosts,
   friendRequest,
   getAllFriends,
@@ -523,4 +605,6 @@ module.exports = {
   followers,
   getInterests,
   addInterests,
+  updateInfo,
+  getUserInfo,
 };

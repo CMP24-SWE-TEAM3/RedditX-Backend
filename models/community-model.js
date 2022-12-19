@@ -13,9 +13,16 @@ const FAQSchema = mongoose.Schema({
 
 const flairSchema = mongoose.Schema({
   flairID: String,
-  flairText: String,
-  flairTextColor: String,
-  flairBackGround: String,
+  flairText: {
+    type: String,
+    default: 'defaultString'
+  },
+  flairTextColor: {
+    type: String,
+  },
+  flairBackGround: {
+    type: String,
+  },
   flairModOnly: {
     type: Boolean,
     default: 0,
@@ -127,8 +134,14 @@ const communitySchema = mongoose.Schema({
       "A community description must have more than or equal to 1 character",
     ],
   },
-  banner: String,
-  icon: String,
+  banner: {
+    type: String,
+    default: "default-banner.jpg",
+  },
+  icon: {
+    type: String,
+    default: "default-icon.jpg",
+  },
   membersCnt: {
     type: Number,
     default: 1,
@@ -208,5 +221,6 @@ const communitySchema = mongoose.Schema({
 });
 
 const Community = mongoose.model("Community", communitySchema);
+
 
 module.exports = Community;

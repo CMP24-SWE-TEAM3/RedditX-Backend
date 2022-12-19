@@ -117,10 +117,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned.value = false)
-          : operation === "mute"
-          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-          : (el.isMuted.value = false)
+            ? (el.isBanned.value = false)
+            : operation === "mute"
+              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+              : (el.isMuted.value = false)
         : el
     );
     return community;
@@ -141,10 +141,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned.value = false)
-          : operation === "mute"
-          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-          : (el.isMuted.value = false)
+            ? (el.isBanned.value = false)
+            : operation === "mute"
+              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+              : (el.isMuted.value = false)
         : el
     );
     await toBeAffected.save();
@@ -240,7 +240,7 @@ class CommunityService extends Service {
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     const creator =
       community.moderators[
-        community.moderators.findIndex((el) => el.role === "creator")
+      community.moderators.findIndex((el) => el.role === "creator")
       ];
     var creatorID = undefined;
     if (creator) creatorID = creator.userID;
@@ -612,7 +612,6 @@ class CommunityService extends Service {
   };
 
   createSubreddit = async (body, user) => {
-
     if (!user.canCreateSubreddit) {
       return {
         status: false,
@@ -622,7 +621,7 @@ class CommunityService extends Service {
     const result = await this.availableSubreddit(body.name);
     if (!result.state) {
       return {
-        errorType:0,
+        errorType: 0,
         status: false,
         error: "subreddit is already made",
       };
@@ -634,47 +633,43 @@ class CommunityService extends Service {
     const memInComm = {
       userID: user._id,
       isMuted: {
-        value:false,
+        value: false,
       },
-      isBanned:{
-        value:false,
+      isBanned: {
+        value: false,
       },
     };
     var mods = [moderator];
-    var mems=[memInComm];
+    var mems = [memInComm];
     const new_community = {
       _id: body.name,
       privacyType: body.type,
       over18: body.over18,
       moderators: mods,
-      members:mems
+      members: mems,
     };
-   try{
-    const doc = await this.insert(new_community);
-    return {
-      status: true,
-      response: "subreddit created successfully",
+    try {
+      await this.insert(new_community);
+      return {
+        status: true,
+        response: "subreddit created successfully",
       };
-   }
-   catch{
-    console.log("d");
-    return {
-      errorType:1,
+    } catch {
+      console.log("d");
+      return {
+        errorType: 1,
 
-      status: false,
-      error: "operation failed",
-    };
-   }
-   
-   
-    
+        status: false,
+        error: "operation failed",
+      };
+    }
   };
   creationValidation = async (body) => {
     if (
       !body.name ||
       body.name.substring(0, 2) !== "t5" ||
       !body.type ||
-      body.over18===null
+      body.over18 === null
     )
       return false;
     return true;
@@ -718,8 +713,22 @@ class CommunityService extends Service {
     await this.updateOne({ _id: subreddit }, { banner: "default.jpg" });
   };
   removeSrIcon = async (subreddit) => {
-    await this.updateOne({ _id: subreddit }, { icon: "default.jpg" });
-  };
+    await this.updateOne({ '_id': subreddit }, { 'icon': 'default.jpg' });
+  }
+
+  inviteModerator = async (subreddit, moderator) => {
+    await this.updateOne({ _id: subreddit }, {
+      $push: {
+        invitedModerators: moderator,
+      }
+    });
+  }
+
+  kickModerator = async (subreddit, moderator) => {
+    let doc = await this.getOne({ _id: subreddit });
+    doc.moderators = doc.moderators.filter(el => el.userID != moderator);
+    await doc.save();
+  }
 }
 
 module.exports = CommunityService;

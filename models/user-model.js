@@ -110,6 +110,21 @@ const isBannedOrMutedSchema = mongoose.Schema({
   date: Date,
 });
 
+const notificationSchema = mongoose.Schema({
+  notificationID: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Notification",
+  },
+  isRead: {
+    type: Boolean,
+    default: false,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const memberSchema = new mongoose.Schema({
   communityId: {
     type: String /*mongoose.Schema.ObjectId,*/,
@@ -211,7 +226,10 @@ const userSchema = new mongoose.Schema({
     default: false,
     select: false,
   },
-  avatar: String,
+  avatar: {
+    type: String,
+    default: "default.jpg",
+  },
   email: {
     type: String,
     required: [true, "Please provide your email"],
@@ -421,8 +439,7 @@ const userSchema = new mongoose.Schema({
    ***************************************/
   notifications: [
     {
-      type: mongoose.Schema.ObjectId,
-      ref: "Notification",
+      type: notificationSchema,
     },
   ],
   /***************************************

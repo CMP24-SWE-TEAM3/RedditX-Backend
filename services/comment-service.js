@@ -26,7 +26,7 @@ class CommentService extends Service {
     delete query.q;
     return this.getAll(
       {
-        $or: [{ text: { $regex: searchQuery, $options: "i" } }],
+        $or: [{ textHTML: { $regex: searchQuery, $options: "i" } }],
       },
       query
     );
@@ -172,7 +172,6 @@ class CommentService extends Service {
       var voter;
       for (let z = 0; z < voters.length; z++) {
         if (voters[z].userID === username) {
-          console.log("jj");
           isFound = true;
           voter = voters[z];
           break;
@@ -377,7 +376,7 @@ class CommentService extends Service {
           { _id: postIdCasted },
           { $set: { votesCount: votesCount + operation, voters: voters } },
           { new: true },
-          () => {}
+          () => { }
         );
 
         return {
@@ -416,8 +415,20 @@ class CommentService extends Service {
   };
 
   showComment = async (comment) => {
-    await this.updateOne({ _id: comment }, { isCollapsed: false });
-  };
+    await this.updateOne({ "_id": comment }, { 'isCollapsed': false });
+  }
+
+  approveComment = async (comment) => {
+    comment.isDeleted = false;
+    comment.spams = [];
+    comment.spamCount = 0;
+    await comment.save();
+  }
+
+  removeComment = async (comment) => {
+    comment.isDeleted = true;
+    await comment.save();
+  }
 }
 
 module.exports = CommentService;
