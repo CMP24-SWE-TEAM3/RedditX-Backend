@@ -745,14 +745,12 @@ const deleteFlair = catchAsync(async (req, res) => {
     });
   }
   //[3]-> delete the flair
-  await communityServiceInstance.updateOne(
-    { _id: req.params.subreddit },
-    {
-      $pull: {
-        flairList: { _id: req.body.id },
-      },
-    }
+  let document = await communityServiceInstance.getOne(
+    { _id: req.params.subreddit }
   );
+
+  document.flairList = document.flairList.filter(el => { el._id != req.body.id });
+  await document.save();
   res.status(200).json({
     status: "succeeded",
   });
