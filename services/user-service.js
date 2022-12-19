@@ -254,14 +254,16 @@ class UserService extends Service {
         try {
           var memCom=result.subreddit.members;
           var memCnt=result.subreddit.membersCnt;
-          var joined=result.subreddit.joined;
-          var left=result.subreddit.left;
-          const date = new Date();
-          const formattedDate = date.toLocaleDateString('en-GB', {
-            day: 'numeric', month: 'numeric', year: 'numeric'
-          });
-          console.log(formattedDate);
+          var joinedPerDay=result.subreddit.joinedPerDay;
+          var joinedPerMonth=result.subreddit.joinedPerMonth;
+          var leftPerDay=result.subreddit.leftPerDay;
+          var leftPerMonth=result.subreddit.leftPerMonth;
 
+          const date = new Date();
+          var dayIndex=date.getDay();
+          var monthIndex=date.getMonth();
+          console.log(dayIndex);
+          console.log(monthIndex);
           if (action === "sub") {
             if (isFound) {
               return {
@@ -269,23 +271,9 @@ class UserService extends Service {
                 error: "already followed",
               };
             }
-            var dateIsFound=false;
-            var dateIndex=-1;
-            for(let z=0;z<joined.length;z++){
-              if(joined[z].date===formattedDate){
-                dateIsFound=true;
-                dateIndex=z;
-              }
-            }
-            if(!dateIsFound){
-              joined.push({
-                "date":formattedDate,
-                "count":1
-              });
-            }
-            else{
-             joined[dateIndex].count++;
-            }
+            joinedPerDay[dayIndex]++;
+          joinedPerMonth[monthIndex]++;
+            
             const memUser=user.user.member;
             memUser.push({
               communityId: body.srName,
@@ -326,7 +314,8 @@ class UserService extends Service {
                  
                   members:memCom ,
                   membersCnt:memCnt,
-                  joined:joined
+                  joinedPerDay:joinedPerDay,
+                  joinedPerMonth:joinedPerMonth
               }
             );
           } else {
@@ -336,29 +325,13 @@ class UserService extends Service {
                 error: "operation failed the user is already not followed",
               };
             }
-            var dateIsFound=false;
-            var dateIndex=-1;
-            for(let z=0;z<left.length;z++){
-              if(left[z].date===formattedDate){
-                dateIsFound=true;
-                dateIndex=z;
-              }
-
-            }
-            
-            if(!dateIsFound){
-              left.push({
-                "date":formattedDate,
-                "count":1
-              });
-            }
-            else{
-              left[dateIndex].count++;
-            }
+            leftPerDay[dayIndex]++;
+            leftPerMonth[monthIndex]++;
             memCnt--;
             var memIndex=-1;
+            console.log(memCom);
             for(let x=0;x<memCom.length;x++){
-              if(memCom[i].userID===username){
+              if(memCom[x].userID===username){
                 memIndex=x;
               }
             }
@@ -370,7 +343,7 @@ class UserService extends Service {
 
             await communityServiceInstance.updateOne(
               { _id: body.srName },
-               { members: memCom , membersCnt:memCnt,left:left} 
+               { members: memCom , membersCnt:memCnt,leftPerDay:leftPerDay,leftPerMonth:leftPerMonth} 
             );
           }
         } catch (err) {
