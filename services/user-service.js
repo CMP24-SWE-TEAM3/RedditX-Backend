@@ -80,6 +80,26 @@ class UserService extends Service {
     };
   };
   /**
+   *  Get followers of user
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getFollowersOfUser = async (username) => {
+    const followers_user = await this.getOne({ _id: username }).select(
+      "followers"
+    );
+    const followersIds = followers_user.followers;
+
+    const followers = await this.find({
+      _id: { $in: followersIds },
+    });
+    return {
+      status: true,
+      followers: followers,
+    };
+  };
+  /**
    *  Get interests of me
    * @param {String} username my username .
    * @returns {Boolean} (state)
