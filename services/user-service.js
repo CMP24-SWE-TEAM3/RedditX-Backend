@@ -36,6 +36,27 @@ class UserService extends Service {
       { expiresIn: "120h" }
     );
   };
+   /**
+   * Saving notification in user's document
+   * @param {String} id notification id.
+   * @param {String} username username of the user.
+   * @returns {Object} (status)
+   * @function
+   */
+   saveNOtificationOfUser = (id, username) => {
+    try{
+      const user= this.updateOne({_id:username}, { $addToSet: { notifications: id }})
+    }
+    catch(err){
+      return {
+        status:false,
+        error:err
+      }
+    }
+    return {
+      status:true
+    }
+  };
 
   /**
    *  Get followers of me
@@ -115,25 +136,27 @@ class UserService extends Service {
     const action = body.action;
     console.log(id);
     if (id === "t2") {
-      console.log("d");
       //check the username
       const result = await authServiceInstance.availableUser(body.srName);
-      console.log(result);
       if (result.state) {
         return {
           state: false,
           error: "invalid username",
         };
       } else {
+        const avatar = result.user.avatar;
+           
         var isFound = false;
+        var followerIndex=-1;
         var followerArr = result.user.followers;
         for (var i = 0; i < followerArr.length; i++) {
           if (followerArr[i] === username) {
             isFound = true;
+            followerIndex=i;
             break;
           }
         }
-
+        
         try {
           if (action === "sub") {
             if (isFound) {
@@ -142,6 +165,8 @@ class UserService extends Service {
                 error: "already followed",
               };
             }
+            
+
             await this.updateOne(
               { _id: username },
               { $addToSet: { follows: body.srName } }
@@ -170,11 +195,13 @@ class UserService extends Service {
           return {
             state: false,
             error: "error",
+           
           };
         }
         return {
           state: true,
           error: null,
+          avatar:avatar
         };
       }
     } else if (id === "t5") {
@@ -209,7 +236,6 @@ class UserService extends Service {
           var memCnt=result.subreddit.membersCnt;
           var joined=result.subreddit.joined;
           var left=result.subreddit.left;
-          console.log(joined);
           const date = new Date();
           const formattedDate = date.toLocaleDateString('en-GB', {
             day: 'numeric', month: 'numeric', year: 'numeric'
@@ -226,7 +252,6 @@ class UserService extends Service {
             var dateIsFound=false;
             var dateIndex=-1;
             for(let z=0;z<joined.length;z++){
-              console.log(joined[z]);
               if(joined[z].date===formattedDate){
                 dateIsFound=true;
                 dateIndex=z;
@@ -311,8 +336,6 @@ class UserService extends Service {
               left[dateIndex].count++;
             }
             memCnt--;
-            console.log(memCom);
-            console.log(index);
             var memIndex=-1;
             for(let x=0;x<memCom.length;x++){
               if(memCom[i].userID===username){

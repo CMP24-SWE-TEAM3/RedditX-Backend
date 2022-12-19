@@ -40,6 +40,133 @@ deleteNotification = async (notificationID) => {
   notification.isDeleted = true;
   await notification.save();
 };
+/**
+   *Creates follower notification
+   * @param {Object} notification
+   * @return {Object} state
+   * @function
+   */
+createFollowerNotification = async (transmitter,avatar) => {
+  
+  const notification={
+    "userIcon":avatar,
+    "title":"You have a new follower",
+    "type":"newFollower",
+    "text":"u/" + `${transmitter.slice(3)} has followed you`,
+    "sourceThing":transmitter,
+  }
+  var not;
+
+  try{
+   not=await this.insert(notification);
+  }
+  catch(err){
+    return {
+      status:false,
+      error:err
+    };
+  }
+  console.log(not);
+  if(!not){
+    return {
+      status:false,
+      error:"error happened while inserting in db"
+    };
+  }
+  return {
+    status:true,
+    id:not._id
+  };
+
+
+};
+/**
+   *Creates upvote to comment notification
+   * @param {String} senderUsername
+   * @param {Object} user
+   * @return {Object} state
+   * @function
+   */
+   createUpvoteToCommentNotification = async (senderUsername,user) => {
+    var notification;
+  
+     notification={
+      "userIcon":user.avatar,
+      "title":"You have a new upvote",
+      "type":"upvoteToYourComment",
+      "text":"u/" + `${senderUsername} upvoted on your comment`,
+      "sourceThing":senderUsername,
+    }
+    var not;
+  
+    try{
+     not=await this.insert(notification);
+    }
+    catch(err){
+      return {
+        status:false,
+        error:err
+      };
+    }
+    console.log(not);
+    if(!not){
+      return {
+        status:false,
+        error:"error happened while inserting in db"
+      };
+    }
+    return {
+      status:true,
+      id:not._id
+    };
+  
+  
+  };
+  /**
+   *Creates upvote to post notification
+   * @param {String} senderUsername
+   * @param {Object} user
+   * @return {Object} state
+   * @function
+   */
+   createUpvoteToPostNotification = async (senderUsername,user) => {
+    var notification;
+  
+     notification={
+      "userIcon":user.avatar,
+      "title":"You have a new upvote",
+      "type":"upvoteToYourPost",
+      "text":"u/" + `${senderUsername} upvoted on your post`,
+      "sourceThing":senderUsername,
+    }
+    var not;
+  
+    try{
+     not=await this.insert(notification);
+    }
+    catch(err){
+      return {
+        status:false,
+        error:err
+      };
+    }
+    console.log(not);
+    if(!not){
+      return {
+        status:false,
+        error:"error happened while inserting in db"
+      };
+    }
+    return {
+      status:true,
+      id:not._id
+    };
+  
+  
+  };
+
 }
+
+
 
 module.exports = NotificationService;
