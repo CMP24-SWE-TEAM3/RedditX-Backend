@@ -81,7 +81,10 @@ const isBannedOrMutedSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  date: Date,
+  date: {
+    type: Date,
+    default: Date.now,
+  },
 });
 const memberSchema = mongoose.Schema({
   userID: {
@@ -131,8 +134,14 @@ const communitySchema = mongoose.Schema({
       "A community description must have more than or equal to 1 character",
     ],
   },
-  banner: String,
-  icon: String,
+  banner: {
+    type: String,
+    default: "default-banner.jpg",
+  },
+  icon: {
+    type: String,
+    default: "default-icon.jpg",
+  },
   membersCnt: {
     type: Number,
     default: 1,
@@ -206,9 +215,9 @@ const communitySchema = mongoose.Schema({
   invitedModerators: [
     {
       type: String,
-      ref: 'User'
-    }
-  ]
+      ref: "User",
+    },
+  ],
 });
 
 const Community = mongoose.model("Community", communitySchema);

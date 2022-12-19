@@ -103,8 +103,12 @@ const getUserComments = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
  const getUserSubmitted = catchAsync(async (req, res, next) => {
+  console.log(req.params);
+  var posts;
   try {
-    var posts =  userServiceInstance.userSubmitted(
+
+     posts = await userServiceInstance.userSubmitted(
+
       req.params.username,
       req.query
     );

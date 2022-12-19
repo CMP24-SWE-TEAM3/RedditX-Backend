@@ -31,6 +31,58 @@ const getNotifications = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * User deletes a notification
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const deleteUserNotification = catchAsync(async (req, res, next) => {
+  try {
+    var user = await userServiceInstance.getOne({
+      _id: req.username,
+      select: "notifications",
+    });
+    await notificationServiceInstance.deleteOrMarkReadUserNotification(
+      req.body.notificationID,
+      user,
+      "isDeleted"
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Notification is deleted successfully",
+  });
+});
+
+/**
+ * User deletes a notification
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const markReadUserNotification = catchAsync(async (req, res, next) => {
+  try {
+    var user = await userServiceInstance.getOne({
+      _id: req.username,
+      select: "notifications",
+    });
+    await notificationServiceInstance.deleteOrMarkReadUserNotification(
+      req.body.notificationID,
+      user,
+      "isRead"
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Notification is marked as read successfully",
+  });
+});
+
 module.exports = {
   getNotifications,
+  deleteUserNotification,
+  markReadUserNotification,
 };

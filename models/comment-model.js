@@ -33,7 +33,14 @@ const commentSchema = new mongoose.Schema({
       type: mongoose.Schema.ObjectId,
     },
   ],
-  text: String,
+  textHTML: {
+    type: String,
+    trim: true, // Remove all the white space in the beginning or end of the field
+  },
+  textJSON: {
+    type: String,
+    trim: true, // Remove all the white space in the beginning or end of the field
+  },
   votesCount: {
     type: Number,
     default: 1,
@@ -57,6 +64,9 @@ const commentSchema = new mongoose.Schema({
   },
   editedAt: {
     type: Date,
+  },
+  communityID: {
+    type: String,
   },
   spamCount: {
     type: Number,

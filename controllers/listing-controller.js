@@ -8,12 +8,202 @@ const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("../services/comment-service");
+const AppError = require("../utils/app-error");
 var postServiceInstance = new PostService(Post);
 // var commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
 var commentServiceInstance = new CommentService(Comment);
-
+const idValidator = require("../validate/listing-validators").validateObjectId;
+/**
+ * Update user text
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const editUserText = async (req, res, next) => {
+  if (!req.body.linkID)
+    return res.status(400).json({
+      response: "invaild parameters",
+    });
+  const linkID = req.body.linkID;
+  delete req.body.linkID;
+  req.body.editedAt = Date.now();
+  if (linkID[1] === "3") {
+    if (
+      (
+        await postServiceInstance.getOne({
+          _id: linkID.slice(3),
+          select: "userID",
+        })
+      ).userID._id !== req.username
+    )
+      return next(new AppError("You are not the author of this post!", 400));
+    const results = await postServiceInstance.updateOne(
+      { _id: linkID.slice(3) },
+      req.body,
+      { new: true }
+    );
+    if (!results)
+      return res.status(400).json({
+        response: "error",
+      });
+    return res.status(200).json({
+      response: results,
+    });
+  } else if (linkID[1] === "1") {
+    if (
+      (
+        await commentServiceInstance.getOne({
+          _id: linkID.slice(3),
+          select: "authorId",
+        })
+      ).authorId !== req.username
+    )
+      return next(new AppError("You are not the author of this comment!", 400));
+    const results = await commentServiceInstance.updateOne(
+      { _id: linkID.slice(3) },
+      req.body,
+      { new: true }
+    );
+    if (!results)
+      return res.status(400).json({
+        response: "error",
+      });
+    return res.status(200).json({
+      response: results,
+    });
+  }
+};
+/**
+ * User delete a link
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const deleteLink = catchAsync(async (req, res, next) => {
+  if (req.body.linkID[1] === "3") {
+    try {
+      await postServiceInstance.deletePost(req.body.linkID);
+    } catch (err) {
+      return next(err);
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Post is deleted successfully",
+    });
+  } else if (req.body.linkID[1] === "1") {
+    try {
+      await commentServiceInstance.deleteComment(req.body.linkID);
+    } catch (err) {
+      return next(err);
+    }
+    res.status(200).json({
+      status: "success",
+      message: "comment is deleted successfully",
+    });
+  }
+});
+/**
+ * mark post in a commuity as spoiler
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const markSpoiler = catchAsync(async (req, res, next) => {
+  try {
+    await communityServiceInstance.markAsSpoiler(
+      req.params.subreddit,
+      req.username,
+      req.body.link,
+      req.body.action
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Link is spoiler",
+  });
+});
+/**
+ * mark post in a commuity as unlocked
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const markUnLocked = catchAsync(async (req, res, next) => {
+  try {
+    await communityServiceInstance.markAsUnLocked(
+      req.params.subreddit,
+      req.username,
+      req.body.linkID
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Link is unlocked",
+  });
+});
+/**
+ * mark post in a commuity as locked
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const markLocked = catchAsync(async (req, res, next) => {
+  try {
+    await communityServiceInstance.markAsLocked(
+      req.params.subreddit,
+      req.username,
+      req.body.linkID
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Link is locked",
+  });
+});
+/**
+ * mark post in a commuity as unspoiler
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const markUnSpoiler = catchAsync(async (req, res, next) => {
+  try {
+    await communityServiceInstance.markAsUnSpoiler(
+      req.params.subreddit,
+      req.username,
+      req.body.linkID
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Link is unspoiler",
+  });
+});
+/**
+ * mark post in a commuity as nsfw
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const markNsfw = catchAsync(async (req, res, next) => {
+  try {
+    await communityServiceInstance.markAsNsfw(
+      req.params.subreddit,
+      req.username,
+      req.body.link,
+      req.body.action
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Link is edited successfully",
+  });
+});
 /**
  * Creates a comment
  * @param {function} (req, res, next)
@@ -154,6 +344,41 @@ const getPosts = catchAsync(async (req, res) => {
     posts,
   });
 });
+/**
+ * User hides a post
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const hide = catchAsync(async (req, res, next) => {
+  try {
+    const user = await userServiceInstance.getOne({ _id: req.username });
+    await postServiceInstance.hide(req.body.linkID, user);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Post is hidden successfully",
+  });
+});
+
+/**
+ * User unhides a post
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const unhide = catchAsync(async (req, res, next) => {
+  try {
+    const user = await userServiceInstance.getOne({ _id: req.username });
+    await postServiceInstance.unhide(req.body.linkID, user);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Post is unhidden successfully",
+  });
+});
 
 const getPostInsights = catchAsync(async (req, res) => {
   const postInsightsCnt = await postServiceInstance.getOne({
@@ -166,6 +391,33 @@ const getPostInsights = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * Follow post
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const followPost = async (req, res) => {
+  if (
+    !req.body.linkID ||
+    req.body.action === null ||
+    !idValidator(req.body.linkID)
+  ) {
+    return res.status(500).json({
+      response: "invalid parameters",
+    });
+  }
+  const result = await postServiceInstance.followPost(req.body, req.username);
+  if (result.status) {
+    return res.status(200).json({
+      response: "done",
+    });
+  } else {
+    return res.status(500).json({
+      response: "operation failed",
+      error: result.error,
+    });
+  }
+};
 module.exports = {
   submit,
   save,
@@ -175,4 +427,14 @@ module.exports = {
   getPosts,
   getPostInsights,
   vote,
+  editUserText,
+  hide,
+  unhide,
+  deleteLink,
+  markNsfw,
+  markUnSpoiler,
+  markSpoiler,
+  markUnLocked,
+  markLocked,
+  followPost,
 };

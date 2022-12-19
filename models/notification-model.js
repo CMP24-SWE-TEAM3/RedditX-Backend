@@ -25,10 +25,6 @@ const notificationSchema = mongoose.Schema({
   },
   text: String,
   sourceThing: String, // t3_54148d012f459b337e2382ce or t2_moazMohamed (post id, user id, community id, comment, or message id)
-  isDeleted: {
-    type: Boolean,
-    default: 0,
-  },
   createdAt: {
     type: Date,
     default: Date.now(),

@@ -1,4 +1,3 @@
-const { populate } = require("../models/post-model");
 const APIfeatures = require("./../utils/api-features");
 
 /**
@@ -42,7 +41,6 @@ class Service {
   };
 
   updateOne = (query, update, options = {}) => {
-    ///msh 3arfa ab3t elfunction ezay hena
     return this.model
       .findOneAndUpdate(query, update, options, (error, doc) => {
         if (!error) return doc;
@@ -74,7 +72,7 @@ class Service {
   deleteMany = (query) => {
     this.model.deleteMany(query);
   };
-  
+
   insert = (data) => {
     return this.model.create(data);
   };

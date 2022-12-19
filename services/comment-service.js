@@ -76,22 +76,21 @@ class CommentService extends Service {
    * @function
    */
   addComment = async (data, username) => {
-    console.log("ay haaaga");
     const user = await userServiceInstance.findById(username);
-    console.log(user);
+    var post = undefined;
     try {
-      var post = await postServiceInstance.findById({ _id: data.postID });
+      post = await postServiceInstance.findById({ _id: data.postID });
     } catch {
       throw new AppError("invailed postID!", 400);
     }
-
-    console.log(post);
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newComment = new Comment({
-      text: data.text,
+      textHTML: data.textHTML,
+      textJSON: data.textJSON,
       isRoot: true,
       authorId: username,
       replyingTo: data.postID,
+      communityID: post.communityID,
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newComment.save();
@@ -118,14 +117,15 @@ class CommentService extends Service {
     const comment = await Comment.findById({ _id: data.commentID });
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newReply = new Comment({
-      text: data.text,
+      textHTML: data.textHTML,
+      textJSON: data.textJSON,
       isRoot: false,
       authorId: username,
       replyingTo: data.commentID,
+      communityID: comment.communityID,
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newReply.save();
-    console.log(username);
     if (!result) throw new AppError("This reply doesn't created!", 400);
     user.hasReply.push(result._id);
     comment.replies.push(result._id);
@@ -166,7 +166,6 @@ class CommentService extends Service {
       var voter;
       for (let z = 0; z < voters.length; z++) {
         if (voters[z].userID === username) {
-          console.log("jj");
           isFound = true;
           voter = voters[z];
           break;
@@ -387,9 +386,24 @@ class CommentService extends Service {
     }
   };
 
+  /**
+   * User delete a comment
+   * @param {string} linkID
+   * @function
+   */
+  deleteComment = async (linkID) => {
+    const comment = await this.getOne({ _id: linkID });
+    if (!comment) throw new AppError("linkID doesn't exist!", 404);
+    comment.isDeleted = true;
+    await comment.save();
+  };
+
   checkUser = async (user, comment) => {
     console.log();
-    return (await (this.getOne({ '_id': comment, 'select': 'authorId' })))['authorId'] === user;
+    return (
+      (await this.getOne({ _id: comment, select: "authorId" }))["authorId"] ===
+      user
+    );
   };
 
   showComment = async (comment) => {
