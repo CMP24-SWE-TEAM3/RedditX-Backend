@@ -702,14 +702,14 @@ const getFlairs = catchAsync(async (req, res) => {
       message: "not found this subreddit",
     });
   }
-  //   // [2] -> check if user isn't moderator in subreddit
-  //   if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
-  //     return res.status(400).json({
-  //       status: 'failed',
-  //       message: 'you aren\'t moderator in this subreddit',
-  //     });
-  //   }
-  //[3]-> get the flairs list
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  // [3]-> get the flairs list
 
   const flairs = await communityServiceInstance.getOne({
     _id: req.params.subreddit,
@@ -921,6 +921,69 @@ kickModerator = catchAsync(async (req, res, next) => {
   });
 })
 
+/**
+ * Remove a spam from a post or a comment
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const removeSpam = catchAsync(async (req, res, next) => {
+  if (!req.body.linkID)
+    return next(new AppError("No linkID is provided!", 400));
+  try {
+    if (req.body.linkID[1] === "3") {
+      // From a post
+      var post = await postServiceInstance.getOne({
+        _id: req.body.linkID.slice(3),
+        select: "spammers",
+      });
+      if (!post) return new AppError("This post doesn't exist!", 404);
+      const subreddit = await communityServiceInstance.getOne({
+        _id: req.params.subreddit,
+        select: "moderators",
+      });
+      if (!subreddit)
+        return next(new AppError("This subreddit doesn't exist!", 404));
+      if (!subreddit.moderators.find((el) => el.userID))
+        return next(
+          new AppError("You are not a moderator in this subreddit!", 400)
+        );
+      await communityServiceInstance.removeSpam(
+        post,
+        req.body.spamID,
+        "spammers"
+      );
+    } else {
+      // From a comment
+      var comment = await commentServiceInstance.getOne({
+        _id: req.body.linkID.slice(3),
+      });
+      if (!comment)
+        return next(new AppError("This comment doesn't exist!", 404));
+      const subreddit = await communityServiceInstance.getOne({
+        _id: req.params.subreddit,
+        select: "moderators",
+      });
+      if (!subreddit)
+        return next(new AppError("This subreddit doesn't exist!", 404));
+      if (!subreddit.moderators.find((el) => el.userID))
+        return next(
+          new AppError("You are not a moderator in this subreddit!", 400)
+        );
+      await communityServiceInstance.removeSpam(
+        comment,
+        req.body.spamID,
+        "spams"
+      );
+    }
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Spams are updated successfully",
+  });
+});
+
 module.exports = {
   uploadCommunityIcon,
   uploadCommunityBanner,
@@ -951,7 +1014,7 @@ module.exports = {
   configureSubreddit,
   approveLink,
   removeLink,
-  kickModerator
+  kickModerator,
   getSpammed,
   removeSpam,
 };
