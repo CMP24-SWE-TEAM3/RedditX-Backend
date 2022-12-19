@@ -23,7 +23,7 @@ class CommentService extends Service {
     delete query.q;
     return this.getAll(
       {
-        $or: [{ text: { $regex: searchQuery, $options: "i" } }],
+        $or: [{ textHTML: { $regex: searchQuery, $options: "i" } }],
       },
       query
     );
@@ -78,7 +78,7 @@ class CommentService extends Service {
     try {
       post = await postServiceInstance.findById({ _id: data.postID });
     } catch {
-      throw new AppError("invailed postID!", 400);
+      throw new AppError("invalid postID!", 400);
     }
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newComment = new Comment({
@@ -130,7 +130,13 @@ class CommentService extends Service {
     await comment.save();
     return result;
   };
-
+  /**
+   * Vote over a post or comment(reply)
+   * @param {object} body
+   * @param {String} username
+   * @returns {object} state
+   * @function
+   */
   vote = async (body, username) => {
     if (body.id === undefined || body.dir === undefined)
       return {
@@ -367,7 +373,7 @@ class CommentService extends Service {
           { _id: postIdCasted },
           { $set: { votesCount: votesCount + operation, voters: voters } },
           { new: true },
-          () => {}
+          () => { }
         );
 
         return {
@@ -395,6 +401,8 @@ class CommentService extends Service {
     await comment.save();
   };
 
+  
+
   checkUser = async (user, comment) => {
     console.log();
     return (
@@ -404,8 +412,20 @@ class CommentService extends Service {
   };
 
   showComment = async (comment) => {
-    await this.updateOne({ _id: comment }, { isCollapsed: false });
-  };
+    await this.updateOne({ "_id": comment }, { 'isCollapsed': false });
+  }
+
+  approveComment = async (comment) => {
+    comment.isDeleted = false;
+    comment.spams = [];
+    comment.spamCount = 0;
+    await comment.save();
+  }
+
+  removeComment = async (comment) => {
+    comment.isDeleted = true;
+    await comment.save();
+  }
 }
 
 module.exports = CommentService;

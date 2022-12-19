@@ -13,9 +13,16 @@ const FAQSchema = mongoose.Schema({
 
 const flairSchema = mongoose.Schema({
   flairID: String,
-  flairText: String,
-  flairTextColor: String,
-  flairBackGround: String,
+  flairText: {
+    type: String,
+    default: 'defaultString'
+  },
+  flairTextColor: {
+    type: String,
+  },
+  flairBackGround: {
+    type: String,
+  },
   flairModOnly: {
     type: Boolean,
     default: 0,
@@ -211,5 +218,6 @@ const communitySchema = mongoose.Schema({
 });
 
 const Community = mongoose.model("Community", communitySchema);
+
 
 module.exports = Community;

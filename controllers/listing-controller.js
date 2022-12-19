@@ -3,13 +3,16 @@ const Post = require("../models/post-model");
 const Comment = require("../models/comment-model");
 const Community = require("../models/community-model");
 const User = require("../models/user-model");
+const Notification  = require("../models/notification-model");
 const PostService = require("./../services/post-service");
 // const CommentService = require("./../services/comment-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("../services/comment-service");
+const NotificationService = require("../services/notification-service");
 const AppError = require("../utils/app-error");
 var postServiceInstance = new PostService(Post);
+var notificationServiceInstance= new NotificationService(Notification);
 // var commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
@@ -305,6 +308,40 @@ const unsave = catchAsync(async (req, res, next) => {
 const vote = async (req, res) => {
   const result = await commentServiceInstance.vote(req.body, req.username);
   if (result.state) {
+    var user;
+    if(req.body.id.substring(0,2)==="t1"){
+        const comment=await commentServiceInstance.getOne({_id:req.body.id.slice(3)});
+         user=await userServiceInstance.getOne({_id:req.username});
+         const notificationSaver=await notificationServiceInstance.createUpvoteToCommentNotification(req.username,user);
+        if(!notificationSaver.status){
+          return res.status(404).json({
+            status: "Error happened while saving notification in db",
+          });
+        }
+    const saveToUser=await userServiceInstance.saveNOtificationOfUser(notificationSaver.id,comment.authorId);
+    if(!saveToUser.status){
+      return res.status(404).json({
+        status: "Error happened while saving notification in user db",
+      });
+    }
+     }
+    else{
+       const post=await postServiceInstance.getOne({_id:req.body.id.slice(3)});
+        user=await userServiceInstance.getOne({_id:post.userID});
+        const notificationSaver=await notificationServiceInstance.createUpvoteToPostNotification(req.username,user);
+        if(!notificationSaver.status){
+          return res.status(404).json({
+            status: "Error happened while saving notification in db",
+          });
+        }
+        const saveToUser=await userServiceInstance.saveNOtificationOfUser(notificationSaver.id,post.userID);
+        if(!saveToUser.status){
+          return res.status(404).json({
+            status: "Error happened while saving notification in user db",
+          });
+        }
+
+    }
     return res.status(200).json({
       status: result.status,
     });

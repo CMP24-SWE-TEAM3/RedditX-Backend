@@ -45,4 +45,8 @@ router
   .route("/insights-count/:post")
   .get(/*authCheck,*/ listingController.getPostInsights);
 
+
+router
+  .route("/insights_count/:post")
+  .get(authCheck, listingController.getPostInsights);
 module.exports = router;
