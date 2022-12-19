@@ -53,7 +53,7 @@ class PostService extends Service {
     delete query.q;
     return this.getAll(
       {
-        $or: [{ text: { $regex: searchQuery, $options: "i" } }],
+        $or: [{ textHTML: { $regex: searchQuery, $options: "i" } }],
       },
       query
     );
@@ -151,6 +151,18 @@ class PostService extends Service {
     }
     await post.save();
   };
+
+  approvePost = async (post) => {
+    post.isDeleted = false;
+    post.spammers = [];
+    post.spamCount = 0;
+    await post.save();
+  }
+
+  removePost = async (post) => {
+    post.isDeleted = true;
+    await post.save();
+  }
 }
 
 module.exports = PostService;

@@ -26,6 +26,7 @@ const commentSchema = new mongoose.Schema({
   },
   replyingTo: {
     type: mongoose.Schema.ObjectId,
+    ref: 'Post'
   },
   replies: [
     {

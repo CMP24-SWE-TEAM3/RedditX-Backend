@@ -294,11 +294,33 @@ const subscribe = async (req, res) => {
   }
 };
 
-const friendRequest = catchAsync((req, res, next) => {
+const friendRequest = catchAsync(async (req, res, next) => {
   if (req.body.type === 'friend') {
-    userServiceInstance.addFriend(req.name);
+    userServiceInstance.addFriend(req.username, req.body.userID);
   } else if (req.body.type === 'moderator_invite') {
-    userServiceInstance.inviteModerator(req.name);
+    //[1]-> check the existence of the moderator
+    subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+    if (subreddit.state) {
+      return res.status(404).json({
+        status: 'failed',
+        message: 'not found this subreddit',
+      })
+    }
+    // [2] -> check if user isn't moderator in subreddit
+    if (!await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.username)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: 'you aren\'t moderator in this subreddit',
+      });
+    }
+    //check that invited moderator isn't moderator
+    if (await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.body.userID)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: 'this user is already moderator',
+      });
+    }
+    await communityServiceInstance.inviteModerator(req.body.communityID, req.body.userID);
   } else {
     return res.status(400).json({
       status: "failed",
@@ -309,6 +331,45 @@ const friendRequest = catchAsync((req, res, next) => {
     status: "succeeded",
   });
 });
+
+const unFriendRequest = catchAsync(async (req, res, next) => {
+  if (req.body.type === 'friend') {
+    userServiceInstance.deleteFriend(req.username, req.body.userID);
+  } else if (req.body.type === 'moderator_deinvite') {
+    //[1]-> check the existence of the moderator
+    subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+    if (subreddit.state) {
+      return res.status(404).json({
+        status: 'failed',
+        message: 'not found this subreddit',
+      })
+    }
+    // [2] -> check if user isn't moderator in subreddit
+    if (!await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.username)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: 'you aren\'t moderator in this subreddit',
+      });
+    }
+    //check that other user is invited
+    if (await userServiceInstance.isInvited(req.body.communityID, req.body.userID)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: 'this user is already moderator',
+      });
+    }
+    await communityServiceInstance.inviteModerator(req.body.communityID, req.body.userID);
+  } else {
+    return res.status(400).json({
+      status: "failed",
+      message: "invalid type"
+    })
+  }
+  return res.status(200).json({
+    status: "succeeded",
+  });
+});
+
 
 const getAllFriends = catchAsync(async (req, res, next) => {
   const friends = await userServiceInstance.getOne({
@@ -410,6 +471,23 @@ const leaveModeratorOfSubredddit = catchAsync(async (req, res, next) => {
     status: 'succeded',
   });
 })
+
+const getUserInfo = catchAsync(async (req, res, next) => {
+  const user = await userServiceInstance.getOne({ _id: req.params.username, select: 'avatar _id about' });
+  if (!user) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this user'
+    });
+  }
+  else {
+    return res.status(200).json({
+      about: user.about,
+      id: user._id,
+      avatar: user.avatar,
+    });
+  }
+})
 module.exports = {
   uploadUserPhoto,
   block,
@@ -432,4 +510,5 @@ module.exports = {
   getInterests,
   addInterests,
   updateInfo,
+  getUserInfo,
 };

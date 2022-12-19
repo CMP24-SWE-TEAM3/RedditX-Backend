@@ -82,7 +82,10 @@ const postSchema = mongoose.Schema({
       type: String,
     },
   ],
-  communityID: String,
+  communityID: {
+    type: String,
+    ref: 'Community'
+  },
   userID: {
     type: String,
     required: [true, "A post must have a user!"],
@@ -118,7 +121,7 @@ postSchema.virtual("hotnessFactor").get(function () {
       this.createdAt().getDay() / 30 +
       this.createdAt.getYear() / 2022) *
       2) /
-      3 +
+    3 +
     this.votesCount +
     this.commentsNum
   );
@@ -130,7 +133,7 @@ postSchema.virtual("bestFactor").get(function () {
       this.createdAt().getDay / 30 +
       this.createdAt.getYear() / 2022) *
       1) /
-      3 +
+    3 +
     this.votesCount +
     this.commentsNum
   );
@@ -147,6 +150,14 @@ postSchema.pre(/^find/, function (next) {
   this.populate({
     path: "userID",
     select: "_id avatar",
+  });
+  next();
+});
+
+postSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "communityID",
+    select: "_id",
   });
   next();
 });

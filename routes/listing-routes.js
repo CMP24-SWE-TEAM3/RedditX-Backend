@@ -30,4 +30,8 @@ router
   .route('/show-comment')
   .post(authCheck, commentController.showComment);
 
+
+router
+  .route("/insights_count/:post")
+  .get(authCheck, listingController.getPostInsights);
 module.exports = router;

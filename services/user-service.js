@@ -38,23 +38,23 @@ class UserService extends Service {
     );
   };
 
- /**
-   *  Get followers of me
-   * @param {String} username my username .
-   * @returns {Boolean} (state)
-   * @function
-   */
-  getFollowers=async(username)=>{
-    const followers_user=await this.getOne({_id:username}).select("followers");
-    const followersIds=followers_user.followers;
-    
-    const followers=await this.find({
+  /**
+    *  Get followers of me
+    * @param {String} username my username .
+    * @returns {Boolean} (state)
+    * @function
+    */
+  getFollowers = async (username) => {
+    const followers_user = await this.getOne({ _id: username }).select("followers");
+    const followersIds = followers_user.followers;
+
+    const followers = await this.find({
       _id: { $in: followersIds },
     }).select("about avatar _id");
 
     return {
-      status:true,
-      followers:followers
+      status: true,
+      followers: followers
     };
   }
   /**
@@ -63,20 +63,20 @@ class UserService extends Service {
    * @returns {Boolean} (state)
    * @function
    */
-  getInterests=async(username)=>{
+  getInterests = async (username) => {
     var categories_user;
-    try{
-       categories_user=await this.getOne({_id:username});
+    try {
+      categories_user = await this.getOne({ _id: username });
     }
-    catch{
+    catch {
       return {
-        status:false
+        status: false
       }
     }
-    const categories=categories_user.categories;
+    const categories = categories_user.categories;
     return {
-      status:true,
-      categories:categories
+      status: true,
+      categories: categories
     };
   }
 
@@ -86,20 +86,20 @@ class UserService extends Service {
    * @returns {Boolean} (state)
    * @function
    */
-  addInterests=async(username,categories)=>{
+  addInterests = async (username, categories) => {
     var categories_user;
-    try{
-       categories_user=await this.updateOne({_id:username},{categories:categories});
+    try {
+      categories_user = await this.updateOne({ _id: username }, { categories: categories });
     }
-    catch{
+    catch {
       return {
-        status:false
+        status: false
       }
     }
     console.log(categories_user);
     return {
-      status:true,
-     
+      status: true,
+
     };
   }
 
@@ -662,7 +662,6 @@ class UserService extends Service {
 
   isModeratorInSubreddit = async (subreddit, user) => {
     let subreddits = (await this.getOne({ "_id": user, "select": 'moderators' })).moderators;
-    console.log(subreddits);
     subreddits = subreddits.map(el => el.communityId);
     return subreddits.includes(subreddit);
   }
@@ -690,6 +689,38 @@ class UserService extends Service {
       }
     });
 
+
+  }
+
+  addFriend = async (username, friend) => {
+    await this.updateOne({ _id: username }, {
+      $push: {
+        friendRequestFromMe: friend,
+      }
+    });
+    await this.updateOne({ _id: friend }, {
+      $push: {
+        friendRequestToMe: username,
+      }
+    });
+  }
+
+  deleteFriend = async (username, friend) => {
+    await this.updateOne({ _id: username }, {
+      $pop: {
+        friend: friend
+      }
+    })
+  }
+  isModeratorInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ "_id": user, "select": 'moderators' })).moderators;
+    subreddits = subreddits.filter(el => el.role == 'creator').map(el => el.communityId);
+    return subreddits.includes(subreddit);
+  }
+  kickModerator = async (subreddit, user) => {
+    let doc = await this.getOne({ _id: user });
+    doc.moderators = doc.moderators.filter(el => el.communityId != subreddit);
+    await doc.save();
   }
 }
 module.exports = UserService;

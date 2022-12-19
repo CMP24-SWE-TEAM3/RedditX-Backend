@@ -7,6 +7,7 @@ const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
+const { response } = require("express");
 const IdValidator = require("../validate/listing-validators").validateObjectId;
 const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
@@ -687,6 +688,132 @@ const addFlair = catchAsync(async (req, res, next) => {
   return res.status(200).json({
     status: 'succeeded',
   });
+});
+
+configureSubreddit = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  // [3]-> configure the settings of subreddit
+
+  await communityServiceInstance.updateOne({ _id: req.params.subreddit }, req.body);
+  res.status(200).json({
+    status: 'succeeded',
+  })
+})
+
+
+const approveLink = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  //[3]-> check if the link is exist
+  const comment = await commentServiceInstance.getOne({ _id: req.body.linkID });
+  const post = await postServiceInstance.getOne({ _id: req.body.linkID });
+  if (!comment && !post) {
+    res.status(404).json({
+      stauts: 'fail',
+      message: 'there isn\'t link with this id'
+    })
+  }
+  //[4]-> do approving the link
+  if (comment) {
+    //approve comment
+    commentServiceInstance.approveComment(comment);
+  } else if (post) {
+    //approve post 
+    postServiceInstance.approvePost(post);
+  }
+  res.status(200).json({
+    status: 'succeeded',
+  })
+});
+
+const removeLink = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (!await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t moderator in this subreddit',
+    });
+  }
+  //[3]-> check if the link is exist
+  const comment = await commentServiceInstance.getOne({ _id: req.body.id, populate: 'replyingTo' });
+  const post = await postServiceInstance.getOne({ _id: req.body.id, communityID: req.body.communityID });
+  if (!(comment && comment.replyingTo.communityID == req.body.communityID) && !post) {
+    return res.status(404).json({
+      stauts: 'fail',
+      message: 'un valid id or this link isn\'t in this subreddit'
+    })
+  }
+  //[4]-> do removing the link
+  if (comment) {
+    //approve comment
+    commentServiceInstance.removeComment(comment);
+  } else if (post) {
+    //approve post 
+    postServiceInstance.removePost(post);
+  }
+  res.status(200).json({
+    status: 'succeeded',
+  })
+});
+
+kickModerator = catchAsync(async (req, res, next) => {
+  // [1] -> check existence of subreddit
+  subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: 'failed',
+      message: 'not found this subreddit',
+    })
+  }
+  // [2] -> check if user isn't creator of subreddit
+  if (!await userServiceInstance.isCreatorInSubreddit(req.body.communityID, req.username)) {
+    return res.status(400).json({
+      status: 'failed',
+      message: 'you aren\'t creator of this subreddit',
+    });
+  }
+
+  //[3] -> kick moderator
+  await communityServiceInstance.kickModerator(subreddit, req.body.userID);
+  await userServiceInstance.kickModerator(subreddit, req.body.userID);
+  return res.status(200).json({
+    status: 'succeeded',
+  });
 })
 
 module.exports = {
@@ -716,4 +843,8 @@ module.exports = {
   getMembersCountPerDay,
   getViewsCountPerDay,
   kickUser,
+  configureSubreddit,
+  approveLink,
+  removeLink,
+  kickModerator
 };
