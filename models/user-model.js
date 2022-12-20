@@ -288,7 +288,14 @@ const userSchema = new mongoose.Schema({
   },
   about: {
     type: String,
-    /*default: `My name is ${this._id.slice(3)}`,*/
+  },
+  contentVisibility: {
+    type: Boolean,
+    default:true
+  },
+  showActiveCommunities: {
+    type: Boolean,
+    default:true
   },
   prefs: {
     type: userPrefsSchema,
