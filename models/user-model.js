@@ -293,6 +293,9 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default:true
   },
+  fcmToken: {
+    type: String,
+  },
   showActiveCommunities: {
     type: Boolean,
     default:true
