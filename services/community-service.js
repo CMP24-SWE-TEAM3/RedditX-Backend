@@ -1,6 +1,5 @@
 const Service = require("./service");
 const AppError = require("../utils/app-error");
-const Community = require("../models/community-model");
 const Post = require("../models/post-model");
 const PostService = require("./post-service");
 var postServiceInstance = new PostService(Post);
@@ -136,10 +135,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-            ? (el.isBanned.value = false)
-            : operation === "mute"
-              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-              : (el.isMuted.value = false)
+          ? (el.isBanned.value = false)
+          : operation === "mute"
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     return community;
@@ -160,10 +159,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-            ? (el.isBanned.value = false)
-            : operation === "mute"
-              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-              : (el.isMuted.value = false)
+          ? (el.isBanned.value = false)
+          : operation === "mute"
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     await toBeAffected.save();
@@ -259,7 +258,7 @@ class CommunityService extends Service {
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     const creator =
       community.moderators[
-      community.moderators.findIndex((el) => el.role === "creator")
+        community.moderators.findIndex((el) => el.role === "creator")
       ];
     var creatorID = undefined;
     if (creator) creatorID = creator.userID;
@@ -686,22 +685,16 @@ class CommunityService extends Service {
   };
 
   setSuggestedSort = async (srName, commentSort) => {
-    Community.findByIdAndUpdate(
-      { _id: srName },
-      { $set: { suggestedCommentSort: commentSort } },
-      { new: true },
-      (err) => {
-        if (err) {
-          return {
-            status: false,
-          };
-        } else {
-          return {
-            status: true,
-          };
-        }
-      }
-    );
+    var community = await this.getOne({
+      _id: srName,
+      select: "communityOptions",
+    });
+    if (!community) return { status: false };
+    community.communityOptions.suggestedCommentSort = commentSort;
+    console.log(commentSort);
+    await community.save();
+    console.log(community);
+    return { status: true };
   };
 
   removeModeratorInvitation = async (subreddit, user) => {
@@ -728,12 +721,12 @@ class CommunityService extends Service {
 
   inviteModerator = async (subreddit, moderator) => {
     const doc = await this.getOne({ _id: subreddit });
-    doc.inviteModerators.push(moderator);
+    doc.invitedModerators.push(moderator);
     await doc.save();
   };
   deInviteModerator = async (subreddit, moderator) => {
     const doc = await this.getOne({ _id: subreddit });
-    doc.invitedModerators = doc.inviteModerators.filter(
+    doc.invitedModerators = doc.invitedModerators.filter(
       (el) => el != moderator
     );
     await doc.save();
