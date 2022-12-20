@@ -189,9 +189,8 @@ class PostService extends Service {
   hide = async (linkID, user) => {
     if (!linkID) throw new AppError("No linkID is provided!", 400);
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    if (user.hiddenPosts.find((el) => el.toString() === linkID.slice(3)))
-      return;
-    user.hiddenPosts.push(linkID.slice(3));
+    if (user.hiddenPosts.find((el) => el.toString() === linkID)) return;
+    user.hiddenPosts.push(linkID);
     await user.save();
   };
 
@@ -205,7 +204,7 @@ class PostService extends Service {
     if (!linkID) throw new AppError("No linkID is provided!", 400);
     if (!user) throw new AppError("This user doesn't exist!", 404);
     user.hiddenPosts.splice(
-      user.hiddenPosts.findIndex((el) => el === linkID.slice(3)),
+      user.hiddenPosts.findIndex((el) => el === linkID),
       1
     );
     await user.save();
@@ -273,7 +272,7 @@ class PostService extends Service {
     };
   };
 
-  userSubmitted = async (postIDs, query) => {
+  userPosts = async (postIDs, query) => {
     /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
     query.limit = query.limit || "10";
     /*return posts to controller */

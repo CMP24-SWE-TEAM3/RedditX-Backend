@@ -401,11 +401,9 @@ class CommunityService extends Service {
     const post = await postServiceInstance.findById(link);
     if (!post) throw new AppError("This post doesn't exist!", 404);
     let linkID = false;
-    if (post.communityID === link) linkID = true;
+    if (post.communityID === subreddit) linkID = true;
     if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
-    if (!post.spoiler) {
-      post.spoiler = true;
-    }
+    post.spoiler = true;
     await post.save();
   };
   /**
@@ -430,11 +428,9 @@ class CommunityService extends Service {
     if (!performerFound)
       throw new AppError("You cannot make this operation!", 400);
     let linkID = false;
-    if (post.communityID === link) linkID = true;
+    if (post.communityID === subreddit) linkID = true;
     if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
-    if (post.spoiler) {
-      post.spoiler = false;
-    }
+    post.spoiler = false;
     await post.save();
   };
   /**
@@ -460,7 +456,7 @@ class CommunityService extends Service {
     if (!performerFound)
       throw new AppError("You cannot make this operation!", 400);
     let linkID = false;
-    if (post.communityID === link) linkID = true;
+    if (post.communityID === subreddit) linkID = true;
     if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
     if (action === "mark") {
       post.nsfw = true;
@@ -490,11 +486,9 @@ class CommunityService extends Service {
     if (!performerFound)
       throw new AppError("You cannot make this operation!", 400);
     let linkID = false;
-    if (post.communityID === link) linkID = true;
+    if (post.communityID === subreddit) linkID = true;
     if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
-    if (post.locked) {
-      post.locked = false;
-    }
+    post.locked = false;
     await post.save();
   };
   /**
@@ -519,11 +513,9 @@ class CommunityService extends Service {
     if (!performerFound)
       throw new AppError("You cannot make this operation!", 400);
     let linkID = false;
-    if (post.communityID === link) linkID = true;
+    if (post.communityID === subreddit) linkID = true;
     if (!linkID) throw new AppError("this post is not in this subreddit!", 400);
-    if (!post.locked) {
-      post.locked = true;
-    }
+    post.locked = true;
     await post.save();
   };
 

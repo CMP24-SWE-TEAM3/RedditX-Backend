@@ -11,50 +11,17 @@ const commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
 
 /**
- * Get comments on posts of the user
- * @param {function} (req, res)
- * @returns {object} res
- */
-const getUserSelfReply = catchAsync(async (req, res, next) => {
-  try {
-    var comments = await userServiceInstance.userSelfReply(
-      req.params.username,
-      req.query
-    );
-  } catch (err) {
-    return next(err);
-  }
-  res.status(200).json({
-    comments,
-  });
-});
-/**
- * Get user comment replies
- * @param {function} (req, res)
- * @returns {object} res
- */
-const getUserCommentReplies = catchAsync(async (req, res, next) => {
-  try {
-    var comments = await userServiceInstance.userCommentReplies(
-      req.params.username,
-      req.query
-    );
-  } catch (err) {
-    return next(err);
-  }
-  res.status(200).json({
-    comments,
-  });
-});
-/**
  * Get user comments
  * @param {function} (req, res)
  * @returns {object} res
  */
 const getUserComments = catchAsync(async (req, res, next) => {
   try {
-    var comments = await userServiceInstance.userComments(
-      req.params.username,
+    const commentIds = await userServiceInstance.userSubmittedComments(
+      req.params.username
+    );
+    var comments = await commentServiceInstance.userComments(
+      commentIds,
       req.query
     );
   } catch (err) {
@@ -71,10 +38,8 @@ const getUserComments = catchAsync(async (req, res, next) => {
  */
 const getUserUpVoted = catchAsync(async (req, res, next) => {
   try {
-    var posts = await userServiceInstance.userUpVoted(
-      req.params.username,
-      req.query
-    );
+    var postIds = await userServiceInstance.userUpVoted(req.params.username);
+    var posts = await postServiceInstance.userPosts(postIds, req.query);
   } catch (err) {
     return next(err);
   }
@@ -89,10 +54,8 @@ const getUserUpVoted = catchAsync(async (req, res, next) => {
  */
 const getUserDownVoted = catchAsync(async (req, res, next) => {
   try {
-    var posts = await userServiceInstance.userDownVoted(
-      req.params.username,
-      req.query
-    );
+    var postIds = await userServiceInstance.userDownVoted(req.params.username);
+    var posts = await postServiceInstance.userPosts(postIds, req.query);
   } catch (err) {
     return next(err);
   }
@@ -108,10 +71,10 @@ const getUserDownVoted = catchAsync(async (req, res, next) => {
 const getUserSubmitted = catchAsync(async (req, res, next) => {
   var posts;
   try {
-    posts = await userServiceInstance.userSubmitted(
-      req.params.username,
-      req.query
+    const postIds = await userServiceInstance.userSubmittedPosts(
+      req.params.username
     );
+    posts = await postServiceInstance.userPosts(postIds, req.query);
   } catch (err) {
     return next(err);
   }
@@ -126,10 +89,8 @@ const getUserSubmitted = catchAsync(async (req, res, next) => {
  */
 const getUserMentions = catchAsync(async (req, res, next) => {
   try {
-    var posts = await userServiceInstance.userMentions(
-      req.params.username,
-      req.query
-    );
+    const postIds = await userServiceInstance.userMentions(req.username);
+    var posts = await postServiceInstance.userPosts(postIds, req.query);
   } catch (err) {
     return next(err);
   }
@@ -169,7 +130,7 @@ const getUserOverview = catchAsync(async (req, res, next) => {
     const postIds = await userServiceInstance.userSubmittedPosts(
       req.params.username
     );
-    var posts = await postServiceInstance.userSubmitted(postIds, req.query);
+    var posts = await postServiceInstance.userPosts(postIds, req.query);
     const commentIds = await userServiceInstance.userSubmittedComments(
       req.params.username
     );
@@ -199,8 +160,6 @@ module.exports = {
   getUserOverview,
   getUserUpVoted,
   getUserMentions,
-  getUserCommentReplies,
-  getUserSelfReply,
   getUserSubmitted,
   getUserComments,
 };
