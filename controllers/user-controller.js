@@ -122,35 +122,18 @@ const editUserPrefs = catchAsync(async (req, res, next) => {
   try {
     const user = await userServiceInstance.findById(req.username);
     if (user) {
+      type=req.body.type;
+      value=req.body.value;
       results = await userServiceInstance.updateOne(
-        { numComments: req.body.numComments },
-        { threadedMessages: req.body.threadedMessages },
-        { showLinkFlair: req.body.showLinkFlair },
-        { threadedMessages: req.body.threadedMessages },
-        { countryCode: req.body.countryCode },
-        { emailCommentReply: req.body.emailCommentReply },
-        { emailUpvoteComment: req.body.emailUpvoteComment },
-        { emailMessages: req.body.emailMessages },
-        { emailUnsubscribeAll: req.body.emailUnsubscribeAll },
-        { emailUpvotePost: req.body.emailUpvotePost },
-        { emailUsernameMention: req.body.emailUsernameMention },
-        { emailUserNewFollower: req.body.emailUserNewFollower },
-        { emailPrivateMessage: req.body.emailPrivateMessage },
-        { over18: req.body.over18 },
-        { newwindow: req.body.newwindow },
-        { labelNsfw: req.body.labelNsfw },
-        { liveOrangeReds: req.body.liveOrangeReds },
-        { markMessageRead: req.body.markMessageRead },
-        { enableFollwers: req.body.enableFollwers },
-        { publicVotes: req.body.publicVotes },
-        {
-          showLocationBasedRecommendations:
-            req.body.showLocationBasedRecommendations,
-        },
-        { searchIncludeOver18: req.body.searchIncludeOver18 },
-        { defaultCommentSort: req.body.defaultCommentSort },
-        { langauge: req.body.langauge }
+       {_id:req.username},
+       {type : value}
+       
       );
+    }
+    else{
+      return res.status(404).json({
+        status:"user is not found"
+      })
     }
   } catch (err) {
     return next(err);
