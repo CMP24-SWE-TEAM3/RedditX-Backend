@@ -365,7 +365,6 @@ const getModerators = catchAsync(async (req, res, next) => {
       else temp.role = "moderator";
       users[index] = temp;
     });
-    console.log(users);
   } catch (err) {
     return next(err);
   }
@@ -430,9 +429,7 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const createSubreddit = async (req, res) => {
-  console.log(req.body);
   const check = await communityServiceInstance.creationValidation(req.body);
-  console.log(check);
   if (!check) {
     return res.status(500).json({
       status: "invalid parameters",
@@ -465,7 +462,6 @@ const createSubreddit = async (req, res) => {
  * @returns {object} res
  */
 const addCommunityRule = async (req, res) => {
-  console.log(req.body);
   if (!req.body.srName || !req.body.rule) {
     return res.status(500).json({
       status: "invalid parameters",
@@ -477,7 +473,6 @@ const addCommunityRule = async (req, res) => {
     req.body,
     user
   );
-  console.log(result);
   if (!result.status) {
     return res.status(500).json({
       status: result.error,
@@ -511,7 +506,6 @@ const editCommunityRule = async (req, res) => {
     req.body,
     user
   );
-  console.log(result);
   if (!result.status) {
     return res.status(500).json({
       status: result.error,
@@ -528,7 +522,6 @@ const editCommunityRule = async (req, res) => {
  * @returns {object} res
  */
 const getCommunityAbout = async (req, res) => {
-  console.log(req.params);
   if (!req.params["subreddit"]) {
     return res.status(500).json({
       status: "invalid parameters",
@@ -538,7 +531,6 @@ const getCommunityAbout = async (req, res) => {
   const result = await communityServiceInstance.availableSubreddit(
     req.params["subreddit"]
   );
-  console.log(result);
   if (result.state) {
     return res.status(500).json({
       status: result.error,
@@ -935,7 +927,7 @@ const removeLink = catchAsync(async (req, res) => {
     communityID: req.body.communityID,
   });
   if (
-    !(comment && comment.replyingTo.communityID == req.body.communityID) &&
+    !(comment && comment.replyingTo.communityID._id == req.body.communityID) &&
     !post
   ) {
     return res.status(404).json({
@@ -959,7 +951,7 @@ const removeLink = catchAsync(async (req, res) => {
 const kickModerator = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   var subreddit = await communityServiceInstance.availableSubreddit(
-    req.body.communityID
+    req.params.subreddit
   );
   if (subreddit.state) {
     return res.status(404).json({
@@ -970,7 +962,7 @@ const kickModerator = catchAsync(async (req, res) => {
   // [2] -> check if user isn't creator of subreddit
   if (
     !(await userServiceInstance.isCreatorInSubreddit(
-      req.body.communityID,
+      req.params.subreddit,
       req.username
     ))
   ) {

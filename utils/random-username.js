@@ -86773,11 +86773,9 @@ const randomUserName = () => {
     "zysk",
   ];
   let chooseWord = wordList[Math.floor(Math.random() * wordList.length)];
-  //   let chooseWord2 = wordList[Math.floor(Math.random() * wordList.length)];
   let randomNumber = Math.floor(Math.random() * 1000 + 1);
-  const randomUserName = "t2_" +chooseWord + "_" + randomNumber;
-  //   console.log(randomUserName);
-  return  randomUserName;
+  const randomUserName = "t2_" + chooseWord + "_" + randomNumber;
+  return randomUserName;
 };
 module.exports = {
   randomUserName,

@@ -6,7 +6,6 @@ const User = require("../models/user-model");
 const Notification = require("../models/notification-model");
 
 const PostService = require("./../services/post-service");
-const PushNotificationService=require("../services/push-notifications-service");
 // const CommentService = require("./../services/comment-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
@@ -15,7 +14,6 @@ const NotificationService = require("../services/notification-service");
 const AppError = require("../utils/app-error");
 var postServiceInstance = new PostService(Post);
 var notificationServiceInstance = new NotificationService(Notification);
-var pushNotificationServiceInstance=new PushNotificationService();
 // var commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
@@ -41,7 +39,7 @@ const editUserText = async (req, res, next) => {
     });
     if (!post || !post.userID)
       return next(new AppError("This post is not found!", 404));
-    if (post.userID._id !== req.username)
+    if (post.userID !== req.username)
       return next(new AppError("You are not the author of this post!", 400));
     const results = await postServiceInstance.updateOne(
       { _id: linkID.slice(3) },
@@ -307,9 +305,8 @@ const unsave = catchAsync(async (req, res, next) => {
  */
 const vote = async (req, res) => {
   const result = await commentServiceInstance.vote(req.body, req.username);
-  console.log(result);
   if (result.state) {
-    if(req.body.dir==1){
+    if (req.body.dir == 1) {
       var user;
       if (req.body.id.substring(0, 2) === "t1") {
         const comment = await commentServiceInstance.getOne({
@@ -335,15 +332,25 @@ const vote = async (req, res) => {
             status: "Error happened while saving notification in user db",
           });
         }
+
         //push notiication
-        const pushResult=Push
+        const fcm_token_user=await userServiceInstance.getOne({ _id:comment.authorId ,
+          select: "_id fcmToken"});
+          console.log(fcm_token_user);
+        var fcmToken=fcm_token_user.fcmToken;
+        console.log(fcmToken);
+        const pushResult=await pushNotificationServiceInstance.upvoteCommentNotification(fcmToken,req.username,comment._id);
+        if(!pushResult.status){
+          return res.status(500).json({
+            "status":"Cannot push notification"
+          })
+        }
 
 
       } else {
         const post = await postServiceInstance.getOne({
           _id: req.body.id.slice(3),
         });
-        console.log(post);
         user = await userServiceInstance.getOne({ _id: req.username });
         const notificationSaver =
           await notificationServiceInstance.createUpvoteToPostNotification(
@@ -357,13 +364,25 @@ const vote = async (req, res) => {
         }
         const saveToUser = await userServiceInstance.saveNOtificationOfUser(
           notificationSaver.id,
-          post.userID._id
+          post.userID
         );
         if (!saveToUser.status) {
           return res.status(404).json({
             status: "Error happened while saving notification in user db",
           });
         }
+          //push notiication
+          const fcm_token_user=await userServiceInstance.getOne({ _id: post.userID._id ,
+            select: "_id fcmToken"});
+            console.log(fcm_token_user);
+          var fcmToken=fcm_token_user.fcmToken;
+          console.log(fcmToken);
+          const pushResult=await pushNotificationServiceInstance.upvotePostNotification(fcmToken,req.username,post.userID._id);
+          if(!pushResult.status){
+            return res.status(500).json({
+              "status":"Cannot push notification"
+            })
+          }
       }
     }
 

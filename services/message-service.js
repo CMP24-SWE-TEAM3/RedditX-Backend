@@ -43,7 +43,6 @@ class MessageService extends Service {
         error: "operation failed",
       };
     }
-    console.log(message);
     return {
       status: true,
       id: message._id.toString(),
@@ -72,7 +71,6 @@ class MessageService extends Service {
         error: "operation failed",
       };
     }
-    console.log(message);
     return {
       status: true,
       id: message._id.toString(),
@@ -88,7 +86,6 @@ class MessageService extends Service {
   unreadMessage = async (body) => {
     var message;
     const existCheck = await this.getOne({ _id: body.msgID });
-    console.log(existCheck);
     if (!existCheck) {
       return {
         status: false,
@@ -155,14 +152,12 @@ class MessageService extends Service {
           { fromID: username, toID: { $ne: username } },
         ],
       });
-      console.log(messages);
     } catch {
       return {
         status: false,
         error: "operation failed",
       };
     }
-    console.log(messages);
     return {
       status: true,
       messages: messages,

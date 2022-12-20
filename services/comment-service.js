@@ -18,7 +18,6 @@ class CommentService extends Service {
     super(model);
   }
   getSearchResults = async (query) => {
-    //console.log('here');
     const searchQuery = query.q;
     delete query.q;
     return this.getAll(
@@ -123,7 +122,7 @@ class CommentService extends Service {
       authorId: username,
       replyingTo: data.commentID,
       postID: comment.postID,
-      communityID: comment.communityID,
+      communityID: comment.communityID._id,
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newReply.save();
@@ -227,55 +226,57 @@ class CommentService extends Service {
       } else if (dir == 0 || dir == -1) {
         operation = -1;
       }
+
       try{
       if (removeDetector && !addDetector) {
         await User.findOneAndUpdate(
           { _id: username },
-          { $pull: { hasVote: { _id: postIdCasted } } }
+          { $pull: { hasVote: { postID: postIdCasted } } }
         ).clone();
       } else if (!removeDetector && addDetector) {
         await User.findOneAndUpdate(
           { _id: username },
-          { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
+          { $addToSet: { hasVote: { postID: postIdCasted, type: operation } } }
         ).clone();
       } else if (addDetector && removeDetector) {
         await User.findOneAndUpdate(
           { _id: username },
-          { $pull: { hasVote: { _id: postIdCasted } } }
+          { $pull: { hasVote: { postID: postIdCasted } } }
         );
         await User.findOneAndUpdate(
           { _id: username },
-          { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
+          { $addToSet: { hasVote: { postID: postIdCasted, type: operation } } }
         ).clone();
       }
       await Post.findByIdAndUpdate(
         { _id: postIdCasted },
         {
+          
           $set: {
             votesCount: votesCount + operation,
             voters: voters,
+
           },
-        },
-        { new: true },
-        (err) => {
-          if (err) {
-            return {
-              state: false,
-              error: "failed",
-            };
-          } else {
-            return {
-              state: true,
-              status: "done",
-            };
+         }, {new: true },
+          (err) => {
+            if (err) {
+              return {
+                state: false,
+                error: "failed",
+              };
+            } else {
+              return {
+                state: true,
+                status: "done",
+              };
+            }
           }
-        }
-      ).clone();}
-      catch(err){
+        ).clone();
+      } catch (err) {
         return {
-          status:false,
-          error:err
-        }
+          status: false,
+          error: err,
+        };
       }
       return {
         state: true,
@@ -302,8 +303,6 @@ class CommentService extends Service {
         }
         index++;
       }
-      console.log(isFound);
-      console.log("a");
       removeDetector = false;
       addDetector = false;
       if (!isFound) {
@@ -353,32 +352,31 @@ class CommentService extends Service {
       } else if (dir == 0 || dir == -1) {
         operation = -1;
       }
-      console.log("aaa");
       try {
         if (removeDetector && !addDetector) {
           await User.findOneAndUpdate(
             { _id: username },
-            { $pull: { votedComments: { _id: postIdCasted } } }
+            { $pull: { votedComments: { commentID: postIdCasted } } }
           ).clone();
         } else if (!removeDetector && addDetector) {
           await User.findOneAndUpdate(
             { _id: username },
             {
               $addToSet: {
-                votedComments: { _id: postIdCasted, type: operation },
+                votedComments: { commentID: postIdCasted, type: operation },
               },
             }
           ).clone();
         } else if (addDetector && removeDetector) {
           await User.findOneAndUpdate(
             { _id: username },
-            { $pull: { votedComments: { _id: postIdCasted } } }
+            { $pull: { votedComments: { commentID: postIdCasted } } }
           );
           await User.findOneAndUpdate(
             { _id: username },
             {
               $addToSet: {
-                votedComments: { _id: postIdCasted, type: operation },
+                votedComments: { commentID: postIdCasted, type: operation },
               },
             }
           ).clone();
@@ -401,7 +399,6 @@ class CommentService extends Service {
           error: "failed",
         };
       }
-     
     }
   };
 
@@ -418,7 +415,6 @@ class CommentService extends Service {
   };
 
   checkUser = async (user, comment) => {
-    console.log();
     return (
       (await this.getOne({ _id: comment, select: "authorId" }))["authorId"] ===
       user

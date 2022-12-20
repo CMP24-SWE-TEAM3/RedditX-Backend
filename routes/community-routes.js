@@ -115,9 +115,8 @@ router.get(
   communityController.getViewsCountPerDayAndMonth
 );
 
-router.get("/:subreddit", communityController.getCommunityAbout);
 router
-  .route("/r/:subreddit/api/flair-list")
+  .route("/:subreddit/api/flair-list")
   .get(authCheck, communityController.getFlairs);
 
 router
@@ -154,7 +153,9 @@ router.route("/approve").post(authCheck, communityController.approveLink);
 router.route("/remove").post(authCheck, communityController.removeLink);
 
 router
-  .route("/kick-moderator")
+  .route("/:subreddit/kick-moderator")
   .post(authCheck, communityController.kickModerator);
+
+router.get("/:subreddit", communityController.getCommunityAbout);
 
 module.exports = router;
