@@ -367,11 +367,12 @@ const vote = async (req, res) => {
           post.userID
         );
         if (!saveToUser.status) {
+          console.log(saveToUser.error);
           return res.status(404).json({
             status: "Error happened while saving notification in user db",
           });
         }
-          //push notiication
+         // push notiication
           const fcm_token_user=await userServiceInstance.getOne({ _id: post.userID._id ,
             select: "_id fcmToken"});
             console.log(fcm_token_user);

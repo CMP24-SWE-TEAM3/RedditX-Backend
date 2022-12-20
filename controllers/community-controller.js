@@ -158,7 +158,7 @@ const getSpecificCategory = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const getRandomCommunities = async (req, res) => {
-  const communities = await communityServiceInstance.getRandomCommunities();
+  const communities = await communityServiceInstance.getRandomCommunities(req.query);
   return res.status(200).json({
     communities: communities,
   });

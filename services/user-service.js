@@ -44,25 +44,27 @@ class UserService extends Service {
    * @function
    */
   saveNOtificationOfUser = async (id, username) => {
-    try {
-      await this.updateOne(
-        { _id: username },
-        {
-          $addToSet: {
-            notifications: {
-              notificationID: id,
-              isRead: false,
-              isDeleted: false,
-            },
-          },
-        }
-      );
-    } catch (err) {
+    const user =await this.getOne({_id:username});
+    const newNotification=
+    {
+      
+        notificationID: id,
+        isRead: false,
+        isDeleted: false,
+      
+    };
+    try{
+       user.notifications.push(newNotification);
+       user.save();
+    }
+    catch(err){
       return {
-        status: false,
-        error: err
+        status:false,
+        error:err
+
       }
     }
+    
     return {
       status: true
     }
