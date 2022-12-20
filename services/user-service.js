@@ -62,6 +62,7 @@ class UserService extends Service {
 
         status: false,
         error: err
+
       }
     }
     
