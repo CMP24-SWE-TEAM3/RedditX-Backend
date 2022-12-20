@@ -21,8 +21,8 @@ router.post("/save", authCheck, listingController.save);
 router.post("/unsave", authCheck, listingController.unsave);
 router.post("/hide", authCheck, listingController.hide);
 router.post("/unhide", authCheck, listingController.unhide);
-router.post("/lock", authCheck, listingController.markLocked);
-router.post("/unlock", authCheck, listingController.markUnLocked);
+router.post("/:subreddit/lock", authCheck, listingController.markLocked);
+router.post("/:subreddit/unlock", authCheck, listingController.markUnLocked);
 router.post("/del", authCheck, listingController.deleteLink);
 router.post("/vote", authCheck, listingController.vote);
 router.post(
@@ -45,8 +45,4 @@ router
   .route("/insights-count/:post")
   .get(/*authCheck,*/ listingController.getPostInsights);
 
-
-router
-  .route("/insights_count/:post")
-  .get(authCheck, listingController.getPostInsights);
 module.exports = router;

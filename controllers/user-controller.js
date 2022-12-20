@@ -193,7 +193,7 @@ const updateEmail = catchAsync(async (req, res, next) => {
     if (user) {
       results = await userServiceInstance.updateOne(
         { _id: req.username },
-        { email: req.body.email }
+        { email: req.body.newEmail }
       );
     }
   } catch (err) {
@@ -312,8 +312,8 @@ const spam = catchAsync(async (req, res, next) => {
 const getUserSavedPosts = catchAsync(async (req, res, next) => {
   var posts = undefined;
   try {
-    const user = await userServiceInstance.findById(req.username);
-    posts = await userServiceInstance.userSavedPosts(user, req.query);
+    const postIds = await userServiceInstance.userSavedPosts(req.username);
+    posts = await postServiceInstance.userPosts(postIds, req.query);
   } catch (err) {
     return next(err);
   }

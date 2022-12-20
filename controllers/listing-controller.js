@@ -116,8 +116,7 @@ const markSpoiler = catchAsync(async (req, res, next) => {
     await communityServiceInstance.markAsSpoiler(
       req.params.subreddit,
       req.username,
-      req.body.link,
-      req.body.action
+      req.body.linkID
     );
   } catch (err) {
     return next(err);
@@ -197,7 +196,7 @@ const markNsfw = catchAsync(async (req, res, next) => {
     await communityServiceInstance.markAsNsfw(
       req.params.subreddit,
       req.username,
-      req.body.link,
+      req.body.linkID,
       req.body.action
     );
   } catch (err) {
@@ -221,47 +220,55 @@ const addComment = catchAsync(async (req, res, next) => {
       req.username
     );
     //notification part
-    const post=await postServiceInstance.getOne({_id:req.body.postID , select: "userID"});
-    const user_id=post.userID;
-       const user = await userServiceInstance.getOne({ _id: req.username });
-        const notificationSaver =
-          await notificationServiceInstance.createReplyToPostNotification(
-            req.username,
-            user
-          );
-        if (!notificationSaver.status) {
-          return res.status(404).json({
-            status: "Error happened while saving notification in db",
-          });
-        }
-        const saveToUser = await userServiceInstance.saveNOtificationOfUser(
-          notificationSaver.id,
-          user_id
-        );
-        if (!saveToUser.status) {
-          return res.status(404).json({
-            status: "Error happened while saving notification in user db",
-          });
-        }
-        //push notiication
-       
-        const fcm_token_user=await userServiceInstance.getOne({ _id:user_id ,
-          select: "_id fcmToken"});
-        var fcmToken=fcm_token_user.fcmToken;
-        if(!fcmToken){
-          return res.status(200).json({
-            status:"success without push notifications as user doesn't have one"
-          })
-        }
-        const pushResult=await pushNotificationServiceInstance.replytoPostNotification(fcmToken,req.username,newComment._id,newComment.postID);
-        if(!pushResult.status){
-          return res.status(500).json({
-            "status":"Cannot push notification"
-          })
-        }
+    const post = await postServiceInstance.getOne({
+      _id: req.body.postID,
+      select: "userID",
+    });
+    const user_id = post.userID;
+    const user = await userServiceInstance.getOne({ _id: req.username });
+    const notificationSaver =
+      await notificationServiceInstance.createReplyToPostNotification(
+        req.username,
+        user
+      );
+    if (!notificationSaver.status) {
+      return res.status(404).json({
+        status: "Error happened while saving notification in db",
+      });
+    }
+    const saveToUser = await userServiceInstance.saveNOtificationOfUser(
+      notificationSaver.id,
+      user_id
+    );
+    if (!saveToUser.status) {
+      return res.status(404).json({
+        status: "Error happened while saving notification in user db",
+      });
+    }
+    //push notiication
 
-
-
+    const fcm_token_user = await userServiceInstance.getOne({
+      _id: user_id,
+      select: "_id fcmToken",
+    });
+    var fcmToken = fcm_token_user.fcmToken;
+    if (!fcmToken) {
+      return res.status(200).json({
+        status: "success without push notifications as user doesn't have one",
+      });
+    }
+    const pushResult =
+      await pushNotificationServiceInstance.replytoPostNotification(
+        fcmToken,
+        req.username,
+        newComment._id,
+        newComment.postID
+      );
+    if (!pushResult.status) {
+      return res.status(500).json({
+        status: "Cannot push notification",
+      });
+    }
   } catch (err) {
     return next(err);
   }
@@ -277,8 +284,11 @@ const addReply = catchAsync(async (req, res, next) => {
   try {
     newReply = await commentServiceInstance.addReply(req.body, req.username);
     //notification part
-    const comment=await commentServiceInstance.getOne({_id:req.body.commentID , select: "authorId"});
-    const user_id=comment.authorId;
+    const comment = await commentServiceInstance.getOne({
+      _id: req.body.commentID,
+      select: "authorId",
+    });
+    const user_id = comment.authorId;
     const user = await userServiceInstance.getOne({ _id: req.username });
     const notificationSaver =
       await notificationServiceInstance.createReplyToCommentNotification(
@@ -300,22 +310,30 @@ const addReply = catchAsync(async (req, res, next) => {
       });
     }
     //push notiication
-    const fcm_token_user=await userServiceInstance.getOne({ _id:user_id ,
-      select: "_id fcmToken"});
-      console.log(fcm_token_user);
-    var fcmToken=fcm_token_user.fcmToken;
+    const fcm_token_user = await userServiceInstance.getOne({
+      _id: user_id,
+      select: "_id fcmToken",
+    });
+    console.log(fcm_token_user);
+    var fcmToken = fcm_token_user.fcmToken;
     console.log(fcmToken);
-    if(!fcmToken){
+    if (!fcmToken) {
       return res.status(200).json({
-        status:"success without push notifications as user doesn't have one"
-      })
+        status: "success without push notifications as user doesn't have one",
+      });
     }
-    const pushResult=await pushNotificationServiceInstance.replytoCommentNotification(fcmToken,req.username,newReply._id,newReply.replyingTo);
+    const pushResult =
+      await pushNotificationServiceInstance.replytoCommentNotification(
+        fcmToken,
+        req.username,
+        newReply._id,
+        newReply.replyingTo
+      );
 
-    if(!pushResult.status){
+    if (!pushResult.status) {
       return res.status(500).json({
-        "status":"Cannot push notification"
-      })
+        status: "Cannot push notification",
+      });
     }
   } catch (err) {
     return next(err);
@@ -428,10 +446,11 @@ const vote = async (req, res) => {
         console.log(fcm_token_user);
         var fcmToken = fcm_token_user.fcmToken;
         console.log(fcmToken);
-        if(!fcmToken){
+        if (!fcmToken) {
           return res.status(200).json({
-            status:"success without push notifications as user doesn't have one"
-          })
+            status:
+              "success without push notifications as user doesn't have one",
+          });
         }
         const pushResult =
           await pushNotificationServiceInstance.upvoteCommentNotification(
@@ -479,10 +498,11 @@ const vote = async (req, res) => {
         console.log(fcm_token_user);
         fcmToken = fcm_token_user.fcmToken;
         console.log(fcmToken);
-        if(!fcmToken){
+        if (!fcmToken) {
           return res.status(200).json({
-            status:"success without push notifications as user doesn't have one"
-          })
+            status:
+              "success without push notifications as user doesn't have one",
+          });
         }
         const pushResult =
           await pushNotificationServiceInstance.upvotePostNotification(
