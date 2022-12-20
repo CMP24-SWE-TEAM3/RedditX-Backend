@@ -370,6 +370,7 @@ const vote = async (req, res) => {
             status: "Error happened while saving notification in db",
           });
         }
+        console.log(post);
         const saveToUser = await userServiceInstance.saveNOtificationOfUser(
           notificationSaver.id,
           post.userID
