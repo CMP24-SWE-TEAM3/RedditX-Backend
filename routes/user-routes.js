@@ -31,6 +31,7 @@ router.post("/spam", authCheck, userController.spam);
 router.post("/getFollowers", authCheck, userController.getFollowersOfUser);
 
 router.post("/update-email", possibleAuthCheck, userController.updateEmail);
+router.post("/edit-profile", authCheck, userController.editProfile);
 
 router.get("/:username/comments", profileController.getUserComments);
 router.get("/:username/submitted", profileController.getUserSubmitted);

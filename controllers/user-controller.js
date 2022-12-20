@@ -60,6 +60,46 @@ const following = async (req, res, next) => {
   });
 };
 
+
+/**
+ * Edit profile
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const editProfile = async (req, res) => {
+  console.log(req.username);
+  if (!req.username || !req.body.type==="showActiveCommunities"||!req.body.type==="showActiveCommunities"||!req.body.type==="contentVisibility") {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const user = await userServiceInstance.getOne({_id:req.username});
+  if(!user){
+    return res.status(404).json({
+      status:"user is not found"
+    })
+  }
+  var attrType2= req.body.type;
+  var value=req.body.value;
+  if(attrType2==="about"){
+    user.about=value;
+  }
+  else if(attrType2==="showActiveCommunities"){
+    user.showActiveCommunities=value;
+  }
+  else{
+    user.contentVisibility=value;
+  }
+  user.save();
+ 
+
+  
+    return res.status(200).json({
+      response: "updated successfully",
+    });
+ 
+};
+
 /**
  * Get user interests
  * @param {function} (req, res)
@@ -124,9 +164,11 @@ const editUserPrefs = catchAsync(async (req, res, next) => {
     if (user) {
       type=req.body.type;
       value=req.body.value;
+      prefs=user.prefs;
+      prefs.type=value;
       results = await userServiceInstance.updateOne(
        {_id:req.username},
-       {type : value}
+       {prefs : prefs}
        
       );
     }
@@ -668,4 +710,5 @@ module.exports = {
   getInterests,
   addInterests,
   getUserInfo,
+  editProfile
 };
