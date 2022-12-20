@@ -248,6 +248,11 @@ const addComment = catchAsync(async (req, res, next) => {
         const fcm_token_user=await userServiceInstance.getOne({ _id:user_id ,
           select: "_id fcmToken"});
         var fcmToken=fcm_token_user.fcmToken;
+        if(!fcmToken){
+          return res.status(200).json({
+            status:"success without push notifications as user doesn't have one"
+          })
+        }
         const pushResult=await pushNotificationServiceInstance.replytoPostNotification(fcmToken,req.username,newComment._id,newComment.postID);
         if(!pushResult.status){
           return res.status(500).json({
@@ -300,6 +305,11 @@ const addReply = catchAsync(async (req, res, next) => {
       console.log(fcm_token_user);
     var fcmToken=fcm_token_user.fcmToken;
     console.log(fcmToken);
+    if(!fcmToken){
+      return res.status(200).json({
+        status:"success without push notifications as user doesn't have one"
+      })
+    }
     const pushResult=await pushNotificationServiceInstance.replytoPostNotification(fcmToken,req.username,newReply._id,newReply.replyingTo);
     if(!pushResult.status){
       return res.status(500).json({
@@ -416,7 +426,11 @@ const vote = async (req, res) => {
         console.log(fcm_token_user);
         var fcmToken = fcm_token_user.fcmToken;
         console.log(fcmToken);
-
+        if(!fcmToken){
+          return res.status(200).json({
+            status:"success without push notifications as user doesn't have one"
+          })
+        }
         const pushResult =
           await pushNotificationServiceInstance.upvoteCommentNotification(
             fcmToken,
@@ -462,6 +476,11 @@ const vote = async (req, res) => {
         console.log(fcm_token_user);
         fcmToken = fcm_token_user.fcmToken;
         console.log(fcmToken);
+        if(!fcmToken){
+          return res.status(200).json({
+            status:"success without push notifications as user doesn't have one"
+          })
+        }
         const pushResult =
           await pushNotificationServiceInstance.upvotePostNotification(
             fcmToken,
