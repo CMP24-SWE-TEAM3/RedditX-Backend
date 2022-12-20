@@ -332,6 +332,7 @@ const vote = async (req, res) => {
             status: "Error happened while saving notification in user db",
           });
         }
+
         //push notiication
         const fcm_token_user=await userServiceInstance.getOne({ _id:comment.authorId ,
           select: "_id fcmToken"});

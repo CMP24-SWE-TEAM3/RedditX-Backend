@@ -226,6 +226,7 @@ class CommentService extends Service {
       } else if (dir == 0 || dir == -1) {
         operation = -1;
       }
+
       try{
       if (removeDetector && !addDetector) {
         await User.findOneAndUpdate(
@@ -250,12 +251,13 @@ class CommentService extends Service {
       await Post.findByIdAndUpdate(
         { _id: postIdCasted },
         {
+          
           $set: {
             votesCount: votesCount + operation,
             voters: voters,
 
           },
-          { new: true },
+         }, {new: true },
           (err) => {
             if (err) {
               return {
