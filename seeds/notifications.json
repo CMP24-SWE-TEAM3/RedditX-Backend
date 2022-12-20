@@ -1,202 +1,136 @@
 [
   {
-    "_id": "5c8a1d5b0190b214360dc057",
-    "name": "Jonas Schmedtmann",
-    "email": "admin@natours.io",
-    "role": "admin",
-    "isActive": true,
-    "photo": "user-1.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6373e1ac1673969ef16dbbe4",
+    "userIcon": "photo.jpg",
+    "title": "hamada started following you",
+    "type": "newFollower",
+    "text": "User hamada started following you",
+    "sourceThing": "t2_hamada",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671095435432"
+      }
+    }
   },
   {
-    "_id": "5c8a1dfa2f8fb814b56fa181",
-    "name": "Lourdes Browning",
-    "email": "loulou@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-2.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6373e3001673969ef16dbbe5",
+    "userIcon": "photo.jpg",
+    "title": "New comment",
+    "type": "replyToPost",
+    "text": "You have new comment",
+    "sourceThing": "t2_hamada",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671181835432"
+      }
+    }
   },
   {
-    "_id": "5c8a1e1a2f8fb814b56fa182",
-    "name": "Sophie Louise Hart",
-    "email": "sophie@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-3.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6373e30d1673969ef16dbbe6",
+    "communityIcon": "photo.jpg",
+    "title": "Ban",
+    "type": "ban",
+    "text": "imagePro235 has banned you",
+    "sourceThing": "t5_imagePro235",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671441035432"
+      }
+    }
   },
   {
-    "_id": "5c8a1ec62f8fb814b56fa183",
-    "name": "Ayla Cornell",
-    "email": "ayls@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-4.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6373e60c1673969ef16dbbe9",
+    "communityIcon": "photo.jpg",
+    "title": "Mute",
+    "type": "mute",
+    "text": "imagePro235 has muted you",
+    "sourceThing": "t5_imagePro235",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671268235432"
+      }
+    }
   },
   {
-    "_id": "5c8a1f292f8fb814b56fa184",
-    "name": "Leo Gillespie",
-    "email": "leo@example.com",
-    "role": "guide",
-    "isActive": true,
-    "photo": "user-5.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6373e63c1673969ef16dbbeb",
+    "communityIcon": "photo.jpg",
+    "title": "Unmute",
+    "type": "unmute",
+    "text": "imagePro235 has unmuted you",
+    "sourceThing": "t5_imagePro235",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671354635432"
+      }
+    }
   },
   {
-    "_id": "5c8a1f4e2f8fb814b56fa185",
-    "name": "Jennifer Hardy",
-    "email": "jennifer@example.com",
-    "role": "guide",
-    "isActive": true,
-    "photo": "user-6.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "63a06f7d17b3dde41c5bb58c",
+    "userIcon": "user-t2_hamada-1668263597432.jpg",
+    "title": "You have a new follower",
+    "type": "newFollower",
+    "text": "t2_lotfy2 has followed you",
+    "sourceThing": "t2_lotfy2",
+    "isDeleted": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671458620473"
+      }
+    }
   },
   {
-    "_id": "5c8a201e2f8fb814b56fa186",
-    "name": "Kate Morrison",
-    "email": "kate@example.com",
-    "role": "guide",
-    "isActive": true,
-    "photo": "user-7.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "63a06fa1589971c9776826a4",
+    "userIcon": "user-t2_hamada-1668263597432.jpg",
+    "title": "You have a new follower",
+    "type": "newFollower",
+    "text": "t2_lotfy2 has followed you",
+    "sourceThing": "t2_lotfy2",
+    "isDeleted": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671458698182"
+      }
+    }
   },
   {
-    "_id": "5c8a20d32f8fb814b56fa187",
-    "name": "Eliana Stout",
-    "email": "eliana@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-8.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "63a074bf19df4c7b2908eac9",
+    "userIcon": "user-t2_hamada-1668263597432.jpg",
+    "title": "You have a new follower",
+    "type": "newFollower",
+    "text": "u lotfy2 has followed you",
+    "sourceThing": "t2_lotfy2",
+    "isDeleted": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671459950000"
+      }
+    }
   },
   {
-    "_id": "5c8a211f2f8fb814b56fa188",
-    "name": "Cristian Vega",
-    "email": "chris@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-9.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "63a0750266ca388880862501",
+    "userIcon": "user-t2_hamada-1668263597432.jpg",
+    "title": "You have a new follower",
+    "type": "newFollower",
+    "text": "u/lotfy2 has followed you",
+    "sourceThing": "t2_lotfy2",
+    "isDeleted": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671460083481"
+      }
+    }
   },
   {
-    "_id": "5c8a21d02f8fb814b56fa189",
-    "name": "Steve T. Scaife",
-    "email": "steve@example.com",
-    "role": "lead-guide",
-    "isActive": true,
-    "photo": "user-10.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a21f22f8fb814b56fa18a",
-    "name": "Aarav Lynn",
-    "email": "aarav@example.com",
-    "role": "lead-guide",
-    "isActive": true,
-    "photo": "user-11.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a22c62f8fb814b56fa18b",
-    "name": "Miyah Myles",
-    "email": "miyah@example.com",
-    "role": "lead-guide",
-    "isActive": true,
-    "photo": "user-12.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a23412f8fb814b56fa18c",
-    "name": "Ben Hadley",
-    "email": "ben@example.com",
-    "role": "guide",
-    "isActive": true,
-    "photo": "user-13.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a23c82f8fb814b56fa18d",
-    "name": "Laura Wilson",
-    "email": "laura@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-14.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a23de2f8fb814b56fa18e",
-    "name": "Max Smith",
-    "email": "max@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-15.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a24282f8fb814b56fa18f",
-    "name": "Isabel Kirkland",
-    "email": "isabel@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-16.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a24402f8fb814b56fa190",
-    "name": "Alexander Jones",
-    "email": "alex@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-17.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a245f2f8fb814b56fa191",
-    "name": "Eduardo Hernandez",
-    "email": "edu@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-18.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a24822f8fb814b56fa192",
-    "name": "John Riley",
-    "email": "john@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-19.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
-  },
-  {
-    "_id": "5c8a24a02f8fb814b56fa193",
-    "name": "Lisa Brown",
-    "email": "lisa@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-20.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "63a0c5ffc0bf3e37ccfdfab9",
+    "userIcon": "default.jpg",
+    "title": "You have a new follower",
+    "type": "newFollower",
+    "text": "u/moazMohamed has followed you",
+    "sourceThing": "t2_moazMohamed",
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671480695154"
+      }
+    }
   }
 ]

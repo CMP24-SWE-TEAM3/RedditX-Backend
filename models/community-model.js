@@ -171,7 +171,7 @@ const communitySchema = mongoose.Schema({
   pageViewsPerMonth: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 6 => december
+  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 11 => december
   joinedPerDay: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0],
@@ -179,7 +179,7 @@ const communitySchema = mongoose.Schema({
   joinedPerMonth: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 6 => december
+  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 11 => december
   leftPerDay: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0],
@@ -187,7 +187,7 @@ const communitySchema = mongoose.Schema({
   leftPerMonth: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 6 => december
+  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 11 => december
   flairList: [
     {
       type: flairSchema,

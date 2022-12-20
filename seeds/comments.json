@@ -1,202 +1,2990 @@
 [
   {
-    "_id": "5c8a1d5b0190b214360dc057",
-    "name": "Jonas Schmedtmann",
-    "email": "admin@natours.io",
-    "role": "admin",
-    "isActive": true,
-    "photo": "user-1.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "636a8816687a4fec0ac7c3fc",
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "authorId": "t2_moazMohamed",
+    "isCollapsed": false,
+    "isDeleted": false,
+    "isLocked": false,
+    "isRoot": true,
+    "replies": [
+      "6389db444deb201ab8ca8d61",
+      "6389df83c835fa17fbc4eff7",
+      "6389e0be346847e9921a6559",
+      "638a689f28ff0273d4fb2be6",
+      "638a6920ebf3a39c8b2fcb89",
+      "638a69522fede11af5f48b9e",
+      "638a69d83e28da79c58b9588"
+    ],
+    "spamCount": 10,
+    "votesCount": 2,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1667939683515"
+      }
+    },
+    "voters": [
+      {
+        "userID": "t2_nabil1",
+        "voteType": 1,
+        "_id": "636f90736e6e123e8aac4b95"
+      },
+      {
+        "userID": "Ahmedlotfy202",
+        "voteType": -1,
+        "_id": "637f1e057d8d1a956b0b3ada"
+      }
+    ],
+    "spams": [
+      {
+        "userID": "t2_moazMohamed",
+        "text": "I found that this content is showing violence",
+        "type": "violent content",
+        "_id": "637c0498ebd693ba11c46dff"
+      }
+    ],
+    "textHTML": "moaz",
+    "textJSON": "xrfx",
+    "editedAt": {
+      "$date": {
+        "$numberLong": "1671134549086"
+      }
+    }
   },
   {
-    "_id": "5c8a1dfa2f8fb814b56fa181",
-    "name": "Lourdes Browning",
-    "email": "loulou@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-2.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "636a8816687a4fe10ac7c3fc",
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "authorId": "t2_moazMohamed",
+    "isCollapsed": false,
+    "isDeleted": false,
+    "isLocked": false,
+    "isRoot": true,
+    "replies": [],
+    "spamCount": 11,
+    "votesCount": 30,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1667939683515"
+      }
+    },
+    "voters": [
+      {
+        "userID": "t2_nabil1",
+        "voteType": 1,
+        "_id": "636f90736e6e123e8aac4b95"
+      },
+      {
+        "userID": "t2_moazMohamed",
+        "voteType": 1,
+        "_id": "637ab2bd95525417735da11a"
+      }
+    ],
+    "spams": [
+      {
+        "userID": "t2_moazMohamed",
+        "text": "I found that this content is showing violence",
+        "type": "violent content",
+        "_id": "637d55b91dcaa6e6bcefb006"
+      }
+    ],
+    "editedAt": {
+      "$date": {
+        "$numberLong": "1671352174080"
+      }
+    },
+    "textHTML": "newews",
+    "textJSON": "newtt"
   },
   {
-    "_id": "5c8a1e1a2f8fb814b56fa182",
-    "name": "Sophie Louise Hart",
-    "email": "sophie@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-3.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "638907ac661b95ab73e85824",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "638907ac661b95ab73e85825"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669924780564"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a1ec62f8fb814b56fa183",
-    "name": "Ayla Cornell",
-    "email": "ayls@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-4.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6389084545731f34c512f050",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "6389084545731f34c512f051"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669924933334"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a1f292f8fb814b56fa184",
-    "name": "Leo Gillespie",
-    "email": "leo@example.com",
-    "role": "guide",
-    "isActive": true,
-    "photo": "user-5.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6389088dd65dea6dc90a3d42",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "6389088dd65dea6dc90a3d43"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669925005754"
+      }
+    },
+    "spams": [],
+    "editedAt": {
+      "$date": {
+        "$numberLong": "1671134570388"
+      }
+    },
+    "textHTML": "moaz",
+    "textJSON": "xrfx"
   },
   {
-    "_id": "5c8a1f4e2f8fb814b56fa185",
-    "name": "Jennifer Hardy",
-    "email": "jennifer@example.com",
-    "role": "guide",
-    "isActive": true,
-    "photo": "user-6.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "63890d43c009fa78e02f743f",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "63890d43c009fa78e02f7440"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669926211456"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a201e2f8fb814b56fa186",
-    "name": "Kate Morrison",
-    "email": "kate@example.com",
-    "role": "guide",
-    "isActive": true,
-    "photo": "user-7.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "63890e5dc009fa78e02f7447",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "63890e5dc009fa78e02f7448"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669926493014"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a20d32f8fb814b56fa187",
-    "name": "Eliana Stout",
-    "email": "eliana@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-8.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "63890f7a853c6f58d80e251f",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "63890f7a853c6f58d80e2520"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669926778250"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a211f2f8fb814b56fa188",
-    "name": "Cristian Vega",
-    "email": "chris@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-9.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6389104628a706288847bc23",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "6389104628a706288847bc24"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669926982584"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a21d02f8fb814b56fa189",
-    "name": "Steve T. Scaife",
-    "email": "steve@example.com",
-    "role": "lead-guide",
-    "isActive": true,
-    "photo": "user-10.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "638910992be6b9c81c40312b",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "638910992be6b9c81c40312c"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669927065112"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a21f22f8fb814b56fa18a",
-    "name": "Aarav Lynn",
-    "email": "aarav@example.com",
-    "role": "lead-guide",
-    "isActive": true,
-    "photo": "user-11.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6389db7331cbf9ac38787b1f",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "636a8816687a4fec0ac7c3fc",
+    "postID": "636a8816687a4fec0ac7c3fc",
+    "replies": [],
+    "text": "new reply",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "6389db7331cbf9ac38787b20"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669978995699"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a22c62f8fb814b56fa18b",
-    "name": "Miyah Myles",
-    "email": "miyah@example.com",
-    "role": "lead-guide",
-    "isActive": true,
-    "photo": "user-12.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6389dc7031cbf9ac38787b29",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "6389dc7031cbf9ac38787b2a"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669979248549"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a23412f8fb814b56fa18c",
-    "name": "Ben Hadley",
-    "email": "ben@example.com",
-    "role": "guide",
-    "isActive": true,
-    "photo": "user-13.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6389dc8431cbf9ac38787b38",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "636a8816687a4fec0ac7c3fc",
+    "postID": "636a8816687a4fec0ac7c3fc",
+    "replies": [],
+    "text": "new reply",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "6389dc8431cbf9ac38787b39"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669979268016"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a23c82f8fb814b56fa18d",
-    "name": "Laura Wilson",
-    "email": "laura@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-14.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6389ded48eb7b5d205c3f584",
+    "authorId": "t2_shredan",
+    "isRoot": true,
+    "replyingTo": "636a8816687a4fec0ac7c3fc",
+    "postID": "636a8816687a4fec0ac7c3fc",
+    "replies": [],
+    "text": "new reply",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "6389ded48eb7b5d205c3f585"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669979860644"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a23de2f8fb814b56fa18e",
-    "name": "Max Smith",
-    "email": "max@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-15.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6389df83c835fa17fbc4eff7",
+    "authorId": "t2_shredan",
+    "isRoot": false,
+    "replyingTo": "636a8816687a4fec0ac7c3fc",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new reply",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "6389df83c835fa17fbc4eff8"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669980035978"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a24282f8fb814b56fa18f",
-    "name": "Isabel Kirkland",
-    "email": "isabel@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-16.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "6389e0be346847e9921a6559",
+    "authorId": "t2_shredan",
+    "isRoot": false,
+    "replyingTo": "636a8816687a4fec0ac7c3fc",
+    "postID": "636a8816687a4fec0ac7c3fc",
+    "replies": [],
+    "text": "new reply",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "6389e0be346847e9921a655a"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1669980350215"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a24402f8fb814b56fa190",
-    "name": "Alexander Jones",
-    "email": "alex@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-17.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "638a689f28ff0273d4fb2be6",
+    "authorId": "t2_shredan",
+    "isRoot": false,
+    "replyingTo": "636a8816687a4fec0ac7c3fc",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "638a689f28ff0273d4fb2be7"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1670015135057"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a245f2f8fb814b56fa191",
-    "name": "Eduardo Hernandez",
-    "email": "edu@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-18.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "638a6920ebf3a39c8b2fcb89",
+    "authorId": "t2_shredan",
+    "isRoot": false,
+    "replyingTo": "636a8816687a4fec0ac7c3fc",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "638a6920ebf3a39c8b2fcb8a"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1670015264546"
+      }
+    },
+    "spams": []
   },
   {
-    "_id": "5c8a24822f8fb814b56fa192",
-    "name": "John Riley",
-    "email": "john@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-19.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "638a69522fede11af5f48b9e",
+    "authorId": "t2_shredan",
+    "isRoot": false,
+    "replyingTo": "636a8816687a4fec0ac7c3fc",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "638a69522fede11af5f48b9f"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1670015314498"
+      }
+    },
+    "spams": [],
+    "editedAt": "2022-12-14T15:10:28.998+00:00",
+    "communityID": "t5_imagePro235"
   },
   {
-    "_id": "5c8a24a02f8fb814b56fa193",
-    "name": "Lisa Brown",
-    "email": "lisa@example.com",
-    "role": "user",
-    "isActive": true,
-    "photo": "user-20.jpg",
-    "password": "moaz1234567",
-    "passwordConfirm": "moaz1234567"
+    "_id": "638a69d83e28da79c58b9588",
+    "authorId": "t2_shredan",
+    "isRoot": false,
+    "replyingTo": "636a8816687a4fec0ac7c3fc",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "text": "new comment",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_shredan",
+        "voteType": 1,
+        "_id": "638a69d83e28da79c58b9589"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 2,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1670015448845"
+      }
+    },
+    "spams": [
+      {
+        "userID": "t2_moazMohamed",
+        "text": "I found that this content is showing violence",
+        "type": "violent content",
+        "_id": "639a6c1ceb5805cb444e6335"
+      }
+    ],
+    "communityID": "t5_imagePro235",
+    "editedAt": "2022-12-14T19:10:28.998+00:00"
+  },
+  {
+    "_id": "639baa395598482430239651",
+    "authorId": "t2_moazMohamed",
+    "isRoot": true,
+    "replyingTo": "639b6c8f44b9dd20b53e5afc",
+    "postID": "639b6c8f44b9dd20b53e5afc",
+    "replies": [],
+    "textHTML": "This is a text",
+    "textJSON": "This is a text",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_moazMohamed",
+        "voteType": 1,
+        "_id": "639baa395598482430239652"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671146041443"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639bb71ecc5a743193dd570c",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639ba90d55984824302393d3",
+    "postID": "639ba90d55984824302393d3",
+    "replies": [],
+    "textHTML": "sdafsdfa\n\nsdfsdf",
+    "textJSON": "{\"blocks\":[{\"key\":\"bmcrr\",\"text\":\"sdafsdfa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"bjia1\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"kq2l\",\"text\":\"sdfsdf\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639bb71ecc5a743193dd570d"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_CMP2024",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671149342246"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639bb728cc5a743193dd572c",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639ba90d55984824302393d3",
+    "postID": "639ba90d55984824302393d3",
+    "replies": [],
+    "textHTML": "sdafsdfa\n\nsdfsdf",
+    "textJSON": "{\"blocks\":[{\"key\":\"bmcrr\",\"text\":\"sdafsdfa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"bjia1\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"kq2l\",\"text\":\"sdfsdf\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639bb728cc5a743193dd572d"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_CMP2024",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671149352477"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639bb782cc5a743193dd5dc4",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639bb359573864892dfcca8f",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": ["639c80b96c0123d1c69d629d"],
+    "textHTML": "Hello zoz",
+    "textJSON": "{\"blocks\":[{\"key\":\"fhus8\",\"text\":\"Hello zoz\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639bb782cc5a743193dd5dc5"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671149442786"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639bbba21f80c2f47f52746b",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639bb359573864892dfcca8f",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": ["639c83b36c0123d1c69d69ba"],
+    "textHTML": "Hello Hamza",
+    "textJSON": "{\"blocks\":[{\"key\":\"9ecqr\",\"text\":\"Hello Hamza\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639bbba21f80c2f47f52746c"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671150498243"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639bbc261f80c2f47f527a95",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639bb359573864892dfcca8f",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": [],
+    "textHTML": "Hello",
+    "textJSON": "{\"blocks\":[{\"key\":\"584hk\",\"text\":\"Hello\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639bbc261f80c2f47f527a96"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671150630032"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639bbc791f80c2f47f527abf",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639bb359573864892dfcca8f",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": [],
+    "textHTML": "Tetx",
+    "textJSON": "{\"blocks\":[{\"key\":\"4frfc\",\"text\":\"Tetx\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639bbc791f80c2f47f527ac0"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671150713072"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639c80b96c0123d1c69d629d",
+    "authorId": "t2_moazMohamed",
+    "isRoot": false,
+    "replyingTo": "639bb782cc5a743193dd5dc4",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": ["639c83ee6c0123d1c69d6c2a"],
+    "textHTML": "This is a reply",
+    "textJSON": "This is a reply",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_moazMohamed",
+        "voteType": 1,
+        "_id": "639c80b96c0123d1c69d629e"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671200953631"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639c83b36c0123d1c69d69ba",
+    "authorId": "t2_home",
+    "isRoot": false,
+    "replyingTo": "639bbba21f80c2f47f52746b",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": [],
+    "textHTML": "Front reply \n\nhello world",
+    "textJSON": "{\"blocks\":[{\"key\":\"a7q2u\",\"text\":\"Front reply \",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"5uf2e\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"dbado\",\"text\":\"hello world\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639c83b36c0123d1c69d69bb"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671201715698"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639c83ee6c0123d1c69d6c2a",
+    "authorId": "t2_home",
+    "isRoot": false,
+    "replyingTo": "639c80b96c0123d1c69d629d",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": [],
+    "textHTML": "REPLY TO REPLY",
+    "textJSON": "{\"blocks\":[{\"key\":\"5boui\",\"text\":\"REPLY TO REPLY\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639c83ee6c0123d1c69d6c2b"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671201774680"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639c9c3216ed61ecacca9061",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639c08cf1f80c2f47f53c689",
+    "postID": "639c08cf1f80c2f47f53c689",
+    "replies": [],
+    "textHTML": "بجرب الكومنت",
+    "textJSON": "{\"blocks\":[{\"key\":\"67smm\",\"text\":\"بجرب الكومنت\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639c9c3216ed61ecacca9062"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro45",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671207986519"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639c9ddc16ed61ecacca9f23",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639c08cd1f80c2f47f53c601",
+    "postID": "639c08cd1f80c2f47f53c601",
+    "replies": [],
+    "textHTML": "hshshshshshs",
+    "textJSON": "{\"blocks\":[{\"key\":\"9rt8c\",\"text\":\"hshshshshshs\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639c9ddc16ed61ecacca9f24"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro45",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671208412191"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639ca1fc16ed61ecaccab97c",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639bc2ec1f80c2f47f529cd1",
+    "postID": "639bc2ec1f80c2f47f529cd1",
+    "replies": [],
+    "textHTML": "Moroccccccoooooooooooo",
+    "textJSON": "{\"blocks\":[{\"key\":\"bi044\",\"text\":\"Moroccccccoooooooooooo\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639ca1fc16ed61ecaccab97d"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671209468266"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639cdc899a173fa9b2921cad",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bb359573864892dfcca8f",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": [],
+    "textHTML": "mangaa",
+    "textJSON": "{\"blocks\":[{\"key\":\"aeh3d\",\"text\":\"mangaa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639cdc899a173fa9b2921cae"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671224457573"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639cdc8b9a173fa9b2921cc7",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bb359573864892dfcca8f",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": [],
+    "textHTML": "mangaa",
+    "textJSON": "{\"blocks\":[{\"key\":\"aeh3d\",\"text\":\"mangaa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639cdc8b9a173fa9b2921cc8"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671224459106"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639cdc969a173fa9b2921ce1",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bb359573864892dfcca8f",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": ["63a0c90ffcc9b6064fd0cd77"],
+    "textHTML": "mangaa",
+    "textJSON": "{\"blocks\":[{\"key\":\"aeh3d\",\"text\":\"mangaa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639cdc969a173fa9b2921ce2"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671224470125"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639ce38b9a173fa9b2922aba",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bc0291f80c2f47f529655",
+    "postID": "639bc0291f80c2f47f529655",
+    "replies": [],
+    "textHTML": "",
+    "textJSON": "{\"blocks\":[{\"key\":\"70mbd\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639ce38b9a173fa9b2922abb"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671226251990"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639ce38d9a173fa9b2922ad4",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bc0291f80c2f47f529655",
+    "postID": "639bc0291f80c2f47f529655",
+    "replies": [],
+    "textHTML": "sdadsada",
+    "textJSON": "{\"blocks\":[{\"key\":\"70mbd\",\"text\":\"sdadsada\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639ce38d9a173fa9b2922ad5"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671226253562"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639ce3919a173fa9b2922aee",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bc0291f80c2f47f529655",
+    "postID": "639bc0291f80c2f47f529655",
+    "replies": [],
+    "textHTML": "sdadsadaadsdaadssa",
+    "textJSON": "{\"blocks\":[{\"key\":\"70mbd\",\"text\":\"sdadsadaadsdaadssa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639ce3919a173fa9b2922aef"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671226257649"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639ce3929a173fa9b2922b08",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bc0291f80c2f47f529655",
+    "postID": "639bc0291f80c2f47f529655",
+    "replies": [],
+    "textHTML": "sdadsadaadsdaadssa",
+    "textJSON": "{\"blocks\":[{\"key\":\"70mbd\",\"text\":\"sdadsadaadsdaadssa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639ce3929a173fa9b2922b09"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671226258324"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639ce3929a173fa9b2922b22",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bc0291f80c2f47f529655",
+    "postID": "639bc0291f80c2f47f529655",
+    "replies": [],
+    "textHTML": "sdadsadaadsdaadssa",
+    "textJSON": "{\"blocks\":[{\"key\":\"70mbd\",\"text\":\"sdadsadaadsdaadssa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639ce3929a173fa9b2922b23"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671226258473"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639ce3929a173fa9b2922b3c",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bc0291f80c2f47f529655",
+    "postID": "639bc0291f80c2f47f529655",
+    "replies": [],
+    "textHTML": "sdadsadaadsdaadssa",
+    "textJSON": "{\"blocks\":[{\"key\":\"70mbd\",\"text\":\"sdadsadaadsdaadssa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639ce3929a173fa9b2922b3d"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671226258616"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639ce3979a173fa9b2922b56",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bc0291f80c2f47f529655",
+    "postID": "639bc0291f80c2f47f529655",
+    "replies": [],
+    "textHTML": "sdadsadaadsdaadssasda",
+    "textJSON": "{\"blocks\":[{\"key\":\"70mbd\",\"text\":\"sdadsadaadsdaadssasda\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639ce3979a173fa9b2922b57"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671226263228"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639ce39a9a173fa9b2922b70",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639bc0291f80c2f47f529655",
+    "postID": "639bc0291f80c2f47f529655",
+    "replies": [],
+    "textHTML": "sdadsadaadsdaadssasda",
+    "textJSON": "{\"blocks\":[{\"key\":\"70mbd\",\"text\":\"sdadsadaadsdaadssasda\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639ce39a9a173fa9b2922b71"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671226266730"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639cefe43957e5341803409e",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639cee046702ed3ec3d51657",
+    "postID": "639cee046702ed3ec3d51657",
+    "replies": [],
+    "textHTML": "انت مين يعم انت",
+    "textJSON": "{\"blocks\":[{\"key\":\"16phg\",\"text\":\"انت مين يعم انت\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639cefe43957e5341803409f"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_abcabcabccom",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671229412550"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639cf86f3957e53418036ac6",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639cf7ba3957e53418035fe5",
+    "postID": "639cf7ba3957e53418035fe5",
+    "replies": [],
+    "textHTML": "خش علي جروب الانونسمنت",
+    "textJSON": "{\"blocks\":[{\"key\":\"3olr\",\"text\":\"خش علي جروب الانونسمنت\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639cf86f3957e53418036ac7"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_CMP2024",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671231599423"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639d06ae9b58be49532851f6",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639cee046702ed3ec3d51657",
+    "postID": "639cee046702ed3ec3d51657",
+    "replies": [],
+    "textHTML": "Ashraf??!\nAshraf??!\nmaksldmsla\nasl,dasd;,\nasl;,dlsda\n,;las,d;lsa,d\naldslkadmaslk\nAshraf??!",
+    "textJSON": "{\"blocks\":[{\"key\":\"9finm\",\"text\":\"Ashraf??!\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":9,\"style\":\"BOLD\"}],\"entityRanges\":[],\"data\":{}},{\"key\":\"toka\",\"text\":\"Ashraf??!\",\"type\":\"header-four\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":9,\"style\":\"BOLD\"}],\"entityRanges\":[],\"data\":{}},{\"key\":\"9hs7k\",\"text\":\"maksldmsla\",\"type\":\"ordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":10,\"style\":\"BOLD\"}],\"entityRanges\":[],\"data\":{}},{\"key\":\"ftlv9\",\"text\":\"asl,dasd;,\",\"type\":\"ordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":10,\"style\":\"BOLD\"}],\"entityRanges\":[],\"data\":{}},{\"key\":\"cn83s\",\"text\":\"asl;,dlsda\",\"type\":\"ordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":10,\"style\":\"BOLD\"}],\"entityRanges\":[],\"data\":{}},{\"key\":\"1iisp\",\"text\":\",;las,d;lsa,d\",\"type\":\"blockquote\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":13,\"style\":\"BOLD\"}],\"entityRanges\":[],\"data\":{}},{\"key\":\"3okjl\",\"text\":\"aldslkadmaslk\",\"type\":\"blockquote\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":13,\"style\":\"BOLD\"}],\"entityRanges\":[],\"data\":{}},{\"key\":\"e3h4c\",\"text\":\"Ashraf??!\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":9,\"style\":\"BOLD\"},{\"offset\":0,\"length\":9,\"style\":\"ITALIC\"},{\"offset\":0,\"length\":9,\"style\":\"UNDERLINE\"},{\"offset\":0,\"length\":9,\"style\":\"STRIKETHROUGH\"}],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639d06ae9b58be49532851f7"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_abcabcabccom",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671235246112"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639d147d9b58be49532866f3",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639d13889b58be4953286473",
+    "postID": "639d13889b58be4953286473",
+    "replies": ["639d15709b58be4953287243"],
+    "textHTML": "comment",
+    "textJSON": "{\"blocks\":[{\"key\":\"21jb8\",\"text\":\"comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639d147d9b58be49532866f4"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_CMP2024",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671238781400"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639d14969b58be4953286811",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639d13889b58be4953286473",
+    "postID": "639d13889b58be4953286473",
+    "replies": [],
+    "textHTML": "ddddddddddddd",
+    "textJSON": "{\"blocks\":[{\"key\":\"68m8r\",\"text\":\"ddddddddddddd\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639d14969b58be4953286812"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_CMP2024",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671238806978"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639d15709b58be4953287243",
+    "authorId": "t2_home",
+    "isRoot": false,
+    "replyingTo": "639d147d9b58be49532866f3",
+    "postID": "639d13889b58be4953286473",
+    "replies": [],
+    "textHTML": "Hello from here",
+    "textJSON": "{\"blocks\":[{\"key\":\"7vhev\",\"text\":\"Hello from here\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639d15709b58be4953287244"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_CMP2024",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671239024092"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dcf346712b418307d2d7a",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "637d55fd1dcaa6e6bcefb01c",
+    "postID": "637d55fd1dcaa6e6bcefb01c",
+    "replies": [],
+    "textHTML": "Hello",
+    "textJSON": "{\"blocks\":[{\"key\":\"4vtnf\",\"text\":\"Hello\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639dcf346712b418307d2d7b"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671286580984"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dcf4f6712b418307d3026",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "textHTML": "test comment",
+    "textJSON": "{\"blocks\":[{\"key\":\"4l2jf\",\"text\":\"test comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639dcf4f6712b418307d3027"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671286607511"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dcf516712b418307d3046",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "textHTML": "test comment",
+    "textJSON": "{\"blocks\":[{\"key\":\"4l2jf\",\"text\":\"test comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639dcf516712b418307d3047"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671286609057"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dde36b6ec8181afe1eb86",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639dde2cb6ec8181afe1eb50",
+    "postID": "639dde2cb6ec8181afe1eb50",
+    "replies": [],
+    "textHTML": "مانجا",
+    "textJSON": "{\"blocks\":[{\"key\":\"e2lsd\",\"text\":\"مانجا \",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639dde36b6ec8181afe1eb87"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671290422397"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dde39b6ec8181afe1eba4",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639dde2cb6ec8181afe1eb50",
+    "postID": "639dde2cb6ec8181afe1eb50",
+    "replies": [],
+    "textHTML": "مانجا",
+    "textJSON": "{\"blocks\":[{\"key\":\"e2lsd\",\"text\":\"مانجا \",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639dde39b6ec8181afe1eba5"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671290425350"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dde4db6ec8181afe1ebc2",
+    "authorId": "t2_ZiadSherif20",
+    "isRoot": true,
+    "replyingTo": "639dde2cb6ec8181afe1eb50",
+    "postID": "639dde2cb6ec8181afe1eb50",
+    "replies": [],
+    "textHTML": "مانجا",
+    "textJSON": "{\"blocks\":[{\"key\":\"e2lsd\",\"text\":\"مانجا \",\"type\":\"unordered-list-item\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif20",
+        "voteType": 1,
+        "_id": "639dde4db6ec8181afe1ebc3"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671290445222"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dfe33b6ec8181afe27cbe",
+    "authorId": "t2_romyRuntime",
+    "isRoot": true,
+    "replyingTo": "639ca1fc16ed61ecaccab97c",
+    "postID": "639ca1fc16ed61ecaccab97c",
+    "replies": [],
+    "textHTML": "romyRuntime",
+    "textJSON": "{\"blocks\":[{\"key\":\"3sbjk\",\"text\":\"romyRuntime\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_romyRuntime",
+        "voteType": 1,
+        "_id": "639dfe33b6ec8181afe27cbf"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671298611273"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dfed4b6ec8181afe2889f",
+    "authorId": "t2_romyRuntime",
+    "isRoot": false,
+    "replyingTo": "639ca1fc16ed61ecaccab97c",
+    "postID": "639ca1fc16ed61ecaccab97c",
+    "replies": [],
+    "textHTML": "Sherif",
+    "textJSON": "{\"blocks\":[{\"key\":\"9f1s2\",\"text\":\"Sherif\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_romyRuntime",
+        "voteType": 1,
+        "_id": "639dfed4b6ec8181afe288a0"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671298772212"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dff01b6ec8181afe288a7",
+    "authorId": "t2_romyRuntime",
+    "isRoot": true,
+    "replyingTo": "639ca1fc16ed61ecaccab97c",
+    "postID": "639ca1fc16ed61ecaccab97c",
+    "replies": [],
+    "textHTML": "Sherif",
+    "textJSON": "{\"blocks\":[{\"key\":\"9f1s2\",\"text\":\"Sherif\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_romyRuntime",
+        "voteType": 1,
+        "_id": "639dff01b6ec8181afe288a8"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_مانجاا",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671298817885"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dff17b6ec8181afe28ad9",
+    "authorId": "t2_romyRuntime",
+    "isRoot": true,
+    "replyingTo": "639dda52b6ec8181afe1d5e9",
+    "postID": "639dda52b6ec8181afe1d5e9",
+    "replies": [],
+    "textHTML": "Helloo comment",
+    "textJSON": "{\"blocks\":[{\"key\":\"du06v\",\"text\":\"Helloo comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"bavu7\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_romyRuntime",
+        "voteType": 1,
+        "_id": "639dff17b6ec8181afe28ada"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671298839995"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dff28b6ec8181afe28d0b",
+    "authorId": "t2_romyRuntime",
+    "isRoot": true,
+    "replyingTo": "639dda52b6ec8181afe1d5e9",
+    "postID": "639dda52b6ec8181afe1d5e9",
+    "replies": [],
+    "textHTML": "Comment",
+    "textJSON": "{\"blocks\":[{\"key\":\"225r5\",\"text\":\"Comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_romyRuntime",
+        "voteType": 1,
+        "_id": "639dff28b6ec8181afe28d0c"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671298856321"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639dffbeb6ec8181afe28d61",
+    "authorId": "t2_romyRuntime",
+    "isRoot": true,
+    "replyingTo": "639dda52b6ec8181afe1d5e9",
+    "postID": "639dda52b6ec8181afe1d5e9",
+    "replies": [],
+    "textHTML": "Comment",
+    "textJSON": "{\"blocks\":[{\"key\":\"225r5\",\"text\":\"Comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_romyRuntime",
+        "voteType": 1,
+        "_id": "639dffbeb6ec8181afe28d62"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671299006824"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e007fb6ec8181afe29a5d",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639dda52b6ec8181afe1d5e9",
+    "postID": "639dda52b6ec8181afe1d5e9",
+    "replies": ["639e0098b6ec8181afe29cf4", "639e016ab6ec8181afe2a997"],
+    "textHTML": "ajbdjsadjs",
+    "textJSON": "{\"blocks\":[{\"key\":\"fm6ba\",\"text\":\"ajbdjsadjs\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639e007fb6ec8181afe29a5e"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671299199429"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e0098b6ec8181afe29cf4",
+    "authorId": "t2_home",
+    "isRoot": false,
+    "replyingTo": "639e007fb6ec8181afe29a5d",
+    "postID": "639dda52b6ec8181afe1d5e9",
+    "replies": ["639e0156b6ec8181afe2a720"],
+    "textHTML": "sajdasjkd",
+    "textJSON": "{\"blocks\":[{\"key\":\"690qo\",\"text\":\"sajdasjkd\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639e0098b6ec8181afe29cf5"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671299224062"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e00e1b6ec8181afe2a0bb",
+    "authorId": "t2_reata_71",
+    "isRoot": true,
+    "replyingTo": "639e007fb6ec8181afe29a5d",
+    "postID": "639e007fb6ec8181afe29a5d",
+    "replies": [],
+    "textHTML": "hello world",
+    "textJSON": "{\"blocks\":[{\"key\":\"58hui\",\"text\":\"hello world\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_reata_71",
+        "voteType": 1,
+        "_id": "639e00e1b6ec8181afe2a0bc"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671299297945"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e00f1b6ec8181afe2a561",
+    "authorId": "t2_reata_71",
+    "isRoot": false,
+    "replyingTo": "639e0098b6ec8181afe29cf4",
+    "postID": "639e0098b6ec8181afe29cf4",
+    "replies": [],
+    "textHTML": "ajsdjnakdnasjkdn",
+    "textJSON": "{\"blocks\":[{\"key\":\"auipl\",\"text\":\"ajsdjnakdnasjkdn\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_reata_71",
+        "voteType": 1,
+        "_id": "639e00f1b6ec8181afe2a562"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671299313907"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e00fcb6ec8181afe2a581",
+    "authorId": "t2_reata_71",
+    "isRoot": true,
+    "replyingTo": "639dda52b6ec8181afe1d5e9",
+    "postID": "639dda52b6ec8181afe1d5e9",
+    "replies": [],
+    "textHTML": "lamslkmalksdmlas",
+    "textJSON": "{\"blocks\":[{\"key\":\"9b759\",\"text\":\"lamslkmalksdmlas\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_reata_71",
+        "voteType": 1,
+        "_id": "639e00fcb6ec8181afe2a582"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671299324284"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e0156b6ec8181afe2a720",
+    "authorId": "t2_avow_493",
+    "isRoot": false,
+    "replyingTo": "639e0098b6ec8181afe29cf4",
+    "postID": "639dda52b6ec8181afe1d5e9",
+    "replies": [],
+    "textHTML": "bjasbjsajd",
+    "textJSON": "{\"blocks\":[{\"key\":\"b96vb\",\"text\":\"bjasbjsajd\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_avow_493",
+        "voteType": 1,
+        "_id": "639e0156b6ec8181afe2a721"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671299414260"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e016ab6ec8181afe2a997",
+    "authorId": "t2_avow_493",
+    "isRoot": false,
+    "replyingTo": "639e007fb6ec8181afe29a5d",
+    "postID": "639dda52b6ec8181afe1d5e9",
+    "replies": [],
+    "textHTML": "asdnkajsdasd",
+    "textJSON": "{\"blocks\":[{\"key\":\"digen\",\"text\":\"asdnkajsdasd\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_avow_493",
+        "voteType": 1,
+        "_id": "639e016ab6ec8181afe2a998"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671299434488"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e017ab6ec8181afe2abe5",
+    "authorId": "t2_avow_493",
+    "isRoot": true,
+    "replyingTo": "639dda52b6ec8181afe1d5e9",
+    "postID": "639dda52b6ec8181afe1d5e9",
+    "replies": [],
+    "textHTML": "Sabry",
+    "textJSON": "{\"blocks\":[{\"key\":\"d93au\",\"text\":\"Sabry\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_avow_493",
+        "voteType": 1,
+        "_id": "639e017ab6ec8181afe2abe6"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671299450711"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e15fa05e77c4d4cc6a355",
+    "authorId": "t2_amin_288",
+    "isRoot": true,
+    "replyingTo": "637becd563fc9ec2d423d0c0",
+    "postID": "637becd563fc9ec2d423d0c0",
+    "replies": [],
+    "textHTML": "manga",
+    "textJSON": "{\"blocks\":[{\"key\":\"4pq0i\",\"text\":\"manga\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_amin_288",
+        "voteType": 1,
+        "_id": "639e15fa05e77c4d4cc6a356"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671304698280"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e29686fd32a57ec44a6c6",
+    "authorId": "t2_home",
+    "isRoot": true,
+    "replyingTo": "639dd9c1b6ec8181afe1d3dd",
+    "postID": "639dd9c1b6ec8181afe1d3dd",
+    "replies": ["639e29796fd32a57ec44a998"],
+    "textHTML": "avasdsad",
+    "textJSON": "{\"blocks\":[{\"key\":\"bmf66\",\"text\":\"avasdsad\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639e29686fd32a57ec44a6c7"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_CMP2024",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671309672670"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e29796fd32a57ec44a998",
+    "authorId": "t2_home",
+    "isRoot": false,
+    "replyingTo": "639e29686fd32a57ec44a6c6",
+    "postID": "639dd9c1b6ec8181afe1d3dd",
+    "replies": [],
+    "textHTML": "sdflkmsdflk",
+    "textJSON": "{\"blocks\":[{\"key\":\"24pse\",\"text\":\"sdflkmsdflk\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_home",
+        "voteType": 1,
+        "_id": "639e29796fd32a57ec44a999"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_CMP2024",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671309689059"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e78940a02a3225abc6961",
+    "authorId": "t2_ZiadSherif10",
+    "isRoot": true,
+    "replyingTo": "639e67f110c3c449fdc62bf6",
+    "postID": "639e67f110c3c449fdc62bf6",
+    "replies": [],
+    "textHTML": "wady ya waldy",
+    "textJSON": "{\"blocks\":[{\"key\":\"cfr11\",\"text\":\"wady ya waldy\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif10",
+        "voteType": 1,
+        "_id": "639e78940a02a3225abc6962"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_lotfy4",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671329940345"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e78ab0a02a3225abc6aa1",
+    "authorId": "t2_ZiadSherif10",
+    "isRoot": true,
+    "replyingTo": "639e67f110c3c449fdc62bf6",
+    "postID": "639e67f110c3c449fdc62bf6",
+    "replies": [],
+    "textHTML": "wady ya waldyy",
+    "textJSON": "{\"blocks\":[{\"key\":\"6qroh\",\"text\":\"wady ya waldyy\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif10",
+        "voteType": 1,
+        "_id": "639e78ab0a02a3225abc6aa2"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_lotfy4",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671329963529"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e99a3d6e0868d81fc5f3b",
+    "authorId": "t2_ZiadSherif10",
+    "isRoot": true,
+    "replyingTo": "639e9963d6e0868d81fc5d8b",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "@lotfy",
+    "textJSON": "{\"blocks\":[{\"key\":\"cl7pl\",\"text\":\"@lotfy\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif10",
+        "voteType": 1,
+        "_id": "639e99a3d6e0868d81fc5f3c"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671338403354"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639e99abd6e0868d81fc5f4d",
+    "authorId": "t2_ZiadSherif10",
+    "isRoot": true,
+    "replyingTo": "639e9963d6e0868d81fc5d8b",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "@lotfy",
+    "textJSON": "{\"blocks\":[{\"key\":\"cl7pl\",\"text\":\"@lotfy\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_ZiadSherif10",
+        "voteType": 1,
+        "_id": "639e99abd6e0868d81fc5f4e"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671338411943"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f413667e7a4293589419b",
+    "authorId": "t2_scsdfsd",
+    "isRoot": true,
+    "replyingTo": "639e9963d6e0868d81fc5d8b",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [
+      "639f59a867e7a429358977f7",
+      "639f5ae167e7a4293589798a",
+      "639f5b0467e7a42935897a32"
+    ],
+    "textHTML": "مجرررررررررررررررررررررررم",
+    "textJSON": "{\"blocks\":[{\"key\":\"f9e03\",\"text\":\"مجرررررررررررررررررررررررم\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_scsdfsd",
+        "voteType": 1,
+        "_id": "639f413667e7a4293589419c"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671381302204"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f41df67e7a42935894a04",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "637d55fd1dcaa6e6bcefb01c",
+    "postID": "637d55fd1dcaa6e6bcefb01c",
+    "replies": [],
+    "textHTML": "Hello",
+    "textJSON": "{\"blocks\":[{\"key\":\"k9de\",\"text\":\"Hello\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f41df67e7a42935894a05"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671381471653"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f442f67e7a429358952da",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "639e9963d6e0868d81fc5d8b",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": ["639f5b8967e7a42935898113", "639f5b9267e7a4293589812d"],
+    "textHTML": "معلممم",
+    "textJSON": "{\"blocks\":[{\"key\":\"fpojs\",\"text\":\"معلممم\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f442f67e7a429358952db"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671382063345"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f591c67e7a42935896f2d",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "639e9963d6e0868d81fc5d8b",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "مفيش حاجه بتوصلي ليه\n\nبتضحك علينا؟!!",
+    "textJSON": "{\"blocks\":[{\"key\":\"7a6j8\",\"text\":\"مفيش حاجه بتوصلي ليه\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"8gn2i\",\"text\":\"\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"diho7\",\"text\":\"بتضحك علينا؟!!\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f591c67e7a42935896f2e"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671387420348"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f599667e7a42935897790",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "639e9963d6e0868d81fc5d8b",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "شكلك بتضحك علينا",
+    "textJSON": "{\"blocks\":[{\"key\":\"d6g4q\",\"text\":\"شكلك بتضحك علينا\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f599667e7a42935897791"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671387542906"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f59a867e7a429358977f7",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639f413667e7a4293589419b",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "مجرم فعلا",
+    "textJSON": "{\"blocks\":[{\"key\":\"ds5ru\",\"text\":\"مجرم فعلا\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f59a867e7a429358977f8"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671387560609"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f5ae167e7a4293589798a",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639f413667e7a4293589419b",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "test reply",
+    "textJSON": "{\"blocks\":[{\"key\":\"9q0e8\",\"text\":\"test reply\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f5ae167e7a4293589798b"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671387873542"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f5b0467e7a42935897a32",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639f413667e7a4293589419b",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": ["639f5b1a67e7a42935897bfc", "639f5b5767e7a42935897f2c"],
+    "textHTML": "test reply",
+    "textJSON": "{\"blocks\":[{\"key\":\"9q0e8\",\"text\":\"test reply\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f5b0467e7a42935897a33"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671387908872"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f5b1a67e7a42935897bfc",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639f5b0467e7a42935897a32",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "reply to reply",
+    "textJSON": "{\"blocks\":[{\"key\":\"851o7\",\"text\":\"reply to reply\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f5b1a67e7a42935897bfd"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 1,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671387930627"
+      }
+    },
+    "spams": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "text": "I found that this content is showing violence",
+        "type": "violent content",
+        "_id": "639fb7fe4369e79cbee9ee09"
+      }
+    ]
+  },
+  {
+    "_id": "639f5b5767e7a42935897f2c",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639f5b0467e7a42935897a32",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "reply to reply",
+    "textJSON": "{\"blocks\":[{\"key\":\"afbc3\",\"text\":\"reply to reply\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f5b5767e7a42935897f2d"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671387991610"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f5b8967e7a42935898113",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639f442f67e7a429358952da",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "aa",
+    "textJSON": "{\"blocks\":[{\"key\":\"cefj2\",\"text\":\"aa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f5b8967e7a42935898114"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671388041889"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f5b9267e7a4293589812d",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639f442f67e7a429358952da",
+    "postID": "639e9963d6e0868d81fc5d8b",
+    "replies": [],
+    "textHTML": "aa",
+    "textJSON": "{\"blocks\":[{\"key\":\"cefj2\",\"text\":\"aa\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f5b9267e7a4293589812e"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_lotfy_subreddit3",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671388050694"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f5bad67e7a429358984b4",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "639e99a0d6e0868d81fc5f25",
+    "postID": "639e99a0d6e0868d81fc5f25",
+    "replies": ["639f5bba67e7a4293589866f", "639f5bd867e7a429358989c8"],
+    "textHTML": "comment",
+    "textJSON": "{\"blocks\":[{\"key\":\"6bof9\",\"text\":\"comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f5bad67e7a429358984b5"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671388077119"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f5bba67e7a4293589866f",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639f5bad67e7a429358984b4",
+    "postID": "639e99a0d6e0868d81fc5f25",
+    "replies": [],
+    "textHTML": "reply",
+    "textJSON": "{\"blocks\":[{\"key\":\"d65pf\",\"text\":\"reply\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f5bba67e7a42935898670"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671388090637"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639f5bd867e7a429358989c8",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639f5bad67e7a429358984b4",
+    "postID": "639e99a0d6e0868d81fc5f25",
+    "replies": [],
+    "textHTML": "reply",
+    "textJSON": "{\"blocks\":[{\"key\":\"7rre4\",\"text\":\"reply\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639f5bd867e7a429358989c9"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671388120544"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639fa16a67e7a429358dd239",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "639d15be9b58be495328753a",
+    "postID": "639d15be9b58be495328753a",
+    "replies": [],
+    "textHTML": "Comment\nComment\ntest voting",
+    "textJSON": "{\"blocks\":[{\"key\":\"9cpgn\",\"text\":\"Comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"dv14p\",\"text\":\"Comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":7,\"style\":\"BOLD\"}],\"entityRanges\":[],\"data\":{}},{\"key\":\"42qa9\",\"text\":\"test voting \",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[{\"offset\":0,\"length\":12,\"style\":\"BOLD\"}],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 0,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639fa47367e7a429358df2c7"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671405930746"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "639fcb934369e79cbeeb7b2e",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "639dd9c1b6ec8181afe1d3dd",
+    "postID": "639dd9c1b6ec8181afe1d3dd",
+    "replies": [],
+    "textHTML": "Hello",
+    "textJSON": "{\"blocks\":[{\"key\":\"7nru1\",\"text\":\"Hello \",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "639fcb934369e79cbeeb7b2f"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_CMP2024",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671416723823"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "63a09cdda93bae2a27a3256e",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "63a09cc9a93bae2a27a3252e",
+    "postID": "63a09cc9a93bae2a27a3252e",
+    "replies": ["63a09cfaa93bae2a27a3301a"],
+    "textHTML": "Not Sherif",
+    "textJSON": "{\"blocks\":[{\"key\":\"d10g0\",\"text\":\"Not Sherif\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "63a09cdda93bae2a27a3256f"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671470301213"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "63a09cfaa93bae2a27a3301a",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "63a09cdda93bae2a27a3256e",
+    "postID": "63a09cc9a93bae2a27a3252e",
+    "replies": [],
+    "textHTML": "ايوه دا مش شريف اللي انا اعرفه",
+    "textJSON": "{\"blocks\":[{\"key\":\"f8gd7\",\"text\":\"ايوه دا مش شريف اللي انا اعرفه\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "63a09cfaa93bae2a27a3301b"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671470330806"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "63a0c7b9c0bf3e37ccfe5ce7",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "63a0c79dc0bf3e37ccfe5725",
+    "postID": "63a0c79dc0bf3e37ccfe5725",
+    "replies": [],
+    "textHTML": "اعملك ايميل يعم انت \nكفايه تسول",
+    "textJSON": "{\"blocks\":[{\"key\":\"ahga2\",\"text\":\"اعملك ايميل يعم انت \",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}},{\"key\":\"b4meb\",\"text\":\"كفايه تسول\",\"type\":\"header-four\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "63a0c7b9c0bf3e37ccfe5ce8"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671481273974"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "63a0c889fcc9b6064fd0bc0c",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "63a09ca2a93bae2a27a31bf0",
+    "postID": "63a09ca2a93bae2a27a31bf0",
+    "replies": [],
+    "textHTML": "comment",
+    "textJSON": "{\"blocks\":[{\"key\":\"c2qnd\",\"text\":\"comment\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "63a0c889fcc9b6064fd0bc0d"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_imagePro235",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671481481848"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "63a0c90ffcc9b6064fd0cd77",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "639cdc969a173fa9b2921ce1",
+    "postID": "639bb359573864892dfcca8f",
+    "replies": [],
+    "textHTML": "Helllllloooooooooooooo",
+    "textJSON": "{\"blocks\":[{\"key\":\"12dph\",\"text\":\"Helllllloooooooooooooo\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "63a0c90ffcc9b6064fd0cd78"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t2_ZiadSherif20",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671481615281"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "63a0cdf71bef7356e91f9c5c",
+    "authorId": "t2_moazMohamed",
+    "isRoot": true,
+    "replyingTo": "63a09d37a93bae2a27a34275",
+    "postID": "63a09d37a93bae2a27a34275",
+    "replies": ["63a0d75f6ef9e66337b770d3"],
+    "textHTML": "منور يا حج حمزة",
+    "textJSON": "{\"blocks\":[{\"key\":\"1gsdp\",\"text\":\"منور يا حج حمزة\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_moazMohamed",
+        "voteType": 1,
+        "_id": "63a0cdf71bef7356e91f9c5d"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_Hamzas",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671482871360"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "63a0d75f6ef9e66337b770d3",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": false,
+    "replyingTo": "63a0cdf71bef7356e91f9c5c",
+    "postID": "63a09d37a93bae2a27a34275",
+    "replies": [],
+    "textHTML": "عمونا",
+    "textJSON": "{\"blocks\":[{\"key\":\"92o9g\",\"text\":\"عمونا\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "63a0d75f6ef9e66337b770d4"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_Hamzas",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671485279506"
+      }
+    },
+    "spams": []
+  },
+  {
+    "_id": "63a0d801c045371e7d018772",
+    "authorId": "t2_AbdelrahmanHamza",
+    "isRoot": true,
+    "replyingTo": "63a09bf5a93bae2a27a2f065",
+    "postID": "63a09bf5a93bae2a27a2f065",
+    "replies": [],
+    "textHTML": "Hello",
+    "textJSON": "{\"blocks\":[{\"key\":\"bpu6q\",\"text\":\"Hello\",\"type\":\"unstyled\",\"depth\":0,\"inlineStyleRanges\":[],\"entityRanges\":[],\"data\":{}}],\"entityMap\":{}}",
+    "votesCount": 1,
+    "voters": [
+      {
+        "userID": "t2_AbdelrahmanHamza",
+        "voteType": 1,
+        "_id": "63a0d801c045371e7d018773"
+      }
+    ],
+    "isDeleted": false,
+    "isLocked": false,
+    "communityID": "t5_Hamzas",
+    "spamCount": 0,
+    "isCollapsed": false,
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1671485441998"
+      }
+    },
+    "spams": []
   }
 ]

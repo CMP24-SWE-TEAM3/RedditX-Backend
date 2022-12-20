@@ -77,7 +77,29 @@ class CommunityService extends Service {
       {
         _id: { $in: communityIDs },
       },
-      "icon description category"
+      "icon description category membersCnt"
+    );
+    return communities;
+  };
+
+  /**
+   * Get a list of communities with a specific category
+   * @param {object} query category, page, limit
+   * @returns {array} communities
+   * @function
+   */
+  getSpecificCategory = async (query) => {
+    if (!query || !query.category)
+      throw new AppError("No category specified!", 400);
+    const category = query.category;
+    delete query.category;
+    query.fields = "icon,description,category,_id";
+    if (!query.limit) query.limit = 10; // limit one page to 10 communities
+    const communities = await this.getAll(
+      {
+        category,
+      },
+      query
     );
     return communities;
   };
@@ -318,17 +340,18 @@ class CommunityService extends Service {
   /**
    * Get stats of a community
    * @param {string} subreddit
-   * @param {string} type type of the stats required ("left", "joined", "pageViews")
+   * @param {string} type1 type of the stats required ("leftPerDay", "leftPerMonth", "joinedPerDay", "joinedPerMonth", "pageViewsPerDay", "pageViewsPerMonth")
+   * @param {string} type1 type of the stats required ("leftPerDay", "leftPerMonth", "joinedPerDay", "joinedPerMonth", "pageViewsPerDay", "pageViewsPerMonth")
    * @returns {object} data
    * @function
    */
-  getStats = async (subreddit, type) => {
+  getStats = async (subreddit, type1, type2) => {
     const community = await this.getOne({
       _id: subreddit,
-      select: type,
+      select: `${type1} ${type2}`,
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    return community[type];
+    return { days: community[type1], months: community[type2] };
   };
 
   getRandomCommunities = async () => {
@@ -710,21 +733,31 @@ class CommunityService extends Service {
     await this.updateOne({ _id: subreddit }, { banner: "default.jpg" });
   };
   removeSrIcon = async (subreddit) => {
-    await this.updateOne({ '_id': subreddit }, { 'icon': 'default.jpg' });
-  }
+    await this.updateOne({ _id: subreddit }, { icon: "default.jpg" });
+  };
 
   inviteModerator = async (subreddit, moderator) => {
-    await this.updateOne({ _id: subreddit }, {
-      $push: {
-        invitedModerators: moderator,
-      }
-    });
-  }
-
+    const doc = await this.getOne(
+      { _id: subreddit },
+    );
+    doc.inviteModerators.push(moderator);
+    await doc.save();
+  };
+  deInviteModerator = async (subreddit, moderator) => {
+    const doc = await this.getOne(
+      { _id: subreddit },
+    );
+    doc.invitedModerators = doc.inviteModerators.filter(el => el != moderator);
+    await doc.save();
+  };
   kickModerator = async (subreddit, moderator) => {
     let doc = await this.getOne({ _id: subreddit });
-    doc.moderators = doc.moderators.filter(el => el.userID != moderator);
+    doc.moderators = doc.moderators.filter((el) => el.userID != moderator);
     await doc.save();
+  };
+  isInvited = async (subreddit, user) => {
+    const invitedModerators = (await this.getOne({ _id: subreddit, select: 'invitedModerators' })).invitedModerators;
+    return invitedModerators.includes(user);
   }
 }
 

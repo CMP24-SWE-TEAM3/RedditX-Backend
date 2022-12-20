@@ -36,25 +36,25 @@ class UserService extends Service {
       { expiresIn: "120h" }
     );
   };
-   /**
-   * Saving notification in user's document
-   * @param {String} id notification id.
-   * @param {String} username username of the user.
-   * @returns {Object} (status)
-   * @function
-   */
-   saveNOtificationOfUser = (id, username) => {
-    try{
-      const user= this.updateOne({_id:username}, { $addToSet: { notifications: id }})
+  /**
+  * Saving notification in user's document
+  * @param {String} id notification id.
+  * @param {String} username username of the user.
+  * @returns {Object} (status)
+  * @function
+  */
+  saveNOtificationOfUser = (id, username) => {
+    try {
+      const user = this.updateOne({ _id: username }, { $addToSet: { notifications: id } })
     }
-    catch(err){
+    catch (err) {
       return {
-        status:false,
-        error:err
+        status: false,
+        error: err
       }
     }
     return {
-      status:true
+      status: true
     }
   };
 
@@ -79,6 +79,30 @@ class UserService extends Service {
       followers: followers,
     };
   };
+
+  /**
+   * Get people that I follow
+   * @param {String} username my username .
+   * @returns {object}
+   * @function
+   */
+  getFollowing = async (username) => {
+    if (!username) throw new AppError("No username is provided!", 400);
+    const user = await this.getOne({ _id: username, select: "follows" });
+    if (!user) throw new AppError("User is not found!", 404);
+    const followingIds = user.follows;
+    const following = await this.getAll(
+      {
+        _id: { $in: followingIds },
+      },
+      { fields: "about,avatar,_id" }
+    );
+    return {
+      status: true,
+      following,
+    };
+  };
+
   /**
    *  Get followers of user
    * @param {String} username my username .
@@ -165,18 +189,18 @@ class UserService extends Service {
         };
       } else {
         const avatar = result.user.avatar;
-           
+
         var isFound = false;
-        var followerIndex=-1;
+        var followerIndex = -1;
         var followerArr = result.user.followers;
         for (var i = 0; i < followerArr.length; i++) {
           if (followerArr[i] === username) {
             isFound = true;
-            followerIndex=i;
+            followerIndex = i;
             break;
           }
         }
-        
+
         try {
           if (action === "sub") {
             if (isFound) {
@@ -185,7 +209,7 @@ class UserService extends Service {
                 error: "already followed",
               };
             }
-            
+
 
             await this.updateOne(
               { _id: username },
@@ -215,13 +239,13 @@ class UserService extends Service {
           return {
             state: false,
             error: "error",
-           
+
           };
         }
         return {
           state: true,
           error: null,
-          avatar:avatar
+          avatar: avatar
         };
       }
     } else if (id === "t5") {
@@ -242,26 +266,26 @@ class UserService extends Service {
           };
         }
         let isFound = false;
-        let index=-1;
+        let index = -1;
         var memberArr = user.user.member;
         for (i = 0; i < memberArr.length; i++) {
           if (memberArr[i].communityId === body.srName) {
             isFound = true;
-            index=i;
+            index = i;
             break;
           }
         }
         try {
-          var memCom=result.subreddit.members;
-          var memCnt=result.subreddit.membersCnt;
-          var joinedPerDay=result.subreddit.joinedPerDay;
-          var joinedPerMonth=result.subreddit.joinedPerMonth;
-          var leftPerDay=result.subreddit.leftPerDay;
-          var leftPerMonth=result.subreddit.leftPerMonth;
+          var memCom = result.subreddit.members;
+          var memCnt = result.subreddit.membersCnt;
+          var joinedPerDay = result.subreddit.joinedPerDay;
+          var joinedPerMonth = result.subreddit.joinedPerMonth;
+          var leftPerDay = result.subreddit.leftPerDay;
+          var leftPerMonth = result.subreddit.leftPerMonth;
 
           const date = new Date();
-          var dayIndex=date.getDay();
-          var monthIndex=date.getMonth();
+          var dayIndex = date.getDay();
+          var monthIndex = date.getMonth();
           console.log(dayIndex);
           console.log(monthIndex);
           if (action === "sub") {
@@ -272,9 +296,9 @@ class UserService extends Service {
               };
             }
             joinedPerDay[dayIndex]++;
-          joinedPerMonth[monthIndex]++;
-            
-            const memUser=user.user.member;
+            joinedPerMonth[monthIndex]++;
+
+            const memUser = user.user.member;
             memUser.push({
               communityId: body.srName,
               isBanned: {
@@ -286,12 +310,12 @@ class UserService extends Service {
                 date: Date.now(),
               },
             });
-           const newUsr= await this.updateOne(
+            const newUsr = await this.updateOne(
               { _id: username },
               {
-                
-                  member: memUser
-                
+
+                member: memUser
+
               }
             );
             memCnt++;
@@ -308,14 +332,14 @@ class UserService extends Service {
                 },
               },
             );
-           const com= await communityServiceInstance.updateOne(
+            const com = await communityServiceInstance.updateOne(
               { _id: body.srName },
               {
-                 
-                  members:memCom ,
-                  membersCnt:memCnt,
-                  joinedPerDay:joinedPerDay,
-                  joinedPerMonth:joinedPerMonth
+
+                members: memCom,
+                membersCnt: memCnt,
+                joinedPerDay: joinedPerDay,
+                joinedPerMonth: joinedPerMonth
               }
             );
           } else {
@@ -328,14 +352,14 @@ class UserService extends Service {
             leftPerDay[dayIndex]++;
             leftPerMonth[monthIndex]++;
             memCnt--;
-            var memIndex=-1;
+            var memIndex = -1;
             console.log(memCom);
-            for(let x=0;x<memCom.length;x++){
-              if(memCom[x].userID===username){
-                memIndex=x;
+            for (let x = 0; x < memCom.length; x++) {
+              if (memCom[x].userID === username) {
+                memIndex = x;
               }
             }
-            memCom.splice(memIndex,1);
+            memCom.splice(memIndex, 1);
             await this.updateOne(
               { _id: username },
               { $pull: { member: { communityId: body.srName } } }
@@ -343,7 +367,7 @@ class UserService extends Service {
 
             await communityServiceInstance.updateOne(
               { _id: body.srName },
-               { members: memCom , membersCnt:memCnt,leftPerDay:leftPerDay,leftPerMonth:leftPerMonth} 
+              { members: memCom, membersCnt: memCnt, leftPerDay: leftPerDay, leftPerMonth: leftPerMonth }
             );
           }
         } catch (err) {
@@ -954,5 +978,35 @@ class UserService extends Service {
       await user.save();
     }
   };
+  addFriend = async (username, friend) => {
+    await this.updateOne({ _id: username }, {
+      $addToSet: {
+        friendRequestFromMe: friend,
+      }
+    });
+    await this.updateOne({ _id: friend }, {
+      $addToSet: {
+        friendRequestToMe: username,
+      }
+    });
+  }
+
+  deleteFriend = async (username, friend) => {
+    await this.updateOne({ _id: username }, {
+      $pull: {
+        friend: friend
+      }
+    })
+  }
+  isCreatorInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ "_id": user, "select": 'moderators' })).moderators;
+    subreddits = subreddits.filter(el => el.role == 'creator').map(el => el.communityId);
+    return subreddits.includes(subreddit);
+  }
+  kickModerator = async (subreddit, user) => {
+    let doc = await this.getOne({ _id: user });
+    doc.moderators = doc.moderators.filter(el => el.communityId != subreddit);
+    await doc.save();
+  }
 }
 module.exports = UserService;

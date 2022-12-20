@@ -80,6 +80,7 @@ class CommentService extends Service {
     } catch {
       throw new AppError("invalid postID!", 400);
     }
+    if (!post) throw new AppError("This post doesn't exist!", 404);
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newComment = new Comment({
       textHTML: data.textHTML,
@@ -87,6 +88,7 @@ class CommentService extends Service {
       isRoot: true,
       authorId: username,
       replyingTo: data.postID,
+      postID: data.postID,
       communityID: post.communityID,
       voters: [{ userID: username, voteType: 1 }],
     });
@@ -112,6 +114,7 @@ class CommentService extends Service {
     }
     const user = await userServiceInstance.findById(username);
     const comment = await Comment.findById({ _id: data.commentID });
+    if (!comment) throw new AppError("This comment doesn't exist!", 404);
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newReply = new Comment({
       textHTML: data.textHTML,
@@ -119,6 +122,7 @@ class CommentService extends Service {
       isRoot: false,
       authorId: username,
       replyingTo: data.commentID,
+      postID: comment.postID,
       communityID: comment.communityID,
       voters: [{ userID: username, voteType: 1 }],
     });
@@ -223,16 +227,17 @@ class CommentService extends Service {
       } else if (dir == 0 || dir == -1) {
         operation = -1;
       }
+      try{
       if (removeDetector && !addDetector) {
         await User.findOneAndUpdate(
           { _id: username },
           { $pull: { hasVote: { _id: postIdCasted } } }
-        );
+        ).clone();
       } else if (!removeDetector && addDetector) {
         await User.findOneAndUpdate(
           { _id: username },
           { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
-        );
+        ).clone();
       } else if (addDetector && removeDetector) {
         await User.findOneAndUpdate(
           { _id: username },
@@ -241,7 +246,7 @@ class CommentService extends Service {
         await User.findOneAndUpdate(
           { _id: username },
           { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
-        );
+        ).clone();
       }
       await Post.findByIdAndUpdate(
         { _id: postIdCasted },
@@ -265,7 +270,17 @@ class CommentService extends Service {
             };
           }
         }
-      );
+      ).clone();}
+      catch(err){
+        return {
+          status:false,
+          error:err
+        }
+      }
+      return {
+        state: true,
+        status: "done",
+      };
     } else if (id === "t1") {
       //comment or reply
       const comment = await this.getOne({ _id: postIdCasted });
@@ -344,7 +359,7 @@ class CommentService extends Service {
           await User.findOneAndUpdate(
             { _id: username },
             { $pull: { votedComments: { _id: postIdCasted } } }
-          );
+          ).clone();
         } else if (!removeDetector && addDetector) {
           await User.findOneAndUpdate(
             { _id: username },
@@ -353,7 +368,7 @@ class CommentService extends Service {
                 votedComments: { _id: postIdCasted, type: operation },
               },
             }
-          );
+          ).clone();
         } else if (addDetector && removeDetector) {
           await User.findOneAndUpdate(
             { _id: username },
@@ -366,15 +381,15 @@ class CommentService extends Service {
                 votedComments: { _id: postIdCasted, type: operation },
               },
             }
-          );
+          ).clone();
         }
 
         Comment.findByIdAndUpdate(
           { _id: postIdCasted },
           { $set: { votesCount: votesCount + operation, voters: voters } },
           { new: true },
-          () => { }
-        );
+          () => {}
+        ).clone();
 
         return {
           state: true,
@@ -386,6 +401,7 @@ class CommentService extends Service {
           error: "failed",
         };
       }
+     
     }
   };
 
@@ -401,8 +417,6 @@ class CommentService extends Service {
     await comment.save();
   };
 
-  
-
   checkUser = async (user, comment) => {
     console.log();
     return (
@@ -412,20 +426,20 @@ class CommentService extends Service {
   };
 
   showComment = async (comment) => {
-    await this.updateOne({ "_id": comment }, { 'isCollapsed': false });
-  }
+    await this.updateOne({ _id: comment }, { isCollapsed: false });
+  };
 
   approveComment = async (comment) => {
     comment.isDeleted = false;
     comment.spams = [];
     comment.spamCount = 0;
     await comment.save();
-  }
+  };
 
   removeComment = async (comment) => {
     comment.isDeleted = true;
     await comment.save();
-  }
+  };
 }
 
 module.exports = CommentService;

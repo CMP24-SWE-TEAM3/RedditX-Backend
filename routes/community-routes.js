@@ -34,6 +34,12 @@ router.get(
   communityController.getRandomCommunities
 );
 
+router.get(
+  "/get-specific-category",
+  authCheck,
+  communityController.getSpecificCategory
+);
+
 router.post("/:subreddit/kick-member", authCheck, communityController.kickUser);
 
 router.get("/info", authCheck, communityController.getGeneralInfo);
@@ -101,12 +107,12 @@ router.get(
 router.get(
   "/:subreddit/members-count",
   authCheck,
-  communityController.getMembersCountPerDay
+  communityController.getMembersCountPerDayAndMonth
 );
 router.get(
   "/:subreddit/page-views",
   authCheck,
-  communityController.getViewsCountPerDay
+  communityController.getViewsCountPerDayAndMonth
 );
 
 router.get("/:subreddit", communityController.getCommunityAbout);
@@ -137,25 +143,18 @@ router
   .route("/:subreddit/delete-flair")
   .post(authCheck, communityController.deleteFlair);
 
-router
-  .route('/:subreddit/flair')
-  .post(authCheck, communityController.addFlair);
+router.route("/:subreddit/flair").post(authCheck, communityController.addFlair);
 
 router
-  .route('/:subreddit/site-admin')
+  .route("/:subreddit/site-admin")
   .post(authCheck, communityController.configureSubreddit);
 
+router.route("/approve").post(authCheck, communityController.approveLink);
+
+router.route("/remove").post(authCheck, communityController.removeLink);
 
 router
-  .route('/approve')
-  .post(authCheck, communityController.approveLink);
-
-router
-  .route('/remove')
-  .post(authCheck, communityController.removeLink);
-
-router
-  .route('/kick-moderator')
+  .route("/kick-moderator")
   .post(authCheck, communityController.kickModerator);
 
 module.exports = router;
