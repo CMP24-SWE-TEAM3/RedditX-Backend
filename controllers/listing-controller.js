@@ -221,6 +221,8 @@ const addComment = catchAsync(async (req, res, next) => {
       req.username
     );
     //notification part
+    const post=await postServiceInstance.getOne({_id:req.body.postID , select: "userID"});
+    const user_id=post.userID;
        const user = await userServiceInstance.getOne({ _id: req.username });
         const notificationSaver =
           await notificationServiceInstance.createReplyToPostNotification(
@@ -234,20 +236,18 @@ const addComment = catchAsync(async (req, res, next) => {
         }
         const saveToUser = await userServiceInstance.saveNOtificationOfUser(
           notificationSaver.id,
-          newComment.authorId
+          user_id
         );
         if (!saveToUser.status) {
           return res.status(404).json({
             status: "Error happened while saving notification in user db",
           });
         }
-        console.log(newComment);
         //push notiication
-        const fcm_token_user=await userServiceInstance.getOne({ _id:newComment.authorId ,
+       
+        const fcm_token_user=await userServiceInstance.getOne({ _id:user_id ,
           select: "_id fcmToken"});
-          console.log(fcm_token_user);
         var fcmToken=fcm_token_user.fcmToken;
-        console.log(fcmToken);
         const pushResult=await pushNotificationServiceInstance.replytoPostNotification(fcmToken,req.username,newComment._id,newComment.postID);
         if(!pushResult.status){
           return res.status(500).json({
@@ -272,6 +272,8 @@ const addReply = catchAsync(async (req, res, next) => {
   try {
     newReply = await commentServiceInstance.addReply(req.body, req.username);
     //notification part
+    const comment=await commentServiceInstance.getOne({_id:req.body.commentID , select: "authorId"});
+    const user_id=comment.authorId;
     const user = await userServiceInstance.getOne({ _id: req.username });
     const notificationSaver =
       await notificationServiceInstance.createReplyToPostNotification(
@@ -285,16 +287,15 @@ const addReply = catchAsync(async (req, res, next) => {
     }
     const saveToUser = await userServiceInstance.saveNOtificationOfUser(
       notificationSaver.id,
-      newReply.authorId
+      user_id
     );
     if (!saveToUser.status) {
       return res.status(404).json({
         status: "Error happened while saving notification in user db",
       });
     }
-    console.log(newReply);
     //push notiication
-    const fcm_token_user=await userServiceInstance.getOne({ _id:newReply.authorId ,
+    const fcm_token_user=await userServiceInstance.getOne({ _id:user_id ,
       select: "_id fcmToken"});
       console.log(fcm_token_user);
     var fcmToken=fcm_token_user.fcmToken;
