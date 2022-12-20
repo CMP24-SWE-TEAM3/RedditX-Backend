@@ -578,7 +578,7 @@ const getGeneralInfo = catchAsync(async (req, res, next) => {
       prepend = thingsIDs[i][1] * 1;
       result =
         prepend === 1 // t1_ => Comment
-          ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+          ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3), populate: { path: 'authorId', select: 'avatar' } })
           : prepend === 3 // t3_ => Post
             ? await postServiceInstance
               .getOne({ _id: thingsIDs[i].slice(3) })
