@@ -11,14 +11,14 @@ const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
 const NotificationService = require("../services/notification-service");
-const PushNotificationService=require("../services/push-notifications-service");
+const PushNotificationService = require("../services/push-notifications-service");
 
 const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
 const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
 const notificationServiceInstance = new NotificationService(Notification);
-var pushNotificationServiceInstance=new PushNotificationService();
+var pushNotificationServiceInstance = new PushNotificationService();
 
 /**
  * Get user followers
@@ -290,7 +290,7 @@ const spam = catchAsync(async (req, res, next) => {
         req.username
       );
       community = await communityServiceInstance.getOne({
-        _id: comment.communityID,
+        _id: comment.communityID._id,
         select: "communityOptions",
       });
       await commentServiceInstance.saveSpammedComment(comment, community);
@@ -426,16 +426,18 @@ const subscribe = async (req, res) => {
           status: "Error happened while saving notification in db",
         });
       }
-       //push notiication
-       const fcm_token_user=await userServiceInstance.getOne({ _id:req.body.srName ,
-        select: "_id fcmToken"});
-        console.log(fcm_token_user);
-      var fcmToken=fcm_token_user.fcmToken;
+      //push notiication
+      const fcm_token_user = await userServiceInstance.getOne({
+        _id: req.body.srName,
+        select: "_id fcmToken"
+      });
+      console.log(fcm_token_user);
+      var fcmToken = fcm_token_user.fcmToken;
       console.log(fcmToken);
-      const pushResult=await pushNotificationServiceInstance.newFollowerNotification(fcmToken,req.username);
-      if(!pushResult.status){
+      const pushResult = await pushNotificationServiceInstance.newFollowerNotification(fcmToken, req.username);
+      if (!pushResult.status) {
         return res.status(500).json({
-          "status":"Cannot push notification"
+          "status": "Cannot push notification"
         })
       }
 
@@ -444,6 +446,8 @@ const subscribe = async (req, res) => {
       status: "done",
     });
   } else {
+
+
     return res.status(404).json({
       status: result.error,
     });
@@ -465,11 +469,16 @@ const friendRequest = catchAsync(async (req, res) => {
       });
     }
     // [2] -> check if user isn't moderator in subreddit
+    let result = await userServiceInstance.isModeratorInSubreddit(
+      req.body.communityID,
+      req.username
+    );
+    console.log('out');
     if (
-      !(await userServiceInstance.isModeratorInSubreddit(
+      ! await userServiceInstance.isModeratorInSubreddit(
         req.body.communityID,
         req.username
-      ))
+      )
     ) {
       return res.status(400).json({
         status: "failed",
@@ -531,14 +540,14 @@ const unFriendRequest = catchAsync(async (req, res) => {
     }
     //check that other user is invited
     if (
-      await userServiceInstance.isInvited(req.body.communityID, req.body.userID)
+      ! await communityServiceInstance.isInvited(req.body.communityID, req.body.userID)
     ) {
       return res.status(400).json({
         status: "failed",
-        message: "this user is already moderator",
+        message: "this user is isn't invited",
       });
     }
-    await communityServiceInstance.inviteModerator(
+    await communityServiceInstance.deInviteModerator(
       req.body.communityID,
       req.body.userID
     );
@@ -643,14 +652,14 @@ const leaveModeratorOfSubredddit = catchAsync(async (req, res) => {
   }
   // [2] -> check if user isn't moderator in subreddit
   if (
-    !(await userServiceInstance.isModeratorInSubreddit(
+    !(await userServiceInstance.isCreatorInSubreddit(
       req.params.subreddit,
       req.username
     ))
   ) {
     return res.status(400).json({
       status: "failed",
-      message: "you aren't moderator in this subreddit",
+      message: "you aren't creator in this subreddit",
     });
   }
   //[3]-> do leaving the subreddit
@@ -709,6 +718,7 @@ module.exports = {
 
   getUserSavedPosts,
   friendRequest,
+  unFriendRequest,
   getAllFriends,
   acceptModeratorInvite,
   updateInfo,
