@@ -43,14 +43,19 @@ class UserService extends Service {
    * @returns {Object} (status)
    * @function
    */
-  saveNOtificationOfUser = (id, username) => {
-    console.log(id);
-    console.log(username);
-
+  saveNOtificationOfUser = async (id, username) => {
     try {
-      const user = this.updateOne(
+      await this.updateOne(
         { _id: username },
-        { $addToSet: { notifications: {notificationID:id,isRead:false,isDeleted:false} } }
+        {
+          $addToSet: {
+            notifications: {
+              notificationID: id,
+              isRead: false,
+              isDeleted: false,
+            },
+          },
+        }
       );
     } catch (err) {
       return {
@@ -157,18 +162,13 @@ class UserService extends Service {
    * @function
    */
   addInterests = async (username, categories) => {
-    var categories_user;
     try {
-      categories_user = await this.updateOne(
-        { _id: username },
-        { categories: categories }
-      );
+      await this.updateOne({ _id: username }, { categories: categories });
     } catch {
       return {
         status: false,
       };
     }
-    console.log(categories_user);
     return {
       status: true,
     };
@@ -183,7 +183,6 @@ class UserService extends Service {
   subscribe = async (body, username) => {
     const id = body.srName.substring(0, 2);
     const action = body.action;
-    console.log(id);
     if (id === "t2") {
       //check the username
       const result = await authServiceInstance.availableUser(body.srName);
@@ -196,12 +195,10 @@ class UserService extends Service {
         const avatar = result.user.avatar;
 
         var isFound = false;
-        var followerIndex = -1;
         var followerArr = result.user.followers;
         for (var i = 0; i < followerArr.length; i++) {
           if (followerArr[i] === username) {
             isFound = true;
-            followerIndex = i;
             break;
           }
         }
@@ -269,12 +266,10 @@ class UserService extends Service {
           };
         }
         let isFound = false;
-        let index = -1;
         var memberArr = user.user.member;
         for (i = 0; i < memberArr.length; i++) {
           if (memberArr[i].communityId === body.srName) {
             isFound = true;
-            index = i;
             break;
           }
         }
@@ -289,8 +284,6 @@ class UserService extends Service {
           const date = new Date();
           var dayIndex = date.getDay();
           var monthIndex = date.getMonth();
-          console.log(dayIndex);
-          console.log(monthIndex);
           if (action === "sub") {
             if (isFound) {
               return {
@@ -313,7 +306,7 @@ class UserService extends Service {
                 date: Date.now(),
               },
             });
-            const newUsr = await this.updateOne(
+            await this.updateOne(
               { _id: username },
               {
                 member: memUser,
@@ -331,7 +324,7 @@ class UserService extends Service {
                 date: Date.now(),
               },
             });
-            const com = await communityServiceInstance.updateOne(
+            await communityServiceInstance.updateOne(
               { _id: body.srName },
               {
                 members: memCom,
@@ -373,7 +366,6 @@ class UserService extends Service {
             );
           }
         } catch (err) {
-          console.log(err);
           return {
             state: false,
             error: "error",
@@ -444,7 +436,6 @@ class UserService extends Service {
     users = users.map((el) => {
       el.follow = follows.indexOf(el._id) != -1;
       delete el.prefs;
-      console.log(el);
       return el;
     });
     return users;
@@ -591,7 +582,6 @@ class UserService extends Service {
     });
     var returnReplies = [];
     for await (const doc of cursor) {
-      console.log(doc);
       returnReplies.push(doc);
     }
     return returnReplies;
@@ -618,7 +608,6 @@ class UserService extends Service {
     });
     var returnComments = [];
     for await (const doc of cursor) {
-      console.log(doc);
       returnComments.push(doc);
     }
     return returnComments;
@@ -689,7 +678,6 @@ class UserService extends Service {
   userUpVoted = async (username, query) => {
     const user = await this.findById(username, "hasVote");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    console.log(user);
     /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
     if (!query.limit) {
       query.limit = "10";
@@ -700,15 +688,13 @@ class UserService extends Service {
         upVotes.push(el.postID);
       }
     });
-    console.log(upVotes);
     const cursor = Post.find({
       _id: { $in: upVotes },
     });
     var returnPosts = [];
     for await (const doc of cursor) {
-      console.log(doc);
       returnPosts.push(doc);
-    } //console.log(returnPosts);
+    }
     return returnPosts;
   };
   /**
@@ -720,19 +706,16 @@ class UserService extends Service {
   userMentions = async (username, query) => {
     const user = await this.findById(username, "mentionedInPosts");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    console.log(user);
     /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
     if (!query.limit) {
       query.limit = "10";
     }
-    //console.log(user);
 
     const cursor = Post.find({
       _id: { $in: user.mentionedInPosts },
     });
     var returnPosts = [];
     for await (const doc of cursor) {
-      console.log(doc);
       returnPosts.push(doc);
     }
     return returnPosts;
@@ -763,13 +746,11 @@ class UserService extends Service {
     const memarr = user.member;
     memarr.push(userMember);
     try {
-      const x = await this.updateOne(
+      await this.updateOne(
         { _id: user._id },
         { moderators: modarr, member: memarr }
       );
-      console.log(x);
     } catch {
-      console.log("dd");
       return {
         status: false,
         error: "operation failed",
@@ -788,19 +769,16 @@ class UserService extends Service {
   userSavedPosts = async (username, query) => {
     const user = await this.findById(username, "savedPosts");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    console.log(user);
     /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
     if (!query.limit) {
       query.limit = "10";
     }
-    //console.log(user);
 
     const cursor = Post.find({
       _id: { $in: user.savedPosts },
     });
     let returnPosts = [];
     for await (const doc of cursor) {
-      console.log(doc);
       returnPosts.push(doc);
     }
     return returnPosts;

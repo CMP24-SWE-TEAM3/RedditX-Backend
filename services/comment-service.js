@@ -18,7 +18,6 @@ class CommentService extends Service {
     super(model);
   }
   getSearchResults = async (query) => {
-    //console.log('here');
     const searchQuery = query.q;
     delete query.q;
     return this.getAll(
@@ -254,28 +253,28 @@ class CommentService extends Service {
           $set: {
             votesCount: votesCount + operation,
             voters: voters,
+
           },
-        },
-        { new: true },
-        (err) => {
-          if (err) {
-            return {
-              state: false,
-              error: "failed",
-            };
-          } else {
-            return {
-              state: true,
-              status: "done",
-            };
+          { new: true },
+          (err) => {
+            if (err) {
+              return {
+                state: false,
+                error: "failed",
+              };
+            } else {
+              return {
+                state: true,
+                status: "done",
+              };
+            }
           }
-        }
-      ).clone();}
-      catch(err){
+        ).clone();
+      } catch (err) {
         return {
-          status:false,
-          error:err
-        }
+          status: false,
+          error: err,
+        };
       }
       return {
         state: true,
@@ -302,8 +301,6 @@ class CommentService extends Service {
         }
         index++;
       }
-      console.log(isFound);
-      console.log("a");
       removeDetector = false;
       addDetector = false;
       if (!isFound) {
@@ -353,7 +350,6 @@ class CommentService extends Service {
       } else if (dir == 0 || dir == -1) {
         operation = -1;
       }
-      console.log("aaa");
       try {
         if (removeDetector && !addDetector) {
           await User.findOneAndUpdate(
@@ -401,7 +397,6 @@ class CommentService extends Service {
           error: "failed",
         };
       }
-     
     }
   };
 
@@ -418,7 +413,6 @@ class CommentService extends Service {
   };
 
   checkUser = async (user, comment) => {
-    console.log();
     return (
       (await this.getOne({ _id: comment, select: "authorId" }))["authorId"] ===
       user

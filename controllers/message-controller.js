@@ -12,8 +12,6 @@ var messageServiceInstance = new MessageService(Message);
  * @returns {object} res
  */
 const compose = async (req, res) => {
-  console.log(req.username);
-  console.log(req.body);
   if (!messageServiceInstance.validateMessage(req.body) || !req.username) {
     return res.status(500).json({
       response: "invalid parameters",
@@ -27,7 +25,6 @@ const compose = async (req, res) => {
   }
 
   const result = await messageServiceInstance.composeMessage(req.body);
-  console.log(result);
   if (result.status) {
     return res.status(200).json({
       response: "done",
@@ -46,8 +43,6 @@ const compose = async (req, res) => {
  * @returns {object} res
  */
 const deleteMessage = async (req, res) => {
-  console.log(req.username);
-  console.log(req.body);
   if (!req.username || !req.body.msgID || !IdValidator(req.body.msgID)) {
     return res.status(500).json({
       response: "invalid parameters",
@@ -55,7 +50,6 @@ const deleteMessage = async (req, res) => {
   }
 
   const result = await messageServiceInstance.deleteMessage(req.body);
-  console.log(result);
   if (result.status) {
     return res.status(200).json({
       response: "done",
@@ -75,8 +69,6 @@ const deleteMessage = async (req, res) => {
  * @returns {object} res
  */
 const unreadMessage = async (req, res) => {
-  console.log(req.username);
-  console.log(req.body);
   if (!req.username || !req.body.msgID || !IdValidator(req.body.msgID)) {
     return res.status(500).json({
       response: "invalid parameters",
@@ -84,7 +76,6 @@ const unreadMessage = async (req, res) => {
   }
 
   const result = await messageServiceInstance.unreadMessage(req.body);
-  console.log(result);
   if (result.status) {
     return res.status(200).json({
       response: "done",
