@@ -40,8 +40,8 @@ class PushNotificationsService {
           body: `${followerUsername} has followed you`,
         },
         data: {
-          followerID: followerUsername ,
-          type:1
+          followerID:`${followerUsername}`  ,
+          type:"1"
         },
         token: receiverFcmToken,
       };
@@ -72,7 +72,7 @@ class PushNotificationsService {
         },
         data: {
           postID: `${postID}`,
-          type:2
+          type:"2"
 
         },
         token: receiverFcmToken,
@@ -105,8 +105,8 @@ class PushNotificationsService {
         },
         data: {
           commentID: `${commentID}`,
-          postID:postID ,
-          type:3
+          postID:`${postID}`,
+          type:"3"
 
         },
         token: receiverFcmToken,
@@ -167,7 +167,7 @@ class PushNotificationsService {
         data: {
           commentID: `${commentID}`,
           postID: `${postID}`,
-          type:4
+          type:"4"
 
         },
         token: receiverFcmToken,
@@ -201,7 +201,7 @@ class PushNotificationsService {
         data: {
           commentID: `${commentID}`,
           replyID: `${replyID}`,
-          type:5
+          type:"5"
 
         },
         token: receiverFcmToken,
