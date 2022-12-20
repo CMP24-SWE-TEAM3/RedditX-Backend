@@ -136,10 +136,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-            ? (el.isBanned.value = false)
-            : operation === "mute"
-              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-              : (el.isMuted.value = false)
+          ? (el.isBanned.value = false)
+          : operation === "mute"
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     return community;
@@ -160,10 +160,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-            ? (el.isBanned.value = false)
-            : operation === "mute"
-              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-              : (el.isMuted.value = false)
+          ? (el.isBanned.value = false)
+          : operation === "mute"
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     await toBeAffected.save();
@@ -259,7 +259,7 @@ class CommunityService extends Service {
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     const creator =
       community.moderators[
-      community.moderators.findIndex((el) => el.role === "creator")
+        community.moderators.findIndex((el) => el.role === "creator")
       ];
     var creatorID = undefined;
     if (creator) creatorID = creator.userID;
@@ -355,8 +355,8 @@ class CommunityService extends Service {
   };
 
   getRandomCommunities = async (query) => {
-    query.limit=query.limit||"10";
-    return this.getAll({},query);
+    query.limit = query.limit || "10";
+    return this.getAll({}, query);
     // const cursor = Community.find();
     // var communities = [];
     // for await (const doc of cursor) {
@@ -735,17 +735,15 @@ class CommunityService extends Service {
   };
 
   inviteModerator = async (subreddit, moderator) => {
-    const doc = await this.getOne(
-      { _id: subreddit },
-    );
+    const doc = await this.getOne({ _id: subreddit });
     doc.inviteModerators.push(moderator);
     await doc.save();
   };
   deInviteModerator = async (subreddit, moderator) => {
-    const doc = await this.getOne(
-      { _id: subreddit },
+    const doc = await this.getOne({ _id: subreddit });
+    doc.invitedModerators = doc.inviteModerators.filter(
+      (el) => el != moderator
     );
-    doc.invitedModerators = doc.inviteModerators.filter(el => el != moderator);
     await doc.save();
   };
   kickModerator = async (subreddit, moderator) => {
@@ -754,9 +752,11 @@ class CommunityService extends Service {
     await doc.save();
   };
   isInvited = async (subreddit, user) => {
-    const invitedModerators = (await this.getOne({ _id: subreddit, select: 'invitedModerators' })).invitedModerators;
+    const invitedModerators = (
+      await this.getOne({ _id: subreddit, select: "invitedModerators" })
+    ).invitedModerators;
     return invitedModerators.includes(user);
-  }
+  };
 }
 
 module.exports = CommunityService;

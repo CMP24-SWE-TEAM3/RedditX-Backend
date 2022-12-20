@@ -429,25 +429,26 @@ const subscribe = async (req, res) => {
       //push notiication
       const fcm_token_user = await userServiceInstance.getOne({
         _id: req.body.srName,
-        select: "_id fcmToken"
+        select: "_id fcmToken",
       });
       console.log(fcm_token_user);
       var fcmToken = fcm_token_user.fcmToken;
       console.log(fcmToken);
-      const pushResult = await pushNotificationServiceInstance.newFollowerNotification(fcmToken, req.username);
+      const pushResult =
+        await pushNotificationServiceInstance.newFollowerNotification(
+          fcmToken,
+          req.username
+        );
       if (!pushResult.status) {
         return res.status(500).json({
-          "status": "Cannot push notification"
-        })
+          status: "Cannot push notification",
+        });
       }
-
     }
     return res.status(200).json({
       status: "done",
     });
   } else {
-
-
     return res.status(404).json({
       status: result.error,
     });
@@ -469,16 +470,11 @@ const friendRequest = catchAsync(async (req, res) => {
       });
     }
     // [2] -> check if user isn't moderator in subreddit
-    let result = await userServiceInstance.isModeratorInSubreddit(
-      req.body.communityID,
-      req.username
-    );
-    console.log('out');
     if (
-      ! await userServiceInstance.isModeratorInSubreddit(
+      !(await userServiceInstance.isModeratorInSubreddit(
         req.body.communityID,
         req.username
-      )
+      ))
     ) {
       return res.status(400).json({
         status: "failed",
@@ -540,7 +536,10 @@ const unFriendRequest = catchAsync(async (req, res) => {
     }
     //check that other user is invited
     if (
-      ! await communityServiceInstance.isInvited(req.body.communityID, req.body.userID)
+      !(await communityServiceInstance.isInvited(
+        req.body.communityID,
+        req.body.userID
+      ))
     ) {
       return res.status(400).json({
         status: "failed",
@@ -729,5 +728,4 @@ module.exports = {
   addInterests,
   getUserInfo,
   editProfile,
-  unFriendRequest,
 };

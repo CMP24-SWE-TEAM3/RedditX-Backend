@@ -20,6 +20,9 @@ var pushNotificationServiceInstance=new PushNotificationService();
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
 var commentServiceInstance = new CommentService(Comment);
+const PushNotificationService = require("../services/push-notifications-service");
+var pushNotificationServiceInstance = new PushNotificationService();
+
 const idValidator = require("../validate/listing-validators").validateObjectId;
 /**
  * Update user text
@@ -407,20 +410,25 @@ const vote = async (req, res) => {
         }
 
         //push notiication
-        const fcm_token_user=await userServiceInstance.getOne({ _id:comment.authorId ,
-          select: "_id fcmToken"});
-          console.log(fcm_token_user);
-        var fcmToken=fcm_token_user.fcmToken;
+        const fcm_token_user = await userServiceInstance.getOne({
+          _id: comment.authorId,
+          select: "_id fcmToken",
+        });
+        console.log(fcm_token_user);
+        var fcmToken = fcm_token_user.fcmToken;
         console.log(fcmToken);
-        
-        const pushResult=await pushNotificationServiceInstance.upvoteCommentNotification(fcmToken,req.username,comment._id,comment.postID);
-        if(!pushResult.status){
+
+        const pushResult =
+          await pushNotificationServiceInstance.upvoteCommentNotification(
+            fcmToken,
+            req.username,
+            comment._id
+          );
+        if (!pushResult.status) {
           return res.status(500).json({
-            "status":"Cannot push notification"
-          })
+            status: "Cannot push notification",
+          });
         }
-
-
       } else {
         const post = await postServiceInstance.getOne({
           _id: req.body.id.slice(3),
@@ -447,18 +455,25 @@ const vote = async (req, res) => {
             status: "Error happened while saving notification in user db",
           });
         }
-         // push notiication
-          const fcm_token_user=await userServiceInstance.getOne({ _id: post.userID ,
-            select: "_id fcmToken"});
-            console.log(fcm_token_user);
-          var fcmToken=fcm_token_user.fcmToken;
-          console.log(fcmToken);
-          const pushResult=await pushNotificationServiceInstance.upvotePostNotification(fcmToken,req.username,post.userID);
-          if(!pushResult.status){
-            return res.status(500).json({
-              "status":"Cannot push notification"
-            })
-          }
+        // push notiication
+        const fcm_token_user = await userServiceInstance.getOne({
+          _id: post.userID._id,
+          select: "_id fcmToken",
+        });
+        console.log(fcm_token_user);
+        fcmToken = fcm_token_user.fcmToken;
+        console.log(fcmToken);
+        const pushResult =
+          await pushNotificationServiceInstance.upvotePostNotification(
+            fcmToken,
+            req.username,
+            post.userID._id
+          );
+        if (!pushResult.status) {
+          return res.status(500).json({
+            status: "Cannot push notification",
+          });
+        }
       }
     }
 
