@@ -578,9 +578,9 @@ const getGeneralInfo = catchAsync(async (req, res, next) => {
       prepend = thingsIDs[i][1] * 1;
       result =
         prepend === 1 // t1_ => Comment
-          ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+          ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3), populate: { path: 'authorId', select: 'avatar' } })
           : prepend === 3 // t3_ => Post
-          ? await postServiceInstance
+            ? await postServiceInstance
               .getOne({ _id: thingsIDs[i].slice(3) })
               .populate({
                 path: "userID",
@@ -590,9 +590,9 @@ const getGeneralInfo = catchAsync(async (req, res, next) => {
                 path: "communityID",
                 select: "_id icon",
               })
-          : prepend === 5 // t5_ => Community
-          ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
-          : undefined;
+            : prepend === 5 // t5_ => Community
+              ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
+              : undefined;
       things.push(result);
     }
   } catch (err) {
@@ -1002,8 +1002,8 @@ const kickModerator = catchAsync(async (req, res) => {
   }
 
   //[3] -> kick moderator
-  await communityServiceInstance.kickModerator(subreddit, req.body.userID);
-  await userServiceInstance.kickModerator(subreddit, req.body.userID);
+  await communityServiceInstance.kickModerator(req.params.subreddit, req.body.userID);
+  await userServiceInstance.kickModerator(req.params.subreddit, req.body.userID);
   return res.status(200).json({
     status: "succeeded",
   });

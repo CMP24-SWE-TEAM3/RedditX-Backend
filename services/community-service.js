@@ -136,10 +136,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned.value = false)
-          : operation === "mute"
-          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-          : (el.isMuted.value = false)
+            ? (el.isBanned.value = false)
+            : operation === "mute"
+              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+              : (el.isMuted.value = false)
         : el
     );
     return community;
@@ -160,10 +160,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned.value = false)
-          : operation === "mute"
-          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-          : (el.isMuted.value = false)
+            ? (el.isBanned.value = false)
+            : operation === "mute"
+              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+              : (el.isMuted.value = false)
         : el
     );
     await toBeAffected.save();
@@ -259,7 +259,7 @@ class CommunityService extends Service {
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     const creator =
       community.moderators[
-        community.moderators.findIndex((el) => el.role === "creator")
+      community.moderators.findIndex((el) => el.role === "creator")
       ];
     var creatorID = undefined;
     if (creator) creatorID = creator.userID;
@@ -740,6 +740,7 @@ class CommunityService extends Service {
   };
   kickModerator = async (subreddit, moderator) => {
     let doc = await this.getOne({ _id: subreddit });
+    console.log(doc.moderators);
     doc.moderators = doc.moderators.filter((el) => el.userID != moderator);
     await doc.save();
   };
