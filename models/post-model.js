@@ -153,26 +153,6 @@ postSchema.post(/^find/, async function (doc, next) {
   next();
 });
 
-postSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: "userID",
-    select: "_id avatar",
-  });
-  this.populate({
-    path: 'communityID',
-    select: 'icon'
-  })
-  next();
-});
-
-// postSchema.pre(/^find/, function (next) {
-//   this.populate({
-//     path: "communityID",
-//     select: "_id",
-//   });
-//   next();
-// });
-
 const Post = mongoose.model("Post", postSchema);
 
 module.exports = Post;

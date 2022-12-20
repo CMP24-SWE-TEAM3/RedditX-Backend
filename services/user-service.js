@@ -59,14 +59,15 @@ class UserService extends Service {
     }
     catch(err){
       return {
-        status:false,
-        error:err
+
+        status: false,
+        error: err
       }
     }
     
     return {
-      status: true,
-    };
+      status: true
+    }
   };
 
   /**
@@ -76,10 +77,10 @@ class UserService extends Service {
    * @function
    */
   getFollowers = async (username) => {
-    const followersUser = await this.getOne({ _id: username }).select(
+    const followers_user = await this.getOne({ _id: username }).select(
       "followers"
     );
-    const followersIds = followersUser.followers;
+    const followersIds = followers_user.followers;
 
     const followers = await this.find({
       _id: { $in: followersIds },
@@ -213,6 +214,7 @@ class UserService extends Service {
               };
             }
 
+
             await this.updateOne(
               { _id: username },
               { $addToSet: { follows: body.srName } }
@@ -241,12 +243,13 @@ class UserService extends Service {
           return {
             state: false,
             error: "error",
+
           };
         }
         return {
           state: true,
           error: null,
-          avatar: avatar,
+          avatar: avatar
         };
       }
     } else if (id === "t5") {
@@ -310,7 +313,9 @@ class UserService extends Service {
             await this.updateOne(
               { _id: username },
               {
-                member: memUser,
+
+                member: memUser
+
               }
             );
             memCnt++;
@@ -328,10 +333,11 @@ class UserService extends Service {
             await communityServiceInstance.updateOne(
               { _id: body.srName },
               {
+
                 members: memCom,
                 membersCnt: memCnt,
                 joinedPerDay: joinedPerDay,
-                joinedPerMonth: joinedPerMonth,
+                joinedPerMonth: joinedPerMonth
               }
             );
           } else {
@@ -345,6 +351,7 @@ class UserService extends Service {
             leftPerMonth[monthIndex]++;
             memCnt--;
             var memIndex = -1;
+            console.log(memCom);
             for (let x = 0; x < memCom.length; x++) {
               if (memCom[x].userID === username) {
                 memIndex = x;
@@ -358,12 +365,7 @@ class UserService extends Service {
 
             await communityServiceInstance.updateOne(
               { _id: body.srName },
-              {
-                members: memCom,
-                membersCnt: memCnt,
-                leftPerDay: leftPerDay,
-                leftPerMonth: leftPerMonth,
-              }
+              { members: memCom, membersCnt: memCnt, leftPerDay: leftPerDay, leftPerMonth: leftPerMonth }
             );
           }
         } catch (err) {
@@ -961,5 +963,35 @@ class UserService extends Service {
       await user.save();
     }
   };
+  addFriend = async (username, friend) => {
+    await this.updateOne({ _id: username }, {
+      $addToSet: {
+        friendRequestFromMe: friend,
+      }
+    });
+    await this.updateOne({ _id: friend }, {
+      $addToSet: {
+        friendRequestToMe: username,
+      }
+    });
+  }
+
+  deleteFriend = async (username, friend) => {
+    await this.updateOne({ _id: username }, {
+      $pull: {
+        friend: friend
+      }
+    })
+  }
+  isCreatorInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ "_id": user, "select": 'moderators' })).moderators;
+    subreddits = subreddits.filter(el => el.role == 'creator').map(el => el.communityId);
+    return subreddits.includes(subreddit);
+  }
+  kickModerator = async (subreddit, user) => {
+    let doc = await this.getOne({ _id: user });
+    doc.moderators = doc.moderators.filter(el => el.communityId != subreddit);
+    await doc.save();
+  }
 }
 module.exports = UserService;
