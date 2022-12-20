@@ -36,11 +36,7 @@ router.get("/:username/submitted", profileController.getUserSubmitted);
 router.get("/:username/overview", profileController.getUserOverview);
 router.get("/:username/upvoted", profileController.getUserUpVoted);
 router.get("/:username/downvoted", profileController.getUserDownVoted);
-
-
-router.get("/:username/userMentions", profileController.getUserMentions);
-router.get("/:username/userCommentReplies", profileController.getUserCommentReplies);
-router.get("/:username/userSelfReply", profileController.getUserSelfReply);
+router.get("/get-user-mentions", profileController.getUserMentions);
 
 
 

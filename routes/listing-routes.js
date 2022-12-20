@@ -14,16 +14,18 @@ router
   .route("/posts/:criteria")
   .get(possibleAuthCheck, listingController.getPosts);
   router.post("/edit-user-text", listingController.editUserText);
-router.post("/addcomment", authCheck, listingController.addComment);
-router.post("/addreply", authCheck, listingController.addReply);
+router.post("/comment", authCheck, listingController.addComment);
+router.post("/reply", authCheck, listingController.addReply);
 router.post("/save", authCheck, listingController.save);
 router.post("/unsave", authCheck, listingController.unsave);
 router.post("/hide", authCheck, listingController.hide);
 router.post("/unhide", authCheck, listingController.unhide);
-router.post("/lock", authCheck, listingController.markLocked);
-router.post("/unlock", authCheck, listingController.markUnLocked);
+router.post("/:subreddit/lock", authCheck, listingController.markLocked);
+router.post("/:subreddit/unlock", authCheck, listingController.markUnLocked);
 router.post("/del", authCheck, listingController.deleteLink);
 router.post("/vote", authCheck, listingController.vote);
+router.get("/get-post-replies", listingController.getUserSelfReply);
+router.get("/get-comment-replies", listingController.getUserCommentReplies);
 router.post(
   "/submit",
   authCheck,

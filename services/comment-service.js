@@ -84,10 +84,13 @@ class CommentService extends Service {
     }
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newComment = new Comment({
-      text: data.text,
+      textHTML: data.textHTML,
+      textJSON: data.textJSON,
       isRoot: true,
       authorId: username,
       replyingTo: data.postID,
+      postID: data.postID,
+      communityID: post.communityID,
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newComment.save();
@@ -114,10 +117,13 @@ class CommentService extends Service {
     const comment = await Comment.findById({ _id: data.commentID });
     if (!user) throw new AppError("This user doesn't exist!", 404);
     const newReply = new Comment({
-      text: data.text,
+      textHTML: data.textHTML,
+      textJSON: data.textJSON,
       isRoot: false,
       authorId: username,
       replyingTo: data.commentID,
+      postID: comment.postID,
+      communityID: comment.communityID,
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newReply.save();

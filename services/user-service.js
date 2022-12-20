@@ -12,6 +12,7 @@ const AuthService = require("./../services/auth-service");
 var authServiceInstance = new AuthService(User);
 const CommunityService = require("./../services/community-service");
 const { doc } = require("prettier");
+const { query } = require("express");
 var communityServiceInstance = new CommunityService(Community);
 
 /**
@@ -439,13 +440,9 @@ class UserService extends Service {
    * @returns {Array} Comments
    * @function
    */
-  userComments = async (username, query) => {
+  userComments = async (username) => {
     const user = await this.findById(username, "hasComment");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
     var comments = [];
     user.hasComment.forEach((el) => {
       comments.push(el);
@@ -465,13 +462,9 @@ class UserService extends Service {
    * @returns {Array} Comments
    * @function
    */
-  userCommentReplies = async (username, query) => {
+  userCommentReplies = async (username) => {
     const comment = await this.findById(username, "replies");
     if (!comment) throw new AppError("This comment doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
     var replies = [];
     comment.replies.forEach((el) => {
       replies.push(el);
@@ -492,13 +485,10 @@ class UserService extends Service {
    * @returns {object} comments
    * @function
    */
-  userSelfReply = async (username, query) => {
+  userSelfReply = async (username) => {
     const post = await this.findById(username, "postComments");
     if (!post) throw new AppError("This post doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
+
     var comments = [];
     post.postComments.forEach((el) => {
       comments.push(el);
@@ -520,13 +510,10 @@ class UserService extends Service {
    * @returns {Array} posts
    * @function
    */
-  userSubmitted = async (username, query) => {
+  userSubmitted = async (username) => {
     const user = await this.findById(username, "hasPost");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
+    
     var posts = [];
     user.hasPost.forEach((el) => {
       posts.push(el);
@@ -546,22 +533,18 @@ class UserService extends Service {
    * @returns {object} downVotes
    * @function
    */
-  userDownVoted = async (username, query) => {
+  userDownVoted = async (username,query) => {
     const user = await this.findById(username, "hasVote");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
     var downVotes = [];
     user.hasVote.forEach((el) => {
       if (el.type === -1) {
         downVotes.push(el.postID);
       }
     });
-    const cursor = Post.find({
-      _id: { $in: downVotes },
-    });
+    const cursor = postSe.getAll({
+      _id: { $in: downVotes }
+    },query);
     var returnPosts = [];
     for await (const doc of cursor) {
       returnPosts.push(doc);
@@ -574,7 +557,7 @@ class UserService extends Service {
    * @returns {object} upVotes
    * @function
    */
-  userUpVoted = async (username, query) => {
+  userUpVoted = async (username) => {
     const user = await this.findById(username, "hasVote");
     if (!user) throw new AppError("This user doesn't exist!", 404);
     console.log(user);
@@ -605,14 +588,9 @@ class UserService extends Service {
    * @returns {object} mentions
    * @function
    */
-  userMentions = async (username, query) => {
+  userMentions = async (username) => {
     const user = await this.findById(username, "mentionedInPosts");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    console.log(user);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
     //console.log(user);
 
     const cursor = Post.find({
@@ -631,16 +609,9 @@ class UserService extends Service {
    * @returns {object} saved posts
    * @function
    */
-  userSavedPosts = async (username, query) => {
+  userSavedPosts = async (username) => {
     const user = await this.findById(username, "savedPosts");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    console.log(user);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
-    //console.log(user);
-
     const cursor = Post.find({
       _id: { $in: user.savedPosts },
     });
@@ -657,9 +628,11 @@ class UserService extends Service {
  * @returns {object} user
  */
 userAbout=async(username)=>{
-  const user = await User.findById(username);
+  const user = await this.findById(username);
+  if (!user) throw new AppError("This user doesn't exist!", 404);
    if (user) {
    const obj={ 
+     followersCount:user.followers.length,
      prefShowTrending: user.aboutReturn.prefShowTrending,
      isBlocked: user.aboutReturn.isBlocked,
      isBanned: user.member.isBanned,
@@ -696,10 +669,11 @@ userAbout=async(username)=>{
  * @returns {object} user
  */
 userMe=async(username)=>{
-  const user = await User.findById(username);
+  const user = await this.findById(username);
+  if (!user) throw new AppError("This user doesn't exist!", 404);
   if (user) {
   const obj={ 
-  numComments: user.prefs.commentsNum,
+  numComments:user.prefs.commentsNum,
   threadedMessages: user.prefs.threadedMessages,
   showLinkFlair: user.prefs.showLinkFlair,
   countryCode: user.prefs.countryCode,
@@ -741,17 +715,17 @@ else {
  * @returns {object} user
  */
 userPrefs=async(username)=>{
-  const user = await User.findById(username);
-  if (user) {
+  const user = await this.findById(username);
+  if (!user) throw new AppError("This user doesn't exist!", 404);
+  const prefs=await this.getOne({_id:username}).select("prefs");
+  if (prefs) {
     return {
-      test:true,
-      user: user.prefs,
+      userPrefs: prefs,
     };
   }
   else {
     return {
-      test:false,
-      user: null,
+      userPrefs: null,
     };
   }
 };

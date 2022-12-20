@@ -16,42 +16,43 @@ var commentServiceInstance = new CommentService(Comment);
 
 /**
  * Update user text
- * @param {function} (req, res)
+ * @param {function} (req, res, next)
  * @returns {object} res
  */
- const editUserText = async (req, res) => {
+const editUserText = catchAsync(async (req, res, next) => {
   if (!req.body.linkID || !req.body.text)
     return res.status(400).json({
       response: "invaild parameters",
     });
-    if (req.body.linkID[1] === "3"){
-  const results = await postServiceInstance.updateOne(
+  if (req.body.linkID[1] === "3"){
+  var results = undefined;
+  try {
+     results = await postServiceInstance.updateOne(
     { _id: req.body.linkID},
     { text: req.body.text},
     { editedAt: Date.now()}
   );
-  if (!results)
-    return res.status(400).json({
-      response: "error",
-    });
-  return res.status(200).json({
+  } catch (err) {
+    return next(err);
+  }
+ return res.status(200).json({
     response: results,
-  });}
-  else if (req.body.linkID[1] === "1") {
-    const results = await commentServiceInstance.updateOne(
+  });
+}else if (req.body.linkID[1] === "1") {
+  try {
+      results = await commentServiceInstance.updateOne(
       { _id: req.body.linkID},
       { text: req.body.text},
       { editedAt: Date.now()}
     );
-    if (!results)
-      return res.status(400).json({
-        response: "error",
-      });
-    return res.status(200).json({
+  } catch (err) {
+    return next(err);
+  }
+   return res.status(200).json({
       response: results,
     });
-  }
-};
+}
+});
 /**
  * User delete a link
  * @param {function} (req, res, next)
@@ -370,6 +371,42 @@ const getPostInsights = catchAsync(async (req, res) => {
     postInsightsCnt,
   });
 });
+/**
+* Get comments on posts of the user 
+* @param {function} (req, res)
+* @returns {object} res
+*/
+const getUserSelfReply = catchAsync(async (req, res, next) => {
+  try {
+    var comments = await userServiceInstance.userSelfReply(
+      req.username,
+      req.query
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    comments
+  });
+});
+/**
+* Get user comment replies
+* @param {function} (req, res)
+* @returns {object} res
+*/
+const getUserCommentReplies = catchAsync(async (req, res, next) => {
+try {
+  var comments= await userServiceInstance.userCommentReplies(
+    req.username,
+    req.query
+  );
+} catch (err) {
+  return next(err);
+}
+res.status(200).json({
+  comments
+});
+});
 
 module.exports = {
   submit,
@@ -380,6 +417,8 @@ module.exports = {
   getPosts,
   getPostInsights,
   vote,
+  getUserCommentReplies,
+  getUserSelfReply,
   editUserText,
   hide,
   unhide,

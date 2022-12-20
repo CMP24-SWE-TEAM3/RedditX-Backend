@@ -1141,3 +1141,52 @@ describe("testing getStats service in community service class", () => {
     });
   });
 });
+////////////////////////////////////////////////
+describe("testing markAsSpoiler service in community service class", () => {
+  describe("given a subreddit", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        members: [
+          {
+            userID: "t2_hamada",
+            isBanned: {
+              value: true,
+              date: "2022-12-09T19:16:16.443Z",
+            },
+            isMuted: {
+              value: false,
+            },
+          },
+          {
+            userID: "t2_moazMohamed",
+            isBanned: {
+              value: false,
+            },
+            isMuted: {
+              value: false,
+            },
+          },
+        ],
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      const { memberIDs, isBannedAndMuted } =
+        await communityServiceInstance.getMembers(community);
+      expect(memberIDs[0]).toBe("t2_hamada");
+      expect(isBannedAndMuted[0].isBanned.value).toBe(true);
+    });
+  });
+  describe("given an undefined subreddit", () => {
+    test("should throw an error", async () => {
+      const community = undefined;
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      expect(
+        communityServiceInstance.getMembers(community)
+      ).rejects.toThrowError();
+    });
+  });
+});

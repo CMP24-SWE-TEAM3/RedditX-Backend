@@ -6,52 +6,17 @@ const UserService = require("./../services/user-service");
 var userServiceInstance = new UserService(User);
 
  /**
-* Get comments on posts of the user 
-* @param {function} (req, res)
-* @returns {object} res
-*/
-  const getUserSelfReply = catchAsync(async (req, res, next) => {
-    try {
-      var comments = await userServiceInstance.userSelfReply(
-        req.params.username,
-        req.query
-      );
-    } catch (err) {
-      return next(err);
-    }
-    res.status(200).json({
-      comments
-    });
-  });
- /**
- * Get user comment replies
- * @param {function} (req, res)
- * @returns {object} res
- */
-const getUserCommentReplies = catchAsync(async (req, res, next) => {
-  try {
-    var comments= await userServiceInstance.userCommentReplies(
-      req.params.username,
-      req.query
-    );
-  } catch (err) {
-    return next(err);
-  }
-  res.status(200).json({
-    comments
-  });
-});
- /**
  * Get user comments
  * @param {function} (req, res)
  * @returns {object} res
  */
 const getUserComments = catchAsync(async (req, res, next) => {
   try {
-    var comments = await userServiceInstance.userComments(
-      req.params.username,
-      req.query
-    );
+    const{page=1,limit=10}=req.query;
+    var comments = await userServiceInstance
+    .userComments(req.params.username)
+    .limit(limit*1)
+    .skip((page-1)*limit);
 
   } catch (err) {
     return next(err);
@@ -67,10 +32,11 @@ const getUserComments = catchAsync(async (req, res, next) => {
  */
  const getUserUpVoted = catchAsync(async (req, res, next) => {
   try {
-    var posts = await userServiceInstance.userUpVoted(
-      req.params.username,
-      req.query
-    );
+    const{page=1,limit=10}=req.query;
+    var posts = await userServiceInstance
+    .userUpVoted(req.params.username)
+    .limit(limit*1)
+    .skip((page-1)*limit);
   } catch (err) {
     return next(err);
   }
@@ -85,10 +51,8 @@ const getUserComments = catchAsync(async (req, res, next) => {
  */
  const getUserDownVoted = catchAsync(async (req, res, next) => {
   try {
-    var posts = await userServiceInstance.userDownVoted(
-      req.params.username,
-      req.query
-    );
+    var posts = await userServiceInstance
+    .userDownVoted(req.params.username,req.query);
 
   } catch (err) {
     return next(err);
@@ -103,19 +67,16 @@ const getUserComments = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
  const getUserSubmitted = catchAsync(async (req, res, next) => {
-  console.log(req.params);
-  var posts;
+  
   try {
-
-     posts = await userServiceInstance.userSubmitted(
-
-      req.params.username,
-      req.query
-    );
+    const{page=1,limit=10}=req.query;
+    var posts = await userServiceInstance
+    .userSubmitted(req.params.username)
+    .limit(limit*1)
+    .skip((page-1)*limit);
   } catch (err) {
     return next(err);
   }
-  console.log(posts);
   res.status(200).json({
     posts
   });
@@ -127,10 +88,11 @@ const getUserComments = catchAsync(async (req, res, next) => {
    */
      const getUserMentions = catchAsync(async (req, res, next) => {
       try {
-        var posts  = await userServiceInstance.userMentions(
-          req.params.username,
-          req.query
-        );
+        const{page=1,limit=10}=req.query;
+        var posts  = await userServiceInstance
+        .userMentions(req.username)
+        .limit(limit*1)
+        .skip((page-1)*limit);
       } catch (err) {
         return next(err);
       }
@@ -194,8 +156,6 @@ const getUserOverview = catchAsync(async (req, res, next) => {
         getUserOverview,
         getUserUpVoted,
         getUserMentions,
-        getUserCommentReplies,
-        getUserSelfReply,
         getUserSubmitted,
         getUserComments
     };

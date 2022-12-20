@@ -3,8 +3,6 @@ const AppError = require("../utils/app-error");
 const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
-const Comment = require("./../models/comment-model");
-const Post = require("./../models/post-model");
 const User = require("./../models/user-model");
 
 const CommunityService = require("./../services/community-service");

@@ -91,3 +91,27 @@ describe("testing saveSpammedComment service in comment service class", () => {
     });
   });
 });
+////////////////////////////////////////////
+describe("testing deleteComment service in post service class", () => {
+  describe("given a comment", () => {
+    test("should not throw an error", async () => {
+      const comment = new Comment({
+        _id: "4564",
+        text: "hdfhdfh",
+      });
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        commentServiceInstance.deleteComment(comment)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an invalid linkID", () => {
+    test("should throw an error", async () => {
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        commentServiceInstance.deleteComment(undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+////////////////////////////////////////////////
