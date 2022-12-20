@@ -539,7 +539,7 @@ const getCommunityAbout = async (req, res) => {
     req.params["subreddit"]
   );
   console.log(result);
-  if (result.status) {
+  if (result.state) {
     return res.status(500).json({
       status: result.error,
     });
@@ -778,10 +778,9 @@ const deleteFlair = catchAsync(async (req, res) => {
     _id: req.params.subreddit,
   });
 
-  document.flairList = document.flairList.filter((el) => {
-    el._id != req.body.id;
-  });
+  document.flairList = document.flairList.filter((el) => el._id != req.body.id);
   await document.save();
+
   res.status(200).json({
     status: "succeeded",
   });

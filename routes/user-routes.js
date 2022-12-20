@@ -28,6 +28,8 @@ router.post("/me/interests", authCheck, userController.addInterests);
 router.post("/block-user", authCheck, userController.block);
 router.post("/spam", authCheck, userController.spam);
 
+router.post("/getFollowers", authCheck, userController.getFollowersOfUser);
+
 router.post("/update-email", possibleAuthCheck, userController.updateEmail);
 
 router.get("/:username/comments", profileController.getUserComments);
