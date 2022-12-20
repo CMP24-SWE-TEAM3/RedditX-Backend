@@ -93,7 +93,7 @@ class CommunityService extends Service {
       throw new AppError("No category specified!", 400);
     const category = query.category;
     delete query.category;
-    query.fields = "icon,description,category,_id";
+    query.fields = "icon,description,category,_id,membersCnt,rank";
     if (!query.limit) query.limit = 10; // limit one page to 10 communities
     const communities = await this.getAll(
       {
