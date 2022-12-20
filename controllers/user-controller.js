@@ -11,12 +11,14 @@ const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
 const NotificationService = require("../services/notification-service");
+const PushNotificationService=require("../services/push-notifications-service");
 
 const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
 const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
 const notificationServiceInstance = new NotificationService(Notification);
+var pushNotificationServiceInstance=new PushNotificationService();
 
 /**
  * Get user followers
@@ -432,6 +434,19 @@ const subscribe = async (req, res) => {
           status: "Error happened while saving notification in db",
         });
       }
+       //push notiication
+       const fcm_token_user=await userServiceInstance.getOne({ _id:req.body.srName ,
+        select: "_id fcmToken"});
+        console.log(fcm_token_user);
+      var fcmToken=fcm_token_user.fcmToken;
+      console.log(fcmToken);
+      const pushResult=await pushNotificationServiceInstance.newFollowerNotification(fcmToken,req.username);
+      if(!pushResult.status){
+        return res.status(500).json({
+          "status":"Cannot push notification"
+        })
+      }
+
     }
     return res.status(200).json({
       status: "done",
