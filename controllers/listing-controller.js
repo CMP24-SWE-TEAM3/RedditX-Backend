@@ -39,7 +39,7 @@ const editUserText = async (req, res, next) => {
     });
     if (!post || !post.userID)
       return next(new AppError("This post is not found!", 404));
-    if (post.userID._id !== req.username)
+    if (post.userID !== req.username)
       return next(new AppError("You are not the author of this post!", 400));
     const results = await postServiceInstance.updateOne(
       { _id: linkID.slice(3) },
@@ -349,7 +349,7 @@ const vote = async (req, res) => {
         }
         const saveToUser = await userServiceInstance.saveNOtificationOfUser(
           notificationSaver.id,
-          post.userID._id
+          post.userID
         );
         if (!saveToUser.status) {
           return res.status(404).json({

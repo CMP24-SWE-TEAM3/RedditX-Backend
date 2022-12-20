@@ -288,7 +288,7 @@ const spam = catchAsync(async (req, res, next) => {
         req.username
       );
       community = await communityServiceInstance.getOne({
-        _id: comment.communityID,
+        _id: comment.communityID._id,
         select: "communityOptions",
       });
       await commentServiceInstance.saveSpammedComment(comment, community);

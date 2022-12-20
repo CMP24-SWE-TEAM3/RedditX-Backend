@@ -927,7 +927,7 @@ const removeLink = catchAsync(async (req, res) => {
     communityID: req.body.communityID,
   });
   if (
-    !(comment && comment.replyingTo.communityID == req.body.communityID) &&
+    !(comment && comment.replyingTo.communityID._id == req.body.communityID) &&
     !post
   ) {
     return res.status(404).json({

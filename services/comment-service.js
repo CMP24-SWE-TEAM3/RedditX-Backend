@@ -122,7 +122,7 @@ class CommentService extends Service {
       authorId: username,
       replyingTo: data.commentID,
       postID: comment.postID,
-      communityID: comment.communityID,
+      communityID: comment.communityID._id,
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newReply.save();
