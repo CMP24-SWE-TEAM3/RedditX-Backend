@@ -52,7 +52,7 @@ class NotificationService extends Service {
   };
 
   /**
-   * Deletes or marks as read a notification from his notifications list
+   * Deletes or marks as read notification from his notifications list
    * @param {string} notificationID
    * @param {object} user
    * @param {string} type
