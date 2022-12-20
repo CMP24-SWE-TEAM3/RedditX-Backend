@@ -65,7 +65,15 @@ class PostService extends Service {
         $or: [{ textHTML: { $regex: searchQuery, $options: "i" } }],
       },
       query
-    );
+    )
+      .populate({
+        path: "userID",
+        select: "_id avatar",
+      })
+      .populate({
+        path: "communityID",
+        select: "_id icon",
+      });
   };
 
   /**

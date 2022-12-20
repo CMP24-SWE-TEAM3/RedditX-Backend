@@ -158,7 +158,9 @@ const getSpecificCategory = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const getRandomCommunities = async (req, res) => {
-  const communities = await communityServiceInstance.getRandomCommunities(req.query);
+  const communities = await communityServiceInstance.getRandomCommunities(
+    req.query
+  );
   return res.status(200).json({
     communities: communities,
   });
@@ -283,10 +285,19 @@ const getEdited = catchAsync(async (req, res, next) => {
       return next(
         new AppError("You are not a moderator in this subreddit!", 400)
       );
-    posts = await postServiceInstance.getAll(
-      { communityID: req.params.subreddit, editedAt: { $exists: true } },
-      { sort: "-editedAt -createdAt" }
-    );
+    posts = await postServiceInstance
+      .getAll(
+        { communityID: req.params.subreddit, editedAt: { $exists: true } },
+        { sort: "-editedAt -createdAt" }
+      )
+      .populate({
+        path: "userID",
+        select: "_id avatar",
+      })
+      .populate({
+        path: "communityID",
+        select: "_id icon",
+      });
     comments = await commentServiceInstance.getAll(
       { communityID: req.params.subreddit, editedAt: { $exists: true } },
       { sort: "-editedAt -createdAt" }
@@ -320,13 +331,22 @@ const getSpammed = catchAsync(async (req, res, next) => {
       return next(
         new AppError("You are not a moderator in this subreddit!", 400)
       );
-    posts = await postServiceInstance.getAll(
-      {
-        communityID: req.params.subreddit,
-        spammers: { $exists: true, $ne: [] },
-      },
-      { sort: "-createdAt" }
-    );
+    posts = await postServiceInstance
+      .getAll(
+        {
+          communityID: req.params.subreddit,
+          spammers: { $exists: true, $ne: [] },
+        },
+        { sort: "-createdAt" }
+      )
+      .populate({
+        path: "userID",
+        select: "_id avatar",
+      })
+      .populate({
+        path: "communityID",
+        select: "_id icon",
+      });
     comments = await commentServiceInstance.getAll(
       { communityID: req.params.subreddit, spams: { $exists: true, $ne: [] } },
       { sort: "-createdAt" }
@@ -560,7 +580,16 @@ const getGeneralInfo = catchAsync(async (req, res, next) => {
         prepend === 1 // t1_ => Comment
           ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
           : prepend === 3 // t3_ => Post
-          ? await postServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+          ? await postServiceInstance
+              .getOne({ _id: thingsIDs[i].slice(3) })
+              .populate({
+                path: "userID",
+                select: "_id avatar",
+              })
+              .populate({
+                path: "communityID",
+                select: "_id icon",
+              })
           : prepend === 5 // t5_ => Community
           ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
           : undefined;
