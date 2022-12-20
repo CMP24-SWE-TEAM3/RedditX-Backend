@@ -6,7 +6,6 @@ const User = require("../models/user-model");
 const Notification = require("../models/notification-model");
 
 const PostService = require("./../services/post-service");
-const PushNotificationService=require("../services/push-notifications-service");
 // const CommentService = require("./../services/comment-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
@@ -15,7 +14,6 @@ const NotificationService = require("../services/notification-service");
 const AppError = require("../utils/app-error");
 var postServiceInstance = new PostService(Post);
 var notificationServiceInstance = new NotificationService(Notification);
-var pushNotificationServiceInstance=new PushNotificationService();
 // var commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
