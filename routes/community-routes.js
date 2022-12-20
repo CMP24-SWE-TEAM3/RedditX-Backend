@@ -154,7 +154,7 @@ router.route("/approve").post(authCheck, communityController.approveLink);
 router.route("/remove").post(authCheck, communityController.removeLink);
 
 router
-  .route("/kick-moderator")
+  .route("/:subreddit/kick-moderator")
   .post(authCheck, communityController.kickModerator);
 
 module.exports = router;

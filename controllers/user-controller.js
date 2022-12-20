@@ -32,10 +32,10 @@ const followers = async (req, res) => {
     });
   }
   const result = await userServiceInstance.getFollowers(req.username);
-  if(!result.status){
+  if (!result.status) {
     return res.status(500).json({
-      status:"operation failed"
-    })
+      status: "operation failed",
+    });
   }
   return res.status(200).json({
     response: "done",
@@ -62,44 +62,42 @@ const following = async (req, res, next) => {
   });
 };
 
-
 /**
  * Edit profile
  * @param {function} (req, res)
  * @returns {object} res
  */
 const editProfile = async (req, res) => {
-  console.log(req.username);
-  if (!req.username || !req.body.type==="showActiveCommunities"||!req.body.type==="showActiveCommunities"||!req.body.type==="contentVisibility") {
+  if (
+    !req.username ||
+    !req.body.type === "showActiveCommunities" ||
+    !req.body.type === "showActiveCommunities" ||
+    !req.body.type === "contentVisibility"
+  ) {
     return res.status(500).json({
       response: "error providing username",
     });
   }
-  const user = await userServiceInstance.getOne({_id:req.username});
-  if(!user){
+  const user = await userServiceInstance.getOne({ _id: req.username });
+  if (!user) {
     return res.status(404).json({
-      status:"user is not found"
-    })
+      status: "user is not found",
+    });
   }
-  var attrType2= req.body.type;
-  var value=req.body.value;
-  if(attrType2==="about"){
-    user.about=value;
-  }
-  else if(attrType2==="showActiveCommunities"){
-    user.showActiveCommunities=value;
-  }
-  else{
-    user.contentVisibility=value;
+  var attrType2 = req.body.type;
+  var value = req.body.value;
+  if (attrType2 === "about") {
+    user.about = value;
+  } else if (attrType2 === "showActiveCommunities") {
+    user.showActiveCommunities = value;
+  } else {
+    user.contentVisibility = value;
   }
   user.save();
- 
 
-  
-    return res.status(200).json({
-      response: "updated successfully",
-    });
- 
+  return res.status(200).json({
+    response: "updated successfully",
+  });
 };
 
 /**
@@ -108,7 +106,6 @@ const editProfile = async (req, res) => {
  * @returns {object} res
  */
 const getInterests = async (req, res) => {
-  console.log(req.username);
   if (!req.username) {
     return res.status(500).json({
       response: "error providing username",
@@ -134,7 +131,6 @@ const getInterests = async (req, res) => {
  * @returns {object} res
  */
 const addInterests = async (req, res) => {
-  console.log(req.username);
   if (!req.username || !req.body.categories) {
     return res.status(500).json({
       response: "error providing username",
@@ -164,21 +160,17 @@ const editUserPrefs = catchAsync(async (req, res, next) => {
   try {
     const user = await userServiceInstance.findById(req.username);
     if (user) {
-      type=req.body.type;
-      value=req.body.value;
-      prefs=user.prefs;
-      prefs.type=value;
+      var value = req.body.value;
+      var prefs = user.prefs;
+      prefs.type = value;
       results = await userServiceInstance.updateOne(
-       {_id:req.username},
-       {prefs : prefs}
-
-       
+        { _id: req.username },
+        { prefs: prefs }
       );
-    }
-    else{
+    } else {
       return res.status(404).json({
-        status:"user is not found"
-      })
+        status: "user is not found",
+      });
     }
   } catch (err) {
     return next(err);
@@ -389,18 +381,18 @@ const returnResponse = (res, obj, statusCode) => {
  * @param {function} (req,res)
  * @returns {object} res
  */
-const getFollowersOfUser=async(req,res)=>{
-  const result=await userServiceInstance.getFollowersOfUser(req.body.userID);
-  if(!result.status){
+const getFollowersOfUser = async (req, res) => {
+  const result = await userServiceInstance.getFollowersOfUser(req.body.userID);
+  if (!result.status) {
     return res.status(500).json({
-      status:"operation failed"
-    })
+      status: "operation failed",
+    });
   }
   return res.status(200).json({
     response: "done",
     followers: result.followers,
   });
-}
+};
 
 /**
  * Subscribe to a subreddit or a redditor
@@ -458,12 +450,12 @@ const subscribe = async (req, res) => {
   }
 };
 
-const friendRequest = catchAsync(async (req, res, next) => {
+const friendRequest = catchAsync(async (req, res) => {
   if (req.body.type === "friend") {
     userServiceInstance.addFriend(req.username, req.body.userID);
   } else if (req.body.type === "moderator_invite") {
     //[1]-> check the existence of the moderator
-    subreddit = await communityServiceInstance.availableSubreddit(
+    var subreddit = await communityServiceInstance.availableSubreddit(
       req.body.communityID
     );
     if (subreddit.state) {
@@ -511,12 +503,12 @@ const friendRequest = catchAsync(async (req, res, next) => {
   });
 });
 
-const unFriendRequest = catchAsync(async (req, res, next) => {
+const unFriendRequest = catchAsync(async (req, res) => {
   if (req.body.type === "friend") {
     userServiceInstance.deleteFriend(req.username, req.body.userID);
   } else if (req.body.type === "moderator_deinvite") {
     //[1]-> check the existence of the moderator
-    subreddit = await communityServiceInstance.availableSubreddit(
+    var subreddit = await communityServiceInstance.availableSubreddit(
       req.body.communityID
     );
     if (subreddit.state) {
@@ -561,7 +553,7 @@ const unFriendRequest = catchAsync(async (req, res, next) => {
   });
 });
 
-const getAllFriends = catchAsync(async (req, res, next) => {
+const getAllFriends = catchAsync(async (req, res) => {
   const friends = await userServiceInstance.getOne({
     _id: req.username,
     select: "-_id friend",
@@ -683,7 +675,7 @@ const leaveModeratorOfSubredddit = catchAsync(async (req, res) => {
   });
 });
 
-const getUserInfo = catchAsync(async (req, res, next) => {
+const getUserInfo = catchAsync(async (req, res) => {
   const user = await userServiceInstance.getOne({
     _id: req.params.username,
     select: "avatar _id about",
@@ -726,5 +718,6 @@ module.exports = {
   getInterests,
   addInterests,
   getUserInfo,
-  editProfile
+  editProfile,
+  unFriendRequest,
 };

@@ -56,4 +56,5 @@ router
   .get(authCheck, userController.getUserInfo);
 
 router.route("/friend").post(authCheck, userController.friendRequest);
+router.route("/unfriend").post(authCheck, userController.unFriendRequest);
 module.exports = router;
