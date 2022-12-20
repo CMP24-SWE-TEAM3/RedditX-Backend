@@ -220,6 +220,43 @@ const addComment = catchAsync(async (req, res, next) => {
       req.body,
       req.username
     );
+    //notification part
+       const user = await userServiceInstance.getOne({ _id: req.username });
+        const notificationSaver =
+          await notificationServiceInstance.createReplyToPostNotification(
+            req.username,
+            user
+          );
+        if (!notificationSaver.status) {
+          return res.status(404).json({
+            status: "Error happened while saving notification in db",
+          });
+        }
+        const saveToUser = await userServiceInstance.saveNOtificationOfUser(
+          notificationSaver.id,
+          newComment.authorId
+        );
+        if (!saveToUser.status) {
+          return res.status(404).json({
+            status: "Error happened while saving notification in user db",
+          });
+        }
+        console.log(newComment);
+        //push notiication
+        const fcm_token_user=await userServiceInstance.getOne({ _id:newComment.authorId ,
+          select: "_id fcmToken"});
+          console.log(fcm_token_user);
+        var fcmToken=fcm_token_user.fcmToken;
+        console.log(fcmToken);
+        const pushResult=await pushNotificationServiceInstance.replytoPostNotification(fcmToken,req.username,newComment._id,newComment.postID);
+        if(!pushResult.status){
+          return res.status(500).json({
+            "status":"Cannot push notification"
+          })
+        }
+
+
+
   } catch (err) {
     return next(err);
   }
@@ -234,6 +271,40 @@ const addReply = catchAsync(async (req, res, next) => {
   let newReply = {};
   try {
     newReply = await commentServiceInstance.addReply(req.body, req.username);
+    //notification part
+    const user = await userServiceInstance.getOne({ _id: req.username });
+    const notificationSaver =
+      await notificationServiceInstance.createReplyToPostNotification(
+        req.username,
+        user
+      );
+    if (!notificationSaver.status) {
+      return res.status(404).json({
+        status: "Error happened while saving notification in db",
+      });
+    }
+    const saveToUser = await userServiceInstance.saveNOtificationOfUser(
+      notificationSaver.id,
+      newReply.authorId
+    );
+    if (!saveToUser.status) {
+      return res.status(404).json({
+        status: "Error happened while saving notification in user db",
+      });
+    }
+    console.log(newReply);
+    //push notiication
+    const fcm_token_user=await userServiceInstance.getOne({ _id:newReply.authorId ,
+      select: "_id fcmToken"});
+      console.log(fcm_token_user);
+    var fcmToken=fcm_token_user.fcmToken;
+    console.log(fcmToken);
+    const pushResult=await pushNotificationServiceInstance.replytoPostNotification(fcmToken,req.username,newReply._id,newReply.replyingTo);
+    if(!pushResult.status){
+      return res.status(500).json({
+        "status":"Cannot push notification"
+      })
+    }
   } catch (err) {
     return next(err);
   }
@@ -344,6 +415,7 @@ const vote = async (req, res) => {
         console.log(fcm_token_user);
         var fcmToken = fcm_token_user.fcmToken;
         console.log(fcmToken);
+
         const pushResult =
           await pushNotificationServiceInstance.upvoteCommentNotification(
             fcmToken,
