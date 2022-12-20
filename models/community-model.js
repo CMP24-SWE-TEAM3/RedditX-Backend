@@ -171,7 +171,7 @@ const communitySchema = mongoose.Schema({
   pageViewsPerMonth: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 6 => december
+  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 11 => december
   joinedPerDay: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0],
@@ -179,7 +179,7 @@ const communitySchema = mongoose.Schema({
   joinedPerMonth: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 6 => december
+  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 11 => december
   leftPerDay: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0],
@@ -187,7 +187,7 @@ const communitySchema = mongoose.Schema({
   leftPerMonth: {
     type: Array,
     default: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 6 => december
+  }, // [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] 0 => january, 11 => december
   flairList: [
     {
       type: flairSchema,
@@ -215,6 +215,20 @@ const communitySchema = mongoose.Schema({
       ref: "User",
     },
   ],
+});
+
+communitySchema.post(/^find/, async function (doc, next) {
+  let filterOfDays = {};
+  let filterOfMonths = {};
+  filterOfDays[`pageViewsPerDay.${new Date().getDay()}`] = 1;
+  filterOfMonths[`pageViewsPerMonth.${new Date().getMonth()}`] = 1;
+  await Community.updateMany(this.getFilter(), {
+    $inc: filterOfDays
+  });
+  await Community.updateMany(this.getFilter(), {
+    $inc: filterOfMonths
+  });
+  next();
 });
 
 const Community = mongoose.model("Community", communitySchema);

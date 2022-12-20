@@ -353,3 +353,77 @@ describe("testing resetForgottenPassword service in user service class", () => {
     });
   });
 });
+
+describe("testing getFollowing service in community service class", () => {
+  describe("given a username", () => {
+    test("should not throw an error", async () => {
+      const user = new User({
+        _id: "t2_nabil",
+        follows: ["t2_moazMohamed", "t2_hamada"],
+      });
+      const follows = [
+        {
+          _id: "t2_moazMohamed",
+          avatar: "default.jpg",
+          about: "blabla",
+        },
+        {
+          _id: "t2_hamada",
+          avatar: "default.jpg",
+          about: "blabla hamada",
+        },
+      ];
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
+      userServiceInstance.getAll = jest.fn().mockReturnValueOnce(follows);
+      const following = await userServiceInstance.getFollowing("t2_nabil");
+      expect(following.following[1].about).toBe("blabla hamada");
+    });
+  });
+  describe("given an undefined username", () => {
+    test("should throw an error", async () => {
+      const user = new User({
+        _id: "t2_nabil",
+        follows: ["t2_moazMohamed", "t2_hamada"],
+      });
+      const follows = [
+        {
+          _id: "t2_moazMohamed",
+          avatar: "default.jpg",
+          about: "blabla",
+        },
+        {
+          _id: "t2_hamada",
+          avatar: "default.jpg",
+          about: "blabla hamada",
+        },
+      ];
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
+      userServiceInstance.find = jest.fn().mockReturnValueOnce(follows);
+      expect(
+        userServiceInstance.getFollowing(undefined)
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a not found user", () => {
+    test("should throw an error", async () => {
+      const user = undefined;
+      const follows = [
+        {
+          _id: "t2_moazMohamed",
+          avatar: "default.jpg",
+          about: "blabla",
+        },
+        {
+          _id: "t2_hamada",
+          avatar: "default.jpg",
+          about: "blabla hamada",
+        },
+      ];
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
+      userServiceInstance.find = jest.fn().mockReturnValueOnce(follows);
+      expect(
+        userServiceInstance.getFollowing("t2_nabil")
+      ).rejects.toThrowError();
+    });
+  });
+});

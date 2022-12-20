@@ -21,6 +21,7 @@ router.patch("/me/prefs", authCheck, userController.editUserPrefs);
 router.get("/me", authCheck, userController.getUserMe);
 router.get("/:username/about", userController.getUserAbout);
 router.get("/me/followers", authCheck, userController.followers);
+router.get("/me/following", authCheck, userController.following);
 router.get("/me/interests", authCheck, userController.getInterests);
 router.post("/me/interests", authCheck, userController.addInterests);
 
@@ -31,32 +32,27 @@ router.post("/getFollowers", authCheck, userController.getFollowersOfUser);
 
 router.post("/update-email", possibleAuthCheck, userController.updateEmail);
 
-
-router.get("/:username/comment", profileController.getUserComments);
+router.get("/:username/comments", profileController.getUserComments);
 router.get("/:username/submitted", profileController.getUserSubmitted);
 router.get("/:username/overview", profileController.getUserOverview);
 router.get("/:username/upvoted", profileController.getUserUpVoted);
 router.get("/:username/downvoted", profileController.getUserDownVoted);
 
-
 router.get("/:username/userMentions", profileController.getUserMentions);
-router.get("/:username/userCommentReplies", profileController.getUserCommentReplies);
+router.get(
+  "/:username/userCommentReplies",
+  profileController.getUserCommentReplies
+);
 router.get("/:username/userSelfReply", profileController.getUserSelfReply);
-
-
 
 router.post("/subscribe", authCheck, userController.subscribe);
 router.post("/update", authCheck, userController.updateInfo);
 
-router
-  .route('/me/friends')
-  .get(authCheck, userController.getAllFriends);
+router.route("/me/friends").get(authCheck, userController.getAllFriends);
 
 router
-  .route('/me/friends/:username')
-  .get(authCheck, userController.getUserInfo)
+  .route("/me/friends/:username")
+  .get(authCheck, userController.getUserInfo);
 
-router
-  .route('/friend')
-  .post(authCheck, userController.friendRequest)
+router.route("/friend").post(authCheck, userController.friendRequest);
 module.exports = router;

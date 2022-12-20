@@ -91,7 +91,7 @@ const postSchema = mongoose.Schema({
   ],
   communityID: {
     type: String,
-    ref: 'Community'
+    ref: "Community",
   },
   userID: {
     type: String,
@@ -128,7 +128,7 @@ postSchema.virtual("hotnessFactor").get(function () {
       this.createdAt().getDay() / 30 +
       this.createdAt.getYear() / 2022) *
       2) /
-    3 +
+      3 +
     this.votesCount +
     this.commentsNum
   );
@@ -140,7 +140,7 @@ postSchema.virtual("bestFactor").get(function () {
       this.createdAt().getDay / 30 +
       this.createdAt.getYear() / 2022) *
       1) /
-    3 +
+      3 +
     this.votesCount +
     this.commentsNum
   );
