@@ -354,13 +354,15 @@ class CommunityService extends Service {
     return { days: community[type1], months: community[type2] };
   };
 
-  getRandomCommunities = async () => {
-    const cursor = Community.find();
-    var communities = [];
-    for await (const doc of cursor) {
-      communities.push(doc);
-    }
-    return communities;
+  getRandomCommunities = async (query) => {
+    query.limit=query.limit||"10";
+    return this.getAll({},query);
+    // const cursor = Community.find();
+    // var communities = [];
+    // for await (const doc of cursor) {
+    //   communities.push(doc);
+    // }
+    // return communities;
   };
   availableSubreddit = async (subreddit) => {
     var subre = await this.getOne({ _id: subreddit });
