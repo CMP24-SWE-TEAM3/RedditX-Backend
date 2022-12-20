@@ -251,12 +251,13 @@ class CommentService extends Service {
       await Post.findByIdAndUpdate(
         { _id: postIdCasted },
         {
+          
           $set: {
             votesCount: votesCount + operation,
             voters: voters,
 
           },
-          { new: true },
+         }, {new: true },
           (err) => {
             if (err) {
               return {
