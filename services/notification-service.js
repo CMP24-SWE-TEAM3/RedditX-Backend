@@ -174,6 +174,46 @@ class NotificationService extends Service {
       id: not._id,
     };
   };
+
+ /**
+   *Creates reply to comment notification
+   * @param {String} senderUsername
+   * @param {Object} user
+   * @return {Object} state
+   * @function
+   */
+   createReplyToCommentNotification = async (senderUsername, user) => {
+    var notification;
+
+    notification = {
+      userIcon: user.avatar,
+      title: "You have a new reply to your comment",
+      type: "upvoteToYourComment",
+      text: "u/" + `${senderUsername} replied on your comment`,
+      sourceThing: senderUsername,
+    };
+    var not;
+
+    try {
+      not = await this.insert(notification);
+    } catch (err) {
+      return {
+        status: false,
+        error: err,
+      };
+    }
+    if (!not) {
+      return {
+        status: false,
+        error: "error happened while inserting in db",
+      };
+    }
+    return {
+      status: true,
+      id: not._id,
+    };
+  };
+
   /**
    *Creates upvote to post notification
    * @param {String} senderUsername
