@@ -654,6 +654,7 @@ class UserService extends Service {
     }
     var downVotes = [];
     user.hasVote.forEach((el) => {
+      console.log(el);
       if (el.type === -1) {
         downVotes.push(el.postID);
       }
@@ -665,6 +666,7 @@ class UserService extends Service {
     for await (const doc of cursor) {
       returnPosts.push(doc);
     }
+
     return returnPosts;
   };
   /**

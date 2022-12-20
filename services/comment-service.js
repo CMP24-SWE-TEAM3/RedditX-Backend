@@ -226,36 +226,38 @@ class CommentService extends Service {
       } else if (dir == 0 || dir == -1) {
         operation = -1;
       }
-      try {
-        if (removeDetector && !addDetector) {
-          await User.findOneAndUpdate(
-            { _id: username },
-            { $pull: { hasVote: { _id: postIdCasted } } }
-          ).clone();
-        } else if (!removeDetector && addDetector) {
-          await User.findOneAndUpdate(
-            { _id: username },
-            { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
-          ).clone();
-        } else if (addDetector && removeDetector) {
-          await User.findOneAndUpdate(
-            { _id: username },
-            { $pull: { hasVote: { _id: postIdCasted } } }
-          );
-          await User.findOneAndUpdate(
-            { _id: username },
-            { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
-          ).clone();
-        }
-        await Post.findByIdAndUpdate(
-          { _id: postIdCasted },
-          {
-            $set: {
-              votesCount: votesCount + operation,
-              voters: voters,
-            },
+
+      try{
+      if (removeDetector && !addDetector) {
+        await User.findOneAndUpdate(
+          { _id: username },
+          { $pull: { hasVote: { postID: postIdCasted } } }
+        ).clone();
+      } else if (!removeDetector && addDetector) {
+        await User.findOneAndUpdate(
+          { _id: username },
+          { $addToSet: { hasVote: { postID: postIdCasted, type: operation } } }
+        ).clone();
+      } else if (addDetector && removeDetector) {
+        await User.findOneAndUpdate(
+          { _id: username },
+          { $pull: { hasVote: { postID: postIdCasted } } }
+        );
+        await User.findOneAndUpdate(
+          { _id: username },
+          { $addToSet: { hasVote: { postID: postIdCasted, type: operation } } }
+        ).clone();
+      }
+      await Post.findByIdAndUpdate(
+        { _id: postIdCasted },
+        {
+          
+          $set: {
+            votesCount: votesCount + operation,
+            voters: voters,
+
           },
-          { new: true },
+         }, {new: true },
           (err) => {
             if (err) {
               return {
@@ -354,27 +356,27 @@ class CommentService extends Service {
         if (removeDetector && !addDetector) {
           await User.findOneAndUpdate(
             { _id: username },
-            { $pull: { votedComments: { _id: postIdCasted } } }
+            { $pull: { votedComments: { commentID: postIdCasted } } }
           ).clone();
         } else if (!removeDetector && addDetector) {
           await User.findOneAndUpdate(
             { _id: username },
             {
               $addToSet: {
-                votedComments: { _id: postIdCasted, type: operation },
+                votedComments: { commentID: postIdCasted, type: operation },
               },
             }
           ).clone();
         } else if (addDetector && removeDetector) {
           await User.findOneAndUpdate(
             { _id: username },
-            { $pull: { votedComments: { _id: postIdCasted } } }
+            { $pull: { votedComments: { commentID: postIdCasted } } }
           );
           await User.findOneAndUpdate(
             { _id: username },
             {
               $addToSet: {
-                votedComments: { _id: postIdCasted, type: operation },
+                votedComments: { commentID: postIdCasted, type: operation },
               },
             }
           ).clone();
