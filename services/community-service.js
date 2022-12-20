@@ -527,7 +527,6 @@ class CommunityService extends Service {
 
   addCommunityRule = async (body, user) => {
     const result = await this.availableSubreddit(body.srName);
-    console.log(result);
     if (result.state) {
       return {
         status: false,
@@ -574,7 +573,6 @@ class CommunityService extends Service {
   };
   editCommunityRule = async (body, user) => {
     const result = await this.availableSubreddit(body.srName);
-    console.log(result);
     if (result.state) {
       return {
         status: false,
@@ -600,7 +598,6 @@ class CommunityService extends Service {
     var ruleIsFound = false;
     var communityRules = result.subreddit.communityRules;
     for (let i = 0; i < communityRules.length; i++) {
-      console.log(communityRules[i]._id.toString());
       if (communityRules[i]._id.toString() == body.rule.id) {
         ruleIsFound = true;
         communityRules[i].title = body.rule.title;
@@ -675,7 +672,6 @@ class CommunityService extends Service {
         response: "subreddit created successfully",
       };
     } catch {
-      console.log("d");
       return {
         errorType: 1,
 

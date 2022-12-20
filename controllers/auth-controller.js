@@ -125,9 +125,6 @@ const resetForgottenPassword = catchAsync(async (req, res, next) => {
   });
 });
 const resetUserPassword = catchAsync(async (req, res, next) => {
-  console.log(req.body);
-  console.log(req.username);
-
   try {
     await authServiceInstance.resetPassword(
       req.username,

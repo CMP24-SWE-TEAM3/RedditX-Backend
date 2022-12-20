@@ -2,35 +2,16 @@ const catchAsync = require("../utils/catch-async");
 const User = require("../models/user-model");
 const UserService = require("./../services/user-service");
 
-
 var userServiceInstance = new UserService(User);
 
- /**
-* Get comments on posts of the user 
-* @param {function} (req, res)
-* @returns {object} res
-*/
-  const getUserSelfReply = catchAsync(async (req, res, next) => {
-    try {
-      var comments = await userServiceInstance.userSelfReply(
-        req.params.username,
-        req.query
-      );
-    } catch (err) {
-      return next(err);
-    }
-    res.status(200).json({
-      comments
-    });
-  });
- /**
- * Get user comment replies
+/**
+ * Get comments on posts of the user
  * @param {function} (req, res)
  * @returns {object} res
  */
-const getUserCommentReplies = catchAsync(async (req, res, next) => {
+const getUserSelfReply = catchAsync(async (req, res, next) => {
   try {
-    var comments= await userServiceInstance.userCommentReplies(
+    var comments = await userServiceInstance.userSelfReply(
       req.params.username,
       req.query
     );
@@ -38,10 +19,28 @@ const getUserCommentReplies = catchAsync(async (req, res, next) => {
     return next(err);
   }
   res.status(200).json({
-    comments
+    comments,
   });
 });
- /**
+/**
+ * Get user comment replies
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const getUserCommentReplies = catchAsync(async (req, res, next) => {
+  try {
+    var comments = await userServiceInstance.userCommentReplies(
+      req.params.username,
+      req.query
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    comments,
+  });
+});
+/**
  * Get user comments
  * @param {function} (req, res)
  * @returns {object} res
@@ -52,12 +51,11 @@ const getUserComments = catchAsync(async (req, res, next) => {
       req.params.username,
       req.query
     );
-
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    comments
+    comments,
   });
 });
 /**
@@ -65,7 +63,7 @@ const getUserComments = catchAsync(async (req, res, next) => {
  * @param {function} (req,res)
  * @returns {object} res
  */
- const getUserUpVoted = catchAsync(async (req, res, next) => {
+const getUserUpVoted = catchAsync(async (req, res, next) => {
   try {
     var posts = await userServiceInstance.userUpVoted(
       req.params.username,
@@ -75,7 +73,7 @@ const getUserComments = catchAsync(async (req, res, next) => {
     return next(err);
   }
   res.status(200).json({
-    posts
+    posts,
   });
 });
 /**
@@ -83,18 +81,17 @@ const getUserComments = catchAsync(async (req, res, next) => {
  * @param {function} (req,res)
  * @returns {object} res
  */
- const getUserDownVoted = catchAsync(async (req, res, next) => {
+const getUserDownVoted = catchAsync(async (req, res, next) => {
   try {
     var posts = await userServiceInstance.userDownVoted(
       req.params.username,
       req.query
     );
-
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    posts
+    posts,
   });
 });
 /**
@@ -102,13 +99,10 @@ const getUserComments = catchAsync(async (req, res, next) => {
  * @param {function} (req, res)
  * @returns {object} res
  */
- const getUserSubmitted = catchAsync(async (req, res, next) => {
-  console.log(req.params);
+const getUserSubmitted = catchAsync(async (req, res, next) => {
   var posts;
   try {
-
-     posts = await userServiceInstance.userSubmitted(
-
+    posts = await userServiceInstance.userSubmitted(
       req.params.username,
       req.query
     );
@@ -116,28 +110,28 @@ const getUserComments = catchAsync(async (req, res, next) => {
     return next(err);
   }
   res.status(200).json({
-    posts
+    posts,
   });
 });
-  /**
-   * Get posts where user is being mentioned in
-   * @param {function} (req,res)
-   * @returns {object} res
-   */
-     const getUserMentions = catchAsync(async (req, res, next) => {
-      try {
-        var posts  = await userServiceInstance.userMentions(
-          req.params.username,
-          req.query
-        );
-      } catch (err) {
-        return next(err);
-      }
-      res.status(200).json({
-        posts
-      });
-    });
-  /**
+/**
+ * Get posts where user is being mentioned in
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const getUserMentions = catchAsync(async (req, res, next) => {
+  try {
+    var posts = await userServiceInstance.userMentions(
+      req.params.username,
+      req.query
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    posts,
+  });
+});
+/**
  * Merge three sorted array in one sorted one
  * @param {Array} (A,B)
  * @returns {Array} D
@@ -157,44 +151,44 @@ function mergeTwo(A, B) {
   while (j < n) D.push(B[j++]);
 
   return D;
-}  
- /**
+}
+/**
 //  * Get user overview
 //  * @param {function} (req, res)
 //  * @returns {object} res
 //  */
 const getUserOverview = catchAsync(async (req, res, next) => {
   let overviewReturn = [];
-    try {
-      var posts = await userServiceInstance.userSubmitted(
-        req.params.username,
-        req.query
-      );
-      var comments= await userServiceInstance.userComments(
-        req.params.username,
-        req.query
-      );
-      var replies = await userServiceInstance.userComments(
-        req.params.username,
-        req.query
-      );
-      let merged = mergeTwo(posts, comments);
-      overviewReturn = mergeTwo(merged, replies);
-    } catch (err) {
-      return next(err);
-    }
-    res.status(200).json({
-      overview: overviewReturn.reverse()
-    });
+  try {
+    var posts = await userServiceInstance.userSubmitted(
+      req.params.username,
+      req.query
+    );
+    var comments = await userServiceInstance.userComments(
+      req.params.username,
+      req.query
+    );
+    var replies = await userServiceInstance.userComments(
+      req.params.username,
+      req.query
+    );
+    let merged = mergeTwo(posts, comments);
+    overviewReturn = mergeTwo(merged, replies);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    overview: overviewReturn.reverse(),
   });
-  
-    module.exports = {
-        getUserDownVoted,
-        getUserOverview,
-        getUserUpVoted,
-        getUserMentions,
-        getUserCommentReplies,
-        getUserSelfReply,
-        getUserSubmitted,
-        getUserComments
-    };
+});
+
+module.exports = {
+  getUserDownVoted,
+  getUserOverview,
+  getUserUpVoted,
+  getUserMentions,
+  getUserCommentReplies,
+  getUserSelfReply,
+  getUserSubmitted,
+  getUserComments,
+};
