@@ -311,6 +311,7 @@ const addReply = catchAsync(async (req, res, next) => {
       })
     }
     const pushResult=await pushNotificationServiceInstance.replytoCommentNotification(fcmToken,req.username,newReply._id,newReply.replyingTo);
+
     if(!pushResult.status){
       return res.status(500).json({
         "status":"Cannot push notification"
