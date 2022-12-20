@@ -1,6 +1,12 @@
 const catchAsync = require("../utils/catch-async");
 const User = require("../models/user-model");
 const UserService = require("./../services/user-service");
+const Post = require("./../models/post-model");
+const PostService = require("./../services/post-service");
+const postServiceInstance = new PostService(Post);
+const Comment = require("./../models/comment-model");
+const CommentService = require("./../services/comment-service");
+const commentServiceInstance = new CommentService(Comment);
 
 var userServiceInstance = new UserService(User);
 
@@ -160,16 +166,22 @@ function mergeTwo(A, B) {
 const getUserOverview = catchAsync(async (req, res, next) => {
   let overviewReturn = [];
   try {
-    var posts = await userServiceInstance.userSubmitted(
-      req.params.username,
+    const postIds = await userServiceInstance.userSubmittedPosts(
+      req.params.username
+    );
+    var posts = await postServiceInstance.userSubmitted(postIds, req.query);
+    const commentIds = await userServiceInstance.userSubmittedComments(
+      req.params.username
+    );
+    var comments = await commentServiceInstance.userComments(
+      commentIds,
       req.query
     );
-    var comments = await userServiceInstance.userComments(
-      req.params.username,
-      req.query
+    const replyIds = await userServiceInstance.userSubmittedReplies(
+      req.params.username
     );
-    var replies = await userServiceInstance.userComments(
-      req.params.username,
+    var replies = await commentServiceInstance.userComments(
+      replyIds,
       req.query
     );
     let merged = mergeTwo(posts, comments);
