@@ -25,7 +25,10 @@ class CommentService extends Service {
         $or: [{ textHTML: { $regex: searchQuery, $options: "i" } }],
       },
       query
-    );
+    ).populate({
+      path: "authorId",
+      select: "_id avatar",
+    });
   };
 
   /**
@@ -389,7 +392,7 @@ class CommentService extends Service {
           { _id: postIdCasted },
           { $set: { votesCount: votesCount + operation, voters: voters } },
           { new: true },
-          () => {}
+          () => { }
         ).clone();
 
         return {
