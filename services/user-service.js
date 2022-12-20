@@ -44,6 +44,7 @@ class UserService extends Service {
    * @function
    */
   saveNOtificationOfUser = async (id, username) => {
+    console.log(username);
     const user =await this.getOne({_id:username});
     const newNotification=
     {
