@@ -44,7 +44,8 @@ class NotificationService extends Service {
     var notifications = [];
     notificationsData.forEach((el, index) => {
       var newEl = { ...el }._doc;
-      newEl.isRead = isRead[index];
+      newEl.isRead = false;
+      if (isRead[index]) newEl.isRead = true;
       notifications[index] = newEl;
     });
     return notifications;
@@ -235,6 +236,8 @@ class NotificationService extends Service {
       text: "u/" + `${senderUsername.slice(3)} upvoted on your post`,
       sourceThing: senderUsername,
       createdAt: Date.now(),
+      isRead: false,
+      isDeleted: false,
     };
     var not;
 
