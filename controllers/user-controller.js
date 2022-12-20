@@ -169,6 +169,7 @@ const editUserPrefs = catchAsync(async (req, res, next) => {
       results = await userServiceInstance.updateOne(
        {_id:req.username},
        {prefs : prefs}
+
        
       );
     }
