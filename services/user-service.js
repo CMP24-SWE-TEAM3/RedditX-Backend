@@ -44,10 +44,13 @@ class UserService extends Service {
    * @function
    */
   saveNOtificationOfUser = (id, username) => {
+    console.log(id);
+    console.log(username);
+
     try {
       const user = this.updateOne(
         { _id: username },
-        { $addToSet: { notifications: id } }
+        { $addToSet: { notifications: {notificationID:id,isRead:false,isDeleted:false} } }
       );
     } catch (err) {
       return {

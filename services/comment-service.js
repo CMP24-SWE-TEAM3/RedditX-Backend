@@ -227,16 +227,17 @@ class CommentService extends Service {
       } else if (dir == 0 || dir == -1) {
         operation = -1;
       }
+      try{
       if (removeDetector && !addDetector) {
         await User.findOneAndUpdate(
           { _id: username },
           { $pull: { hasVote: { _id: postIdCasted } } }
-        );
+        ).clone();
       } else if (!removeDetector && addDetector) {
         await User.findOneAndUpdate(
           { _id: username },
           { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
-        );
+        ).clone();
       } else if (addDetector && removeDetector) {
         await User.findOneAndUpdate(
           { _id: username },
@@ -245,7 +246,7 @@ class CommentService extends Service {
         await User.findOneAndUpdate(
           { _id: username },
           { $addToSet: { hasVote: { _id: postIdCasted, type: operation } } }
-        );
+        ).clone();
       }
       await Post.findByIdAndUpdate(
         { _id: postIdCasted },
@@ -269,7 +270,17 @@ class CommentService extends Service {
             };
           }
         }
-      );
+      ).clone();}
+      catch(err){
+        return {
+          status:false,
+          error:err
+        }
+      }
+      return {
+        state: true,
+        status: "done",
+      };
     } else if (id === "t1") {
       //comment or reply
       const comment = await this.getOne({ _id: postIdCasted });
@@ -348,7 +359,7 @@ class CommentService extends Service {
           await User.findOneAndUpdate(
             { _id: username },
             { $pull: { votedComments: { _id: postIdCasted } } }
-          );
+          ).clone();
         } else if (!removeDetector && addDetector) {
           await User.findOneAndUpdate(
             { _id: username },
@@ -357,7 +368,7 @@ class CommentService extends Service {
                 votedComments: { _id: postIdCasted, type: operation },
               },
             }
-          );
+          ).clone();
         } else if (addDetector && removeDetector) {
           await User.findOneAndUpdate(
             { _id: username },
@@ -370,7 +381,7 @@ class CommentService extends Service {
                 votedComments: { _id: postIdCasted, type: operation },
               },
             }
-          );
+          ).clone();
         }
 
         Comment.findByIdAndUpdate(
@@ -378,7 +389,7 @@ class CommentService extends Service {
           { $set: { votesCount: votesCount + operation, voters: voters } },
           { new: true },
           () => {}
-        );
+        ).clone();
 
         return {
           state: true,
@@ -390,6 +401,7 @@ class CommentService extends Service {
           error: "failed",
         };
       }
+     
     }
   };
 

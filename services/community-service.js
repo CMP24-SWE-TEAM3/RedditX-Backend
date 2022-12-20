@@ -77,7 +77,7 @@ class CommunityService extends Service {
       {
         _id: { $in: communityIDs },
       },
-      "icon description category"
+      "icon description category membersCnt"
     );
     return communities;
   };

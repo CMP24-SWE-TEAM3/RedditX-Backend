@@ -3,17 +3,16 @@ var fcm = require("fcm-notification");
 var serviceAccount = require("../config/push-notification-key.json");
 const certPath = admin.credential.cert(serviceAccount);
 var FCM = new fcm(certPath);
-const Service = require("./service");
 
 /**
  * Service class to send notifications.
  * @class PushNotificationsService
  */
-class PushNotificationsService extends Service {
-  constructor(model) {
-    super(model);
-  }
+class PushNotificationsService {
 
+  constructor(){
+
+  }
   sendNotification = async (message) => {
     FCM.send(message, function (err) {
       if (err) {
@@ -28,6 +27,10 @@ class PushNotificationsService extends Service {
         };
       }
     });
+    return {
+      status: true,
+      message: "notification sent",
+    };
   };
   newFollowerNotification = async (receiverFcmToken, followerUsername) => {
     try {

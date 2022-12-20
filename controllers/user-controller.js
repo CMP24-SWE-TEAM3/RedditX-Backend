@@ -60,6 +60,46 @@ const following = async (req, res, next) => {
   });
 };
 
+
+/**
+ * Edit profile
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const editProfile = async (req, res) => {
+  console.log(req.username);
+  if (!req.username || !req.body.type==="showActiveCommunities"||!req.body.type==="showActiveCommunities"||!req.body.type==="contentVisibility") {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const user = await userServiceInstance.getOne({_id:req.username});
+  if(!user){
+    return res.status(404).json({
+      status:"user is not found"
+    })
+  }
+  var attrType2= req.body.type;
+  var value=req.body.value;
+  if(attrType2==="about"){
+    user.about=value;
+  }
+  else if(attrType2==="showActiveCommunities"){
+    user.showActiveCommunities=value;
+  }
+  else{
+    user.contentVisibility=value;
+  }
+  user.save();
+ 
+
+  
+    return res.status(200).json({
+      response: "updated successfully",
+    });
+ 
+};
+
 /**
  * Get user interests
  * @param {function} (req, res)
@@ -122,35 +162,21 @@ const editUserPrefs = catchAsync(async (req, res, next) => {
   try {
     const user = await userServiceInstance.findById(req.username);
     if (user) {
+      type=req.body.type;
+      value=req.body.value;
+      prefs=user.prefs;
+      prefs.type=value;
       results = await userServiceInstance.updateOne(
-        { numComments: req.body.numComments },
-        { threadedMessages: req.body.threadedMessages },
-        { showLinkFlair: req.body.showLinkFlair },
-        { threadedMessages: req.body.threadedMessages },
-        { countryCode: req.body.countryCode },
-        { emailCommentReply: req.body.emailCommentReply },
-        { emailUpvoteComment: req.body.emailUpvoteComment },
-        { emailMessages: req.body.emailMessages },
-        { emailUnsubscribeAll: req.body.emailUnsubscribeAll },
-        { emailUpvotePost: req.body.emailUpvotePost },
-        { emailUsernameMention: req.body.emailUsernameMention },
-        { emailUserNewFollower: req.body.emailUserNewFollower },
-        { emailPrivateMessage: req.body.emailPrivateMessage },
-        { over18: req.body.over18 },
-        { newwindow: req.body.newwindow },
-        { labelNsfw: req.body.labelNsfw },
-        { liveOrangeReds: req.body.liveOrangeReds },
-        { markMessageRead: req.body.markMessageRead },
-        { enableFollwers: req.body.enableFollwers },
-        { publicVotes: req.body.publicVotes },
-        {
-          showLocationBasedRecommendations:
-            req.body.showLocationBasedRecommendations,
-        },
-        { searchIncludeOver18: req.body.searchIncludeOver18 },
-        { defaultCommentSort: req.body.defaultCommentSort },
-        { langauge: req.body.langauge }
+       {_id:req.username},
+       {prefs : prefs}
+
+       
       );
+    }
+    else{
+      return res.status(404).json({
+        status:"user is not found"
+      })
     }
   } catch (err) {
     return next(err);
@@ -685,4 +711,5 @@ module.exports = {
   getInterests,
   addInterests,
   getUserInfo,
+  editProfile
 };
