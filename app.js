@@ -15,14 +15,13 @@ const listingRouter = require("./routes/listing-routes");
 const authRouter = require("./routes/auth-routes");
 const searchRouter = require("./routes/search-routes");
 const notificationRouter = require("./routes/notification-routes");
-const notRouter = require("./routes/push-notification-routes");
 const messageRouter = require("./routes/message-routes");
 const AppError = require("./utils/app-error");
 
 const app = express();
 
 app.use(function (req, res, next) {
-  console.log(req.originalUrl);   //  for debugging
+  console.log(req.originalUrl); //  for debugging
   res.setHeader("Access-Control-Allow-Credentials", true);
   next();
 });
@@ -99,7 +98,6 @@ app.use(express.json({ limit: "10kb" }));
 
 // ROUTES
 app.use("/api/auth", authRouter);
-app.use("/not", notRouter);
 app.use("/api/message", messageRouter);
 app.use("/api/user", userRouter);
 app.use("/api/r", communityRouter);
