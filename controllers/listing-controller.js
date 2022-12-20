@@ -3,7 +3,7 @@ const Post = require("../models/post-model");
 const Comment = require("../models/comment-model");
 const Community = require("../models/community-model");
 const User = require("../models/user-model");
-const Notification  = require("../models/notification-model");
+const Notification = require("../models/notification-model");
 const PostService = require("./../services/post-service");
 // const CommentService = require("./../services/comment-service");
 const UserService = require("./../services/user-service");
@@ -12,7 +12,7 @@ const CommentService = require("../services/comment-service");
 const NotificationService = require("../services/notification-service");
 const AppError = require("../utils/app-error");
 var postServiceInstance = new PostService(Post);
-var notificationServiceInstance= new NotificationService(Notification);
+var notificationServiceInstance = new NotificationService(Notification);
 // var commentServiceInstance = new CommentService(Comment);
 var userServiceInstance = new UserService(User);
 var communityServiceInstance = new CommunityService(Community);
@@ -32,14 +32,13 @@ const editUserText = async (req, res, next) => {
   delete req.body.linkID;
   req.body.editedAt = Date.now();
   if (linkID[1] === "3") {
-    if (
-      (
-        await postServiceInstance.getOne({
-          _id: linkID.slice(3),
-          select: "userID",
-        })
-      ).userID._id !== req.username
-    )
+    const post = await postServiceInstance.getOne({
+      _id: linkID.slice(3),
+      select: "userID",
+    });
+    if (!post || !post.userID)
+      return next(new AppError("This post is not found!", 404));
+    if (post.userID._id !== req.username)
       return next(new AppError("You are not the author of this post!", 400));
     const results = await postServiceInstance.updateOne(
       { _id: linkID.slice(3) },
@@ -54,14 +53,12 @@ const editUserText = async (req, res, next) => {
       response: results,
     });
   } else if (linkID[1] === "1") {
-    if (
-      (
-        await commentServiceInstance.getOne({
-          _id: linkID.slice(3),
-          select: "authorId",
-        })
-      ).authorId !== req.username
-    )
+    const comment = await commentServiceInstance.getOne({
+      _id: linkID.slice(3),
+      select: "authorId",
+    });
+    if (!comment) return next(new AppError("This comment is not found!", 404));
+    if (comment.authorId !== req.username)
       return next(new AppError("You are not the author of this comment!", 400));
     const results = await commentServiceInstance.updateOne(
       { _id: linkID.slice(3) },
@@ -309,38 +306,54 @@ const vote = async (req, res) => {
   const result = await commentServiceInstance.vote(req.body, req.username);
   if (result.state) {
     var user;
-    if(req.body.id.substring(0,2)==="t1"){
-        const comment=await commentServiceInstance.getOne({_id:req.body.id.slice(3)});
-         user=await userServiceInstance.getOne({_id:req.username});
-         const notificationSaver=await notificationServiceInstance.createUpvoteToCommentNotification(req.username,user);
-        if(!notificationSaver.status){
-          return res.status(404).json({
-            status: "Error happened while saving notification in db",
-          });
-        }
-    const saveToUser=await userServiceInstance.saveNOtificationOfUser(notificationSaver.id,comment.authorId);
-    if(!saveToUser.status){
-      return res.status(404).json({
-        status: "Error happened while saving notification in user db",
+    if (req.body.id.substring(0, 2) === "t1") {
+      const comment = await commentServiceInstance.getOne({
+        _id: req.body.id.slice(3),
       });
-    }
-     }
-    else{
-       const post=await postServiceInstance.getOne({_id:req.body.id.slice(3)});
-        user=await userServiceInstance.getOne({_id:post.userID});
-        const notificationSaver=await notificationServiceInstance.createUpvoteToPostNotification(req.username,user);
-        if(!notificationSaver.status){
-          return res.status(404).json({
-            status: "Error happened while saving notification in db",
-          });
-        }
-        const saveToUser=await userServiceInstance.saveNOtificationOfUser(notificationSaver.id,post.userID);
-        if(!saveToUser.status){
-          return res.status(404).json({
-            status: "Error happened while saving notification in user db",
-          });
-        }
-
+      user = await userServiceInstance.getOne({ _id: req.username });
+      const notificationSaver =
+        await notificationServiceInstance.createUpvoteToCommentNotification(
+          req.username,
+          user
+        );
+      if (!notificationSaver.status) {
+        return res.status(404).json({
+          status: "Error happened while saving notification in db",
+        });
+      }
+      const saveToUser = await userServiceInstance.saveNOtificationOfUser(
+        notificationSaver.id,
+        comment.authorId
+      );
+      if (!saveToUser.status) {
+        return res.status(404).json({
+          status: "Error happened while saving notification in user db",
+        });
+      }
+    } else {
+      const post = await postServiceInstance.getOne({
+        _id: req.body.id.slice(3),
+      });
+      user = await userServiceInstance.getOne({ _id: post.userID });
+      const notificationSaver =
+        await notificationServiceInstance.createUpvoteToPostNotification(
+          req.username,
+          user
+        );
+      if (!notificationSaver.status) {
+        return res.status(404).json({
+          status: "Error happened while saving notification in db",
+        });
+      }
+      const saveToUser = await userServiceInstance.saveNOtificationOfUser(
+        notificationSaver.id,
+        post.userID
+      );
+      if (!saveToUser.status) {
+        return res.status(404).json({
+          status: "Error happened while saving notification in user db",
+        });
+      }
     }
     return res.status(200).json({
       status: result.status,

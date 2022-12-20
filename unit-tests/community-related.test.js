@@ -178,12 +178,121 @@ describe("testing getCommunities service in community service class", () => {
     });
   });
   describe("given an undefined user, type=member", () => {
-    test("should not throw an error", async () => {
+    test("should throw an error", async () => {
       communityServiceInstance.find = jest
         .fn()
         .mockReturnValueOnce([community]);
       expect(
         communityServiceInstance.getCommunities(undefined, "moderators")
+      ).rejects.toThrowError();
+    });
+  });
+});
+
+describe("testing getSpecificCategory service in community service class", () => {
+  describe("given a category=Gaming, page=1, limit=3", () => {
+    test("should not throw an error", async () => {
+      const communities = [
+        {
+          _id: "t5_imagePro235",
+          category: "Gaming",
+        },
+        {
+          _id: "t5_imagePro23",
+          category: "Gaming",
+        },
+        {
+          _id: "t5_imagePro25",
+          category: "Gaming",
+        },
+      ];
+      communityServiceInstance.getAll = jest
+        .fn()
+        .mockReturnValueOnce(communities);
+      const communitiesWithCategory =
+        await communityServiceInstance.getSpecificCategory({
+          category: "Gaming",
+          page: "1",
+          limit: "3",
+        });
+      expect(communitiesWithCategory[0]._id).toBe("t5_imagePro235");
+    });
+  });
+  describe("given a category=Gaming, no page or limit", () => {
+    test("should not throw an error", async () => {
+      const communities = [
+        {
+          _id: "t5_imagePro235",
+          category: "Gaming",
+        },
+        {
+          _id: "t5_imagePro23",
+          category: "Gaming",
+        },
+        {
+          _id: "t5_imagePro25",
+          category: "Gaming",
+        },
+      ];
+      communityServiceInstance.getAll = jest
+        .fn()
+        .mockReturnValueOnce(communities);
+      const communitiesWithCategory =
+        await communityServiceInstance.getSpecificCategory({
+          category: "Gaming",
+          page: "1",
+          limit: "3",
+        });
+      expect(communitiesWithCategory[0]._id).toBe("t5_imagePro235");
+    });
+  });
+  describe("given an undefined query", () => {
+    test("should throw an error", async () => {
+      const communities = [
+        {
+          _id: "t5_imagePro235",
+          category: "Gaming",
+        },
+        {
+          _id: "t5_imagePro23",
+          category: "Gaming",
+        },
+        {
+          _id: "t5_imagePro25",
+          category: "Gaming",
+        },
+      ];
+      communityServiceInstance.getAll = jest
+        .fn()
+        .mockReturnValueOnce(communities);
+      expect(
+        communityServiceInstance.getSpecificCategory(undefined)
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given an undefined category", () => {
+    test("should throw an error", async () => {
+      const communities = [
+        {
+          _id: "t5_imagePro235",
+          category: "Gaming",
+        },
+        {
+          _id: "t5_imagePro23",
+          category: "Gaming",
+        },
+        {
+          _id: "t5_imagePro25",
+          category: "Gaming",
+        },
+      ];
+      communityServiceInstance.getAll = jest
+        .fn()
+        .mockReturnValueOnce(communities);
+      expect(
+        communityServiceInstance.getSpecificCategory({
+          category: undefined,
+        })
       ).rejects.toThrowError();
     });
   });
@@ -1130,70 +1239,61 @@ describe("testing getThingsIDs service in community service class", () => {
 });
 
 describe("testing getStats service in community service class", () => {
-  describe("given a subreddit and type=joined", () => {
+  describe("given a subreddit and type1=joinedPerDay,type2=joinedPerMonth", () => {
     test("should not throw an error", async () => {
       const community = new Community({
         _id: "t5_imagePro235",
-        joined: [
-          {
-            date: "10/12/2022",
-            count: 5,
-          },
-        ],
+        joinedPerDay: [0, 0, 5, 0, 0, 0, 0],
+        joinedPerMonth: [0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0],
       });
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
       const data = await communityServiceInstance.getStats(
         "t5_imagePro235",
-        "joined"
+        "joinedPerDay",
+        "joinedPerMonth"
       );
-      expect(data[0].count).toBe(5);
-      expect(data[0].date).toBe("10/12/2022");
+      expect(data.days[2]).toBe(5);
+      expect(data.months[9]).toBe(20);
     });
   });
-  describe("given a subreddit and type=left", () => {
+  describe("given a subreddit and type1=leftPerDay,type2=leftPerMonth", () => {
     test("should not throw an error", async () => {
       const community = new Community({
         _id: "t5_imagePro235",
-        left: [
-          {
-            date: "10/12/2022",
-            count: 20,
-          },
-        ],
+        leftPerDay: [0, 0, 5, 0, 0, 0, 0],
+        leftPerMonth: [0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0],
       });
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
       const data = await communityServiceInstance.getStats(
         "t5_imagePro235",
-        "left"
+        "leftPerDay",
+        "leftPerMonth"
       );
-      expect(data[0].count).toBe(20);
-      expect(data[0].date).toBe("10/12/2022");
+      expect(data.days[2]).toBe(5);
+      expect(data.months[9]).toBe(20);
     });
   });
-  describe("given a subreddit and type=pageViews", () => {
+  describe("given a subreddit and type1=pageViewsPerDay,type2=pageViewsPerMonth", () => {
     test("should not throw an error", async () => {
       const community = new Community({
         _id: "t5_imagePro235",
-        pageViews: [
-          {
-            date: "10/12/2022",
-            count: 521,
-          },
-        ],
+        pageViewsPerDay: [0, 0, 5, 0, 0, 0, 0],
+        pageViewsPerMonth: [0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0],
       });
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
       const data = await communityServiceInstance.getStats(
         "t5_imagePro235",
-        "pageViews"
+        "pageViewsPerDay",
+        "pageViewsPerMonth"
       );
-      expect(data[0].count).toBe(521);
-      expect(data[0].date).toBe("10/12/2022");
+      expect(data.days[2]).toBe(5);
+      expect(data.months[9]).toBe(20);
     });
   });
   describe("given an undefined subreddit", () => {

@@ -14,6 +14,7 @@ const voteSchema = mongoose.Schema({
   },
   voteType: Number,
 });
+
 const commentSchema = new mongoose.Schema({
   authorId: {
     type: String,
@@ -26,7 +27,10 @@ const commentSchema = new mongoose.Schema({
   },
   replyingTo: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Post'
+  },
+  postID: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Post",
   },
   replies: [
     {
@@ -67,6 +71,7 @@ const commentSchema = new mongoose.Schema({
   },
   communityID: {
     type: String,
+    ref: "Community",
   },
   spamCount: {
     type: Number,
@@ -81,6 +86,17 @@ const commentSchema = new mongoose.Schema({
       type: spamSchema,
     },
   ],
+});
+
+commentSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "postID",
+    select: "title userID votesCount commentsNum createdAt",
+  }).populate({
+    path: "communityID",
+    select: "icon",
+  });
+  next();
 });
 
 const Comment = mongoose.model("Comment", commentSchema);

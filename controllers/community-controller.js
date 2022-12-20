@@ -8,7 +8,6 @@ const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
-const { response } = require("express");
 const IdValidator = require("../validate/listing-validators").validateObjectId;
 
 const communityServiceInstance = new CommunityService(Community);
@@ -134,6 +133,25 @@ const getSubscribed = catchAsync(async (req, res, next) => {
     communities,
   });
 });
+
+/**
+ * Get a list of communities with a specific category
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getSpecificCategory = catchAsync(async (req, res, next) => {
+  var communities = undefined;
+  try {
+    communities = await communityServiceInstance.getSpecificCategory(req.query);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    communities,
+  });
+});
+
 /**
  * Get the list of random communities
  * @param {function} (req, res, next)
@@ -200,7 +218,7 @@ const getBanned = catchAsync(async (req, res, next) => {
     );
     dates.forEach((date, index) => {
       var tempBanned = { ...users[index] }._doc;
-      tempBanned.date = date;
+      if (tempBanned != undefined) tempBanned.date = date;
       banned[index] = tempBanned;
     });
   } catch (err) {
@@ -234,7 +252,7 @@ const getMuted = catchAsync(async (req, res, next) => {
     );
     dates.forEach((date, index) => {
       var tempMuted = { ...users[index] }._doc;
-      tempMuted.date = date;
+      if (tempMuted != undefined) tempMuted.date = date;
       muted[index] = tempMuted;
     });
   } catch (err) {
@@ -423,15 +441,16 @@ const createSubreddit = async (req, res) => {
   var user = await userServiceInstance.getOne({ _id: req.username });
 
   const result = await communityServiceInstance.createSubreddit(req.body, user);
-  if(!result.status){
+  if (!result.status) {
     return res.status(200).json({
       status: result.error,
     });
   }
-  const updateUser=await userServiceInstance.addUserToComm(user,req.body.name);
+  const updateUser = await userServiceInstance.addUserToComm(
+    user,
+    req.body.name
+  );
   if (!updateUser.status) {
-    
-
     return res.status(500).json({
       status: result.error,
     });
@@ -549,10 +568,10 @@ const getGeneralInfo = catchAsync(async (req, res, next) => {
         prepend === 1 // t1_ => Comment
           ? await commentServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
           : prepend === 3 // t3_ => Post
-            ? await postServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
-            : prepend === 5 // t5_ => Community
-              ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
-              : undefined;
+          ? await postServiceInstance.getOne({ _id: thingsIDs[i].slice(3) })
+          : prepend === 5 // t5_ => Community
+          ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
+          : undefined;
       things.push(result);
     }
   } catch (err) {
@@ -565,44 +584,49 @@ const getGeneralInfo = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Get members count (joined or left) per day
+ * Get members count (joined or left) per day and month
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-const getMembersCountPerDay = catchAsync(async (req, res, next) => {
-  var data = [];
+const getMembersCountPerDayAndMonth = catchAsync(async (req, res, next) => {
+  if (!req.query.type) return next(new AppError("Type is not provided!", 400));
+  var data = undefined;
   try {
     data = await communityServiceInstance.getStats(
       req.params.subreddit,
-      req.query.type
+      `${req.query.type}PerDay`,
+      `${req.query.type}PerMonth`
     );
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    data,
+    days: data.days,
+    months: data.months,
   });
 });
 
 /**
- * Get views count per day
+ * Get views count per day and month
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-const getViewsCountPerDay = catchAsync(async (req, res, next) => {
-  var data = [];
+const getViewsCountPerDayAndMonth = catchAsync(async (req, res, next) => {
+  var data = undefined;
   try {
     data = await communityServiceInstance.getStats(
       req.params.subreddit,
-      "pageViews"
+      "pageViewsPerDay",
+      "pageViewsPerMonth"
     );
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    data,
+    days: data.days,
+    months: data.months,
   });
 });
 
@@ -703,10 +727,15 @@ const getFlairs = catchAsync(async (req, res) => {
     });
   }
   // [2] -> check if user isn't moderator in subreddit
-  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
     return res.status(400).json({
-      status: 'failed',
-      message: 'you aren\'t moderator in this subreddit',
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
     });
   }
   // [3]-> get the flairs list
@@ -745,11 +774,13 @@ const deleteFlair = catchAsync(async (req, res) => {
     });
   }
   //[3]-> delete the flair
-  let document = await communityServiceInstance.getOne(
-    { _id: req.params.subreddit }
-  );
+  let document = await communityServiceInstance.getOne({
+    _id: req.params.subreddit,
+  });
 
-  document.flairList = document.flairList.filter(el => { el._id != req.body.id });
+  document.flairList = document.flairList.filter((el) => {
+    el._id != req.body.id;
+  });
   await document.save();
   res.status(200).json({
     status: "succeeded",
@@ -793,45 +824,61 @@ const addFlair = catchAsync(async (req, res) => {
   });
 });
 
-configureSubreddit = catchAsync(async (req, res, next) => {
+const configureSubreddit = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
-  subreddit = await communityServiceInstance.availableSubreddit(req.params.subreddit);
+  var subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
   if (subreddit.state) {
     return res.status(404).json({
-      status: 'failed',
-      message: 'not found this subreddit',
-    })
+      status: "failed",
+      message: "not found this subreddit",
+    });
   }
   // [2] -> check if user isn't moderator in subreddit
-  if (!await userServiceInstance.isModeratorInSubreddit(req.params.subreddit, req.username)) {
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
     return res.status(400).json({
-      status: 'failed',
-      message: 'you aren\'t moderator in this subreddit',
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
     });
   }
   // [3]-> configure the settings of subreddit
 
-  await communityServiceInstance.updateOne({ _id: req.params.subreddit }, req.body);
+  await communityServiceInstance.updateOne(
+    { _id: req.params.subreddit },
+    req.body
+  );
   res.status(200).json({
-    status: 'succeeded',
-  })
-})
+    status: "succeeded",
+  });
+});
 
-
-const approveLink = catchAsync(async (req, res, next) => {
+const approveLink = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
-  subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+  var subreddit = await communityServiceInstance.availableSubreddit(
+    req.body.communityID
+  );
   if (subreddit.state) {
     return res.status(404).json({
-      status: 'failed',
-      message: 'not found this subreddit',
-    })
+      status: "failed",
+      message: "not found this subreddit",
+    });
   }
   // [2] -> check if user isn't moderator in subreddit
-  if (!await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.username)) {
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.body.communityID,
+      req.username
+    ))
+  ) {
     return res.status(400).json({
-      status: 'failed',
-      message: 'you aren\'t moderator in this subreddit',
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
     });
   }
   //[3]-> check if the link is exist
@@ -839,75 +886,98 @@ const approveLink = catchAsync(async (req, res, next) => {
   const post = await postServiceInstance.getOne({ _id: req.body.linkID });
   if (!comment && !post) {
     res.status(404).json({
-      stauts: 'fail',
-      message: 'there isn\'t link with this id'
-    })
+      stauts: "fail",
+      message: "there isn't link with this id",
+    });
   }
   //[4]-> do approving the link
   if (comment) {
     //approve comment
     commentServiceInstance.approveComment(comment);
   } else if (post) {
-    //approve post 
+    //approve post
     postServiceInstance.approvePost(post);
   }
   res.status(200).json({
-    status: 'succeeded',
-  })
+    status: "succeeded",
+  });
 });
 
-const removeLink = catchAsync(async (req, res, next) => {
+const removeLink = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
-  subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+  var subreddit = await communityServiceInstance.availableSubreddit(
+    req.body.communityID
+  );
   if (subreddit.state) {
     return res.status(404).json({
-      status: 'failed',
-      message: 'not found this subreddit',
-    })
+      status: "failed",
+      message: "not found this subreddit",
+    });
   }
   // [2] -> check if user isn't moderator in subreddit
-  if (!await userServiceInstance.isModeratorInSubreddit(req.body.communityID, req.username)) {
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.body.communityID,
+      req.username
+    ))
+  ) {
     return res.status(400).json({
-      status: 'failed',
-      message: 'you aren\'t moderator in this subreddit',
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
     });
   }
   //[3]-> check if the link is exist
-  const comment = await commentServiceInstance.getOne({ _id: req.body.id, populate: 'replyingTo' });
-  const post = await postServiceInstance.getOne({ _id: req.body.id, communityID: req.body.communityID });
-  if (!(comment && comment.replyingTo.communityID == req.body.communityID) && !post) {
+  const comment = await commentServiceInstance.getOne({
+    _id: req.body.id,
+    populate: "replyingTo",
+  });
+  const post = await postServiceInstance.getOne({
+    _id: req.body.id,
+    communityID: req.body.communityID,
+  });
+  if (
+    !(comment && comment.replyingTo.communityID == req.body.communityID) &&
+    !post
+  ) {
     return res.status(404).json({
-      stauts: 'fail',
-      message: 'un valid id or this link isn\'t in this subreddit'
-    })
+      stauts: "fail",
+      message: "un valid id or this link isn't in this subreddit",
+    });
   }
   //[4]-> do removing the link
   if (comment) {
     //approve comment
     commentServiceInstance.removeComment(comment);
   } else if (post) {
-    //approve post 
+    //approve post
     postServiceInstance.removePost(post);
   }
   res.status(200).json({
-    status: 'succeeded',
-  })
+    status: "succeeded",
+  });
 });
 
-kickModerator = catchAsync(async (req, res, next) => {
+const kickModerator = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
-  subreddit = await communityServiceInstance.availableSubreddit(req.body.communityID);
+  var subreddit = await communityServiceInstance.availableSubreddit(
+    req.body.communityID
+  );
   if (subreddit.state) {
     return res.status(404).json({
-      status: 'failed',
-      message: 'not found this subreddit',
-    })
+      status: "failed",
+      message: "not found this subreddit",
+    });
   }
   // [2] -> check if user isn't creator of subreddit
-  if (!await userServiceInstance.isCreatorInSubreddit(req.body.communityID, req.username)) {
+  if (
+    !(await userServiceInstance.isCreatorInSubreddit(
+      req.body.communityID,
+      req.username
+    ))
+  ) {
     return res.status(400).json({
-      status: 'failed',
-      message: 'you aren\'t creator of this subreddit',
+      status: "failed",
+      message: "you aren't creator of this subreddit",
     });
   }
 
@@ -915,9 +985,9 @@ kickModerator = catchAsync(async (req, res, next) => {
   await communityServiceInstance.kickModerator(subreddit, req.body.userID);
   await userServiceInstance.kickModerator(subreddit, req.body.userID);
   return res.status(200).json({
-    status: 'succeeded',
+    status: "succeeded",
   });
-})
+});
 
 /**
  * Remove a spam from a post or a comment
@@ -996,6 +1066,7 @@ module.exports = {
   getMembers,
   getCommunityOptions,
   getRandomCommunities,
+  getSpecificCategory,
   removeSrBanner,
   removeSrIcon,
   getFlairs,
@@ -1006,8 +1077,8 @@ module.exports = {
   editCommunityRule,
   getCommunityAbout,
   getGeneralInfo,
-  getMembersCountPerDay,
-  getViewsCountPerDay,
+  getMembersCountPerDayAndMonth,
+  getViewsCountPerDayAndMonth,
   kickUser,
   configureSubreddit,
   approveLink,

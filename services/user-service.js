@@ -36,26 +36,28 @@ class UserService extends Service {
       { expiresIn: "120h" }
     );
   };
-   /**
+  /**
    * Saving notification in user's document
    * @param {String} id notification id.
    * @param {String} username username of the user.
    * @returns {Object} (status)
    * @function
    */
-   saveNOtificationOfUser = (id, username) => {
-    try{
-      const user= this.updateOne({_id:username}, { $addToSet: { notifications: id }})
-    }
-    catch(err){
+  saveNOtificationOfUser = (id, username) => {
+    try {
+      const user = this.updateOne(
+        { _id: username },
+        { $addToSet: { notifications: id } }
+      );
+    } catch (err) {
       return {
-        status:false,
-        error:err
-      }
+        status: false,
+        error: err,
+      };
     }
     return {
-      status:true
-    }
+      status: true,
+    };
   };
 
   /**
@@ -65,10 +67,10 @@ class UserService extends Service {
    * @function
    */
   getFollowers = async (username) => {
-    const followers_user = await this.getOne({ _id: username }).select(
+    const followersUser = await this.getOne({ _id: username }).select(
       "followers"
     );
-    const followersIds = followers_user.followers;
+    const followersIds = followersUser.followers;
 
     const followers = await this.find({
       _id: { $in: followersIds },
@@ -79,6 +81,30 @@ class UserService extends Service {
       followers: followers,
     };
   };
+
+  /**
+   * Get people that I follow
+   * @param {String} username my username .
+   * @returns {object}
+   * @function
+   */
+  getFollowing = async (username) => {
+    if (!username) throw new AppError("No username is provided!", 400);
+    const user = await this.getOne({ _id: username, select: "follows" });
+    if (!user) throw new AppError("User is not found!", 404);
+    const followingIds = user.follows;
+    const following = await this.getAll(
+      {
+        _id: { $in: followingIds },
+      },
+      { fields: "about,avatar,_id" }
+    );
+    return {
+      status: true,
+      following,
+    };
+  };
+
   /**
    *  Get interests of me
    * @param {String} username my username .
@@ -145,18 +171,18 @@ class UserService extends Service {
         };
       } else {
         const avatar = result.user.avatar;
-           
+
         var isFound = false;
-        var followerIndex=-1;
+        var followerIndex = -1;
         var followerArr = result.user.followers;
         for (var i = 0; i < followerArr.length; i++) {
           if (followerArr[i] === username) {
             isFound = true;
-            followerIndex=i;
+            followerIndex = i;
             break;
           }
         }
-        
+
         try {
           if (action === "sub") {
             if (isFound) {
@@ -165,7 +191,6 @@ class UserService extends Service {
                 error: "already followed",
               };
             }
-            
 
             await this.updateOne(
               { _id: username },
@@ -195,13 +220,12 @@ class UserService extends Service {
           return {
             state: false,
             error: "error",
-           
           };
         }
         return {
           state: true,
           error: null,
-          avatar:avatar
+          avatar: avatar,
         };
       }
     } else if (id === "t5") {
@@ -222,23 +246,25 @@ class UserService extends Service {
           };
         }
         let isFound = false;
-        let index=-1;
+        let index = -1;
         var memberArr = user.user.member;
         for (i = 0; i < memberArr.length; i++) {
           if (memberArr[i].communityId === body.srName) {
             isFound = true;
-            index=i;
+            index = i;
             break;
           }
         }
         try {
-          var memCom=result.subreddit.members;
-          var memCnt=result.subreddit.membersCnt;
-          var joined=result.subreddit.joined;
-          var left=result.subreddit.left;
+          var memCom = result.subreddit.members;
+          var memCnt = result.subreddit.membersCnt;
+          var joined = result.subreddit.joined;
+          var left = result.subreddit.left;
           const date = new Date();
-          const formattedDate = date.toLocaleDateString('en-GB', {
-            day: 'numeric', month: 'numeric', year: 'numeric'
+          const formattedDate = date.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "numeric",
+            year: "numeric",
           });
           console.log(formattedDate);
 
@@ -249,24 +275,23 @@ class UserService extends Service {
                 error: "already followed",
               };
             }
-            var dateIsFound=false;
-            var dateIndex=-1;
-            for(let z=0;z<joined.length;z++){
-              if(joined[z].date===formattedDate){
-                dateIsFound=true;
-                dateIndex=z;
+            var dateIsFound = false;
+            var dateIndex = -1;
+            for (let z = 0; z < joined.length; z++) {
+              if (joined[z].date === formattedDate) {
+                dateIsFound = true;
+                dateIndex = z;
               }
             }
-            if(!dateIsFound){
+            if (!dateIsFound) {
               joined.push({
-                "date":formattedDate,
-                "count":1
+                date: formattedDate,
+                count: 1,
               });
+            } else {
+              joined[dateIndex].count++;
             }
-            else{
-             joined[dateIndex].count++;
-            }
-            const memUser=user.user.member;
+            const memUser = user.user.member;
             memUser.push({
               communityId: body.srName,
               isBanned: {
@@ -278,35 +303,30 @@ class UserService extends Service {
                 date: Date.now(),
               },
             });
-           const newUsr= await this.updateOne(
+            const newUsr = await this.updateOne(
               { _id: username },
               {
-                
-                  member: memUser
-                
+                member: memUser,
               }
             );
             memCnt++;
-            memCom.push(
-              {
-                userID: username,
-                isBanned: {
-                  value: false,
-                  date: Date.now(),
-                },
-                isMuted: {
-                  value: false,
-                  date: Date.now(),
-                },
+            memCom.push({
+              userID: username,
+              isBanned: {
+                value: false,
+                date: Date.now(),
               },
-            );
-           const com= await communityServiceInstance.updateOne(
+              isMuted: {
+                value: false,
+                date: Date.now(),
+              },
+            });
+            const com = await communityServiceInstance.updateOne(
               { _id: body.srName },
               {
-                 
-                  members:memCom ,
-                  membersCnt:memCnt,
-                  joined:joined
+                members: memCom,
+                membersCnt: memCnt,
+                joined: joined,
               }
             );
           } else {
@@ -316,33 +336,31 @@ class UserService extends Service {
                 error: "operation failed the user is already not followed",
               };
             }
-            var dateIsFound=false;
-            var dateIndex=-1;
-            for(let z=0;z<left.length;z++){
-              if(left[z].date===formattedDate){
-                dateIsFound=true;
-                dateIndex=z;
+            var dateIsFound = false;
+            var dateIndex = -1;
+            for (let z = 0; z < left.length; z++) {
+              if (left[z].date === formattedDate) {
+                dateIsFound = true;
+                dateIndex = z;
               }
+            }
 
-            }
-            
-            if(!dateIsFound){
+            if (!dateIsFound) {
               left.push({
-                "date":formattedDate,
-                "count":1
+                date: formattedDate,
+                count: 1,
               });
-            }
-            else{
+            } else {
               left[dateIndex].count++;
             }
             memCnt--;
-            var memIndex=-1;
-            for(let x=0;x<memCom.length;x++){
-              if(memCom[i].userID===username){
-                memIndex=x;
+            var memIndex = -1;
+            for (let x = 0; x < memCom.length; x++) {
+              if (memCom[i].userID === username) {
+                memIndex = x;
               }
             }
-            memCom.splice(memIndex,1);
+            memCom.splice(memIndex, 1);
             await this.updateOne(
               { _id: username },
               { $pull: { member: { communityId: body.srName } } }
@@ -350,7 +368,7 @@ class UserService extends Service {
 
             await communityServiceInstance.updateOne(
               { _id: body.srName },
-               { members: memCom , membersCnt:memCnt,left:left} 
+              { members: memCom, membersCnt: memCnt, left: left }
             );
           }
         } catch (err) {

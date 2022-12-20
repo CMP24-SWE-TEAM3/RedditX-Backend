@@ -83,6 +83,28 @@ class CommunityService extends Service {
   };
 
   /**
+   * Get a list of communities with a specific category
+   * @param {object} query category, page, limit
+   * @returns {array} communities
+   * @function
+   */
+  getSpecificCategory = async (query) => {
+    if (!query || !query.category)
+      throw new AppError("No category specified!", 400);
+    const category = query.category;
+    delete query.category;
+    query.fields = "icon,description,category,_id";
+    if (!query.limit) query.limit = 10; // limit one page to 10 communities
+    const communities = await this.getAll(
+      {
+        category,
+      },
+      query
+    );
+    return communities;
+  };
+
+  /**
    * Ban a user within a community
    * @param {string} subreddit
    * @param {string} moderator
@@ -114,10 +136,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-            ? (el.isBanned.value = false)
-            : operation === "mute"
-              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-              : (el.isMuted.value = false)
+          ? (el.isBanned.value = false)
+          : operation === "mute"
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     return community;
@@ -138,10 +160,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-            ? (el.isBanned.value = false)
-            : operation === "mute"
-              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-              : (el.isMuted.value = false)
+          ? (el.isBanned.value = false)
+          : operation === "mute"
+          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+          : (el.isMuted.value = false)
         : el
     );
     await toBeAffected.save();
@@ -237,7 +259,7 @@ class CommunityService extends Service {
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     const creator =
       community.moderators[
-      community.moderators.findIndex((el) => el.role === "creator")
+        community.moderators.findIndex((el) => el.role === "creator")
       ];
     var creatorID = undefined;
     if (creator) creatorID = creator.userID;
@@ -318,17 +340,18 @@ class CommunityService extends Service {
   /**
    * Get stats of a community
    * @param {string} subreddit
-   * @param {string} type type of the stats required ("left", "joined", "pageViews")
+   * @param {string} type1 type of the stats required ("leftPerDay", "leftPerMonth", "joinedPerDay", "joinedPerMonth", "pageViewsPerDay", "pageViewsPerMonth")
+   * @param {string} type1 type of the stats required ("leftPerDay", "leftPerMonth", "joinedPerDay", "joinedPerMonth", "pageViewsPerDay", "pageViewsPerMonth")
    * @returns {object} data
    * @function
    */
-  getStats = async (subreddit, type) => {
+  getStats = async (subreddit, type1, type2) => {
     const community = await this.getOne({
       _id: subreddit,
-      select: type,
+      select: `${type1} ${type2}`,
     });
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
-    return community[type];
+    return { days: community[type1], months: community[type2] };
   };
 
   getRandomCommunities = async () => {
@@ -710,22 +733,25 @@ class CommunityService extends Service {
     await this.updateOne({ _id: subreddit }, { banner: "default.jpg" });
   };
   removeSrIcon = async (subreddit) => {
-    await this.updateOne({ '_id': subreddit }, { 'icon': 'default.jpg' });
-  }
+    await this.updateOne({ _id: subreddit }, { icon: "default.jpg" });
+  };
 
   inviteModerator = async (subreddit, moderator) => {
-    await this.updateOne({ _id: subreddit }, {
-      $push: {
-        invitedModerators: moderator,
+    await this.updateOne(
+      { _id: subreddit },
+      {
+        $push: {
+          invitedModerators: moderator,
+        },
       }
-    });
-  }
+    );
+  };
 
   kickModerator = async (subreddit, moderator) => {
     let doc = await this.getOne({ _id: subreddit });
-    doc.moderators = doc.moderators.filter(el => el.userID != moderator);
+    doc.moderators = doc.moderators.filter((el) => el.userID != moderator);
     await doc.save();
-  }
+  };
 }
 
 module.exports = CommunityService;
