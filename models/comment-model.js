@@ -57,6 +57,9 @@ const commentSchema = new mongoose.Schema({
   editedAt: {
     type: Date,
   },
+  communityID: {
+    type: String,
+  },
   spamCount: {
     type: Number,
     default: 0,
