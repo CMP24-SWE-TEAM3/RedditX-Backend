@@ -272,6 +272,21 @@ class PostService extends Service {
       status: true,
     };
   };
+
+  userSubmitted = async (postIDs, query) => {
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    query.limit = query.limit || "10";
+    /*return posts to controller */
+    return await this.getAll({ _id: { $in: postIDs } }, query)
+      .populate({
+        path: "userID",
+        select: "_id avatar",
+      })
+      .populate({
+        path: "communityID",
+        select: "_id icon",
+      }); //addedFilter contain either the subreddit or the information of signed in user
+  };
 }
 
 module.exports = PostService;

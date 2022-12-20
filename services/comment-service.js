@@ -227,37 +227,40 @@ class CommentService extends Service {
         operation = -1;
       }
 
-      try{
-      if (removeDetector && !addDetector) {
-        await User.findOneAndUpdate(
-          { _id: username },
-          { $pull: { hasVote: { postID: postIdCasted } } }
-        ).clone();
-      } else if (!removeDetector && addDetector) {
-        await User.findOneAndUpdate(
-          { _id: username },
-          { $addToSet: { hasVote: { postID: postIdCasted, type: operation } } }
-        ).clone();
-      } else if (addDetector && removeDetector) {
-        await User.findOneAndUpdate(
-          { _id: username },
-          { $pull: { hasVote: { postID: postIdCasted } } }
-        );
-        await User.findOneAndUpdate(
-          { _id: username },
-          { $addToSet: { hasVote: { postID: postIdCasted, type: operation } } }
-        ).clone();
-      }
-      await Post.findByIdAndUpdate(
-        { _id: postIdCasted },
-        {
-          
-          $set: {
-            votesCount: votesCount + operation,
-            voters: voters,
-
+      try {
+        if (removeDetector && !addDetector) {
+          await User.findOneAndUpdate(
+            { _id: username },
+            { $pull: { hasVote: { postID: postIdCasted } } }
+          ).clone();
+        } else if (!removeDetector && addDetector) {
+          await User.findOneAndUpdate(
+            { _id: username },
+            {
+              $addToSet: { hasVote: { postID: postIdCasted, type: operation } },
+            }
+          ).clone();
+        } else if (addDetector && removeDetector) {
+          await User.findOneAndUpdate(
+            { _id: username },
+            { $pull: { hasVote: { postID: postIdCasted } } }
+          );
+          await User.findOneAndUpdate(
+            { _id: username },
+            {
+              $addToSet: { hasVote: { postID: postIdCasted, type: operation } },
+            }
+          ).clone();
+        }
+        await Post.findByIdAndUpdate(
+          { _id: postIdCasted },
+          {
+            $set: {
+              votesCount: votesCount + operation,
+              voters: voters,
+            },
           },
-         }, {new: true },
+          { new: true },
           (err) => {
             if (err) {
               return {
@@ -435,6 +438,13 @@ class CommentService extends Service {
   removeComment = async (comment) => {
     comment.isDeleted = true;
     await comment.save();
+  };
+
+  userComments = async (commentIds, query) => {
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    query.limit = query.limit || "10";
+    /*return posts to controller */
+    return await this.getAll({ _id: { $in: commentIds } }, query); //addedFilter contain either the subreddit or the information of signed in user
   };
 }
 

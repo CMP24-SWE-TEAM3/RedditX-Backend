@@ -617,33 +617,44 @@ class UserService extends Service {
    * @returns {Array} posts
    * @function
    */
-  userSubmitted = async (username, query) => {
+  userSubmittedPosts = async (username) => {
     const user = await this.findById(username, "hasPost");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
     var posts = [];
     user.hasPost.forEach((el) => {
       posts.push(el);
     });
-    const cursor = Post.find({
-      _id: { $in: posts },
-    })
-      .populate({
-        path: "userID",
-        select: "_id avatar",
-      })
-      .populate({
-        path: "communityID",
-        select: "_id icon",
-      });
-    var returnPosts = [];
-    for await (const doc of cursor) {
-      returnPosts.push(doc);
-    }
-    return returnPosts;
+    return posts;
+  };
+  /**
+   * Get comments which is written by the user from database
+   * @param {String} (username)
+   * @returns {Array} posts
+   * @function
+   */
+  userSubmittedComments = async (username) => {
+    const user = await this.findById(username, "hasComment");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    var comments = [];
+    user.hasComment.forEach((el) => {
+      comments.push(el);
+    });
+    return comments;
+  };
+  /**
+   * Get replies which is written by the user from database
+   * @param {String} (username)
+   * @returns {Array} posts
+   * @function
+   */
+  userSubmittedReplies = async (username) => {
+    const user = await this.findById(username, "hasReply");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    var replies = [];
+    user.hasReply.forEach((el) => {
+      replies.push(el);
+    });
+    return replies;
   };
   /**
    * Get posts which downvoted by the user from database
@@ -788,14 +799,10 @@ class UserService extends Service {
    * @returns {object} saved posts
    * @function
    */
-  userSavedPosts = async (username, query) => {
+  userSavedPosts = async (username) => {
     const user = await this.findById(username, "savedPosts");
     if (!user) throw new AppError("This user doesn't exist!", 404);
     /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
-
     const cursor = Post.find({
       _id: { $in: user.savedPosts },
     })

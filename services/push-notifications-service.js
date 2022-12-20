@@ -40,8 +40,8 @@ class PushNotificationsService {
           body: `${followerUsername} has followed you`,
         },
         data: {
-          orderId: "123456",
-          orderDate: "2022-12-15",
+          followerID:`${followerUsername}`  ,
+          type:"1"
         },
         token: receiverFcmToken,
       };
@@ -72,6 +72,8 @@ class PushNotificationsService {
         },
         data: {
           postID: `${postID}`,
+          type:"2"
+
         },
         token: receiverFcmToken,
       };
@@ -92,7 +94,8 @@ class PushNotificationsService {
   upvoteCommentNotification = async (
     receiverFcmToken,
     upvotedUsername,
-    commentID
+    commentID,
+    postID
   ) => {
     try {
       let message = {
@@ -102,6 +105,9 @@ class PushNotificationsService {
         },
         data: {
           commentID: `${commentID}`,
+          postID:`${postID}`,
+          type:"3"
+
         },
         token: receiverFcmToken,
       };
@@ -161,6 +167,8 @@ class PushNotificationsService {
         data: {
           commentID: `${commentID}`,
           postID: `${postID}`,
+          type:"4"
+
         },
         token: receiverFcmToken,
       };
@@ -193,6 +201,8 @@ class PushNotificationsService {
         data: {
           commentID: `${commentID}`,
           replyID: `${replyID}`,
+          type:"5"
+
         },
         token: receiverFcmToken,
       };
