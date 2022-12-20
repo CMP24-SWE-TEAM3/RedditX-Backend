@@ -98,6 +98,8 @@ class PushNotificationsService {
     postID
   ) => {
     try {
+      console.log(commentID);
+      console.log(postID);
       let message = {
         notification: {
           title: "You have a new upvote",

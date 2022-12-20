@@ -397,6 +397,7 @@ const vote = async (req, res) => {
         const comment = await commentServiceInstance.getOne({
           _id: req.body.id.slice(3),
         });
+        console.log(comment);
         user = await userServiceInstance.getOne({ _id: req.username });
         const notificationSaver =
           await notificationServiceInstance.createUpvoteToCommentNotification(
@@ -435,7 +436,8 @@ const vote = async (req, res) => {
           await pushNotificationServiceInstance.upvoteCommentNotification(
             fcmToken,
             req.username,
-            comment._id
+            comment._id,
+            comment.replyingTo
           );
         if (!pushResult.status) {
           return res.status(500).json({
