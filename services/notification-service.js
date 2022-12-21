@@ -76,6 +76,7 @@ class NotificationService extends Service {
       type: "newFollower",
       text: "u/" + `${transmitter.slice(3)} has followed you`,
       sourceThing: transmitter,
+      createdAt: Date.now(),
     };
     var not;
 
@@ -112,8 +113,9 @@ class NotificationService extends Service {
       userIcon: user.avatar,
       title: "You have a new upvote",
       type: "upvoteToYourComment",
-      text: "u/" + `${senderUsername} upvoted on your comment`,
+      text: "u/" + `${senderUsername.slice(3)} upvoted on your comment`,
       sourceThing: senderUsername,
+      createdAt: Date.now(),
     };
     var not;
 
@@ -136,22 +138,23 @@ class NotificationService extends Service {
       id: not._id,
     };
   };
-   /**
+  /**
    *Creates reply to post notification
    * @param {String} senderUsername
    * @param {Object} user
    * @return {Object} state
    * @function
    */
-   createReplyToPostNotification = async (senderUsername, user) => {
+  createReplyToPostNotification = async (senderUsername, user) => {
     var notification;
 
     notification = {
       userIcon: user.avatar,
       title: "You have a new reply to your post",
       type: "upvoteToYourComment",
-      text: "u/" + `${senderUsername} commented on your post`,
+      text: "u/" + `${senderUsername.slice(3)} commented on your post`,
       sourceThing: senderUsername,
+      createdAt: Date.now(),
     };
     var not;
 
@@ -175,22 +178,23 @@ class NotificationService extends Service {
     };
   };
 
- /**
+  /**
    *Creates reply to comment notification
    * @param {String} senderUsername
    * @param {Object} user
    * @return {Object} state
    * @function
    */
-   createReplyToCommentNotification = async (senderUsername, user) => {
+  createReplyToCommentNotification = async (senderUsername, user) => {
     var notification;
 
     notification = {
       userIcon: user.avatar,
       title: "You have a new reply to your comment",
       type: "upvoteToYourComment",
-      text: "u/" + `${senderUsername} replied on your comment`,
+      text: "u/" + `${senderUsername.slice(3)} replied on your comment`,
       sourceThing: senderUsername,
+      createdAt: Date.now(),
     };
     var not;
 
@@ -228,8 +232,9 @@ class NotificationService extends Service {
       userIcon: user.avatar,
       title: "You have a new upvote",
       type: "upvoteToYourPost",
-      text: "u/" + `${senderUsername} upvoted on your post`,
+      text: "u/" + `${senderUsername.slice(3)} upvoted on your post`,
       sourceThing: senderUsername,
+      createdAt: Date.now(),
     };
     var not;
 

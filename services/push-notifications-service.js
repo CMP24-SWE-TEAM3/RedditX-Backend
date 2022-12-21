@@ -9,10 +9,7 @@ var FCM = new fcm(certPath);
  * @class PushNotificationsService
  */
 class PushNotificationsService {
-
-  constructor(){
-
-  }
+  constructor() {}
   sendNotification = async (message) => {
     FCM.send(message, function (err) {
       if (err) {
@@ -37,11 +34,11 @@ class PushNotificationsService {
       let message = {
         notification: {
           title: "You have a new follower",
-          body: `${followerUsername} has followed you`,
+          body: `${followerUsername.slice(3)} has followed you`,
         },
         data: {
-          followerID:`${followerUsername}`  ,
-          type:"1"
+          followerID: `${followerUsername}`,
+          type: "1",
         },
         token: receiverFcmToken,
       };
@@ -68,12 +65,11 @@ class PushNotificationsService {
       let message = {
         notification: {
           title: "You have a new upvote",
-          body: `${upvotedUsername} upvoted on your post`,
+          body: `${upvotedUsername.slice(3)} upvoted on your post`,
         },
         data: {
           postID: `${postID}`,
-          type:"2"
-
+          type: "2",
         },
         token: receiverFcmToken,
       };
@@ -103,13 +99,12 @@ class PushNotificationsService {
       let message = {
         notification: {
           title: "You have a new upvote",
-          body: `${upvotedUsername} upvoted on your comment`,
+          body: `${upvotedUsername.slice(3)} upvoted on your comment`,
         },
         data: {
           commentID: `${commentID}`,
-          postID:`${postID}`,
-          type:"3"
-
+          postID: `${postID}`,
+          type: "3",
         },
         token: receiverFcmToken,
       };
@@ -133,7 +128,7 @@ class PushNotificationsService {
       let message = {
         notification: {
           title: "You have a new mention",
-          body: `${actionUsername} mention you on a comment`,
+          body: `${actionUsername.slice(3)} mention you on a comment`,
         },
         data: {
           commentID: `${commentID}`,
@@ -164,13 +159,12 @@ class PushNotificationsService {
       let message = {
         notification: {
           title: "You have a new reply to your post",
-          body: `${actionUsername} has replied to your post`,
+          body: `${actionUsername.slice(3)} has replied to your post`,
         },
         data: {
           commentID: `${commentID}`,
           postID: `${postID}`,
-          type:"4"
-
+          type: "4",
         },
         token: receiverFcmToken,
       };
@@ -198,13 +192,12 @@ class PushNotificationsService {
       let message = {
         notification: {
           title: "You have a new reply to your comment",
-          body: `${actionUsername} has replied to your comment`,
+          body: `${actionUsername.slice(3)} has replied to your comment`,
         },
         data: {
           commentID: `${commentID}`,
           replyID: `${replyID}`,
-          type:"5"
-
+          type: "5",
         },
         token: receiverFcmToken,
       };
