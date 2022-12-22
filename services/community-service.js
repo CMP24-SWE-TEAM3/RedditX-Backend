@@ -353,7 +353,12 @@ class CommunityService extends Service {
     if (!community) throw new AppError("This subreddit doesn't exist!", 404);
     return { days: community[type1], months: community[type2] };
   };
-
+  /**
+   * Get random subreddits of random categories
+   * @param {string} query 
+   * @returns {object} data
+   * @function
+   */
   getRandomCommunities = async (query) => {
     query.limit = query.limit || "10";
     return this.getAll({}, query);
@@ -364,6 +369,12 @@ class CommunityService extends Service {
     // }
     // return communities;
   };
+  /**
+   * Check whether subreddit is available or not
+   * @param {string} subreddit 
+   * @returns {object} {state and subreddit}
+   * @function
+   */
   availableSubreddit = async (subreddit) => {
     var subre = await this.getOne({ _id: subreddit });
     if (subre) {
@@ -519,6 +530,13 @@ class CommunityService extends Service {
     await post.save();
   };
 
+   /**
+   * Add community rule
+   * @param {string} body contain rules details
+   * @param {string} user user information
+   * @return {Object} state
+   * @function
+   */
   addCommunityRule = async (body, user) => {
     const result = await this.availableSubreddit(body.srName);
     if (result.state) {
@@ -565,6 +583,13 @@ class CommunityService extends Service {
       response: "rule is added successfully",
     };
   };
+    /**
+   * Edit community rule
+   * @param {string} body contain rules details
+   * @param {string} user user information
+   * @return {Object} state
+   * @function
+   */
   editCommunityRule = async (body, user) => {
     const result = await this.availableSubreddit(body.srName);
     if (result.state) {
@@ -621,7 +646,13 @@ class CommunityService extends Service {
       response: "rule is edited successfully",
     };
   };
-
+    /**
+   * Create subreddit
+   * @param {string} body contain rules details
+   * @param {string} user user information
+   * @return {Object} state
+   * @function
+   */
   createSubreddit = async (body, user) => {
     if (!user.canCreateSubreddit) {
       return {
@@ -674,6 +705,12 @@ class CommunityService extends Service {
       };
     }
   };
+    /**
+   * Validation of subreddit's attributes before creation
+   * @param {string} body contain rules details
+   * @return {Boolean} state
+   * @function
+   */
   creationValidation = async (body) => {
     if (
       !body.name ||
@@ -684,7 +721,13 @@ class CommunityService extends Service {
       return false;
     return true;
   };
-
+ /**
+   * Change the suggested comment sort of a subreddit
+   * @param {string} srName subreddit name
+   * @param {string} commentSort comment sort type
+   * @return {Object} state {boolean}
+   * @function
+   */
   setSuggestedSort = async (srName, commentSort) => {
     Community.findByIdAndUpdate(
       { _id: srName },
