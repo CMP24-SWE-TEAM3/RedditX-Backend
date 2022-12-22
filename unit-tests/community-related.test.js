@@ -1358,8 +1358,17 @@ describe("Test create subreddit",()=>{
   });
 });
 describe("Test change comment sort type of subreddit",()=>{
-  test("test", async () => {
-    communityServiceInstance.findByIdAndUpdate=jest.fn().mockReturnValueOnce({});
+  test("Test change comment sort type of non-existing subreddit", async () => {
+    communityServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+    Community.prototype.save = jest.fn().mockImplementation(() => {});
+    const result = await communityServiceInstance.setSuggestedSort("t5_notfound","old");
+    expect(result.status).toBe(false);
   });
+  // test("Test change comment sort type of existing subreddit", async () => {
+  //   communityServiceInstance.getOne=jest.fn().mockReturnValueOnce({"_id":"t5_imagePro235","communityOptions":{"suggestedCommentSort":"new"}});
+  //   Community.prototype.save = jest.fn().mockImplementation(() => {});
+  //   const result = await communityServiceInstance.setSuggestedSort("t5_notfound","old");
+  //   expect(result.status).toBe(true);
+  // }); //moza
 
 });
