@@ -703,8 +703,10 @@ class UserService extends Service {
         passwordSet: user.isPasswordSet,
         email: user.email,
         about: user.about,
+        gender: user.gender,
         avatar: user.avatar,
         userID: user._id,
+        showActiveCommunities: user.showActiveCommunities,
       };
       return {
         user: obj,
@@ -746,11 +748,13 @@ class UserService extends Service {
         emailCommentReply: user.prefs.emailCommentReply,
         emailUpvoteComment: user.prefs.emailUpvoteComment,
         about: user.about,
+        gender: user.gender,
         avatar: user.avatar,
         userID: user._id,
         emailUserNewFollwer: user.meReturn.emailUserNewFollwer,
         emailUpVotePost: user.meReturn.emailUpVotePost,
         emailUsernameMention: user.meReturn.emailUsernameMention,
+        showActiveCommunities: user.showActiveCommunities,
       };
       return {
         user: obj,

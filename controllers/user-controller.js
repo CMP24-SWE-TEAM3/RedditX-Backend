@@ -403,7 +403,7 @@ const subscribe = async (req, res) => {
   if (!req.body.srName || !req.body.action) {
     return returnResponse(res, { error: "invalid inputs" }, 400);
   }
-  
+
   const result = await userServiceInstance.subscribe(req.body, req.username);
   if (result.state) {
     if (req.body.srName.substring(0, 2) === "t2" && req.body.action === "sub") {
@@ -434,10 +434,10 @@ const subscribe = async (req, res) => {
       console.log(fcm_token_user);
       var fcmToken = fcm_token_user.fcmToken;
       console.log(fcmToken);
-      if(!fcmToken){
+      if (!fcmToken) {
         return res.status(200).json({
-          status:"success without push notifications as user doesn't have one"
-        })
+          status: "success without push notifications as user doesn't have one",
+        });
       }
       const pushResult =
         await pushNotificationServiceInstance.newFollowerNotification(
