@@ -29,63 +29,34 @@
             <pre class="prettyprint source linenums"><code>const catchAsync = require("../utils/catch-async");
 const User = require("../models/user-model");
 const UserService = require("./../services/user-service");
-
+const Post = require("./../models/post-model");
+const PostService = require("./../services/post-service");
+const postServiceInstance = new PostService(Post);
+const Comment = require("./../models/comment-model");
+const CommentService = require("./../services/comment-service");
+const commentServiceInstance = new CommentService(Comment);
 
 var userServiceInstance = new UserService(User);
 
- /**
-* Get comments on posts of the user 
-* @param {function} (req, res)
-* @returns {object} res
-*/
-  const getUserSelfReply = catchAsync(async (req, res, next) => {
-    try {
-      var comments = await userServiceInstance.userSelfReply(
-        req.params.username,
-        req.query
-      );
-    } catch (err) {
-      return next(err);
-    }
-    res.status(200).json({
-      comments
-    });
-  });
- /**
- * Get user comment replies
- * @param {function} (req, res)
- * @returns {object} res
- */
-const getUserCommentReplies = catchAsync(async (req, res, next) => {
-  try {
-    var comments= await userServiceInstance.userCommentReplies(
-      req.params.username,
-      req.query
-    );
-  } catch (err) {
-    return next(err);
-  }
-  res.status(200).json({
-    comments
-  });
-});
- /**
+/**
  * Get user comments
  * @param {function} (req, res)
  * @returns {object} res
  */
 const getUserComments = catchAsync(async (req, res, next) => {
   try {
-    var comments = await userServiceInstance.userComments(
-      req.params.username,
+    const commentIds = await userServiceInstance.userSubmittedComments(
+      req.params.username
+    );
+    var comments = await commentServiceInstance.userComments(
+      commentIds,
       req.query
     );
-
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    comments
+    comments,
   });
 });
 /**
@@ -93,17 +64,15 @@ const getUserComments = catchAsync(async (req, res, next) => {
  * @param {function} (req,res)
  * @returns {object} res
  */
- const getUserUpVoted = catchAsync(async (req, res, next) => {
+const getUserUpVoted = catchAsync(async (req, res, next) => {
   try {
-    var posts = await userServiceInstance.userUpVoted(
-      req.params.username,
-      req.query
-    );
+    var postIds = await userServiceInstance.userUpVoted(req.params.username);
+    var posts = await postServiceInstance.userPosts(postIds, req.query);
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    posts
+    posts,
   });
 });
 /**
@@ -111,18 +80,15 @@ const getUserComments = catchAsync(async (req, res, next) => {
  * @param {function} (req,res)
  * @returns {object} res
  */
- const getUserDownVoted = catchAsync(async (req, res, next) => {
+const getUserDownVoted = catchAsync(async (req, res, next) => {
   try {
-    var posts = await userServiceInstance.userDownVoted(
-      req.params.username,
-      req.query
-    );
-
+    var postIds = await userServiceInstance.userDownVoted(req.params.username);
+    var posts = await postServiceInstance.userPosts(postIds, req.query);
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    posts
+    posts,
   });
 });
 /**
@@ -130,38 +96,37 @@ const getUserComments = catchAsync(async (req, res, next) => {
  * @param {function} (req, res)
  * @returns {object} res
  */
- const getUserSubmitted = catchAsync(async (req, res, next) => {
+const getUserSubmitted = catchAsync(async (req, res, next) => {
+  var posts;
   try {
-    var posts =  userServiceInstance.userSubmitted(
-      req.params.username,
-      req.query
+    const postIds = await userServiceInstance.userSubmittedPosts(
+      req.params.username
     );
+    posts = await postServiceInstance.userPosts(postIds, req.query);
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
-    posts
+    posts,
   });
 });
-  /**
-   * Get posts where user is being mentioned in
-   * @param {function} (req,res)
-   * @returns {object} res
-   */
-     const getUserMentions = catchAsync(async (req, res, next) => {
-      try {
-        var posts  = await userServiceInstance.userMentions(
-          req.params.username,
-          req.query
-        );
-      } catch (err) {
-        return next(err);
-      }
-      res.status(200).json({
-        posts
-      });
-    });
-  /**
+/**
+ * Get posts where user is being mentioned in
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const getUserMentions = catchAsync(async (req, res, next) => {
+  try {
+    const postIds = await userServiceInstance.userMentions(req.username);
+    var posts = await postServiceInstance.userPosts(postIds, req.query);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    posts,
+  });
+});
+/**
  * Merge three sorted array in one sorted one
  * @param {Array} (A,B)
  * @returns {Array} D
@@ -181,47 +146,52 @@ function mergeTwo(A, B) {
   while (j &lt; n) D.push(B[j++]);
 
   return D;
-}  
- /**
+}
+/**
 //  * Get user overview
 //  * @param {function} (req, res)
 //  * @returns {object} res
 //  */
 const getUserOverview = catchAsync(async (req, res, next) => {
   let overviewReturn = [];
-    try {
-      var posts = await userServiceInstance.userSubmitted(
-        req.params.username,
-        req.query
-      );
-      var comments= await userServiceInstance.userComments(
-        req.params.username,
-        req.query
-      );
-      var replies = await userServiceInstance.userComments(
-        req.params.username,
-        req.query
-      );
-      let merged = mergeTwo(posts, comments);
-      overviewReturn = mergeTwo(merged, replies);
-    } catch (err) {
-      return next(err);
-    }
-    res.status(200).json({
-      overview: overviewReturn.reverse()
-    });
+  try {
+    const postIds = await userServiceInstance.userSubmittedPosts(
+      req.params.username
+    );
+    var posts = await postServiceInstance.userPosts(postIds, req.query);
+    const commentIds = await userServiceInstance.userSubmittedComments(
+      req.params.username
+    );
+    var comments = await commentServiceInstance.userComments(
+      commentIds,
+      req.query
+    );
+    const replyIds = await userServiceInstance.userSubmittedReplies(
+      req.params.username
+    );
+    var replies = await commentServiceInstance.userComments(
+      replyIds,
+      req.query
+    );
+    let merged = mergeTwo(posts, comments);
+    overviewReturn = mergeTwo(merged, replies);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    overview: overviewReturn.reverse(),
   });
-  
-    module.exports = {
-        getUserDownVoted,
-        getUserOverview,
-        getUserUpVoted,
-        getUserMentions,
-        getUserCommentReplies,
-        getUserSelfReply,
-        getUserSubmitted,
-        getUserComments
-    };</code></pre>
+});
+
+module.exports = {
+  getUserDownVoted,
+  getUserOverview,
+  getUserUpVoted,
+  getUserMentions,
+  getUserSubmitted,
+  getUserComments,
+};
+</code></pre>
         </article>
     </section>
 
@@ -231,13 +201,13 @@ const getUserOverview = catchAsync(async (req, res, next) => {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserCommentReplies">getUserCommentReplies</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSelfReply">getUserSelfReply</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="MessageService.html">MessageService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="PushNotificationsService.html">PushNotificationsService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addCommunityRule">addCommunityRule</a></li><li><a href="global.html#addInterests">addInterests</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#allMessages">allMessages</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#compose">compose</a></li><li><a href="global.html#createSubreddit">createSubreddit</a></li><li><a href="global.html#deleteData">deleteData</a></li><li><a href="global.html#deleteLink">deleteLink</a></li><li><a href="global.html#deleteMessage">deleteMessage</a></li><li><a href="global.html#deleteUserNotification">deleteUserNotification</a></li><li><a href="global.html#editCommunityRule">editCommunityRule</a></li><li><a href="global.html#editProfile">editProfile</a></li><li><a href="global.html#editUserPrefs">editUserPrefs</a></li><li><a href="global.html#editUserText">editUserText</a></li><li><a href="global.html#followPost">followPost</a></li><li><a href="global.html#followers">followers</a></li><li><a href="global.html#following">following</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityAbout">getCommunityAbout</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getEdited">getEdited</a></li><li><a href="global.html#getFollowersOfUser">getFollowersOfUser</a></li><li><a href="global.html#getGeneralInfo">getGeneralInfo</a></li><li><a href="global.html#getInterests">getInterests</a></li><li><a href="global.html#getMembers">getMembers</a></li><li><a href="global.html#getMembersCountPerDayAndMonth">getMembersCountPerDayAndMonth</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSpammed">getSpammed</a></li><li><a href="global.html#getSpecificCategory">getSpecificCategory</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSavedPosts">getUserSavedPosts</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#getViewsCountPerDayAndMonth">getViewsCountPerDayAndMonth</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#hide">hide</a></li><li><a href="global.html#importData">importData</a></li><li><a href="global.html#inboxMessages">inboxMessages</a></li><li><a href="global.html#kickUser">kickUser</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#markLocked">markLocked</a></li><li><a href="global.html#markNsfw">markNsfw</a></li><li><a href="global.html#markReadUserNotification">markReadUserNotification</a></li><li><a href="global.html#markSpoiler">markSpoiler</a></li><li><a href="global.html#markUnLocked">markUnLocked</a></li><li><a href="global.html#markUnSpoiler">markUnSpoiler</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#readAllMessages">readAllMessages</a></li><li><a href="global.html#removeSpam">removeSpam</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#sentMessages">sentMessages</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unhide">unhide</a></li><li><a href="global.html#unreadMessage">unreadMessage</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sun Dec 04 2022 20:40:38 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Dec 23 2022 21:19:42 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

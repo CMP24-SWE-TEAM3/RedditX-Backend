@@ -27,12 +27,20 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>const catchAsync = require("../utils/catch-async");
+const AppError = require("../utils/app-error");
+const Post = require("./../models/post-model");
+const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
 const User = require("./../models/user-model");
 const CommunityService = require("./../services/community-service");
+const CommentService = require("./../services/comment-service");
+const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
+const IdValidator = require("../validate/listing-validators").validateObjectId;
 
 const communityServiceInstance = new CommunityService(Community);
+const commentServiceInstance = new CommentService(Comment);
+const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
 
 /**
@@ -41,8 +49,9 @@ const userServiceInstance = new UserService(User);
  * @returns {object} res
  */
 const uploadCommunityIcon = catchAsync(async (req, res, next) => {
+  var icon = undefined;
   try {
-    await communityServiceInstance.uploadCommunityPhoto(
+    icon = await communityServiceInstance.uploadCommunityPhoto(
       req.file,
       req.username,
       req.params.subreddit,
@@ -53,7 +62,7 @@ const uploadCommunityIcon = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Icon is updated successfully",
+    icon,
   });
 });
 
@@ -63,8 +72,9 @@ const uploadCommunityIcon = catchAsync(async (req, res, next) => {
  * @returns {object} res
  */
 const uploadCommunityBanner = catchAsync(async (req, res, next) => {
+  var banner = undefined;
   try {
-    await communityServiceInstance.uploadCommunityPhoto(
+    banner = await communityServiceInstance.uploadCommunityPhoto(
       req.file,
       req.username,
       req.params.subreddit,
@@ -75,7 +85,7 @@ const uploadCommunityBanner = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Banner is updated successfully",
+    banner,
   });
 });
 
@@ -91,22 +101,18 @@ const setSuggestedSort = async (req, res) => {
       status: "failed",
     });
   }
-  Community.findByIdAndUpdate(
-    { _id: req.body.srName },
-    { $set: { suggestedCommentSort: req.body.suggestedCommentSort } },
-    { new: true },
-    (err) => {
-      if (err) {
-        return res.status(500).json({
-          status: "failed",
-        });
-      } else {
-        return res.status(200).json({
-          status: "done",
-        });
-      }
-    }
+  const result = await communityServiceInstance.setSuggestedSort(
+    req.body.srName,
+    req.body.suggestedCommentSort
   );
+  if (result.status) {
+    return res.status(200).json({
+      status: "done",
+    });
+  }
+  return res.status(500).json({
+    status: "failed",
+  });
 };
 
 /**
@@ -155,18 +161,38 @@ const getSubscribed = catchAsync(async (req, res, next) => {
     communities,
   });
 });
+
 /**
- * Get the list of random communities 
+ * Get a list of communities with a specific category
  * @param {function} (req, res, next)
  * @returns {object} res
  */
- const getRandomCommunities =async(req,res)=>{
-    const communities=await communityServiceInstance.getRandomCommunities();
-    return res.status(200).json({
-      communities:communities
-    });
+const getSpecificCategory = catchAsync(async (req, res, next) => {
+  var communities = undefined;
+  try {
+    communities = await communityServiceInstance.getSpecificCategory(req.query);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    communities,
+  });
+});
 
- } 
+/**
+ * Get the list of random communities
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getRandomCommunities = async (req, res) => {
+  const communities = await communityServiceInstance.getRandomCommunities(
+    req.query
+  );
+  return res.status(200).json({
+    communities: communities,
+  });
+};
 
 /**
  * Ban or mute a user within a community
@@ -207,23 +233,30 @@ const banOrMute = catchAsync(async (req, res, next) => {
  */
 const getBanned = catchAsync(async (req, res, next) => {
   var users = undefined;
+  var banned = [];
   try {
-    const memberIDs = await communityServiceInstance.getBannedOrMuted(
-      req.params.subreddit,
-      "isBanned"
-    );
+    const { memberIDs, dates } =
+      await communityServiceInstance.getBannedOrMuted(
+        req.params.subreddit,
+        "isBanned"
+      );
     users = await userServiceInstance.find(
       {
         _id: { $in: memberIDs },
       },
       "avatar about"
     );
+    dates.forEach((date, index) => {
+      var tempBanned = { ...users[index] }._doc;
+      if (tempBanned != undefined) tempBanned.date = date;
+      banned[index] = tempBanned;
+    });
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    users,
+    users: banned,
   });
 });
 
@@ -234,17 +267,152 @@ const getBanned = catchAsync(async (req, res, next) => {
  */
 const getMuted = catchAsync(async (req, res, next) => {
   var users = undefined;
+  var muted = [];
   try {
-    const memberIDs = await communityServiceInstance.getBannedOrMuted(
-      req.params.subreddit,
-      "isMuted"
-    );
+    const { memberIDs, dates } =
+      await communityServiceInstance.getBannedOrMuted(
+        req.params.subreddit,
+        "isMuted"
+      );
     users = await userServiceInstance.find(
       {
         _id: { $in: memberIDs },
       },
       "avatar about"
     );
+    dates.forEach((date, index) => {
+      var tempMuted = { ...users[index] }._doc;
+      if (tempMuted != undefined) tempMuted.date = date;
+      muted[index] = tempMuted;
+    });
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    users: muted,
+  });
+});
+
+/**
+ * Get edited posts and comments within a community
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getEdited = catchAsync(async (req, res, next) => {
+  var posts = undefined;
+  var comments = undefined;
+  try {
+    const subreddit = await communityServiceInstance.getOne({
+      _id: req.params.subreddit,
+      select: "moderators",
+    });
+    if (!subreddit)
+      return next(new AppError("This subreddit doesn't exist!", 404));
+    if (!subreddit.moderators.find((el) => el.userID))
+      return next(
+        new AppError("You are not a moderator in this subreddit!", 400)
+      );
+    posts = await postServiceInstance
+      .getAll(
+        { communityID: req.params.subreddit, editedAt: { $exists: true } },
+        { sort: "-editedAt -createdAt" }
+      )
+      .populate({
+        path: "userID",
+        select: "_id avatar",
+      })
+      .populate({
+        path: "communityID",
+        select: "_id icon",
+      });
+    comments = await commentServiceInstance.getAll(
+      { communityID: req.params.subreddit, editedAt: { $exists: true } },
+      { sort: "-editedAt -createdAt" }
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    posts,
+    comments,
+  });
+});
+
+/**
+ * Get spammed posts and comments within a community
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getSpammed = catchAsync(async (req, res, next) => {
+  var posts = undefined;
+  var comments = undefined;
+  try {
+    const subreddit = await communityServiceInstance.getOne({
+      _id: req.params.subreddit,
+      select: "moderators",
+    });
+    if (!subreddit)
+      return next(new AppError("This subreddit doesn't exist!", 404));
+    if (!subreddit.moderators.find((el) => el.userID))
+      return next(
+        new AppError("You are not a moderator in this subreddit!", 400)
+      );
+    posts = await postServiceInstance
+      .getAll(
+        {
+          communityID: req.params.subreddit,
+          spammers: { $exists: true, $ne: [] },
+        },
+        { sort: "-createdAt" }
+      )
+      .populate({
+        path: "userID",
+        select: "_id avatar",
+      })
+      .populate({
+        path: "communityID",
+        select: "_id icon",
+      });
+    comments = await commentServiceInstance.getAll(
+      { communityID: req.params.subreddit, spams: { $exists: true, $ne: [] } },
+      { sort: "-createdAt" }
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    posts,
+    comments,
+  });
+});
+
+/**
+ * Get all moderators of a subreddit
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getModerators = catchAsync(async (req, res, next) => {
+  var usersReturned = undefined;
+  var users = [];
+  try {
+    const { moderatorIDs, creatorID } =
+      await communityServiceInstance.getModerators(req.params.subreddit);
+    usersReturned = await userServiceInstance.find(
+      {
+        _id: { $in: moderatorIDs },
+      },
+      "avatar about"
+    );
+    var temp = undefined;
+    usersReturned.forEach((el, index) => {
+      temp = { ...el }._doc;
+      if (el._id === creatorID) temp.role = "creator";
+      else temp.role = "moderator";
+      users[index] = temp;
+    });
   } catch (err) {
     return next(err);
   }
@@ -255,28 +423,35 @@ const getMuted = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Get all moderators of a subreddit
+ * Get all members of a subreddit
  * @param {function} (req, res, next)
  * @returns {object} res
  */
-const getModerators = catchAsync(async (req, res, next) => {
+const getMembers = catchAsync(async (req, res, next) => {
   var users = undefined;
+  var members = [];
   try {
-    const moderatorIDs = await communityServiceInstance.getModerators(
-      req.params.subreddit
-    );
+    const { memberIDs, isBannedAndMuted } =
+      await communityServiceInstance.getMembers(req.params.subreddit);
     users = await userServiceInstance.find(
       {
-        _id: { $in: moderatorIDs },
+        _id: { $in: memberIDs },
       },
       "avatar about"
     );
+    isBannedAndMuted.forEach((isBannedAndMutedElement, index) => {
+      var temp = { ...users[index] }._doc;
+      if (temp === undefined) temp = {};
+      temp.isBanned = isBannedAndMutedElement.isBanned;
+      temp.isMuted = isBannedAndMutedElement.isMuted;
+      members[index] = temp;
+    });
   } catch (err) {
     return next(err);
   }
   res.status(200).json({
     status: "success",
-    users,
+    users: members,
   });
 });
 
@@ -296,6 +471,643 @@ const getCommunityOptions = catchAsync(async (req, res, next) => {
   }
   res.status(200).json(communityOptions);
 });
+/**
+ * Create subreddit
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const createSubreddit = async (req, res) => {
+  const check = await communityServiceInstance.creationValidation(req.body);
+  if (!check) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+  var user = await userServiceInstance.getOne({ _id: req.username });
+
+  const result = await communityServiceInstance.createSubreddit(req.body, user);
+  if (!result.status) {
+    return res.status(200).json({
+      status: result.error,
+    });
+  }
+  const updateUser = await userServiceInstance.addUserToComm(
+    user,
+    req.body.name
+  );
+  if (!updateUser.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: result.response,
+  });
+};
+/**
+ * Add community rule
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const addCommunityRule = async (req, res) => {
+  if (!req.body.srName || !req.body.rule) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+  var user = await userServiceInstance.getOne({ _id: req.username });
+
+  const result = await communityServiceInstance.addCommunityRule(
+    req.body,
+    user
+  );
+  if (!result.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: result.response,
+    id: result.id,
+  });
+};
+
+/**
+ * Edit community rule
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const editCommunityRule = async (req, res) => {
+  if (
+    !req.body.srName ||
+    !req.body.rule ||
+    !req.body.rule.id ||
+    !IdValidator(req.body.rule.id)
+  ) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+  var user = await userServiceInstance.getOne({ _id: req.username });
+
+  const result = await communityServiceInstance.editCommunityRule(
+    req.body,
+    user
+  );
+  if (!result.status) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: result.response,
+  });
+};
+
+/**
+ * Get community about
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getCommunityAbout = async (req, res) => {
+  if (!req.params["subreddit"]) {
+    return res.status(500).json({
+      status: "invalid parameters",
+    });
+  }
+
+  const result = await communityServiceInstance.availableSubreddit(
+    req.params["subreddit"]
+  );
+  if (result.state) {
+    return res.status(500).json({
+      status: result.error,
+    });
+  }
+  return res.status(200).json({
+    status: "done",
+    communityRules: result.subreddit.communityRules,
+    moderators: result.subreddit.moderators,
+  });
+};
+
+/**
+ * Get general information about things like a link, comment or a community
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getGeneralInfo = catchAsync(async (req, res, next) => {
+  var things = [];
+  try {
+    const thingsIDs = communityServiceInstance.getThingsIDs(req.query.id);
+    var result;
+    var prepend = undefined;
+    for (var i = 0; i &lt; thingsIDs.length; i++) {
+      prepend = thingsIDs[i][1] * 1;
+      result =
+        prepend === 1 // t1_ => Comment
+          ? await commentServiceInstance.getOne({
+              _id: thingsIDs[i].slice(3),
+              populate: { path: "authorId", select: "avatar" },
+            })
+          : prepend === 3 // t3_ => Post
+          ? await postServiceInstance
+              .getOne({ _id: thingsIDs[i].slice(3) })
+              .populate({
+                path: "userID",
+                select: "_id avatar",
+              })
+              .populate({
+                path: "communityID",
+                select: "_id icon",
+              })
+          : prepend === 5 // t5_ => Community
+          ? await communityServiceInstance.getOne({ _id: thingsIDs[i] })
+          : undefined;
+      things.push(result);
+    }
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    things,
+  });
+});
+
+/**
+ * Get members count (joined or left) per day and month
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getMembersCountPerDayAndMonth = catchAsync(async (req, res, next) => {
+  if (!req.query.type) return next(new AppError("Type is not provided!", 400));
+  var data = undefined;
+  try {
+    data = await communityServiceInstance.getStats(
+      req.params.subreddit,
+      `${req.query.type}PerDay`,
+      `${req.query.type}PerMonth`
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    days: data.days,
+    months: data.months,
+  });
+});
+
+/**
+ * Get views count per day and month
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const getViewsCountPerDayAndMonth = catchAsync(async (req, res, next) => {
+  var data = undefined;
+  try {
+    data = await communityServiceInstance.getStats(
+      req.params.subreddit,
+      "pageViewsPerDay",
+      "pageViewsPerMonth"
+    );
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    days: data.days,
+    months: data.months,
+  });
+});
+
+/**
+ * Kick a user within a community
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const kickUser = catchAsync(async (req, res, next) => {
+  var community = undefined;
+  try {
+    community = await communityServiceInstance.kickAtCommunity(
+      req.params.subreddit,
+      req.username,
+      req.body.userID
+    );
+    const toBeKicked = await userServiceInstance.getOne({
+      _id: req.body.userID,
+      select: "member",
+    });
+    await communityServiceInstance.kickAtUser(toBeKicked, community);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Operation is done successfully",
+  });
+});
+
+const removeSrBanner = catchAsync(async (req, res) => {
+  // [1] -> check existence of subreddit
+  const subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
+    });
+  }
+  await communityServiceInstance.removeSrBanner(req.params.subreddit);
+  res.status(200).json({
+    status: "succeded",
+  });
+});
+
+const removeSrIcon = catchAsync(async (req, res) => {
+  // [1] -> check existence of subreddit
+  const subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
+    });
+  }
+  await communityServiceInstance.removeSrIcon(req.params.subreddit);
+  res.status(200).json({
+    status: "succeded",
+  });
+});
+
+const getFlairs = catchAsync(async (req, res) => {
+  // [1] -> check existence of subreddit
+  const subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
+    });
+  }
+  // [3]-> get the flairs list
+
+  const flairs = await communityServiceInstance.getOne({
+    _id: req.params.subreddit,
+    select: "-_id flairList",
+  });
+  res.status(200).json({
+    status: "succeeded",
+    flairs: flairs.flairList,
+  });
+});
+
+const deleteFlair = catchAsync(async (req, res) => {
+  // [1] -> check existence of subreddit
+  const subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
+    });
+  }
+  //[3]-> delete the flair
+  let document = await communityServiceInstance.getOne({
+    _id: req.params.subreddit,
+  });
+
+  document.flairList = document.flairList.filter((el) => el._id != req.body.id);
+  await document.save();
+
+  res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const addFlair = catchAsync(async (req, res) => {
+  // [1] -> check existence of subreddit
+  const subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
+    });
+  }
+  //[3]-> adding flair
+  communityServiceInstance.updateOne(
+    { _id: req.params.subreddit },
+    {
+      $push: {
+        flairList: req.body,
+      },
+    }
+  );
+  return res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const configureSubreddit = catchAsync(async (req, res) => {
+  // [1] -> check existence of subreddit
+  var subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
+    });
+  }
+  // [3]-> configure the settings of subreddit
+
+  await communityServiceInstance.updateOne(
+    { _id: req.params.subreddit },
+    req.body
+  );
+  res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const approveLink = catchAsync(async (req, res) => {
+  // [1] -> check existence of subreddit
+  var subreddit = await communityServiceInstance.availableSubreddit(
+    req.body.communityID
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.body.communityID,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
+    });
+  }
+  //[3]-> check if the link is exist
+  const comment = await commentServiceInstance.getOne({ _id: req.body.linkID });
+  const post = await postServiceInstance.getOne({ _id: req.body.linkID });
+  if (!comment &amp;&amp; !post) {
+    res.status(404).json({
+      stauts: "fail",
+      message: "there isn't link with this id",
+    });
+  }
+  //[4]-> do approving the link
+  if (comment) {
+    //approve comment
+    commentServiceInstance.approveComment(comment);
+  } else if (post) {
+    //approve post
+    postServiceInstance.approvePost(post);
+  }
+  res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const removeLink = catchAsync(async (req, res) => {
+  // [1] -> check existence of subreddit
+  var subreddit = await communityServiceInstance.availableSubreddit(
+    req.body.communityID
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (
+    !(await userServiceInstance.isModeratorInSubreddit(
+      req.body.communityID,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't moderator in this subreddit",
+    });
+  }
+  //[3]-> check if the link is exist
+  const comment = await commentServiceInstance.getOne({
+    _id: req.body.id,
+    populate: "replyingTo",
+  });
+  const post = await postServiceInstance.getOne({
+    _id: req.body.id,
+    communityID: req.body.communityID,
+  });
+  if (
+    !(comment &amp;&amp; comment.replyingTo.communityID._id == req.body.communityID) &amp;&amp;
+    !post
+  ) {
+    return res.status(404).json({
+      stauts: "fail",
+      message: "un valid id or this link isn't in this subreddit",
+    });
+  }
+  //[4]-> do removing the link
+  if (comment) {
+    //approve comment
+    commentServiceInstance.removeComment(comment);
+  } else if (post) {
+    //approve post
+    postServiceInstance.removePost(post);
+  }
+  res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const kickModerator = catchAsync(async (req, res) => {
+  // [1] -> check existence of subreddit
+  var subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't creator of subreddit
+  if (
+    !(await userServiceInstance.isCreatorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't creator of this subreddit",
+    });
+  }
+
+  //[3] -> kick moderator
+  await communityServiceInstance.kickModerator(
+    req.params.subreddit,
+    req.body.userID
+  );
+  await userServiceInstance.kickModerator(
+    req.params.subreddit,
+    req.body.userID
+  );
+  return res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+/**
+ * Remove a spam from a post or a comment
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const removeSpam = catchAsync(async (req, res, next) => {
+  if (!req.body.linkID)
+    return next(new AppError("No linkID is provided!", 400));
+  try {
+    if (req.body.linkID[1] === "3") {
+      // From a post
+      var post = await postServiceInstance.getOne({
+        _id: req.body.linkID.slice(3),
+        select: "spammers",
+      });
+      if (!post) return new AppError("This post doesn't exist!", 404);
+      const subreddit = await communityServiceInstance.getOne({
+        _id: req.params.subreddit,
+        select: "moderators",
+      });
+      if (!subreddit)
+        return next(new AppError("This subreddit doesn't exist!", 404));
+      if (!subreddit.moderators.find((el) => el.userID))
+        return next(
+          new AppError("You are not a moderator in this subreddit!", 400)
+        );
+      await communityServiceInstance.removeSpam(
+        post,
+        req.body.spamID,
+        "spammers"
+      );
+    } else {
+      // From a comment
+      var comment = await commentServiceInstance.getOne({
+        _id: req.body.linkID.slice(3),
+      });
+      if (!comment)
+        return next(new AppError("This comment doesn't exist!", 404));
+      const subreddit = await communityServiceInstance.getOne({
+        _id: req.params.subreddit,
+        select: "moderators",
+      });
+      if (!subreddit)
+        return next(new AppError("This subreddit doesn't exist!", 404));
+      if (!subreddit.moderators.find((el) => el.userID))
+        return next(
+          new AppError("You are not a moderator in this subreddit!", 400)
+        );
+      await communityServiceInstance.removeSpam(
+        comment,
+        req.body.spamID,
+        "spams"
+      );
+    }
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Spams are updated successfully",
+  });
+});
 
 module.exports = {
   uploadCommunityIcon,
@@ -306,9 +1118,31 @@ module.exports = {
   banOrMute,
   getBanned,
   getMuted,
+  getEdited,
   getModerators,
+  getMembers,
   getCommunityOptions,
-  getRandomCommunities
+  getRandomCommunities,
+  getSpecificCategory,
+  removeSrBanner,
+  removeSrIcon,
+  getFlairs,
+  deleteFlair,
+  addFlair,
+  addCommunityRule,
+  createSubreddit,
+  editCommunityRule,
+  getCommunityAbout,
+  getGeneralInfo,
+  getMembersCountPerDayAndMonth,
+  getViewsCountPerDayAndMonth,
+  kickUser,
+  configureSubreddit,
+  approveLink,
+  removeLink,
+  kickModerator,
+  getSpammed,
+  removeSpam,
 };
 </code></pre>
         </article>
@@ -320,13 +1154,13 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserCommentReplies">getUserCommentReplies</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSelfReply">getUserSelfReply</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="MessageService.html">MessageService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="PushNotificationsService.html">PushNotificationsService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addCommunityRule">addCommunityRule</a></li><li><a href="global.html#addInterests">addInterests</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#allMessages">allMessages</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#compose">compose</a></li><li><a href="global.html#createSubreddit">createSubreddit</a></li><li><a href="global.html#deleteData">deleteData</a></li><li><a href="global.html#deleteLink">deleteLink</a></li><li><a href="global.html#deleteMessage">deleteMessage</a></li><li><a href="global.html#deleteUserNotification">deleteUserNotification</a></li><li><a href="global.html#editCommunityRule">editCommunityRule</a></li><li><a href="global.html#editProfile">editProfile</a></li><li><a href="global.html#editUserPrefs">editUserPrefs</a></li><li><a href="global.html#editUserText">editUserText</a></li><li><a href="global.html#followPost">followPost</a></li><li><a href="global.html#followers">followers</a></li><li><a href="global.html#following">following</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityAbout">getCommunityAbout</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getEdited">getEdited</a></li><li><a href="global.html#getFollowersOfUser">getFollowersOfUser</a></li><li><a href="global.html#getGeneralInfo">getGeneralInfo</a></li><li><a href="global.html#getInterests">getInterests</a></li><li><a href="global.html#getMembers">getMembers</a></li><li><a href="global.html#getMembersCountPerDayAndMonth">getMembersCountPerDayAndMonth</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSpammed">getSpammed</a></li><li><a href="global.html#getSpecificCategory">getSpecificCategory</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSavedPosts">getUserSavedPosts</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#getViewsCountPerDayAndMonth">getViewsCountPerDayAndMonth</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#hide">hide</a></li><li><a href="global.html#importData">importData</a></li><li><a href="global.html#inboxMessages">inboxMessages</a></li><li><a href="global.html#kickUser">kickUser</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#markLocked">markLocked</a></li><li><a href="global.html#markNsfw">markNsfw</a></li><li><a href="global.html#markReadUserNotification">markReadUserNotification</a></li><li><a href="global.html#markSpoiler">markSpoiler</a></li><li><a href="global.html#markUnLocked">markUnLocked</a></li><li><a href="global.html#markUnSpoiler">markUnSpoiler</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#readAllMessages">readAllMessages</a></li><li><a href="global.html#removeSpam">removeSpam</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#sentMessages">sentMessages</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unhide">unhide</a></li><li><a href="global.html#unreadMessage">unreadMessage</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sun Dec 04 2022 20:40:38 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Dec 23 2022 21:19:42 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

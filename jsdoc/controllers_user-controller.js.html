@@ -32,48 +32,216 @@ const User = require("./../models/user-model");
 const Post = require("./../models/post-model");
 const Comment = require("./../models/comment-model");
 const Community = require("./../models/community-model");
+const Notification = require("../models/notification-model");
 
 const PostService = require("./../services/post-service");
 const UserService = require("./../services/user-service");
 const CommunityService = require("./../services/community-service");
 const CommentService = require("./../services/comment-service");
+const NotificationService = require("../services/notification-service");
+const PushNotificationService = require("../services/push-notifications-service");
 
 const postServiceInstance = new PostService(Post);
 const userServiceInstance = new UserService(User);
 const communityServiceInstance = new CommunityService(Community);
 const commentServiceInstance = new CommentService(Comment);
+const notificationServiceInstance = new NotificationService(Notification);
+var pushNotificationServiceInstance = new PushNotificationService();
 
 /**
- * Update user email
+ * Get user followers
  * @param {function} (req, res)
  * @returns {object} res
  */
-const updateEmail = async (req, res) => {
-  if (!req.username || !req.body.email)
-    return res.status(400).json({
-      response: "invaild parameters",
+const followers = async (req, res) => {
+  if (!req.username) {
+    return res.status(500).json({
+      response: "error providing username",
     });
-  const results = await userServiceInstance.updateOne(
-    { _id: req.username },
-    { email: req.body.email }
-  );
-  if (!results)
-    return res.status(400).json({
-      response: "error",
+  }
+  const result = await userServiceInstance.getFollowers(req.username);
+  if (!result.status) {
+    return res.status(500).json({
+      status: "operation failed",
     });
-  console.log("ay haga");
+  }
   return res.status(200).json({
-    response: results,
+    response: "done",
+    followers: result.followers,
   });
 };
+
+/**
+ * Get user following
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const following = async (req, res, next) => {
+  var followingPeople = undefined;
+  try {
+    const result = await userServiceInstance.getFollowing(req.username);
+    followingPeople = result.following;
+  } catch (err) {
+    return next(err);
+  }
+  return res.status(200).json({
+    response: "done",
+    following: followingPeople,
+  });
+};
+
+/**
+ * Edit profile
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const editProfile = async (req, res) => {
+  if (
+    !req.username ||
+    !req.body.type === "showActiveCommunities" ||
+    !req.body.type === "showActiveCommunities" ||
+    !req.body.type === "contentVisibility"
+  ) {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const user = await userServiceInstance.getOne({ _id: req.username });
+  if (!user) {
+    return res.status(404).json({
+      status: "user is not found",
+    });
+  }
+  var attrType2 = req.body.type;
+  var value = req.body.value;
+  if (attrType2 === "about") {
+    user.about = value;
+  } else if (attrType2 === "showActiveCommunities") {
+    user.showActiveCommunities = value;
+  } else {
+    user.contentVisibility = value;
+  }
+  user.save();
+
+  return res.status(200).json({
+    response: "updated successfully",
+  });
+};
+
+/**
+ * Get user interests
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const getInterests = async (req, res) => {
+  if (!req.username) {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const result = await userServiceInstance.getInterests(req.username);
+
+  if (result.status) {
+    return res.status(200).json({
+      response: "done",
+      categories: result.categories,
+    });
+  } else {
+    return res.status(500).json({
+      response: "operation failed",
+    });
+  }
+};
+
+/**
+ * Add user interests
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
+const addInterests = async (req, res) => {
+  if (!req.username || !req.body.categories) {
+    return res.status(500).json({
+      response: "error providing username",
+    });
+  }
+  const result = await userServiceInstance.addInterests(
+    req.username,
+    req.body.categories
+  );
+  if (result.status) {
+    return res.status(200).json({
+      response: "done",
+    });
+  } else {
+    return res.status(500).json({
+      response: "operation failed",
+    });
+  }
+};
+/**
+ * Update user prefs
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const editUserPrefs = catchAsync(async (req, res, next) => {
+  var results = undefined;
+  try {
+    const user = await userServiceInstance.findById(req.username);
+    if (user) {
+      var value = req.body.value;
+      var prefs = user.prefs;
+      prefs.type = value;
+      results = await userServiceInstance.updateOne(
+        { _id: req.username },
+        { prefs: prefs }
+      );
+    } else {
+      return res.status(404).json({
+        status: "user is not found",
+      });
+    }
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    results,
+  });
+});
+
+/**
+ * Update user email
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
+const updateEmail = catchAsync(async (req, res, next) => {
+  var results = undefined;
+  try {
+    const user = await userServiceInstance.findById(req.username);
+    if (user) {
+      results = await userServiceInstance.updateOne(
+        { _id: req.username },
+        { email: req.body.newEmail }
+      );
+    }
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    status: "success",
+    results,
+  });
+});
+
 /**
  * Saves filename to database
  * @param {function} (req, res, next)
  * @returns {object} res
  */
 const uploadUserPhoto = catchAsync(async (req, res, next) => {
+  var avatar = undefined;
   try {
-    await userServiceInstance.uploadUserPhoto(
+    avatar = await userServiceInstance.uploadUserPhoto(
       req.body.action,
       req.username,
       req.file
@@ -83,7 +251,7 @@ const uploadUserPhoto = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({
     status: "success",
-    message: "Avatar is updated successfully",
+    avatar,
   });
 });
 
@@ -129,7 +297,7 @@ const spam = catchAsync(async (req, res, next) => {
           _id: post.communityID,
           select: "communityOptions",
         });
-      postServiceInstance.spamPost(
+      await postServiceInstance.spamPost(
         post,
         req.body.spamType,
         req.body.spamText,
@@ -149,15 +317,10 @@ const spam = catchAsync(async (req, res, next) => {
         req.body.spamText,
         req.username
       );
-      const post = await postServiceInstance.getOne({
-        _id: comment.replyingTo,
-        select: "communityID",
+      community = await communityServiceInstance.getOne({
+        _id: comment.communityID._id,
+        select: "communityOptions",
       });
-      if (post &amp;&amp; post.communityID !== undefined &amp;&amp; post.communityID !== "")
-        community = await communityServiceInstance.getOne({
-          _id: post.communityID,
-          select: "communityOptions",
-        });
       await commentServiceInstance.saveSpammedComment(comment, community);
     }
   } catch (err) {
@@ -168,6 +331,24 @@ const spam = catchAsync(async (req, res, next) => {
     message: "Spams are updated successfully",
   });
 });
+
+/**
+ * Get posts where is saved by the user
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const getUserSavedPosts = catchAsync(async (req, res, next) => {
+  var posts = undefined;
+  try {
+    const postIds = await userServiceInstance.userSavedPosts(req.username);
+    posts = await postServiceInstance.userPosts(postIds, req.query);
+  } catch (err) {
+    return next(err);
+  }
+  res.status(200).json({
+    posts,
+  });
+});
 /**
  * Get user prefs
  * @param {function} (req,res)
@@ -176,8 +357,7 @@ const spam = catchAsync(async (req, res, next) => {
 const getUserPrefs = catchAsync(async (req, res, next) => {
   var prefs = undefined;
   try {
-    const user = await userServiceInstance.findById(req.username);
-    prefs = await communityServiceInstance.userPrefs(user);
+    prefs = await userServiceInstance.userPrefs(req.username);
   } catch (err) {
     return next(err);
   }
@@ -194,8 +374,7 @@ const getUserPrefs = catchAsync(async (req, res, next) => {
 const getUserAbout = catchAsync(async (req, res, next) => {
   var about = undefined;
   try {
-    const user = await userServiceInstance.findById(req.username);
-    about = await communityServiceInstance.userAbout(user);
+    about = await userServiceInstance.userAbout(req.params.username);
   } catch (err) {
     return next(err);
   }
@@ -212,8 +391,7 @@ const getUserAbout = catchAsync(async (req, res, next) => {
 const getUserMe = catchAsync(async (req, res, next) => {
   var meInfo = undefined;
   try {
-    const user = await userServiceInstance.findById(req.username);
-    meInfo = await communityServiceInstance.userMe(user);
+    meInfo = await userServiceInstance.userMe(req.username);
   } catch (err) {
     return next(err);
   }
@@ -227,6 +405,24 @@ const returnResponse = (res, obj, statusCode) => {
 };
 
 /**
+ * Get followers of specific user
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
+const getFollowersOfUser = async (req, res) => {
+  const result = await userServiceInstance.getFollowersOfUser(req.body.userID);
+  if (!result.status) {
+    return res.status(500).json({
+      status: "operation failed",
+    });
+  }
+  return res.status(200).json({
+    response: "done",
+    followers: result.followers,
+  });
+};
+
+/**
  * Subscribe to a subreddit or a redditor
  * @param {function} (req,res)
  * @returns {object} res
@@ -235,12 +431,53 @@ const subscribe = async (req, res) => {
   if (!req.body.srName || !req.body.action) {
     return returnResponse(res, { error: "invalid inputs" }, 400);
   }
-  console.log(req.body);
-  console.log(req.username);
 
   const result = await userServiceInstance.subscribe(req.body, req.username);
-  console.log("res", result);
   if (result.state) {
+    if (req.body.srName.substring(0, 2) === "t2" &amp;&amp; req.body.action === "sub") {
+      const notificationSaver =
+        await notificationServiceInstance.createFollowerNotification(
+          req.username,
+          result.avatar
+        );
+      if (!notificationSaver.status) {
+        return res.status(404).json({
+          status: "Error happened while saving notification in db",
+        });
+      }
+      const saveToUser = await userServiceInstance.saveNOtificationOfUser(
+        notificationSaver.id,
+        req.body.srName
+      );
+      if (!saveToUser.status) {
+        return res.status(404).json({
+          status: "Error happened while saving notification in db",
+        });
+      }
+      //push notiication
+      const fcm_token_user = await userServiceInstance.getOne({
+        _id: req.body.srName,
+        select: "_id fcmToken",
+      });
+      console.log(fcm_token_user);
+      var fcmToken = fcm_token_user.fcmToken;
+      console.log(fcmToken);
+      if (!fcmToken) {
+        return res.status(200).json({
+          status: "success without push notifications as user doesn't have one",
+        });
+      }
+      const pushResult =
+        await pushNotificationServiceInstance.newFollowerNotification(
+          fcmToken,
+          req.username
+        );
+      if (!pushResult.status) {
+        return res.status(500).json({
+          status: "Cannot push notification",
+        });
+      }
+    }
     return res.status(200).json({
       status: "done",
     });
@@ -251,19 +488,279 @@ const subscribe = async (req, res) => {
   }
 };
 
+const friendRequest = catchAsync(async (req, res) => {
+  if (req.body.type === "friend") {
+    userServiceInstance.addFriend(req.username, req.body.userID);
+  } else if (req.body.type === "moderator_invite") {
+    //[1]-> check the existence of the moderator
+    var subreddit = await communityServiceInstance.availableSubreddit(
+      req.body.communityID
+    );
+    if (subreddit.state) {
+      return res.status(404).json({
+        status: "failed",
+        message: "not found this subreddit",
+      });
+    }
+    // [2] -> check if user isn't moderator in subreddit
+    if (
+      !(await userServiceInstance.isModeratorInSubreddit(
+        req.body.communityID,
+        req.username
+      ))
+    ) {
+      return res.status(400).json({
+        status: "failed",
+        message: "you aren't moderator in this subreddit",
+      });
+    }
+    //check that invited moderator isn't moderator
+    if (
+      await userServiceInstance.isModeratorInSubreddit(
+        req.body.communityID,
+        req.body.userID
+      )
+    ) {
+      return res.status(400).json({
+        status: "failed",
+        message: "this user is already moderator",
+      });
+    }
+    await communityServiceInstance.inviteModerator(
+      req.body.communityID,
+      req.body.userID
+    );
+  } else {
+    return res.status(400).json({
+      status: "failed",
+      message: "invalid type",
+    });
+  }
+  return res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const unFriendRequest = catchAsync(async (req, res) => {
+  if (req.body.type === "friend") {
+    userServiceInstance.deleteFriend(req.username, req.body.userID);
+  } else if (req.body.type === "moderator_deinvite") {
+    //[1]-> check the existence of the moderator
+    var subreddit = await communityServiceInstance.availableSubreddit(
+      req.body.communityID
+    );
+    if (subreddit.state) {
+      return res.status(404).json({
+        status: "failed",
+        message: "not found this subreddit",
+      });
+    }
+    // [2] -> check if user isn't moderator in subreddit
+    if (
+      !(await userServiceInstance.isModeratorInSubreddit(
+        req.body.communityID,
+        req.username
+      ))
+    ) {
+      return res.status(400).json({
+        status: "failed",
+        message: "you aren't moderator in this subreddit",
+      });
+    }
+    //check that other user is invited
+    if (
+      !(await communityServiceInstance.isInvited(
+        req.body.communityID,
+        req.body.userID
+      ))
+    ) {
+      return res.status(400).json({
+        status: "failed",
+        message: "this user is isn't invited",
+      });
+    }
+    await communityServiceInstance.deInviteModerator(
+      req.body.communityID,
+      req.body.userID
+    );
+  } else {
+    return res.status(400).json({
+      status: "failed",
+      message: "invalid type",
+    });
+  }
+  return res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const getAllFriends = catchAsync(async (req, res) => {
+  const friends = await userServiceInstance.getOne({
+    _id: req.username,
+    select: "-_id friend",
+    populate: {
+      path: "friend",
+      select: "avatar about _id",
+    },
+  });
+  res.status(200).json({
+    status: "succeeded",
+    friends,
+  });
+});
+
+const acceptModeratorInvite = catchAsync(async (req, res) => {
+  //[1]-> check existence of subreddit
+  var subredditReturned = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subredditReturned.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  var subreddit = subredditReturned.subreddit;
+  // [2]-> check if the user has been invited to be moderator
+  if (!subreddit.invitedModerators.includes(req.username)) {
+    return res.status(401).json({
+      status: "failed",
+      message: "you aren't invited to this subreddit",
+    });
+  }
+  // [3]-> accept the invitation
+  //[1] -> update the subreddit invitedModerators
+  subreddit = await communityServiceInstance.removeModeratorInvitation(
+    subreddit,
+    req.username
+  );
+  var user = await userServiceInstance.getOne({
+    _id: req.username,
+    select: "moderators",
+  });
+  //[2] -> update the relation of the user moderators
+  await userServiceInstance.addSubredditModeration(req.params.subreddit, user);
+  //[3] -> update the subreddit moderators
+  await communityServiceInstance.addModerator(subreddit, req.username);
+  res.status(200).json({
+    status: "success",
+  });
+});
+
+const updateInfo = catchAsync(async (req, res) => {
+  const type = req.body.type;
+  const permittedChangedVariables = [
+    "gender",
+    "about",
+    "phoneNumber",
+    "name",
+    "email",
+  ];
+  if (!permittedChangedVariables.includes(type)) {
+    res.status(400).json({
+      status: "failed",
+      message: "wrong entered type",
+    });
+  }
+  //[TODO]: we must check if the new name or email is available in case of changing email and name
+  var update = {};
+  update[type + ""] = req.body.value;
+  userServiceInstance.updateOne({ _id: req.username }, update);
+  res.status(200).json({
+    status: "succeeded",
+  });
+});
+
+const leaveModeratorOfSubredddit = catchAsync(async (req, res) => {
+  //[1]-> check the existence of the moderator
+  const subreddit = await communityServiceInstance.availableSubreddit(
+    req.params.subreddit
+  );
+  if (subreddit.state) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this subreddit",
+    });
+  }
+  // [2] -> check if user isn't moderator in subreddit
+  if (
+    !(await userServiceInstance.isCreatorInSubreddit(
+      req.params.subreddit,
+      req.username
+    ))
+  ) {
+    return res.status(400).json({
+      status: "failed",
+      message: "you aren't creator in this subreddit",
+    });
+  }
+  //[3]-> do leaving the subreddit
+  await userServiceInstance.updateOne(
+    { _id: req.username },
+    {
+      $pull: {
+        moderators: { communityId: req.params.subreddit },
+      },
+    }
+  );
+  await communityServiceInstance.updateOne(
+    { _id: req.params.subreddit },
+    {
+      $pull: {
+        moderators: { userID: req.username },
+      },
+    }
+  );
+  return res.status(200).json({
+    status: "succeded",
+  });
+});
+
+const getUserInfo = catchAsync(async (req, res) => {
+  const user = await userServiceInstance.getOne({
+    _id: req.params.username,
+    select: "avatar _id about",
+  });
+  if (!user) {
+    return res.status(404).json({
+      status: "failed",
+      message: "not found this user",
+    });
+  } else {
+    return res.status(200).json({
+      about: user.about,
+      id: user._id,
+      avatar: user.avatar,
+    });
+  }
+});
 module.exports = {
   uploadUserPhoto,
   block,
   spam,
-
   updateEmail,
-
   returnResponse,
-
   getUserMe,
   getUserAbout,
   getUserPrefs,
+  editUserPrefs,
   subscribe,
+
+  getFollowersOfUser,
+
+  getUserSavedPosts,
+  friendRequest,
+  unFriendRequest,
+  getAllFriends,
+  acceptModeratorInvite,
+  updateInfo,
+  leaveModeratorOfSubredddit,
+  followers,
+  following,
+  getInterests,
+  addInterests,
+  getUserInfo,
+  editProfile,
 };
 </code></pre>
         </article>
@@ -275,13 +772,13 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserCommentReplies">getUserCommentReplies</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSelfReply">getUserSelfReply</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="MessageService.html">MessageService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="PushNotificationsService.html">PushNotificationsService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addCommunityRule">addCommunityRule</a></li><li><a href="global.html#addInterests">addInterests</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#allMessages">allMessages</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#compose">compose</a></li><li><a href="global.html#createSubreddit">createSubreddit</a></li><li><a href="global.html#deleteData">deleteData</a></li><li><a href="global.html#deleteLink">deleteLink</a></li><li><a href="global.html#deleteMessage">deleteMessage</a></li><li><a href="global.html#deleteUserNotification">deleteUserNotification</a></li><li><a href="global.html#editCommunityRule">editCommunityRule</a></li><li><a href="global.html#editProfile">editProfile</a></li><li><a href="global.html#editUserPrefs">editUserPrefs</a></li><li><a href="global.html#editUserText">editUserText</a></li><li><a href="global.html#followPost">followPost</a></li><li><a href="global.html#followers">followers</a></li><li><a href="global.html#following">following</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityAbout">getCommunityAbout</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getEdited">getEdited</a></li><li><a href="global.html#getFollowersOfUser">getFollowersOfUser</a></li><li><a href="global.html#getGeneralInfo">getGeneralInfo</a></li><li><a href="global.html#getInterests">getInterests</a></li><li><a href="global.html#getMembers">getMembers</a></li><li><a href="global.html#getMembersCountPerDayAndMonth">getMembersCountPerDayAndMonth</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSpammed">getSpammed</a></li><li><a href="global.html#getSpecificCategory">getSpecificCategory</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSavedPosts">getUserSavedPosts</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#getViewsCountPerDayAndMonth">getViewsCountPerDayAndMonth</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#hide">hide</a></li><li><a href="global.html#importData">importData</a></li><li><a href="global.html#inboxMessages">inboxMessages</a></li><li><a href="global.html#kickUser">kickUser</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#markLocked">markLocked</a></li><li><a href="global.html#markNsfw">markNsfw</a></li><li><a href="global.html#markReadUserNotification">markReadUserNotification</a></li><li><a href="global.html#markSpoiler">markSpoiler</a></li><li><a href="global.html#markUnLocked">markUnLocked</a></li><li><a href="global.html#markUnSpoiler">markUnSpoiler</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#readAllMessages">readAllMessages</a></li><li><a href="global.html#removeSpam">removeSpam</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#sentMessages">sentMessages</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unhide">unhide</a></li><li><a href="global.html#unreadMessage">unreadMessage</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sun Dec 04 2022 20:40:38 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Dec 23 2022 21:19:42 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -6,10 +6,12 @@ const Community = require("../models/community-model");
 const User = require("../models/user-model");
 const CommentService = require("../services/comment-service");
 const PostService = require("../services/post-service");
+const validators = require("../validate/listing-validators");
 const UserService = require("../services/user-service");
 const userServiceInstance = new UserService(User);
-const postServiceInstance = new PostService(Post);
 const commentServiceInstance = new CommentService(Comment);
+const postServiceInstance = new PostService(Post);
+jest.setTimeout(1000000);
 
 describe("testing spamComment service in comment service class", () => {
   describe("given a comment, spamType, spamText, and a username", () => {
@@ -143,4 +145,165 @@ describe("testing addComment service in comment service class", () => {
       expect(newComment.textHTML).toBe("This is a comment textHTML");
     });
   });
+});
+
+
+describe("Test vote over post",()=>{
+  test("test invalid id or dir", async () => {
+    const body={
+      "id":"63a4415d3df1c10771f2100b",
+      "dir":""
+    };
+    const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+    expect(result.state).toBe(false);
+    expect(result.error).toBe("invalid id or dir");
+  });
+  test("test invalid id or dir", async () => {
+    const body={
+      "id":"63a4415d3df1c10771f2100b",
+      "dir":1
+    };
+    validators.validateVoteIn=jest.fn().mockReturnValue(false);
+
+    const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+    expect(result.state).toBe(false);
+    expect(result.error).toBe("invalid id or dir");
+  });
+
+  test("test post not found", async () => {
+    const body={
+      "id":"t3_63a4415d3df1c10771f2100b",
+      "dir":1
+    };
+    validators.validateVoteIn=jest.fn().mockReturnValue(true);
+    jest.spyOn(Post, "findOne").mockReturnValueOnce(null);      
+
+    const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+    expect(result.state).toBe(false);
+    expect(result.error).toBe("not found");
+  });
+  test("test voter not found and do invalid dir (0,2)", async () => {
+      const body={
+        "id":"t3_63a4415d3df1c10771f2100b",
+        "dir":0
+      };
+      const post={"_id":"t3_63a4415d3df1c10771f2100b",
+          "voters":[{"userID":"t2_nabil","voteType":1}]};
+      validators.validateVoteIn=jest.fn().mockReturnValue(true);
+      jest.spyOn(Post, "findOne").mockReturnValueOnce(post);      
+      const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+      
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("invalid dir");
+  });
+
+  test("test voter is found but do invalid dir (0,2)", async () => {
+    const body={
+      "id":"t3_63a4415d3df1c10771f2100b",
+      "dir":-1
+    };
+    const post={"_id":"t3_63a4415d3df1c10771f2100b",
+        "voters":[{"userID":"t2_lotfy2","voteType":-1}]};
+    validators.validateVoteIn=jest.fn().mockReturnValue(true);
+    jest.spyOn(Post, "findOne").mockReturnValueOnce(post);      
+    const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+    
+    expect(result.state).toBe(false);
+    expect(result.error).toBe("already voted");
+});
+test("failed update of voter operation", async () => {
+  const body={
+    "id":"t3_63a4415d3df1c10771f2100b",
+    "dir":-1
+  };
+  const post={"_id":"t3_63a4415d3df1c10771f2100b",
+      "voters":[{"userID":"t2_lotfy2","voteType":1}]};
+  validators.validateVoteIn=jest.fn().mockReturnValue(true);
+  jest.spyOn(Post, "findOne").mockReturnValueOnce(post);      
+  jest.spyOn(Post, "findByIdAndUpdate").mockRejectedValueOnce()      
+
+  const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+  expect(result.status).toBe(false);
+});
+
+// test("success vote over a post", async () => {
+//   const body={
+//     "id":"t3_63a4415d3df1c10771f2100b",
+//     "dir":-1
+//   };
+//   const post={"_id":"t3_63a4415d3df1c10771f2100b",
+//       "voters":[{"userID":"t2_lotfy2","voteType":1}]};
+//   validators.validateVoteIn=jest.fn().mockReturnValue(true);
+//   jest.spyOn(Post, "findOne").mockReturnValueOnce(post);      
+//   //postServiceInstance.findByIdAndUpdate=jest.fn().mockReturnValueOnce({});
+//   jest.spyOn(Post, "findByIdAndUpdate").mockReturnValue({})      
+//   jest.spyOn(User, "findOneAndUpdate").mockReturnValue({})      
+
+//   User.findOneAndUpdate.clone=jest.fn().mockReturnValue({});
+
+//   const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+//   console.log(result);
+//   expect(result.state).toBe(true);
+//   expect(result.status).toBe("done");
+
+// });
+
+
+
+test("test comment not found", async () => {
+  const body={
+    "id":"t1_63a4415d3df1c10771f2100b",
+    "dir":1
+  };
+  validators.validateVoteIn=jest.fn().mockReturnValue(true);
+  jest.spyOn(Comment, "findOne").mockReturnValueOnce(null);      
+
+  const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+  expect(result.state).toBe(false);
+  expect(result.error).toBe("not found");
+});
+test("test voter not found and do invalid dir (0,2)", async () => {
+    const body={
+      "id":"t1_63a4415d3df1c10771f2100b",
+      "dir":0
+    };
+    const comment={"_id":"t1_63a4415d3df1c10771f2100b",
+        "voters":[{"userID":"t2_nabil","voteType":1}]};
+    validators.validateVoteIn=jest.fn().mockReturnValue(true);
+    jest.spyOn(Comment, "findOne").mockReturnValueOnce(comment);      
+    const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+    
+    expect(result.state).toBe(false);
+    expect(result.error).toBe("invalid dir");
+});
+
+test("test voter is found but do invalid dir (0,2)", async () => {
+  const body={
+    "id":"t1_63a4415d3df1c10771f2100b",
+    "dir":-1
+  };
+  const comment={"_id":"t1_63a4415d3df1c10771f2100b",
+      "voters":[{"userID":"t2_lotfy2","voteType":-1}]};
+  validators.validateVoteIn=jest.fn().mockReturnValue(true);
+  jest.spyOn(Comment, "findOne").mockReturnValueOnce(comment);      
+  const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+  
+  expect(result.state).toBe(false);
+  expect(result.error).toBe("already voted");
+});
+test("failed update of voter operation", async () => {
+const body={
+  "id":"t1_63a4415d3df1c10771f2100b",
+  "dir":-1
+};
+const comment={"_id":"t1_63a4415d3df1c10771f2100b",
+    "voters":[{"userID":"t2_lotfy2","voteType":1}]};
+validators.validateVoteIn=jest.fn().mockReturnValue(true);
+jest.spyOn(Comment, "findOne").mockReturnValueOnce(comment);      
+jest.spyOn(Comment, "findByIdAndUpdate").mockRejectedValueOnce()      
+
+const result = await commentServiceInstance.vote(body,"t2_lotfy2");
+console.log(result);
+expect(result.state).toBe(false);
+});
 });

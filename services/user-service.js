@@ -679,6 +679,7 @@ class UserService extends Service {
    * Get user about from database
    * @param {String} (username)
    * @returns {object} user
+   * @function
    */
   userAbout = async (username) => {
     const user = await this.findById(username);
@@ -721,6 +722,7 @@ class UserService extends Service {
    * Get user me info from database
    * @param {String} (username)
    * @returns {object} user
+   * @function
    */
   userMe = async (username) => {
     const user = await this.findById(username);
@@ -769,6 +771,7 @@ class UserService extends Service {
    * Get user prefs from database
    * @param {String} (username)
    * @returns {object} user
+   * @function
    */
   userPrefs = async (username) => {
     const user = await this.findById(username);

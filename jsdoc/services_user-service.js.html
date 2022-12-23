@@ -32,8 +32,6 @@ const Email = require("./../utils/email");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Comment = require("../models/comment-model");
-const Post = require("../models/post-model");
 const User = require("../models/user-model");
 const Community = require("../models/community-model");
 const AuthService = require("./../services/auth-service");
@@ -49,7 +47,6 @@ class UserService extends Service {
   constructor(model) {
     super(model);
   }
-
   /**
    * Signing the token
    * @param {String} emailType email type.
@@ -64,6 +61,140 @@ class UserService extends Service {
       { expiresIn: "120h" }
     );
   };
+  /**
+   * Saving notification in user's document
+   * @param {String} id notification id.
+   * @param {String} username username of the user.
+   * @returns {Object} (status)
+   * @function
+   */
+  saveNOtificationOfUser = async (id, username) => {
+    const user = await this.getOne({ _id: username });
+    const newNotification = {
+      notificationID: id,
+      isRead: false,
+      isDeleted: false,
+    };
+    try {
+      user.notifications.push(newNotification);
+      user.save();
+    } catch (err) {
+      return {
+        status: false,
+        error: err,
+      };
+    }
+
+    return {
+      status: true,
+    };
+  };
+
+  /**
+   *  Get followers of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getFollowers = async (username) => {
+    const followers_user = await this.getOne({ _id: username }).select(
+      "followers"
+    );
+    const followersIds = followers_user.followers;
+
+    const followers = await this.find({
+      _id: { $in: followersIds },
+    }).select("about avatar _id");
+
+    return {
+      status: true,
+      followers: followers,
+    };
+  };
+
+  /**
+   * Get people that I follow
+   * @param {String} username my username .
+   * @returns {object}
+   * @function
+   */
+  getFollowing = async (username) => {
+    if (!username) throw new AppError("No username is provided!", 400);
+    const user = await this.getOne({ _id: username, select: "follows" });
+    if (!user) throw new AppError("User is not found!", 404);
+    const followingIds = user.follows;
+    const following = await this.getAll(
+      {
+        _id: { $in: followingIds },
+      },
+      { fields: "about,avatar,_id" }
+    );
+    return {
+      status: true,
+      following,
+    };
+  };
+
+  /**
+   *  Get followers of user
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getFollowersOfUser = async (username) => {
+    const followers_user = await this.getOne({ _id: username }).select(
+      "followers"
+    );
+    const followersIds = followers_user.followers;
+
+    const followers = await this.find({
+      _id: { $in: followersIds },
+    });
+    return {
+      status: true,
+      followers: followers,
+    };
+  };
+  /**
+   *  Get interests of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  getInterests = async (username) => {
+    var categories_user;
+    try {
+      categories_user = await this.getOne({ _id: username });
+    } catch {
+      return {
+        status: false,
+      };
+    }
+    const categories = categories_user.categories;
+    return {
+      status: true,
+      categories: categories,
+    };
+  };
+
+  /**
+   *  Add interests of me
+   * @param {String} username my username .
+   * @returns {Boolean} (state)
+   * @function
+   */
+  addInterests = async (username, categories) => {
+    try {
+      await this.updateOne({ _id: username }, { categories: categories });
+    } catch {
+      return {
+        status: false,
+      };
+    }
+    return {
+      status: true,
+    };
+  };
 
   /**
    * Subscribe to a subreddit or redditor
@@ -74,18 +205,17 @@ class UserService extends Service {
   subscribe = async (body, username) => {
     const id = body.srName.substring(0, 2);
     const action = body.action;
-
     if (id === "t2") {
-      console.log("d");
       //check the username
       const result = await authServiceInstance.availableUser(body.srName);
-      console.log(result);
       if (result.state) {
         return {
           state: false,
           error: "invalid username",
         };
       } else {
+        const avatar = result.user.avatar;
+
         var isFound = false;
         var followerArr = result.user.followers;
         for (var i = 0; i &lt; followerArr.length; i++) {
@@ -103,6 +233,7 @@ class UserService extends Service {
                 error: "already followed",
               };
             }
+
             await this.updateOne(
               { _id: username },
               { $addToSet: { follows: body.srName } }
@@ -136,6 +267,7 @@ class UserService extends Service {
         return {
           state: true,
           error: null,
+          avatar: avatar,
         };
       }
     } else if (id === "t5") {
@@ -155,7 +287,7 @@ class UserService extends Service {
             error: "invalid username",
           };
         }
-        isFound = false;
+        let isFound = false;
         var memberArr = user.user.member;
         for (i = 0; i &lt; memberArr.length; i++) {
           if (memberArr[i].communityId === body.srName) {
@@ -164,6 +296,16 @@ class UserService extends Service {
           }
         }
         try {
+          var memCom = result.subreddit.members;
+          var memCnt = result.subreddit.membersCnt;
+          var joinedPerDay = result.subreddit.joinedPerDay;
+          var joinedPerMonth = result.subreddit.joinedPerMonth;
+          var leftPerDay = result.subreddit.leftPerDay;
+          var leftPerMonth = result.subreddit.leftPerMonth;
+
+          const date = new Date();
+          var dayIndex = date.getDay();
+          var monthIndex = date.getMonth();
           if (action === "sub") {
             if (isFound) {
               return {
@@ -171,28 +313,46 @@ class UserService extends Service {
                 error: "already followed",
               };
             }
+            joinedPerDay[dayIndex]++;
+            joinedPerMonth[monthIndex]++;
+
+            const memUser = user.user.member;
+            memUser.push({
+              communityId: body.srName,
+              isBanned: {
+                value: false,
+                date: Date.now(),
+              },
+              isMuted: {
+                value: false,
+                date: Date.now(),
+              },
+            });
             await this.updateOne(
               { _id: username },
               {
-                $addToSet: {
-                  member: {
-                    communityId: body.srName,
-                    isBanned: false,
-                    isMuted: false,
-                  },
-                },
+                member: memUser,
               }
             );
+            memCnt++;
+            memCom.push({
+              userID: username,
+              isBanned: {
+                value: false,
+                date: Date.now(),
+              },
+              isMuted: {
+                value: false,
+                date: Date.now(),
+              },
+            });
             await communityServiceInstance.updateOne(
               { _id: body.srName },
               {
-                $addToSet: {
-                  members: {
-                    userID: username,
-                    isBanned: false,
-                    isMuted: false,
-                  },
-                },
+                members: memCom,
+                membersCnt: memCnt,
+                joinedPerDay: joinedPerDay,
+                joinedPerMonth: joinedPerMonth,
               }
             );
           } else {
@@ -202,17 +362,33 @@ class UserService extends Service {
                 error: "operation failed the user is already not followed",
               };
             }
+            leftPerDay[dayIndex]++;
+            leftPerMonth[monthIndex]++;
+            memCnt--;
+            var memIndex = -1;
+            console.log(memCom);
+            for (let x = 0; x &lt; memCom.length; x++) {
+              if (memCom[x].userID === username) {
+                memIndex = x;
+              }
+            }
+            memCom.splice(memIndex, 1);
             await this.updateOne(
               { _id: username },
               { $pull: { member: { communityId: body.srName } } }
             );
+
             await communityServiceInstance.updateOne(
               { _id: body.srName },
-              { $pull: { members: { userID: username } } }
+              {
+                members: memCom,
+                membersCnt: memCnt,
+                leftPerDay: leftPerDay,
+                leftPerMonth: leftPerMonth,
+              }
             );
           }
         } catch (err) {
-          console.log(err);
           return {
             state: false,
             error: "error",
@@ -227,7 +403,7 @@ class UserService extends Service {
   };
   getFilteredSubreddits = (subreddits) => {
     return subreddits.map((el) => {
-      if (!el.isBanned) {
+      if (!el.isBanned.value) {
         return el.communityId;
       }
     });
@@ -266,7 +442,7 @@ class UserService extends Service {
   getSearchResults = async (query, username) => {
     const searchQuery = query.q;
     delete query.q;
-    let users = await this.getAll(
+    var users = await this.getAll(
       {
         $or: [
           { _id: { $regex: searchQuery, $options: "i" } },
@@ -283,7 +459,6 @@ class UserService extends Service {
     users = users.map((el) => {
       el.follow = follows.indexOf(el._id) != -1;
       delete el.prefs;
-      console.log(el);
       return el;
     });
     return users;
@@ -294,17 +469,19 @@ class UserService extends Service {
    * @param {object} data
    * @param {string} username
    * @param {object} file
+   * @returns {string} avatar Name of the file
    * @function
    */
   uploadUserPhoto = async (action, username, file) => {
     if (!action)
       throw new AppError("No attachment or action is provided!", 400);
-    let avatar = "default.jpg";
+    var avatar = "default.jpg";
     if (action === "upload") {
       if (!file) throw new AppError("No photo is uploaded!", 400);
       avatar = file.filename;
     }
     await this.findByIdAndUpdate(username, { avatar }, { runValidators: true });
+    return avatar;
   };
 
   /**
@@ -380,86 +557,6 @@ class UserService extends Service {
       throw new AppError("There was an error in sending the mail!", 500);
     }
   };
-  /**
-   * Get comments which is written by the user from database
-   * @param {String} (username)
-   * @returns {Array} Comments
-   * @function
-   */
-  userComments = async (username, query) => {
-    const user = await this.findById(username, "hasComment");
-    if (!user) throw new AppError("This user doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
-    let comments = [];
-    user.hasComment.forEach((el) => {
-      comments.push(el);
-    });
-    const cursor = Comment.find({
-      _id: { $in: comments },
-    });
-    let returnComments = [];
-    for await (const doc of cursor) {
-      returnComments.push(doc);
-    }
-    return returnComments;
-  };
-  /**
-   * Get replies on a comment written by the user from database
-   * @param {String} (username)
-   * @returns {Array} Comments
-   * @function
-   */
-  userCommentReplies = async (username, query) => {
-    const comment = await this.findById(username, "replies");
-    if (!comment) throw new AppError("This comment doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
-    let replies = [];
-    comment.replies.forEach((el) => {
-      replies.push(el);
-    });
-    const cursor = Comment.find({
-      _id: { $in: replies },
-    });
-    let returnReplies = [];
-    for await (const doc of cursor) {
-      console.log(doc);
-      returnReplies.push(doc);
-    }
-    return returnReplies;
-  };
-  /**
-   * Get comments on posts of the user from database
-   * @param {String} (username)
-   * @returns {object} comments
-   * @function
-   */
-  userSelfReply = async (username, query) => {
-    const post = await this.findById(username, "postComments");
-    if (!post) throw new AppError("This post doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
-    let comments = [];
-    post.postComments.forEach((el) => {
-      comments.push(el);
-    });
-    const cursor = Comment.find({
-      _id: { $in: comments },
-    });
-    let returnComments = [];
-    for await (const doc of cursor) {
-      console.log(doc);
-      returnComments.push(doc);
-    }
-    return returnComments;
-  };
 
   /**
    * Get posts which is written by the user from database
@@ -467,26 +564,44 @@ class UserService extends Service {
    * @returns {Array} posts
    * @function
    */
-  userSubmitted = async (username, query) => {
+  userSubmittedPosts = async (username) => {
     const user = await this.findById(username, "hasPost");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
-    let posts = [];
+    var posts = [];
     user.hasPost.forEach((el) => {
       posts.push(el);
     });
-    const cursor = Post.find({
-      _id: { $in: posts },
+    return posts;
+  };
+  /**
+   * Get comments which is written by the user from database
+   * @param {String} (username)
+   * @returns {Array} posts
+   * @function
+   */
+  userSubmittedComments = async (username) => {
+    const user = await this.findById(username, "hasComment");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    var comments = [];
+    user.hasComment.forEach((el) => {
+      comments.push(el);
     });
-    let returnPosts = [];
-    for await (const doc of cursor) {
-      console.log(doc);
-      returnPosts.push(doc);
-    }
-    return returnPosts;
+    return comments;
+  };
+  /**
+   * Get replies which is written by the user from database
+   * @param {String} (username)
+   * @returns {Array} posts
+   * @function
+   */
+  userSubmittedReplies = async (username) => {
+    const user = await this.findById(username, "hasReply");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    var replies = [];
+    user.hasReply.forEach((el) => {
+      replies.push(el);
+    });
+    return replies;
   };
   /**
    * Get posts which downvoted by the user from database
@@ -494,27 +609,16 @@ class UserService extends Service {
    * @returns {object} downVotes
    * @function
    */
-  userDownVoted = async (username, query) => {
+  userDownVoted = async (username) => {
     const user = await this.findById(username, "hasVote");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
-    let downVotes = [];
+    var downVotes = [];
     user.hasVote.forEach((el) => {
       if (el.type === -1) {
         downVotes.push(el.postID);
       }
     });
-    const cursor = Post.find({
-      _id: { $in: downVotes },
-    });
-    let returnPosts = [];
-    for await (const doc of cursor) {
-      returnPosts.push(doc);
-    }
-    return returnPosts;
+    return downVotes;
   };
   /**
    * Get posts which upvoted by the user from database
@@ -522,30 +626,16 @@ class UserService extends Service {
    * @returns {object} upVotes
    * @function
    */
-  userUpVoted = async (username, query) => {
+  userUpVoted = async (username) => {
     const user = await this.findById(username, "hasVote");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    console.log(user);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
-    let upVotes = [];
+    var upVotes = [];
     user.hasVote.forEach((el) => {
       if (el.type === 1) {
         upVotes.push(el.postID);
       }
     });
-    console.log(upVotes);
-    const cursor = Post.find({
-      _id: { $in: upVotes },
-    });
-    let returnPosts = [];
-    for await (const doc of cursor) {
-      console.log(doc);
-      returnPosts.push(doc);
-    } //console.log(returnPosts);
-    return returnPosts;
+    return upVotes;
   };
   /**
    * Get posts where user is being mentioned in from database
@@ -553,26 +643,201 @@ class UserService extends Service {
    * @returns {object} mentions
    * @function
    */
-  userMentions = async (username, query) => {
+  userMentions = async (username) => {
     const user = await this.findById(username, "mentionedInPosts");
     if (!user) throw new AppError("This user doesn't exist!", 404);
-    console.log(user);
-    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
-    if (!query.limit) {
-      query.limit = "10";
-    }
-    //console.log(user);
-
-    const cursor = Post.find({
-      _id: { $in: user.mentionedInPosts },
-    });
-    let returnPosts = [];
-    for await (const doc of cursor) {
-      console.log(doc);
-      returnPosts.push(doc);
-    }
-    return returnPosts;
+    return user.mentionedInPosts;
   };
+  /**
+   * Add user to community
+   * @param {String} (username)
+   * @param {String} (communityID)
+   * @returns {object} mentions
+   * @function
+   */
+  addUserToComm = async (user, communityID) => {
+    const userModerator = {
+      communityId: communityID,
+      role: "creator",
+    };
+    const userMember = {
+      communityId: communityID,
+      isMuted: {
+        value: false,
+      },
+      isBanned: {
+        value: false,
+      },
+    };
+    const modarr = user.moderators;
+    modarr.push(userModerator);
+    const memarr = user.member;
+    memarr.push(userMember);
+    try {
+      await this.updateOne(
+        { _id: user._id },
+        { moderators: modarr, member: memarr }
+      );
+    } catch {
+      return {
+        status: false,
+        error: "operation failed",
+      };
+    }
+    return {
+      status: true,
+    };
+  };
+  /**
+   * Get posts where is saved by the user in from database
+   * @param {String} (username)
+   * @returns {object} saved posts
+   * @function
+   */
+  userSavedPosts = async (username) => {
+    const user = await this.findById(username, "savedPosts");
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    var posts = [];
+    user.savedPosts.forEach((el) => {
+      posts.push(el);
+    });
+    return posts;
+  };
+  /**
+   * Get user about from database
+   * @param {String} (username)
+   * @returns {object} user
+   */
+  userAbout = async (username) => {
+    const user = await this.findById(username);
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    if (user) {
+      const obj = {
+        followerCount: user.followers.length,
+        prefShowTrending: user.aboutReturn.prefShowTrending,
+        isBlocked: user.aboutReturn.isBlocked,
+        isBanned: user.member.isBanned,
+        isMuted: user.member.isMuted,
+        canCreateSubreddit: user.canCreateSubreddit,
+        isMod: user.aboutReturn.isMuted,
+        over18: user.prefs.over18,
+        hasVerifiedEmail: user.hasVerifiedEmail,
+        createdAt: user.createdAt,
+        inboxCount: user.inboxCount,
+        totalKarma: user.karma,
+        linkKarma: user.postKarma,
+        acceptFollowers: user.aboutReturn.acceptFollowers,
+        commentKarma: user.commentKarma,
+        passwordSet: user.isPasswordSet,
+        email: user.email,
+        about: user.about,
+        gender: user.gender,
+        avatar: user.avatar,
+        userID: user._id,
+        showActiveCommunities: user.showActiveCommunities,
+      };
+      return {
+        user: obj,
+      };
+    } else {
+      return {
+        user: null,
+      };
+    }
+  };
+  /**
+   * Get user me info from database
+   * @param {String} (username)
+   * @returns {object} user
+   */
+  userMe = async (username) => {
+    const user = await this.findById(username);
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    if (user) {
+      const obj = {
+        numComments: user.prefs.commentsNum,
+        threadedMessages: user.prefs.threadedMessages,
+        showLinkFlair: user.prefs.showLinkFlair,
+        countryCode: user.prefs.countryCode,
+        langauge: user.prefs.langauge,
+        over18: user.prefs.over18,
+        defaultCommentSort: user.prefs.defaultCommentSort,
+        showLocationBasedRecommendations:
+          user.prefs.showLocationBasedRecommendations,
+        searchInclude18: user.prefs.searchInclude18,
+        publicVotes: user.prefs.publicVotes,
+        enableFollwers: user.prefs.enableFollwers,
+        liveOrangeRed: user.prefs.liveOrangereds,
+        labelNSFW: user.prefs.labelNSFW,
+        newWindow: user.prefs.showPostInNewWindow,
+        emailPrivateMessage: user.prefs.emailPrivateMessage,
+        emailPostReply: user.prefs.emailPostReply,
+        emailMessages: user.prefs.emailMessages,
+        emailCommentReply: user.prefs.emailCommentReply,
+        emailUpvoteComment: user.prefs.emailUpvoteComment,
+        about: user.about,
+        gender: user.gender,
+        avatar: user.avatar,
+        userID: user._id,
+        emailUserNewFollwer: user.meReturn.emailUserNewFollwer,
+        emailUpVotePost: user.meReturn.emailUpVotePost,
+        emailUsernameMention: user.meReturn.emailUsernameMention,
+        showActiveCommunities: user.showActiveCommunities,
+      };
+      return {
+        user: obj,
+      };
+    } else {
+      return {
+        user: null,
+      };
+    }
+  };
+  /**
+   * Get user prefs from database
+   * @param {String} (username)
+   * @returns {object} user
+   */
+  userPrefs = async (username) => {
+    const user = await this.findById(username);
+    if (!user) throw new AppError("This user doesn't exist!", 404);
+    const prefs = await this.getOne({ _id: username }).select("prefs");
+    if (prefs) {
+      return {
+        userPrefs: prefs,
+      };
+    } else {
+      return {
+        userPrefs: null,
+      };
+    }
+  };
+
+  /**
+   * Resets user password
+   * @param {string} currentPassword
+   * @param {string} newPassword
+   * @param {string} confirmedNewPassword
+   * @function
+   */
+  resetPassword = async (
+    username,
+    currentPassword,
+    newPassword,
+    confirmedNewPassword
+  ) => {
+    const user = await this.getOne({ _id: username });
+    if (!user) throw new AppError("user is invalid or expired!", 400);
+    if (confirmedNewPassword !== newPassword)
+      throw new AppError("Password is not equal to confirmed password!", 400);
+    const result = await bcrypt.compare(currentPassword, user.password);
+
+    if (!result) throw new AppError("this password is not correct!", 400);
+    const hash = await bcrypt.hash(newPassword, 10);
+    user.password = hash;
+    await user.save();
+  };
+
   /**
    * Resets user password and returns a new token
    * @param {string} token
@@ -601,8 +866,70 @@ class UserService extends Service {
     const newToken = await this.signToken("bare email", user._id);
     return { token: newToken, id: user._id };
   };
-}
 
+  isParticipantInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ _id: user, select: "member" }))
+      .member;
+    subreddits = subreddits.map((el) => el.communityId);
+    return subreddits.includes(subreddit);
+  };
+
+  isModeratorInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ _id: user, select: "moderators" }))
+      .moderators;
+    subreddits = subreddits.map((el) => el.communityId);
+    return subreddits.includes(subreddit);
+  };
+
+  addSubredditModeration = async (subreddit, user) => {
+    if (!user.moderators.find((el) => el.communityId === subreddit)) {
+      user.moderators.push({ communityId: subreddit, role: "moderator" });
+      await user.save();
+    }
+  };
+  addFriend = async (username, friend) => {
+    await this.updateOne(
+      { _id: username },
+      {
+        $addToSet: {
+          friendRequestFromMe: friend,
+        },
+      }
+    );
+    await this.updateOne(
+      { _id: friend },
+      {
+        $addToSet: {
+          friendRequestToMe: username,
+        },
+      }
+    );
+  };
+
+  deleteFriend = async (username, friend) => {
+    await this.updateOne(
+      { _id: username },
+      {
+        $pull: {
+          friend: friend,
+        },
+      }
+    );
+  };
+  isCreatorInSubreddit = async (subreddit, user) => {
+    let subreddits = (await this.getOne({ _id: user, select: "moderators" }))
+      .moderators;
+    subreddits = subreddits
+      .filter((el) => el.role == "creator")
+      .map((el) => el.communityId);
+    return subreddits.includes(subreddit);
+  };
+  kickModerator = async (subreddit, user) => {
+    let doc = await this.getOne({ _id: user });
+    doc.moderators = doc.moderators.filter((el) => el.communityId != subreddit);
+    await doc.save();
+  };
+}
 module.exports = UserService;
 </code></pre>
         </article>
@@ -614,13 +941,13 @@ module.exports = UserService;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserCommentReplies">getUserCommentReplies</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSelfReply">getUserSelfReply</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="APIFeatures.html">APIFeatures</a></li><li><a href="AppError.html">AppError</a></li></ul><h3>Classes</h3><ul><li><a href="AuthService.html">AuthService</a></li><li><a href="CommentService.html">CommentService</a></li><li><a href="CommunityService.html">CommunityService</a></li><li><a href="MessageService.html">MessageService</a></li><li><a href="NotificationService.html">NotificationService</a></li><li><a href="PostService.html">PostService</a></li><li><a href="PushNotificationsService.html">PushNotificationsService</a></li><li><a href="UserService.html">UserService</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addComment">addComment</a></li><li><a href="global.html#addCommunityRule">addCommunityRule</a></li><li><a href="global.html#addInterests">addInterests</a></li><li><a href="global.html#addReply">addReply</a></li><li><a href="global.html#allMessages">allMessages</a></li><li><a href="global.html#availableUsername">availableUsername</a></li><li><a href="global.html#banOrMute">banOrMute</a></li><li><a href="global.html#block">block</a></li><li><a href="global.html#compose">compose</a></li><li><a href="global.html#createSubreddit">createSubreddit</a></li><li><a href="global.html#deleteData">deleteData</a></li><li><a href="global.html#deleteLink">deleteLink</a></li><li><a href="global.html#deleteMessage">deleteMessage</a></li><li><a href="global.html#deleteUserNotification">deleteUserNotification</a></li><li><a href="global.html#editCommunityRule">editCommunityRule</a></li><li><a href="global.html#editProfile">editProfile</a></li><li><a href="global.html#editUserPrefs">editUserPrefs</a></li><li><a href="global.html#editUserText">editUserText</a></li><li><a href="global.html#followPost">followPost</a></li><li><a href="global.html#followers">followers</a></li><li><a href="global.html#following">following</a></li><li><a href="global.html#getBanned">getBanned</a></li><li><a href="global.html#getCommunityAbout">getCommunityAbout</a></li><li><a href="global.html#getCommunityOptions">getCommunityOptions</a></li><li><a href="global.html#getEdited">getEdited</a></li><li><a href="global.html#getFollowersOfUser">getFollowersOfUser</a></li><li><a href="global.html#getGeneralInfo">getGeneralInfo</a></li><li><a href="global.html#getInterests">getInterests</a></li><li><a href="global.html#getMembers">getMembers</a></li><li><a href="global.html#getMembersCountPerDayAndMonth">getMembersCountPerDayAndMonth</a></li><li><a href="global.html#getModerates">getModerates</a></li><li><a href="global.html#getModerators">getModerators</a></li><li><a href="global.html#getMuted">getMuted</a></li><li><a href="global.html#getNotifications">getNotifications</a></li><li><a href="global.html#getPosts">getPosts</a></li><li><a href="global.html#getRandomCommunities">getRandomCommunities</a></li><li><a href="global.html#getSpammed">getSpammed</a></li><li><a href="global.html#getSpecificCategory">getSpecificCategory</a></li><li><a href="global.html#getSubscribed">getSubscribed</a></li><li><a href="global.html#getUserAbout">getUserAbout</a></li><li><a href="global.html#getUserComments">getUserComments</a></li><li><a href="global.html#getUserDownVoted">getUserDownVoted</a></li><li><a href="global.html#getUserMe">getUserMe</a></li><li><a href="global.html#getUserMentions">getUserMentions</a></li><li><a href="global.html#getUserOverview">getUserOverview</a></li><li><a href="global.html#getUserPrefs">getUserPrefs</a></li><li><a href="global.html#getUserSavedPosts">getUserSavedPosts</a></li><li><a href="global.html#getUserSubmitted">getUserSubmitted</a></li><li><a href="global.html#getUserUpVoted">getUserUpVoted</a></li><li><a href="global.html#getViewsCountPerDayAndMonth">getViewsCountPerDayAndMonth</a></li><li><a href="global.html#globalErrorHandler">globalErrorHandler</a></li><li><a href="global.html#handleCastErrorDB">handleCastErrorDB</a></li><li><a href="global.html#handleDuplicateFieldDB">handleDuplicateFieldDB</a></li><li><a href="global.html#handleValidatorErrorDB">handleValidatorErrorDB</a></li><li><a href="global.html#hide">hide</a></li><li><a href="global.html#importData">importData</a></li><li><a href="global.html#inboxMessages">inboxMessages</a></li><li><a href="global.html#kickUser">kickUser</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#markLocked">markLocked</a></li><li><a href="global.html#markNsfw">markNsfw</a></li><li><a href="global.html#markReadUserNotification">markReadUserNotification</a></li><li><a href="global.html#markSpoiler">markSpoiler</a></li><li><a href="global.html#markUnLocked">markUnLocked</a></li><li><a href="global.html#markUnSpoiler">markUnSpoiler</a></li><li><a href="global.html#mergeTwo">mergeTwo</a></li><li><a href="global.html#multerFilter">multerFilter</a></li><li><a href="global.html#multerStorage">multerStorage</a></li><li><a href="global.html#readAllMessages">readAllMessages</a></li><li><a href="global.html#removeSpam">removeSpam</a></li><li><a href="global.html#resizeCommunityBanner">resizeCommunityBanner</a></li><li><a href="global.html#resizeCommunityIcon">resizeCommunityIcon</a></li><li><a href="global.html#resizeUserPhoto">resizeUserPhoto</a></li><li><a href="global.html#save">save</a></li><li><a href="global.html#sendErrorDev">sendErrorDev</a></li><li><a href="global.html#sendErrorProd">sendErrorProd</a></li><li><a href="global.html#sentMessages">sentMessages</a></li><li><a href="global.html#setSuggestedSort">setSuggestedSort</a></li><li><a href="global.html#signup">signup</a></li><li><a href="global.html#spam">spam</a></li><li><a href="global.html#submit">submit</a></li><li><a href="global.html#subscribe">subscribe</a></li><li><a href="global.html#unhide">unhide</a></li><li><a href="global.html#unreadMessage">unreadMessage</a></li><li><a href="global.html#unsave">unsave</a></li><li><a href="global.html#updateEmail">updateEmail</a></li><li><a href="global.html#uploadCommunityBanner">uploadCommunityBanner</a></li><li><a href="global.html#uploadCommunityIcon">uploadCommunityIcon</a></li><li><a href="global.html#uploadUserPhoto">uploadUserPhoto</a></li><li><a href="global.html#vote">vote</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sun Dec 04 2022 20:40:38 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Fri Dec 23 2022 21:19:42 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
