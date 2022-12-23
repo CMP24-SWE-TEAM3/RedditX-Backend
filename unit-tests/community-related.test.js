@@ -1308,3 +1308,67 @@ describe("testing getStats service in community service class", () => {
     });
   });
 });
+
+describe("Test random categories",()=>{
+  test("test", async () => {
+    communityServiceInstance.getAll=jest.fn().mockReturnValueOnce({});
+    const result = await communityServiceInstance.getRandomCommunities({"limit":10});
+    expect(result).toStrictEqual({});
+
+  });
+
+});
+describe("Test get subbredit about",()=>{
+  test("test available one", async () => {
+    communityServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+    const result = await communityServiceInstance.availableSubreddit("t5_notfound");
+    expect(result.state).toBe(true);
+
+  });
+  test("test not available one", async () => {
+    communityServiceInstance.getOne=jest.fn().mockReturnValueOnce({"_id":"t5_imagePro235"});
+    const result = await communityServiceInstance.availableSubreddit("t5_imagePro235");
+    expect(result.state).toBe(false);
+
+  });
+
+});
+
+describe("Test create subreddit",()=>{
+  test("test user cannot create subreddit", async () => {
+    var user={"_id":"t2_lotfy2","canCreateSubreddit":false};
+    var body={"name":"t5_new","type":"public","over18":false};
+    const result = await communityServiceInstance.createSubreddit(body,user);
+    expect(result.status).toBe(false);
+  });
+  test("test user creates  existing subreddit", async () => {
+    var user={"_id":"t2_lotfy2","canCreateSubreddit":true};
+    var body={"name":"t5_new","type":"public","over18":false};
+    communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({state:false});
+    const result = await communityServiceInstance.createSubreddit(body,user);
+    expect(result.status).toBe(false);
+  });
+  test("test user creates  existing subreddit", async () => {
+    var user={"_id":"t2_lotfy2","canCreateSubreddit":true};
+    var body={"name":"t5_new","type":"public","over18":false};
+    communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({state:true});
+    communityServiceInstance.insert=jest.fn().mockReturnValueOnce({});
+    const result = await communityServiceInstance.createSubreddit(body,user);
+    expect(result.status).toBe(true);
+  });
+});
+describe("Test change comment sort type of subreddit",()=>{
+  test("Test change comment sort type of non-existing subreddit", async () => {
+    communityServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+    Community.prototype.save = jest.fn().mockImplementation(() => {});
+    const result = await communityServiceInstance.setSuggestedSort("t5_notfound","old");
+    expect(result.status).toBe(false);
+  });
+  // test("Test change comment sort type of existing subreddit", async () => {
+  //   communityServiceInstance.getOne=jest.fn().mockReturnValueOnce({"_id":"t5_imagePro235","communityOptions":{"suggestedCommentSort":"new"}});
+  //   Community.prototype.save = jest.fn().mockImplementation(() => {});
+  //   const result = await communityServiceInstance.setSuggestedSort("t5_notfound","old");
+  //   expect(result.status).toBe(true);
+  // }); //moza
+
+});

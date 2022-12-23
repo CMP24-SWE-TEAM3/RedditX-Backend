@@ -1,10 +1,15 @@
 /* eslint-disable */
 const User = require("../models/user-model");
+const Community= require("../models/community-model");
+const CommunityService = require("../services/community-service");
 const UserService = require("../services/user-service");
+const AuthService = require("../services/auth-service");
 const Email = require("./../utils/email");
-
+const bcrypt = require("bcryptjs");
 const userServiceInstance = new UserService(User);
-
+const authServiceInstance = new AuthService(User);
+const communityServiceInstance = new CommunityService(Community);
+jest.setTimeout(1000000);
 describe("testing uploadUserPhoto service in user service class", () => {
   describe("given a data with action=upload, username, and a file", () => {
     test("should not throw an error", async () => {
@@ -426,4 +431,455 @@ describe("testing getFollowing service in community service class", () => {
       ).rejects.toThrowError();
     });
   });
+});
+describe("Testing User System", () => {
+    describe("Test Signup",()=>{
+      describe("Test valid signup using bare email",()=>{
+        test("test using valid username and password and email", async () => {
+          const body={
+            "type":"bare email",
+            "username":"t2_lotfy22",
+            "password":"lotfy@reddit",
+            "email":"lotfy6@rreddit.com"
+          };
+          authServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+          authServiceInstance.createUser=jest.fn().mockReturnValueOnce({  username: "t2_lotfy22",
+            status: "done"});
+          const result = await authServiceInstance.signup(body);
+          expect(result.state).toBe(true);  
+
+        });
+      });
+      describe("Test invalid signup using bare email",()=>{
+        test("test using existing email", async () => {
+          const user = new User({
+            _id: "t2_lotfy2",
+            email:"lotfy@rreddit.com",
+          });
+          const body={
+            "type":"bare email",
+            "username":"t2_lotfy2",
+            "password":"lotfy@reddit",
+            "email":"lotfy@rreddit.com"
+          };
+          authServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+          const result = await authServiceInstance.signup(body);
+          expect(result.error).toBe("Duplicate email!");  
+        });
+      });
+      describe("Test invalid signup using bare email",()=>{
+        test("test using existing username", async () => {
+          const body={
+            "type":"bare email",
+            "username":"t2_lotfy2",
+            "password":"lotfy@reddit",
+            "email":"lotfy@rreddit.com"
+          };
+          authServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+          authServiceInstance.createUser=jest.fn().mockReturnValueOnce({  username: null,
+          status: "error"});
+          const result = await authServiceInstance.signup(body);
+          expect(result.state).toBe(false);  
+        });
+      });
+      describe("Test valid signup using gmail auth",()=>{
+        test("test using existing user so he will be logged in", async () => {
+          const user = new User({
+            _id: "t2_lotfy2",
+            email:"lotfy@rreddit.com",
+          });
+          const body={
+            "type":"gmail",
+            "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImE5NmFkY2U5OTk5YmJmNWNkMzBmMjlmNDljZDM3ZjRjNWU2NDI3NDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2OTEyODg2MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY5MTI4ODYyLCJleHAiOjE2NjkxMzI0NjIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.YQRDqWDcnH1VFfbo8QenfIRXAUHIlhUIIYrWibmSN5qZMQdUpJuUgL47ropSJsvBZ9bOUH7EQ0nW3clb3UCt2Sv-lNnfF5OPF-30rpnz5fHqB2PHGhwj3JRQ7ErsrGG3xHcGJl-jUa2vKNVIY_fz44N07F1ouZvex5_j6pv2z5RizD-w4r32gxTEvV8yvLDhaXJhkkaaYH0DTS8I7avYYXSzMl8iVX54_V4grhYmQX-kLJ7JTSaUFviALhe0IatTb7_5k9GRXrxZW7XDaQxnNgXOa9XB5I4FNt6oUoR8eO-O8q8Qc9T9BBSpX3TMpze-RyUR7G5-odkH84XAKAne4A"
+          };
+          authServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+          const result = await authServiceInstance.signup(body);
+          expect(result.state).toBe(true);  
+        });
+      });
+
+      describe("Test valid signup using gmail auth",()=>{
+        test("test using new user", async () => {
+        
+          const body={
+            "type":"gmail",
+            "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImE5NmFkY2U5OTk5YmJmNWNkMzBmMjlmNDljZDM3ZjRjNWU2NDI3NDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2OTEyODg2MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY5MTI4ODYyLCJleHAiOjE2NjkxMzI0NjIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.YQRDqWDcnH1VFfbo8QenfIRXAUHIlhUIIYrWibmSN5qZMQdUpJuUgL47ropSJsvBZ9bOUH7EQ0nW3clb3UCt2Sv-lNnfF5OPF-30rpnz5fHqB2PHGhwj3JRQ7ErsrGG3xHcGJl-jUa2vKNVIY_fz44N07F1ouZvex5_j6pv2z5RizD-w4r32gxTEvV8yvLDhaXJhkkaaYH0DTS8I7avYYXSzMl8iVX54_V4grhYmQX-kLJ7JTSaUFviALhe0IatTb7_5k9GRXrxZW7XDaQxnNgXOa9XB5I4FNt6oUoR8eO-O8q8Qc9T9BBSpX3TMpze-RyUR7G5-odkH84XAKAne4A"
+          };
+          authServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+          authServiceInstance.createUser=jest.fn().mockReturnValueOnce({  username: "t2_lovePizza",
+            status: "done"});
+          const result = await authServiceInstance.signup(body);
+          expect(result.state).toBe(true);  
+        });
+      });
+
+      describe("Test invalid signup using gmail auth",()=>{
+        test("test using invalid token", async () => {
+          const body={
+            "type":"gmail",
+            "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsI.67sdf....mtpZCI6ImE5NmFkY2U5OTk5YmJmNWNkMzBmMjlmNDljZDM3ZjRjNWU2NDI3NDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2OTEyODg2MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY5MTI4ODYyLCJleHAiOjE2NjkxMzI0NjIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.YQRDqWDcnH1VFfbo8QenfIRXAUHIlhUIIYrWibmSN5qZMQdUpJuUgL47ropSJsvBZ9bOUH7EQ0nW3clb3UCt2Sv-lNnfF5OPF-30rpnz5fHqB2PHGhwj3JRQ7ErsrGG3xHcGJl-jUa2vKNVIY_fz44N07F1ouZvex5_j6pv2z5RizD-w4r32gxTEvV8yvLDhaXJhkkaaYH0DTS8I7avYYXSzMl8iVX54_V4grhYmQX-kLJ7JTSaUFviALhe0IatTb7_5k9GRXrxZW7XDaQxnNgXOa9XB5I4FNt6oUoR8eO-O8q8Qc9T9BBSpX3TMpze-RyUR7G5-odkH84XAKAne4A"
+          };
+    
+          const result = await authServiceInstance.signup(body);
+          expect(result.state).toBe(false);  
+          expect(result.error).toBe("invalid token");  
+
+        });
+      });
+
+    
+    
+    });
+    describe("Test Login",()=>{
+     
+      describe("Test invalid login using bare email",()=>{
+        test("test without type", async () => {
+        const body={
+            "password":"lotfy@reddit.com"
+        };
+    
+          const result = await authServiceInstance.login(body);
+          expect(result.state).toBe(false);  
+          expect(result.error).toBe("invalid parameters");  
+
+        });
+      });
+      describe("Test invalid login using bare email",()=>{
+        test("test without username", async () => {
+        const body={
+          "type":"bare email",
+          "password":"lotfy@reddit.com"
+
+        };
+          const result = await authServiceInstance.login(body);
+          expect(result.state).toBe(false);  
+          expect(result.error).toBe("invalid parameters");  
+
+        });
+      });
+      describe("Test invalid login using bare email",()=>{
+        test("test using wrong username", async () => {
+        const body={
+          "type":"bare email",
+          "username":"t2_nothere",
+          "password":"lotfy@reddit.com"
+
+        };
+         authServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+          const result = await authServiceInstance.login(body);
+          expect(result.state).toBe(false);  
+          expect(result.error).toBe("Wrong username or password");  
+
+        });
+      });
+      describe("Test invalid login using bare email",()=>{
+        test("test using wrong password", async () => {
+          const user = new User({
+            _id: "t2_lotfy2",
+            email:"lotfy@rreddit.com",
+          });
+        const body={
+          "type":"bare email",
+          "username":"t2_nothere",
+          "password":"lotfy@reddit.com"
+
+        };
+        authServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+        bcrypt.compareSync=jest.fn().mockReturnValueOnce(false);
+
+        const result = await authServiceInstance.login(body);
+        expect(result.state).toBe(false);  
+        expect(result.error).toBe("Wrong username or password");  
+
+        });
+      });
+       describe("Test valid login using bare email",()=>{
+        test("test vaild parameters", async () => {
+          const user = new User({
+            _id: "t2_lotfy2",
+            email:"lotfy@rreddit.com",
+          });
+          const body={
+            "type":"bare email",
+            "username":"t2_nothere",
+            "password":"lotfy@reddit.com"
+  
+          };
+          authServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+          bcrypt.compareSync=jest.fn().mockReturnValueOnce(true);
+          const result = await authServiceInstance.login(body);
+          expect(result.state).toBe(true);  
+
+        });
+      });
+      describe("Test invalid login using gmail auth",()=>{
+        test("test without sending token", async () => {
+        const body={
+          "type":"gmail",
+          "username":"t2_nothere",
+          "password":"lotfy@reddit.com"
+
+        };
+          const result = await authServiceInstance.login(body);
+          expect(result.state).toBe(false);  
+
+        });
+      });
+      describe("Test invalid login using gmail auth",()=>{
+        test("test without sending token", async () => {
+        const body={
+          "type":"gmail",
+          "username":"t2_nothere",
+          "password":"lotfy@reddit.com",
+          "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsI,l,mtpZCI6ImE5NmFkY2U5OTk5YmJmNWNkMzBmMjlmNDljZDM3ZjRjNWU2NDI3NDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2OTEyODg2MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY5MTI4ODYyLCJleHAiOjE2NjkxMzI0NjIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.YQRDqWDcnH1VFfbo8QenfIRXAUHIlhUIIYrWibmSN5qZMQdUpJuUgL47ropSJsvBZ9bOUH7EQ0nW3clb3UCt2Sv-lNnfF5OPF-30rpnz5fHqB2PHGhwj3JRQ7ErsrGG3xHcGJl-jUa2vKNVIY_fz44N07F1ouZvex5_j6pv2z5RizD-w4r32gxTEvV8yvLDhaXJhkkaaYH0DTS8I7avYYXSzMl8iVX54_V4grhYmQX-kLJ7JTSaUFviALhe0IatTb7_5k9GRXrxZW7XDaQxnNgXOa9XB5I4FNt6oUoR8eO-O8q8Qc9T9BBSpX3TMpze-RyUR7G5-odkH84XAKAne4A"
+        
+
+        };
+          const result = await authServiceInstance.login(body);
+          expect(result.state).toBe(false);  
+          expect(result.error).toBe("invalid token");  
+        });
+      });
+
+      describe("Test valid login using gmail auth",()=>{
+        test("test using existing username", async () => {
+          const user = new User({
+            _id: "t2_lotfy2",
+            email:"lotfy@rreddit.com",
+          });
+        const body={
+          "type":"gmail",
+          "password":"lotfy@reddit.com",
+           "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImE5NmFkY2U5OTk5YmJmNWNkMzBmMjlmNDljZDM3ZjRjNWU2NDI3NDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2OTEyODg2MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY5MTI4ODYyLCJleHAiOjE2NjkxMzI0NjIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.YQRDqWDcnH1VFfbo8QenfIRXAUHIlhUIIYrWibmSN5qZMQdUpJuUgL47ropSJsvBZ9bOUH7EQ0nW3clb3UCt2Sv-lNnfF5OPF-30rpnz5fHqB2PHGhwj3JRQ7ErsrGG3xHcGJl-jUa2vKNVIY_fz44N07F1ouZvex5_j6pv2z5RizD-w4r32gxTEvV8yvLDhaXJhkkaaYH0DTS8I7avYYXSzMl8iVX54_V4grhYmQX-kLJ7JTSaUFviALhe0IatTb7_5k9GRXrxZW7XDaQxnNgXOa9XB5I4FNt6oUoR8eO-O8q8Qc9T9BBSpX3TMpze-RyUR7G5-odkH84XAKAne4A"
+         };
+         authServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+          const result = await authServiceInstance.login(body);
+          expect(result.state).toBe(true);  
+        });
+      });
+
+      describe("Test valid login using gmail auth",()=>{
+        test("test using new username", async () => {
+        const body={
+          "type":"gmail",
+          "username":"t2_lovePizza",
+          "password":"lotfy@reddit.com",
+           "googleOrFacebookToken":"eyJhbGciOiJSUzI1NiIsImtpZCI6ImE5NmFkY2U5OTk5YmJmNWNkMzBmMjlmNDljZDM3ZjRjNWU2NDI3NDAiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiTW9oYW1lZCBpYnJhaGltIE1vdXNzYSBNdXN0YWZhIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FMbTV3dTBFT1ZPTzJlSjNNRDcwV3Q2ZVJDLThxLVd3eDU4VERrdWlXME1OPXM5Ni1jIiwiaXNzIjoiaHR0cHM6Ly9zZWN1cmV0b2tlbi5nb29nbGUuY29tL3JlZGRpdC1jbG9uZS1hZDY2YyIsImF1ZCI6InJlZGRpdC1jbG9uZS1hZDY2YyIsImF1dGhfdGltZSI6MTY2OTEyODg2MiwidXNlcl9pZCI6IkhrRzVTaG1pbUhUa0NRbWEzOXhjMkRxMU5ObDEiLCJzdWIiOiJIa0c1U2htaW1IVGtDUW1hMzl4YzJEcTFOTmwxIiwiaWF0IjoxNjY5MTI4ODYyLCJleHAiOjE2NjkxMzI0NjIsImVtYWlsIjoibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZ29vZ2xlLmNvbSI6WyIxMTM4OTQ4NTY0MDAxMzIzODE4MTUiXSwiZW1haWwiOlsibW9oYW1lZHJvbWVlMTJAZ21haWwuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoiZ29vZ2xlLmNvbSJ9fQ.YQRDqWDcnH1VFfbo8QenfIRXAUHIlhUIIYrWibmSN5qZMQdUpJuUgL47ropSJsvBZ9bOUH7EQ0nW3clb3UCt2Sv-lNnfF5OPF-30rpnz5fHqB2PHGhwj3JRQ7ErsrGG3xHcGJl-jUa2vKNVIY_fz44N07F1ouZvex5_j6pv2z5RizD-w4r32gxTEvV8yvLDhaXJhkkaaYH0DTS8I7avYYXSzMl8iVX54_V4grhYmQX-kLJ7JTSaUFviALhe0IatTb7_5k9GRXrxZW7XDaQxnNgXOa9XB5I4FNt6oUoR8eO-O8q8Qc9T9BBSpX3TMpze-RyUR7G5-odkH84XAKAne4A"
+         };
+         authServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+         authServiceInstance.createUser=jest.fn().mockReturnValueOnce({  username: "t2_lovePizza",
+            status: "done"});
+          const result = await authServiceInstance.login(body);
+          expect(result.state).toBe(true);  
+        });
+      });
+
+
+    });
+    describe("Test username available",()=>{
+      describe("Test username is available",()=>{
+        test("test", async () => {
+          authServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+          const result = await authServiceInstance.availableUser("t2_notfound");
+          expect(result.state).toBe(true);  
+
+        });
+      });
+      describe("Test username is not available",()=>{
+        test("test", async () => {
+          const user = new User({
+            _id: "t2_lotfy2",
+            email:"lotfy@rreddit.com",
+          });
+          authServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+          const result = await authServiceInstance.availableUser("t2_found");
+          expect(result.state).toBe(false);  
+
+        });
+      });
+    });
+    // describe("Test get my followers",()=>{
+    //   test("test", async () => {
+    //     userServiceInstance.getOne.select=jest.fn().mockReturnValueOnce({"id":"t2_lotfy2","followers":["t2_nabil","t2_moazMohamed"]});
+    //         userServiceInstance.find.select = jest.fn().mockReturnValueOnce(["users"]);
+
+    //     const result = await userServiceInstance.getFollowers("t2_lotfy2");
+    //     expect(result.status).toBe(true);  
+
+    //   });
+
+    // });
+    describe("Test interests of user",()=>{
+      describe("Test get my interests",()=>{
+        test("test", async () => {
+          userServiceInstance.getOne=jest.fn().mockReturnValueOnce({"_id":"t2_lotfy2","categories":["Gaming","Memess"]});
+  
+          const result = await userServiceInstance.getInterests("t2_lotfy2");
+          expect(result.status).toBe(true);  
+  
+        });
+  
+      });
+      describe("Test add my interests",()=>{
+        test("test", async () => {
+          userServiceInstance.updateOne=jest.fn().mockReturnValueOnce({});
+  
+          const result = await userServiceInstance.addInterests("t2_lotfy2",["Gaming"]);
+          expect(result.status).toBe(true);  
+  
+        });
+  
+      });
+    }); 
+   
+
+});
+
+describe("Test Subscribe",()=>{
+  describe(("Test subscribe to a user"),()=>{
+    test("test success subscribe to user", async () => {
+      const body={
+        "srName":"t2_nabil",
+        "action":"sub"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+
+      }
+      authServiceInstance.availableUser=jest.fn().mockReturnValueOnce({"state":true,"user":null});
+      jest.spyOn(User, "findOne").mockReturnValueOnce(user);      
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(true);
+    });
+    test("test subscribe to user not followed", async () => {
+      const body={
+        "srName":"t2_nabil",
+        "action":"unsub"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+
+      }
+      authServiceInstance.availableUser=jest.fn().mockReturnValueOnce({"state":true,"user":null});
+      jest.spyOn(User, "findOne").mockReturnValueOnce(user);      
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("operation failed the user is already not followed");
+    });
+
+  });
+  
+  describe(("Test subscribe to a subreddit"),()=>{
+    test("test subscribe to non existing subreddit", async () => {
+      const body={
+        "srName":"t5_imagePro2as35",
+        "action":"sub"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+
+      } 
+      communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({"state":false});
+      jest.spyOn(Community, "findOne").mockReturnValueOnce(null);      
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("invalid subreddit");
+
+    });
+    test("test subscribe to existing subreddit but invaild user", async () => {
+      const body={
+        "srName":"t5_imagePro235",
+        "action":"sub"
+      };
+      const subreddit={
+        "_id":"t5_imagePro235"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+        "member":[{"communityId":"t5_imagePro"}]
+      } 
+      communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({"state":false});
+      jest.spyOn(Community, "findOne").mockReturnValueOnce(subreddit);      
+      jest.spyOn(User, "findOne").mockReturnValueOnce(null);      
+
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("invalid username");
+
+    });
+    test("test subscribe to existing subreddit but already followed", async () => {
+      const body={
+        "srName":"t5_imagePro235",
+        "action":"sub"
+      };
+      const subreddit={
+        "_id":"t5_imagePro235"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+        "member":[{"communityId":"t5_imagePro"},{"communityId":"t5_imagePro235"}]
+      } 
+      communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({"state":false,"subreddit":subreddit});
+      jest.spyOn(Community, "findOne").mockReturnValueOnce(subreddit);      
+      jest.spyOn(User, "findOne").mockReturnValueOnce(user);      
+
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("already followed");
+
+    });
+    test("test unsubscribe to subreddit which is already not followed", async () => {
+      const body={
+        "srName":"t5_imagePro235ssx",
+        "action":"unsub"
+      };
+      const subreddit={
+        "_id":"t5_imagePro235ssx",
+        "members":[],
+        "membersCnt":20,
+        "joinedPerDay":[0,0,0,0,0,0,0],
+        "joinedPerMonth":[0,0,0,0,0,0,0,0,0,0,0,0],
+        "leftPerDay":[0,0,0,0,0,0,0],
+        "leftPerMonth":[0,0,0,0,0,0,0,0,0,0,0,0],
+
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+        "member":[{"communityId":"t5_imagePro"},{"communityId":"t5_imagePro235"}]
+        
+      } 
+      communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({"state":false,"subreddit":subreddit});
+      jest.spyOn(Community, "findOne").mockReturnValueOnce(subreddit);      
+      jest.spyOn(User, "findOne").mockReturnValueOnce(user);      
+      jest.spyOn(User, "updateOne").mockReturnValueOnce(user);      
+      jest.spyOn(Community, "updateOne").mockReturnValueOnce(subreddit);      
+
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      console.log(result);
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("operation failed the user is already not followed");
+
+    });
+    
+
+  });
+  
 });
