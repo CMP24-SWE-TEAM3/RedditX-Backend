@@ -1,11 +1,14 @@
 /* eslint-disable */
 const User = require("../models/user-model");
+const Community= require("../models/community-model");
+const CommunityService = require("../services/community-service");
 const UserService = require("../services/user-service");
 const AuthService = require("../services/auth-service");
 const Email = require("./../utils/email");
 const bcrypt = require("bcryptjs");
 const userServiceInstance = new UserService(User);
 const authServiceInstance = new AuthService(User);
+const communityServiceInstance = new CommunityService(Community);
 jest.setTimeout(1000000);
 describe("testing uploadUserPhoto service in user service class", () => {
   describe("given a data with action=upload, username, and a file", () => {
@@ -730,4 +733,153 @@ describe("Testing User System", () => {
     }); 
    
 
+});
+
+describe("Test Subscribe",()=>{
+  describe(("Test subscribe to a user"),()=>{
+    test("test success subscribe to user", async () => {
+      const body={
+        "srName":"t2_nabil",
+        "action":"sub"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+
+      }
+      authServiceInstance.availableUser=jest.fn().mockReturnValueOnce({"state":true,"user":null});
+      jest.spyOn(User, "findOne").mockReturnValueOnce(user);      
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(true);
+    });
+    test("test subscribe to user not followed", async () => {
+      const body={
+        "srName":"t2_nabil",
+        "action":"unsub"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+
+      }
+      authServiceInstance.availableUser=jest.fn().mockReturnValueOnce({"state":true,"user":null});
+      jest.spyOn(User, "findOne").mockReturnValueOnce(user);      
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("operation failed the user is already not followed");
+    });
+
+  });
+  
+  describe(("Test subscribe to a subreddit"),()=>{
+    test("test subscribe to non existing subreddit", async () => {
+      const body={
+        "srName":"t5_imagePro2as35",
+        "action":"sub"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+
+      } 
+      communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({"state":false});
+      jest.spyOn(Community, "findOne").mockReturnValueOnce(null);      
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("invalid subreddit");
+
+    });
+    test("test subscribe to existing subreddit but invaild user", async () => {
+      const body={
+        "srName":"t5_imagePro235",
+        "action":"sub"
+      };
+      const subreddit={
+        "_id":"t5_imagePro235"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+        "member":[{"communityId":"t5_imagePro"}]
+      } 
+      communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({"state":false});
+      jest.spyOn(Community, "findOne").mockReturnValueOnce(subreddit);      
+      jest.spyOn(User, "findOne").mockReturnValueOnce(null);      
+
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(null);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("invalid username");
+
+    });
+    test("test subscribe to existing subreddit but already followed", async () => {
+      const body={
+        "srName":"t5_imagePro235",
+        "action":"sub"
+      };
+      const subreddit={
+        "_id":"t5_imagePro235"
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+        "member":[{"communityId":"t5_imagePro"},{"communityId":"t5_imagePro235"}]
+      } 
+      communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({"state":false,"subreddit":subreddit});
+      jest.spyOn(Community, "findOne").mockReturnValueOnce(subreddit);      
+      jest.spyOn(User, "findOne").mockReturnValueOnce(user);      
+
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("already followed");
+
+    });
+    test("test unsubscribe to subreddit which is already not followed", async () => {
+      const body={
+        "srName":"t5_imagePro235ssx",
+        "action":"unsub"
+      };
+      const subreddit={
+        "_id":"t5_imagePro235ssx",
+        "members":[],
+        "membersCnt":20,
+        "joinedPerDay":[0,0,0,0,0,0,0],
+        "joinedPerMonth":[0,0,0,0,0,0,0,0,0,0,0,0],
+        "leftPerDay":[0,0,0,0,0,0,0],
+        "leftPerMonth":[0,0,0,0,0,0,0,0,0,0,0,0],
+
+      };
+      const user={
+        "_id":"t2_nabil",
+        "avatar":"user_image.jpg",
+        "followers":["t2_moazMohamed","t2_shredan"],
+        "member":[{"communityId":"t5_imagePro"},{"communityId":"t5_imagePro235"}]
+        
+      } 
+      communityServiceInstance.availableSubreddit=jest.fn().mockReturnValueOnce({"state":false,"subreddit":subreddit});
+      jest.spyOn(Community, "findOne").mockReturnValueOnce(subreddit);      
+      jest.spyOn(User, "findOne").mockReturnValueOnce(user);      
+      jest.spyOn(User, "updateOne").mockReturnValueOnce(user);      
+      jest.spyOn(Community, "updateOne").mockReturnValueOnce(subreddit);      
+
+      userServiceInstance.getOne=jest.fn().mockReturnValueOnce(user);
+      const result = await userServiceInstance.subscribe(body,"t2_nabil");
+      console.log(result);
+      expect(result.state).toBe(false);
+      expect(result.error).toBe("operation failed the user is already not followed");
+
+    });
+    
+
+  });
+  
 });
