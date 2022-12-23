@@ -3,6 +3,11 @@ const CommentService = require("./../services/comment-service");
 const Comment = require("./../models/comment-model");
 
 const commentServiceInstance = new CommentService(Comment);
+/**
+ * show comment
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
 const showComment = catchAsync(async (req, res) => {
   //[1] -> check the owner of the user
   const comment = req.body.commentID;

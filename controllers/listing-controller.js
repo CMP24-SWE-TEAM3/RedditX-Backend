@@ -590,7 +590,11 @@ const unhide = catchAsync(async (req, res, next) => {
     message: "Post is unhidden successfully",
   });
 });
-
+/**
+ * get post insights 
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
 const getPostInsights = catchAsync(async (req, res) => {
   const postInsightsCnt = await postServiceInstance.getOne({
     _id: req.params.post,

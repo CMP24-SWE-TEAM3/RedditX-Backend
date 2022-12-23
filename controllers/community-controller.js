@@ -680,7 +680,11 @@ const kickUser = catchAsync(async (req, res, next) => {
     message: "Operation is done successfully",
   });
 });
-
+/**
+ * remove sr banner
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
 const removeSrBanner = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   const subreddit = await communityServiceInstance.availableSubreddit(
@@ -709,7 +713,11 @@ const removeSrBanner = catchAsync(async (req, res) => {
     status: "succeded",
   });
 });
-
+/**
+ * remove sr icon
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
 const removeSrIcon = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   const subreddit = await communityServiceInstance.availableSubreddit(
@@ -738,7 +746,11 @@ const removeSrIcon = catchAsync(async (req, res) => {
     status: "succeded",
   });
 });
-
+/**
+ * get flairs
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
 const getFlairs = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   const subreddit = await communityServiceInstance.availableSubreddit(
@@ -773,7 +785,11 @@ const getFlairs = catchAsync(async (req, res) => {
     flairs: flairs.flairList,
   });
 });
-
+/**
+ * delete flair
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
 const deleteFlair = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   const subreddit = await communityServiceInstance.availableSubreddit(
@@ -809,7 +825,11 @@ const deleteFlair = catchAsync(async (req, res) => {
     status: "succeeded",
   });
 });
-
+/**
+ * add flair
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
 const addFlair = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   const subreddit = await communityServiceInstance.availableSubreddit(
@@ -846,7 +866,11 @@ const addFlair = catchAsync(async (req, res) => {
     status: "succeeded",
   });
 });
-
+/**
+ * configure subreddit
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
 const configureSubreddit = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   var subreddit = await communityServiceInstance.availableSubreddit(
@@ -880,7 +904,11 @@ const configureSubreddit = catchAsync(async (req, res) => {
     status: "succeeded",
   });
 });
-
+/**
+ * approve link
+ * @param {function} (req, res)
+ * @returns {object} res
+ */
 const approveLink = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   var subreddit = await communityServiceInstance.availableSubreddit(
@@ -925,7 +953,11 @@ const approveLink = catchAsync(async (req, res) => {
     status: "succeeded",
   });
 });
-
+/**
+ * remove link
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
 const removeLink = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   var subreddit = await communityServiceInstance.availableSubreddit(
@@ -979,7 +1011,11 @@ const removeLink = catchAsync(async (req, res) => {
     status: "succeeded",
   });
 });
-
+/**
+ * kick moderator by creator
+ * @param {function} (req, res, next)
+ * @returns {object} res
+ */
 const kickModerator = catchAsync(async (req, res) => {
   // [1] -> check existence of subreddit
   var subreddit = await communityServiceInstance.availableSubreddit(

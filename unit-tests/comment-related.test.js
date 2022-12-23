@@ -67,7 +67,7 @@ describe("testing saveSpammedComment service in comment service class", () => {
           spamsNumBeforeRemove: 21,
         },
       });
-      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      Comment.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         commentServiceInstance.saveSpammedComment(comment, community)
       ).resolves.not.toThrowError();
@@ -88,10 +88,88 @@ describe("testing saveSpammedComment service in comment service class", () => {
           spamsNumBeforeRemove: 21,
         },
       });
-      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      Comment.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         commentServiceInstance.saveSpammedComment(comment, community)
       ).resolves.not.toThrowError();
+    });
+  });
+});
+
+
+describe("testing showComment service in comment service class", () => {
+  describe("given a comment", () => {
+    let comments = [
+      {
+        _id: "123",
+        isCollapsed: false,
+      },
+      {
+        _id: "456",
+        isCollapsed: true
+      }
+    ]
+    test("show collapsed comment", async () => {
+      commentServiceInstance.updateOne = jest.fn().mockImplementationOnce((filter, update) => {
+        comments.forEach((element, index) => {
+          if (element._id == filter._id)
+            comments[index].isCollapsed = update.isCollapsed;
+        });
+      });
+      commentServiceInstance.showComment('456');
+      expect(comments[1].isCollapsed).toBe(false);
+    });
+    test("show already un collapsed comment", async () => {
+      commentServiceInstance.updateOne = jest.fn().mockImplementationOnce((filter, update) => {
+        comments.forEach((element, index) => {
+          if (element._id == filter._id)
+            comments[index].isCollapsed = update.isCollapsed;
+        });
+      });
+
+      commentServiceInstance.showComment('123');
+      expect(comments[0].isCollapsed).toBe(false);
+    });
+
+  });
+});
+
+
+
+
+
+
+describe("testing approve comment service in comment service class", () => {
+  describe("given a comment", () => {
+    let comments = [
+      Comment({
+        _id: "123",
+        isDeleted: true,
+        spams: [
+          'heat speech'
+        ],
+        spamCount: 40,
+      }),
+      Comment({
+        _id: "456",
+        isDeleted: false,
+        spams: [],
+        spamCount: 0,
+      })
+    ];
+    test("approve un deleted comment", async () => {
+      Comment.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      commentServiceInstance.approveComment(comments[1]);
+      expect(comments[1].isDeleted).toBe(false);
+      expect(comments[1].spams.length).toBe(0);
+      expect(comments[1].spamCount).toBe(0);
+    });
+    test("approve un deleted comment", async () => {
+      Comment.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      commentServiceInstance.approveComment(comments[0]);
+      expect(comments[0].isDeleted).toBe(false);
+      expect(comments[0].spams.length).toBe(0);
+      expect(comments[0].spamCount).toBe(0);
     });
   });
 });

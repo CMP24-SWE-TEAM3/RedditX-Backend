@@ -10,6 +10,11 @@ class PostService extends Service {
     super(model);
   }
 
+  /**
+   * get sort criteria of posts
+   * @param {string} criteria
+   * @function
+   */
   addSortCriteria(criteria) {
     let sort = {};
     if (criteria) {
@@ -39,6 +44,13 @@ class PostService extends Service {
     return sort;
   }
 
+  /**
+   * get listing posts based on subreddit(params) and query(query) and signed in user(addedFilter)
+   * @param {string} params
+   * @param {string} query
+   * @param {string} addedFilter
+   * @function
+   */
   getListingPosts = async (params, query, addedFilter) => {
     /*first of all : check if the request has certain subreddit or not*/
     let sort = this.addSortCriteria(params.criteria);
@@ -56,7 +68,11 @@ class PostService extends Service {
         select: "_id icon",
       }); //addedFilter contain either the subreddit or the information of signed in user
   };
-
+  /**
+   * get posts based on search query
+   * @param {string} query
+   * @function
+   */
   getSearchResults = (query) => {
     const searchQuery = query.q;
     delete query.q;

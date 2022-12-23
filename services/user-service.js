@@ -373,6 +373,12 @@ class UserService extends Service {
       }
     }
   };
+  /**
+   * filter subreddits to filter banned subreddits
+   * @param {object} subreddits
+   * @returns {Promise} users
+   * @function
+   */
   getFilteredSubreddits = (subreddits) => {
     return subreddits.map((el) => {
       if (!el.isBanned.value) {
@@ -380,7 +386,13 @@ class UserService extends Service {
       }
     });
   };
-
+  /**
+   * add user filter
+   * @param {object} query
+   * @param {string} username
+   * @returns {Promise} users
+   * @function
+   */
   addUserFilter = async (username) => {
     /*step 1,2 :get the categories and friends of the user*/
     const { member, friend, follows } = await this.getOne({
@@ -411,6 +423,13 @@ class UserService extends Service {
     };
     return addedFilter;
   };
+  /**
+   * get users based on query search
+   * @param {object} query
+   * @param {string} username
+   * @returns {Promise} users
+   * @function
+   */
   getSearchResults = async (query, username) => {
     const searchQuery = query.q;
     delete query.q;
@@ -839,26 +858,45 @@ class UserService extends Service {
     return { token: newToken, id: user._id };
   };
 
+  /**
+ * get if participant in subreddit
+ * @param {String} (subreddit)
+ * @param {String} (user)
+ */
   isParticipantInSubreddit = async (subreddit, user) => {
     let subreddits = (await this.getOne({ _id: user, select: "member" }))
       .member;
     subreddits = subreddits.map((el) => el.communityId);
     return subreddits.includes(subreddit);
   };
-
+  /**
+ * isModeratorInSubreddit
+ * @param {String} (subreddit)
+ * @param {String} (user)
+ */
   isModeratorInSubreddit = async (subreddit, user) => {
     let subreddits = (await this.getOne({ _id: user, select: "moderators" }))
       .moderators;
     subreddits = subreddits.map((el) => el.communityId);
     return subreddits.includes(subreddit);
   };
-
+  /**
+ * addSubredditModeration
+ * @param {String} (subreddit)
+ * @param {String} (user)
+ */
   addSubredditModeration = async (subreddit, user) => {
     if (!user.moderators.find((el) => el.communityId === subreddit)) {
       user.moderators.push({ communityId: subreddit, role: "moderator" });
       await user.save();
     }
   };
+
+  /**
+ * add friend of user
+ * @param {String} (username)
+ * @param {String} (friend)
+ */
   addFriend = async (username, friend) => {
     await this.updateOne(
       { _id: username },
@@ -878,6 +916,11 @@ class UserService extends Service {
     );
   };
 
+  /**
+   * delete friend of user 
+   * @param {String} (username)
+   * @param {String} (friend)
+   */
   deleteFriend = async (username, friend) => {
     await this.updateOne(
       { _id: username },
@@ -888,6 +931,11 @@ class UserService extends Service {
       }
     );
   };
+  /**
+   * get if the user is creator of the subreddit
+   * @param {String} (subreddit)
+   * @param {String} (user)
+   */
   isCreatorInSubreddit = async (subreddit, user) => {
     let subreddits = (await this.getOne({ _id: user, select: "moderators" }))
       .moderators;
@@ -896,6 +944,12 @@ class UserService extends Service {
       .map((el) => el.communityId);
     return subreddits.includes(subreddit);
   };
+
+  /**
+   * kick moderator of subreddit
+   * @param {String} (subreddit)
+   * @param {String} (user)
+   */
   kickModerator = async (subreddit, user) => {
     let doc = await this.getOne({ _id: user });
     doc.moderators = doc.moderators.filter((el) => el.communityId != subreddit);

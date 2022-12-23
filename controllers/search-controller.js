@@ -14,7 +14,11 @@ const userServiceInstance = new UserService(User);
 const postServiceInstance = new PostService(Post);
 const commentServiceInstance = new CommentService(Comment);
 const communityServiceInstance = new CommunityService(Community);
-
+/**
+ * get search results
+ * @param {function} (req,res,next)
+ * @returns {object} res
+ */
 const getSearchResults = async (req, res, next) => {
   let results = [];
   if (req.query.type) {

@@ -10,7 +10,7 @@ describe("testing uploadUserPhoto service in user service class", () => {
     test("should not throw an error", async () => {
       userServiceInstance.findByIdAndUpdate = jest
         .fn()
-        .mockImplementationOnce(() => {});
+        .mockImplementationOnce(() => { });
       const avatar = await userServiceInstance.uploadUserPhoto(
         "upload",
         "t2_moazMohamed",
@@ -25,7 +25,7 @@ describe("testing uploadUserPhoto service in user service class", () => {
     test("should throw an error", async () => {
       userServiceInstance.findByIdAndUpdate = jest
         .fn()
-        .mockImplementationOnce(() => {});
+        .mockImplementationOnce(() => { });
       expect(
         userServiceInstance.uploadUserPhoto(
           "upload",
@@ -39,7 +39,7 @@ describe("testing uploadUserPhoto service in user service class", () => {
     test("should not throw an error", async () => {
       userServiceInstance.findByIdAndUpdate = jest
         .fn()
-        .mockImplementationOnce(() => {});
+        .mockImplementationOnce(() => { });
       const avatar = await userServiceInstance.uploadUserPhoto(
         "delete",
         "t2_moazMohamed"
@@ -51,7 +51,7 @@ describe("testing uploadUserPhoto service in user service class", () => {
     test("should throw an error", async () => {
       userServiceInstance.findByIdAndUpdate = jest
         .fn()
-        .mockImplementationOnce(() => {});
+        .mockImplementationOnce(() => { });
       expect(
         userServiceInstance.uploadUserPhoto(undefined, "t2_moazMohamed", {
           filename: "photo.jpg",
@@ -72,7 +72,7 @@ describe("testing block service in user service class", () => {
         _id: "t2_hamada",
         blocksFromMe: [],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       userServiceInstance.getOne = jest
         .fn()
         .mockReturnValue(toUser)
@@ -92,7 +92,7 @@ describe("testing block service in user service class", () => {
         _id: "t2_hamada",
         blocksFromMe: [],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       toUser.blocksToMe[0] = "t2_hamada";
       fromUser.blocksFromMe[0] = "t2_moazMohamed";
       userServiceInstance.getOne = jest
@@ -114,7 +114,7 @@ describe("testing block service in user service class", () => {
         _id: "t2_hamada",
         blocksFromMe: [],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       toUser.blocksToMe[0] = "t2_hamada";
       fromUser.blocksFromMe[0] = "t2_moazMohamed";
       userServiceInstance.getOne = jest
@@ -136,7 +136,7 @@ describe("testing block service in user service class", () => {
         _id: "t2_hamada",
         blocksFromMe: [],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       toUser.blocksToMe[0] = "t2_hamada";
       fromUser.blocksFromMe[0] = "t2_moazMohamed";
       userServiceInstance.getOne = jest
@@ -158,7 +158,7 @@ describe("testing block service in user service class", () => {
         _id: "t2_hamada",
         blocksFromMe: [],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       userServiceInstance.getOne = jest
         .fn()
         .mockReturnValue(toUser)
@@ -180,7 +180,7 @@ describe("testing block service in user service class", () => {
         _id: "t2_hamada",
         blocksFromMe: [],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       userServiceInstance.getOne = jest
         .fn()
         .mockReturnValue(toUser)
@@ -198,7 +198,7 @@ describe("testing forgotUsername service in user service class", () => {
         _id: "t2_moazMohamed",
         email: "moaz25jan2015@gmail.com",
       });
-      Email.prototype.sendUsername = jest.fn().mockImplementation(() => {});
+      Email.prototype.sendUsername = jest.fn().mockImplementation(() => { });
       userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
       expect(
         userServiceInstance.forgotUsername("moaz25jan2015@gmail.com")
@@ -207,7 +207,7 @@ describe("testing forgotUsername service in user service class", () => {
   });
   describe("given an invalid email", () => {
     test("should throw an error", async () => {
-      Email.prototype.sendUsername = jest.fn().mockImplementation(() => {});
+      Email.prototype.sendUsername = jest.fn().mockImplementation(() => { });
       userServiceInstance.getOne = jest.fn().mockReturnValueOnce(undefined);
       expect(
         userServiceInstance.forgotUsername("moaz25jan2015@gmail.com")
@@ -240,12 +240,12 @@ describe("testing forgotPassword service in user service class", () => {
       });
       Email.prototype.sendPasswordReset = jest
         .fn()
-        .mockImplementation(() => {});
+        .mockImplementation(() => { });
       userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
       User.prototype.createPasswordResetToken = jest
         .fn()
         .mockReturnValueOnce("hdf45d5a6s465");
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         userServiceInstance.forgotPassword("t2_moazMohamed")
       ).resolves.not.toThrowError();
@@ -256,12 +256,12 @@ describe("testing forgotPassword service in user service class", () => {
       const user = undefined;
       Email.prototype.sendPasswordReset = jest
         .fn()
-        .mockImplementation(() => {});
+        .mockImplementation(() => { });
       userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
       User.prototype.createPasswordResetToken = jest
         .fn()
         .mockReturnValueOnce("hdf45d5a6s465");
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         userServiceInstance.forgotPassword("t2_moazMohamed")
       ).rejects.toThrowError();
@@ -280,7 +280,7 @@ describe("testing forgotPassword service in user service class", () => {
       User.prototype.createPasswordResetToken = jest
         .fn()
         .mockReturnValueOnce("hdf45d5a6s465");
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         userServiceInstance.forgotPassword("t2_moazMohamed")
       ).rejects.toThrowError();
@@ -300,8 +300,8 @@ describe("testing resetForgottenPassword service in user service class", () => {
         email: "moaz25jan2015@gmail.com",
       });
       userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
-      User.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       const data = await userServiceInstance.resetForgottenPassword(
         token,
         newPassword,
@@ -319,8 +319,8 @@ describe("testing resetForgottenPassword service in user service class", () => {
       const confirmedNewPassword = "moaz42hassan";
       const user = undefined;
       userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
-      User.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         userServiceInstance.resetForgottenPassword(
           token,
@@ -341,8 +341,8 @@ describe("testing resetForgottenPassword service in user service class", () => {
         email: "moaz25jan2015@gmail.com",
       });
       userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
-      User.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         userServiceInstance.resetForgottenPassword(
           token,
@@ -424,6 +424,301 @@ describe("testing getFollowing service in community service class", () => {
       expect(
         userServiceInstance.getFollowing("t2_nabil")
       ).rejects.toThrowError();
+    });
+  });
+});
+
+
+describe("testing kickModerator in community service", () => {
+  describe("given subreddit id and moderator", () => {
+    let users = [
+      User({
+        _id: '123',
+        moderators: [
+          'nabil123',
+          'moaz123'
+        ]
+      }),
+      User({
+        _id: '456',
+        moderators: [
+          'nabil123',
+        ]
+      })
+    ]
+    test("kick one of the moderators", async () => {
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(users[0]);
+      User.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      expect(userServiceInstance.kickModerator('123', 'nabil123')).resolves.not.toThrowError();
+    });
+  });
+});
+
+
+describe("testing isCreatorInSubreddit in community service", () => {
+  describe("given subreddit id and moderator", () => {
+    let users = [
+      User({
+        _id: 'nabil123',
+        moderators: [
+          {
+            communityId: 't5_imagePro235',
+            role: 'creator'
+          }
+        ]
+      }),
+      User({
+        _id: 'lotfy12',
+        moderators: [
+          {
+            communityId: 't5_imagePro235',
+            role: 'moderator'
+          }
+        ]
+      })
+    ]
+    test("test if the person is creator", async () => {
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(users[0]);
+      expect(await userServiceInstance.isCreatorInSubreddit('t5_imagePro235', 'nabil123')).toBe(true);
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(users[1]);
+      expect(await userServiceInstance.isCreatorInSubreddit('t5_imagePro235', 'lotfy12')).toBe(false);
+    });
+  });
+});
+
+
+describe("testing delete friend of user service ", () => {
+  describe("given the username and friend", () => {
+    test("test that the function doesn't throw error", async () => {
+      userServiceInstance.updateOne = jest.fn().mockImplementationOnce(() => { });
+      expect(userServiceInstance.deleteFriend('t2_lotfy', 't2_nabil')).resolves.not.toThrowError();
+    });
+  });
+});
+
+
+
+
+describe("testing add friend of user service ", () => {
+  describe("given the username and friend", () => {
+    test("test that the function doesn't throw error", async () => {
+      userServiceInstance.updateOne = jest.fn().mockImplementationOnce(() => { });
+      expect(userServiceInstance.addFriend('t2_lotfy', 't2_nabil')).resolves.not.toThrowError();
+    });
+  });
+});
+
+
+
+describe("testing isModeratorInSubreddit in community service", () => {
+  describe("given subreddit id and moderator", () => {
+    let users = [
+      User({
+        _id: 'nabil123',
+        moderators: [
+          {
+            communityId: 't5_imagePro235',
+            role: 'creator'
+          }
+        ]
+      }),
+      User({
+        _id: 'lotfy12',
+        moderators: [
+          {
+            communityId: 't5_imagePro235',
+            role: 'moderator'
+          }
+        ]
+      }),
+      User({
+        _id: 'moaz12',
+        moderators: [
+          {
+            communityId: 't5_tesla',
+            role: 'moderator'
+          }
+        ]
+      })
+    ]
+    test("test if the person is creator", async () => {
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(users[0]);
+      expect(await userServiceInstance.isModeratorInSubreddit('t5_imagePro235', 'nabil123')).toBe(true);
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(users[1]);
+      expect(await userServiceInstance.isModeratorInSubreddit('t5_imagePro235', 'lotfy12')).toBe(true);
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(users[2]);
+      expect(await userServiceInstance.isModeratorInSubreddit('t5_imagePro235', 'moaz12')).toBe(false);
+    });
+  });
+});
+
+
+
+describe("testing addSubredditModeration of user service ", () => {
+  describe("given the username and friend", () => {
+    let users = [
+      User({
+        _id: 'nabil123',
+        moderators: [
+          {
+            communityId: 't5_imagePro235',
+            role: 'creator'
+          }
+        ]
+      })
+    ]
+    test("test that the function doesn't throw error", async () => {
+      User.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      expect(userServiceInstance.addSubredditModeration('t5_imagePro235', users[0])).resolves.not.toThrowError();
+    });
+  });
+});
+
+
+describe("testing isParticipantInSubreddit of user service ", () => {
+  describe("given the username and subreddit", () => {
+    let users = [
+      User({
+        _id: 'nabil123',
+        member: [
+          {
+            communityId: 't5_imagePro235',
+          }
+        ]
+      }),
+      User({
+        _id: 'moaz12',
+        member: [
+          {
+            communityId: 't5_tesla',
+          }
+        ]
+      })
+    ]
+    test("test that the function doesn't throw error", async () => {
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(users[0]);
+      expect(await userServiceInstance.isParticipantInSubreddit('t5_imagePro235', 'nabil123')).toBe(true);
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(users[1]);
+      expect(await userServiceInstance.isParticipantInSubreddit('t5_imagePro235', 'moaz12')).toBe(false);
+    });
+  });
+});
+
+
+describe("testing getFilteredSubreddits ", () => {
+  describe("given subreddits", () => {
+    let subreddits = [
+      {
+        communityId: 't5_imagePro235',
+        isBanned: {
+          value: false,
+          date: Date.now()
+        }
+      },
+      {
+        communityId: 't5_tesla',
+        isBanned: {
+          value: true,
+          date: Date.now()
+        }
+      },
+      {
+        communityId: 't5_cars',
+        isBanned: {
+          value: true,
+          date: Date.now()
+        }
+      }
+    ]
+    test("test filter filter subreddits", async () => {
+      expect(await userServiceInstance.getFilteredSubreddits(subreddits)[0]).toBe('t5_imagePro235');
+    });
+  });
+});
+
+
+describe("testing addUserFilter ", () => {
+  describe("given username", () => {
+    let user = {
+      member: [
+        {
+          communityId: 't5_imagePro235',
+          isBanned: {
+            value: false,
+            date: Date.now()
+          }
+        },
+        {
+          communityId: 't5_tesla',
+          isBanned: {
+            value: true,
+            date: Date.now()
+          }
+        },
+        {
+          communityId: 't5_cars',
+          isBanned: {
+            value: true,
+            date: Date.now()
+          }
+        }
+      ],
+      friend: ['lotfy', 'moaz'],
+      follows: ['el3dawy'],
+    }
+    test("test filter subreddits", async () => {
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
+      expect(await userServiceInstance.addUserFilter('nabil')).toStrictEqual({
+        $or: [
+          {
+            communityID: {
+              $in: ['t5_imagePro235', undefined, undefined],
+            },
+          },
+          {
+            userID: {
+              $in: ['lotfy', 'moaz'],
+            },
+          },
+          {
+            userID: {
+              $in: ['el3dawy'],
+            },
+          },
+        ],
+      });
+    });
+  });
+});
+
+
+describe("testing getSearchResults ", () => {
+  describe("given subreddits", () => {
+    let subreddits = [
+      {
+        communityId: 't5_imagePro235',
+        isBanned: {
+          value: false,
+          date: Date.now()
+        }
+      },
+      {
+        communityId: 't5_tesla',
+        isBanned: {
+          value: true,
+          date: Date.now()
+        }
+      },
+      {
+        communityId: 't5_cars',
+        isBanned: {
+          value: true,
+          date: Date.now()
+        }
+      }
+    ]
+    test("test filter filter subreddits", async () => {
+      expect(await userServiceInstance.getFilteredSubreddits(subreddits)[0]).toBe('t5_imagePro235');
     });
   });
 });

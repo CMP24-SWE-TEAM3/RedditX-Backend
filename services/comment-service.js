@@ -17,6 +17,12 @@ class CommentService extends Service {
   constructor(model) {
     super(model);
   }
+  /**
+   * Spams a comment
+   * @param {object} query
+   * @returns {Promise} comments 
+   * @function
+   */
   getSearchResults = async (query) => {
     const searchQuery = query.q;
     delete query.q;
@@ -427,10 +433,20 @@ class CommentService extends Service {
     );
   };
 
+  /**
+   * show certain comment 
+   * @param {string} comment
+   * @function
+   */
   showComment = async (comment) => {
     await this.updateOne({ _id: comment }, { isCollapsed: false });
   };
 
+  /**
+   * moderator approve comment in subreddit
+   * @param {string} comment
+   * @function
+   */
   approveComment = async (comment) => {
     comment.isDeleted = false;
     comment.spams = [];
@@ -438,6 +454,11 @@ class CommentService extends Service {
     await comment.save();
   };
 
+  /**
+   * moderator remove comment in subreddit
+   * @param {string} comment
+   * @function
+   */
   removeComment = async (comment) => {
     comment.isDeleted = true;
     await comment.save();
