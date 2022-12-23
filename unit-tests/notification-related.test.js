@@ -310,3 +310,97 @@ describe("testing deleteOrMarkReadUserNotification service in notification servi
     });
   });
 });
+describe("Test Creating notifications",()=>{
+  test("test create new follower notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce(null);
+    const result= await notificationServiceInstance.createFollowerNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+
+  });
+  test("test failed to create new follower notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce("not null");
+    const result= await notificationServiceInstance.createFollowerNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(true);
+
+  });
+  test("test failed to create new follower notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockRejectedValueOnce();
+    const result= await notificationServiceInstance.createFollowerNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+  });
+  test("test upvote to comment notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce(null);
+    const result= await notificationServiceInstance.createUpvoteToCommentNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+
+  });
+  test("test failed to upvote to comment notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce("not null");
+    const result= await notificationServiceInstance.createUpvoteToCommentNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(true);
+
+  });
+  test("test failed to upvote to comment notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockRejectedValueOnce();
+    const result= await notificationServiceInstance.createUpvoteToCommentNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+
+  });
+
+  test("test reply to post notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce(null);
+    const result= await notificationServiceInstance.createReplyToPostNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+
+  });
+  test("test failed to reply to post notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce("not null");
+    const result= await notificationServiceInstance.createReplyToPostNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(true);
+
+  });
+  test("test failed to reply to post notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockRejectedValueOnce();
+    const result= await notificationServiceInstance.createReplyToPostNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+
+  });
+  test("test reply to comment notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce(null);
+    const result= await notificationServiceInstance.createReplyToCommentNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+
+  });
+  test("test failed to reply to comment notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce("not null");
+    const result= await notificationServiceInstance.createReplyToCommentNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(true);
+
+  });
+  test("test failed to reply to comment notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockRejectedValueOnce();
+    const result= await notificationServiceInstance.createReplyToCommentNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+
+  });
+  test("test upvote to post  notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce(null);
+    const result= await notificationServiceInstance.createUpvoteToPostNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+
+  });
+  test("test failed to upvote to post notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockReturnValueOnce("not null");
+    const result= await notificationServiceInstance.createUpvoteToPostNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(true);
+
+  });
+  test("test failed to upvote to post notification", async () => {
+    notificationServiceInstance.insert=jest.fn().mockRejectedValueOnce();
+    const result= await notificationServiceInstance.createUpvoteToPostNotification("t2_lotfy","moza.jpg");
+    expect(result.status).toBe(false);
+
+  });
+
+
+})

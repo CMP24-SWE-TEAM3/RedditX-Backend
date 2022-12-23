@@ -7,7 +7,7 @@ const PostService = require("../services/post-service");
 var ObjectID = require("bson").ObjectID;
 const mockingoose = require('mockingoose');
 const postServiceInstance = new PostService(Post);
-
+jest.setTimeout(1000000);
 describe("testing submit service in post service class", () => {
   describe("given a text, title, attachments (files), user, and community", () => {
     test("should respond with a valid post object", async () => {
@@ -316,6 +316,56 @@ describe("testing addSortCriteria in post service ", () => {
         postServiceInstance.addSortCriteria("random")
       ).toEqual({});
     });
+  });
+});
+
+
+describe("Test follow post",()=>{
+  test("test user already followed the post", async () => {
+    const body={
+      "linkID":"637d55fd1dcaa6e6bcefb01c",
+      "action":true
+    };
+    postServiceInstance.getOne=jest.fn().mockReturnValueOnce({_id:"637d55fd1dcaa6e6bcefb01c","followers":["t2_lotfy2"]});
+    const result= await postServiceInstance.followPost(body,"t2_lotfy2");
+    expect(result.status).toBe(false);
+    expect(result.error).toBe("user already followed this post");
+
+  });
+  test("test user already not followed the post", async () => {
+    const body={
+      "linkID":"637d55fd1dcaa6e6bcefb01c",
+      "action":false
+    };
+    postServiceInstance.getOne=jest.fn().mockReturnValueOnce({_id:"637d55fd1dcaa6e6bcefb01c","followers":["t2_nabil"]});
+    const result= await postServiceInstance.followPost(body,"t2_lotfy2");
+    expect(result.status).toBe(false);
+    expect(result.error).toBe("user already not followed this post");
+
+  });
+  test("test user already not followed the post", async () => {
+    const body={
+      "linkID":"637d55fd1dcaa6e6bcefb01c",
+      "action":true
+    };
+    postServiceInstance.getOne=jest.fn().mockReturnValueOnce({_id:"637d55fd1dcaa6e6bcefb01c","followers":["t2_nabil"]});
+    const result= await postServiceInstance.followPost(body,"t2_lotfy2");
+    postServiceInstance.updateOne=jest.fn().mockRejectedValueOnce();
+    expect(result.status).toBe(false);
+    expect(result.error).toBe("operation failed");
+
+  });
+  test("test user already not followed the post", async () => {
+    const body={
+      "linkID":"637d55fd1dcaa6e6bcefb01c",
+      "action":true
+    };
+    postServiceInstance.getOne=jest.fn().mockReturnValueOnce({_id:"637d55fd1dcaa6e6bcefb01c","followers":["t2_nabil"]});
+    postServiceInstance.updateOne=jest.fn().mockReturnValueOnce({});
+
+    const result= await postServiceInstance.followPost(body,"t2_lotfy2");
+    expect(result.status).toBe(true);
+
   });
 });
 
