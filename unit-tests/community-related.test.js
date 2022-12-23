@@ -4,8 +4,10 @@ const Post = require("../models/post-model");
 const Comment = require("../models/comment-model");
 const User = require("../models/user-model");
 const CommunityService = require("../services/community-service");
+const PostService = require("../services/post-service");
 
 const communityServiceInstance = new CommunityService(Community);
+const postServiceInstance = new PostService(Post);
 
 describe("testing uploadCommunityPhoto service in community service class", () => {
   describe("given a file, username, community, type=icon", () => {
@@ -1304,6 +1306,124 @@ describe("testing getStats service in community service class", () => {
         .mockReturnValueOnce(community);
       expect(
         communityServiceInstance.getStats("t5_imagePro235")
+      ).rejects.toThrowError();
+    });
+  });
+});
+
+describe("testing markAsLocked service in community service class", () => {
+  describe("given a subreddit, moderator, link", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        locked: false,
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      jest.spyOn(Post, "findOne").mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsLocked(
+          "t5_imagePro235",
+          "t2_hamada",
+          link
+        )
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an undefined subreddit, moderator, link", () => {
+    test("should throw an error", async () => {
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        locked: false,
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(undefined);
+      jest.spyOn(Post, "findOne").mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsLocked(undefined, "t2_hamada", link)
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, not a moderator, link", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        locked: false,
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      jest.spyOn(Post, "findOne").mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsLocked(
+          "t5_imagePro235",
+          "t2_moazMohamed",
+          link
+        )
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, moderator, link that is not in this subreddit", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ],
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_Pro235",
+        locked: false,
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      jest.spyOn(Post, "findOne").mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsLocked(
+          "t5_imagePro235",
+          "t2_hamada",
+          link
+        )
       ).rejects.toThrowError();
     });
   });
