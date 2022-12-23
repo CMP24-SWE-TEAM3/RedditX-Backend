@@ -35,6 +35,7 @@
     "helmet": "^6.0.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
+    "mockingoose": "^2.16.2",
     "mongodb-memory-server": "^8.9.5",
     "mongoose": "^6.5.2",
     "morgan": "^1.10.0",

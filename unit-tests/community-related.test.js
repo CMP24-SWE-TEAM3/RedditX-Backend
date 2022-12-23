@@ -24,7 +24,7 @@ describe("testing uploadCommunityPhoto service in community service class", () =
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
       const icon = await communityServiceInstance.uploadCommunityPhoto(
         { filename: "photo.jpg" },
         "t2_moazMohamed",
@@ -48,7 +48,7 @@ describe("testing uploadCommunityPhoto service in community service class", () =
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
       const banner = await communityServiceInstance.uploadCommunityPhoto(
         { filename: "photo.jpg" },
         "t2_moazMohamed",
@@ -67,7 +67,7 @@ describe("testing uploadCommunityPhoto service in community service class", () =
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.uploadCommunityPhoto(
           { filename: "photo.jpg" },
@@ -92,7 +92,7 @@ describe("testing uploadCommunityPhoto service in community service class", () =
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.uploadCommunityPhoto(
           undefined,
@@ -109,7 +109,7 @@ describe("testing uploadCommunityPhoto service in community service class", () =
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.uploadCommunityPhoto(
           { filename: "photo.jpg" },
@@ -584,8 +584,8 @@ describe("testing banOrMuteAtUser service in community service class", () => {
           },
         ],
       });
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.banOrMuteAtUser(member, community, "ban")
       ).resolves.not.toThrowError();
@@ -627,8 +627,8 @@ describe("testing banOrMuteAtUser service in community service class", () => {
           },
         ],
       });
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.banOrMuteAtUser(member, community, "unban")
       ).resolves.not.toThrowError();
@@ -670,8 +670,8 @@ describe("testing banOrMuteAtUser service in community service class", () => {
           },
         ],
       });
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.banOrMuteAtUser(member, community, "mute")
       ).resolves.not.toThrowError();
@@ -713,8 +713,8 @@ describe("testing banOrMuteAtUser service in community service class", () => {
           },
         ],
       });
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.banOrMuteAtUser(member, community, "unmute")
       ).resolves.not.toThrowError();
@@ -743,8 +743,8 @@ describe("testing banOrMuteAtUser service in community service class", () => {
         ],
       });
       const member = undefined;
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.banOrMuteAtUser(member, community, "unmute")
       ).rejects.toThrowError();
@@ -926,8 +926,8 @@ describe("testing kickAtUser service in community service class", () => {
           },
         ],
       });
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.banOrMuteAtUser(member, community)
       ).resolves.not.toThrowError();
@@ -956,8 +956,8 @@ describe("testing kickAtUser service in community service class", () => {
         ],
       });
       const member = undefined;
-      Community.prototype.save = jest.fn().mockImplementation(() => {});
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Community.prototype.save = jest.fn().mockImplementation(() => { });
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.kickAtUser(member, community)
       ).rejects.toThrowError();
@@ -979,8 +979,8 @@ describe("testing removeSpam service in community service class", () => {
           },
         ],
       });
-      Post.prototype.save = jest.fn().mockImplementation(() => {});
-      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      Post.prototype.save = jest.fn().mockImplementation(() => { });
+      Comment.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.removeSpam(
           post,
@@ -1003,8 +1003,8 @@ describe("testing removeSpam service in community service class", () => {
           },
         ],
       });
-      Post.prototype.save = jest.fn().mockImplementation(() => {});
-      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      Post.prototype.save = jest.fn().mockImplementation(() => { });
+      Comment.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         communityServiceInstance.removeSpam(
           comment,
@@ -1999,6 +1999,213 @@ describe("testing markAsLocked service in community service class", () => {
           link
         )
       ).rejects.toThrowError();
+    });
+  });
+});
+
+
+
+
+describe("testing removing subreddit banner", () => {
+  describe("given a comment", () => {
+    let communities = [
+      {
+        _id: '123',
+        banner: 'newImage.jpd'
+      },
+      {
+        _id: '456',
+        banner: 'default.jpg',
+      }
+    ]
+    test("remove sr banner of non deleted one", async () => {
+      communityServiceInstance.updateOne = jest.fn().mockImplementationOnce((filter, update) => {
+        communities.forEach((element, index) => {
+          if (element._id == filter._id)
+            communities[index].banner = update.banner;
+        });
+      });
+      communityServiceInstance.removeSrBanner('123');
+      expect(communities[0].banner).toBe('default.jpg');
+    });
+    test("remove sr icon of already deleted one", async () => {
+      communityServiceInstance.updateOne = jest.fn().mockImplementationOnce((filter, update) => {
+        communities.forEach((element, index) => {
+          if (element._id == filter._id)
+            communities[index].banner = update.banner;
+        });
+      });
+      communityServiceInstance.removeSrBanner('123');
+      expect(communities[0].banner).toBe('default.jpg');
+    });
+  });
+});
+
+
+
+
+describe("testing removing subreddit icon", () => {
+  describe("given a comment", () => {
+    let communities = [
+      {
+        _id: '123',
+        icon: 'newImage.jpd'
+      },
+      {
+        _id: '456',
+        icon: 'default.jpg',
+      }
+    ]
+    test("remove sr icon of non deleted one", async () => {
+      communityServiceInstance.updateOne = jest.fn().mockImplementationOnce((filter, update) => {
+        communities.forEach((element, index) => {
+          if (element._id == filter._id)
+            communities[index].icon = update.icon;
+        });
+      });
+      communityServiceInstance.removeSrIcon('123');
+      expect(communities[0].icon).toBe('default.jpg');
+    });
+    test("remove sr icon of already deleted one", async () => {
+      communityServiceInstance.updateOne = jest.fn().mockImplementationOnce((filter, update) => {
+        communities.forEach((element, index) => {
+          if (element._id == filter._id)
+            communities[index].icon = update.icon;
+        });
+      });
+      communityServiceInstance.removeSrIcon('123');
+      expect(communities[0].icon).toBe('default.jpg');
+    });
+  });
+});
+
+
+describe("testing inviteModerator of community service", () => {
+  describe("given subreddit id and moderator", () => {
+    let communities = [
+      Community({
+        _id: '123',
+        invitedModerators: [
+          'nabil123',
+          'moaz123'
+        ]
+      }),
+      Community({
+        _id: '456',
+        invitedModerators: [
+          'nabil123',
+        ]
+      })
+    ]
+    test("invite user not invited befote", async () => {
+      communityServiceInstance.getOne = jest.fn().mockReturnValueOnce(communities[0]);
+      Community.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      expect(communityServiceInstance.inviteModerator('123', 'lotfy12')).resolves.not.toThrowError();
+    });
+  });
+});
+
+
+
+describe("testing deinviteModerator of community service", () => {
+  describe("given subreddit id and moderator", () => {
+    let communities = [
+      Community({
+        _id: '123',
+        invitedModerators: [
+          'nabil123',
+          'moaz123'
+        ]
+      }),
+      Community({
+        _id: '456',
+        invitedModerators: [
+          'nabil123',
+        ]
+      })
+    ]
+    test("deinvite user not invited befote", async () => {
+      communityServiceInstance.getOne = jest.fn().mockReturnValueOnce(communities[0]);
+      Community.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      expect(communityServiceInstance.deInviteModerator('123', 'lotfy12')).resolves.not.toThrowError();
+    });
+  });
+});
+
+
+describe("testing kickModerator in community service", () => {
+  describe("given subreddit id and moderator", () => {
+    let communities = [
+      Community({
+        _id: '123',
+        moderators: [
+          'nabil123',
+          'moaz123'
+        ]
+      }),
+      Community({
+        _id: '456',
+        moderators: [
+          'nabil123',
+        ]
+      })
+    ]
+    test("kick one of the moderators", async () => {
+      communityServiceInstance.getOne = jest.fn().mockReturnValueOnce(communities[0]);
+      Community.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      expect(communityServiceInstance.kickModerator('123', 'nabil123')).resolves.not.toThrowError();
+    });
+  });
+});
+
+
+describe("testing isInvited in community service", () => {
+  describe("given subreddit id and moderator", () => {
+    let communities = [
+      Community({
+        _id: '123',
+        invitedModerators: [
+          'nabil123',
+          'moaz123'
+        ]
+      }),
+      Community({
+        _id: '456',
+        invitedModerators: [
+          'nabil123',
+        ]
+      })
+    ]
+    test("test if moderator is invited", async () => {
+      communityServiceInstance.getOne = jest.fn().mockReturnValueOnce(communities[0]);
+      Community.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      expect(await communityServiceInstance.isInvited('123', 'nabil123')).toBe(true);
+    });
+    test("test if moderator isn\'t invited", async () => {
+      communityServiceInstance.getOne = jest.fn().mockReturnValueOnce(communities[0]);
+      Community.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      expect(await communityServiceInstance.isInvited('123', 'lotfy12')).toBe(false);
+    });
+
+  });
+});
+
+
+describe("testing getSearchResults of community Service", () => {
+  describe("given query search", () => {
+    let communities = [
+      Community({
+        _id: 't5_imagePro',
+        description: "the first subreddit in our reddit"
+      }),
+      Community({
+        _id: 't3_bolbolreddit',
+        description: 'biggest gaming community'
+      })
+    ]
+    test("get first community by _id ", () => {
+      communityServiceInstance.getAll = jest.fn().mockReturnValueOnce(communities[0]);
+      expect(communityServiceInstance.getSearchResults({ q: 'image' })).toBe(communities[0]);
     });
   });
 });

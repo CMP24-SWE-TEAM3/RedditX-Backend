@@ -135,10 +135,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned.value = false)
-          : operation === "mute"
-          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-          : (el.isMuted.value = false)
+            ? (el.isBanned.value = false)
+            : operation === "mute"
+              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+              : (el.isMuted.value = false)
         : el
     );
     return community;
@@ -159,10 +159,10 @@ class CommunityService extends Service {
         ? operation === "ban"
           ? ((el.isBanned.value = true), (el.isBanned.date = Date.now()))
           : operation === "unban"
-          ? (el.isBanned.value = false)
-          : operation === "mute"
-          ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
-          : (el.isMuted.value = false)
+            ? (el.isBanned.value = false)
+            : operation === "mute"
+              ? ((el.isMuted.value = true), (el.isMuted.date = Date.now()))
+              : (el.isMuted.value = false)
         : el
     );
     await toBeAffected.save();
@@ -754,19 +754,40 @@ class CommunityService extends Service {
       await subreddit.save();
     }
   };
-
+  /**
+     * remove subreddit banner by moderator
+     * @param {string} subreddit
+     * @function
+     */
   removeSrBanner = async (subreddit) => {
     await this.updateOne({ _id: subreddit }, { banner: "default.jpg" });
   };
+  /**
+   * remove subreddit icon by moderator
+   * @param {string} subreddit
+   * @function
+   */
   removeSrIcon = async (subreddit) => {
     await this.updateOne({ _id: subreddit }, { icon: "default.jpg" });
   };
 
+  /**
+     * invite user to be moderator in subreddit
+     * @param {string} subreddit
+     * @param {string} moderator
+     * @function
+     */
   inviteModerator = async (subreddit, moderator) => {
     const doc = await this.getOne({ _id: subreddit });
     doc.invitedModerators.push(moderator);
     await doc.save();
   };
+  /**
+     * deinvite user to be moderator in subreddit
+     * @param {string} subreddit
+     * @param {string} moderator
+     * @function
+     */
   deInviteModerator = async (subreddit, moderator) => {
     const doc = await this.getOne({ _id: subreddit });
     doc.invitedModerators = doc.invitedModerators.filter(
@@ -774,12 +795,25 @@ class CommunityService extends Service {
     );
     await doc.save();
   };
+
+  /**
+   * kick moderator of subreddit by creator
+   * @param {string} subreddit
+   * @param {string} moderator
+   * @function
+   */
   kickModerator = async (subreddit, moderator) => {
     let doc = await this.getOne({ _id: subreddit });
     console.log(doc.moderators);
     doc.moderators = doc.moderators.filter((el) => el.userID != moderator);
     await doc.save();
   };
+  /**
+   * check if user is moderatot in subreddit
+   * @param {string} subreddit
+   * @param {string} moderator
+   * @function
+   */
   isInvited = async (subreddit, user) => {
     const invitedModerators = (
       await this.getOne({ _id: subreddit, select: "invitedModerators" })

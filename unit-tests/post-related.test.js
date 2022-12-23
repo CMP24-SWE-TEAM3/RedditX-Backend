@@ -1,10 +1,11 @@
 /* eslint-disable */
 const Post = require("../models/post-model");
+const mongoose = require('mongoose');
 const Community = require("../models/community-model");
 const User = require("../models/user-model");
 const PostService = require("../services/post-service");
 var ObjectID = require("bson").ObjectID;
-
+const mockingoose = require('mockingoose');
 const postServiceInstance = new PostService(Post);
 jest.setTimeout(1000000);
 describe("testing submit service in post service class", () => {
@@ -49,7 +50,7 @@ describe("testing submit service in post service class", () => {
         title: "This is a post title",
         attachments: ["test.jpg", "test.video"],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       const newPost = await postServiceInstance.submit(
         data,
         files,
@@ -90,7 +91,7 @@ describe("testing submit service in post service class", () => {
         title: "This is a post title",
         attachments: ["test.jpg", "test.video"],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.submit(data, files, user, community)
       ).rejects.toThrowError();
@@ -112,7 +113,7 @@ describe("testing save service in post service class", () => {
         _id: "t2_moazMohamed",
         savedPosts: [new ObjectID()],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.save("t3_637becd453fc9fc3d423a1d4", user)
       ).resolves.not.toThrowError();
@@ -124,7 +125,7 @@ describe("testing save service in post service class", () => {
         _id: "t2_moazMohamed",
         savedPosts: [new ObjectID("637becd453fc9fc3d423a1d4")],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.save("t3_637becd453fc9fc3d423a1d4", user)
       ).resolves.not.toThrowError();
@@ -136,13 +137,13 @@ describe("testing save service in post service class", () => {
         _id: "t2_moazMohamed",
         savedPosts: [new ObjectID()],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(postServiceInstance.save(undefined, user)).rejects.toThrowError();
     });
   });
   describe("given a linkID & an invalid user", () => {
     test("should throw an error", async () => {
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.save("t3_637becd453fc9fc3d423a1d4", undefined)
       ).rejects.toThrowError();
@@ -157,7 +158,7 @@ describe("testing unsave service in post service class", () => {
         _id: "t2_moazMohamed",
         savedPosts: [new ObjectID()],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.unsave("t3_637becd453fc9fc3d423a1d4", user)
       ).resolves.not.toThrowError();
@@ -169,7 +170,7 @@ describe("testing unsave service in post service class", () => {
         _id: "t2_moazMohamed",
         savedPosts: [new ObjectID()],
       });
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.unsave(undefined, user)
       ).rejects.toThrowError();
@@ -177,7 +178,7 @@ describe("testing unsave service in post service class", () => {
   });
   describe("given a linkID & an invalid user", () => {
     test("should throw an error", async () => {
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.unsave("t3_637becd453fc9fc3d423a1d4", undefined)
       ).rejects.toThrowError();
@@ -201,7 +202,7 @@ describe("testing spamPost service in post service class", () => {
           spamsNumBeforeRemove: 21,
         },
       });
-      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      Post.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.spamPost(
           post,
@@ -229,7 +230,7 @@ describe("testing spamPost service in post service class", () => {
           spamsNumBeforeRemove: 21,
         },
       });
-      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      Post.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.spamPost(
           post,
@@ -263,7 +264,7 @@ describe("testing spamPost service in post service class", () => {
           spamsNumBeforeRemove: 21,
         },
       });
-      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      Post.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         postServiceInstance.spamPost(
           post,
@@ -276,6 +277,48 @@ describe("testing spamPost service in post service class", () => {
     });
   });
 });
+
+
+
+
+describe("testing addSortCriteria in post service ", () => {
+  describe("sort criteria as srting", () => {
+    test("get best sort criteria", async () => {
+      expect(
+        postServiceInstance.addSortCriteria("best")
+      ).toEqual({
+        bestFactor: -1,
+      });
+    });
+    test("get hot sort criteria", async () => {
+      expect(
+        postServiceInstance.addSortCriteria("hot")
+      ).toEqual({
+        hotnessFactor: -1,
+      });
+    });
+    test("get new sort criteria", async () => {
+      expect(
+        postServiceInstance.addSortCriteria("new")
+      ).toEqual({
+        createdAt: -1,
+      });
+    });
+    test("get top sort criteria", async () => {
+      expect(
+        postServiceInstance.addSortCriteria("top")
+      ).toEqual({
+        votesCount: -1,
+      });
+    });
+    test("get random sort criteria", async () => {
+      expect(
+        postServiceInstance.addSortCriteria("random")
+      ).toEqual({});
+    });
+  });
+});
+
 
 describe("Test follow post",()=>{
   test("test user already followed the post", async () => {

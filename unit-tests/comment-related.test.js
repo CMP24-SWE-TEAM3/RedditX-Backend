@@ -72,7 +72,7 @@ describe("testing saveSpammedComment service in comment service class", () => {
           spamsNumBeforeRemove: 21,
         },
       });
-      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      Comment.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         commentServiceInstance.saveSpammedComment(comment, community)
       ).resolves.not.toThrowError();
@@ -93,7 +93,7 @@ describe("testing saveSpammedComment service in comment service class", () => {
           spamsNumBeforeRemove: 21,
         },
       });
-      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      Comment.prototype.save = jest.fn().mockImplementation(() => { });
       expect(
         commentServiceInstance.saveSpammedComment(comment, community)
       ).resolves.not.toThrowError();
@@ -450,3 +450,224 @@ describe("testing addComment service in comment service class", () => {
 //     });
 //   });
 // });
+
+////////////////////////////////////////////
+describe("testing deleteComment service in comment service class", () => {
+  describe("given a comment", () => {
+    test("should not throw an error", async () => {
+      const comment = new Comment({
+        _id: "4564",
+        text: "hdfhdfh",
+      });
+      commentServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(comment);
+      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        commentServiceInstance.deleteComment(comment)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an invalid linkID", () => {
+    test("should throw an error", async () => {
+      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        commentServiceInstance.deleteComment(undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+////////////////////////////////////////////////
+describe("testing addComment service in comment service class", () => {
+  describe("given a data and user", () => {
+    test("should respond with a valid comment object", async () => {
+      const data = {
+        postID: "637becd453fc9fc3d423a1d4",
+        textHTML: "This is a comment textHTML",
+        textJSON: "This is a comment textJSON",
+      };
+      const user = new User({
+        _id: "t2_moazMohamed",
+      });
+      const post = new Post({
+        _id: "637becd453fc9fc3d423a1d4",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+      });
+      jest.spyOn(User, "findOne").mockImplementation(() => {
+        return user;
+      });
+      jest.spyOn(Post, "findOne").mockImplementation(() => {
+        return post;
+      });
+      Comment.prototype.save = jest
+        .fn()
+        .mockReturnValueOnce({
+          postID: "637becd453fc9fc3d423a1d4",
+          textHTML: "This is a comment textHTML",
+          textJSON: "This is a comment textJSON",
+          isRoot: true,
+          authorId: "t2_moazMohamed",
+          replyingTo: "637becd453fc9fc3d423a1d4",
+          communityID: "t5_imagePro235",
+          voters: [{ userID: "t2_moazMohamed", voteType: 1 }],
+        });
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      const newComment = await commentServiceInstance.addComment(
+        data,
+        "t2_moazMohamed"
+      );
+      expect(newComment.textHTML).toBe("This is a comment textHTML");
+    });
+  });
+  describe("given invalid user & data", () => {
+    test("should respond with an error", async () => {
+      userServiceInstance.findById = jest
+       .fn()
+       .mockReturnValueOnce(undefined);
+       postServiceInstance.findById = jest
+       .fn()
+       .mockReturnValueOnce(undefined);
+      expect(
+        commentServiceInstance.addComment(undefined, undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
+// describe("testing addReply service in comment service class", () => {
+//   describe("given a data and user", () => {
+//     test("should respond with a valid reply object", async () => {
+//       const data = {
+//         postID: "637becd453fc9fc3d423a1d4",
+//         textHTML: "This is a reply textHTML",
+//         textJSON: "This is a reply textJSON",
+//       };
+//       const user = new User({
+//         _id: "t2_moazMohamed",
+//       });
+//       const comment = new Comment({
+//         _id: "637becd453fc9fc3d423a1d4",
+//         text: "hdfhdfh"
+//       });
+//       jest.spyOn(User, "findOne").mockImplementation(() => {
+//         return user;
+//       });
+//       jest.spyOn(Comment, "findOne").mockImplementation(() => {
+//         return comment;
+//       });
+//       Comment.prototype.save = jest
+//         .fn()
+//         .mockReturnValueOnce({
+//           postID: "637becd453fc9fc3d423a1d4",
+//           textHTML: "This is a reply textHTML",
+//           textJSON: "This is a reply textJSON",
+//           isRoot: false,
+//           authorId: "t2_moazMohamed",
+//           replyingTo: "637becd453fc9fc3d423a1d4",
+//           communityID: "t5_imagePro235",
+//           voters: [{ userID: "t2_moazMohamed", voteType: 1 }],
+//         });
+//       User.prototype.save = jest.fn().mockImplementation(() => {});
+//       Comment.prototype.save = jest.fn().mockImplementation(() => {});
+//       const newReply = await commentServiceInstance.addReply(
+//         data,
+//         "t2_moazMohamed"
+//       );
+//       expect(newReply.textHTML).toBe("This is a reply textHTML");
+//     });
+//   });
+//   describe("given invalid & data", () => {
+//     test("should respond with an error", async () => {
+//       userServiceInstance.findById = jest
+//        .fn()
+//        .mockReturnValueOnce(undefined);
+//        commentServiceInstance.findById = jest
+//        .fn()
+//        .mockReturnValueOnce(undefined);
+//       expect(
+//         commentServiceInstance.addReply(undefined, undefined)
+//       ).rejects.toThrowError();
+//     });
+//   });
+// });
+
+
+describe("testing showComment service in comment service class", () => {
+  describe("given a comment", () => {
+    let comments = [
+      {
+        _id: "123",
+        isCollapsed: false,
+      },
+      {
+        _id: "456",
+        isCollapsed: true
+      }
+    ]
+    test("show collapsed comment", async () => {
+      commentServiceInstance.updateOne = jest.fn().mockImplementationOnce((filter, update) => {
+        comments.forEach((element, index) => {
+          if (element._id == filter._id)
+            comments[index].isCollapsed = update.isCollapsed;
+        });
+      });
+      commentServiceInstance.showComment('456');
+      expect(comments[1].isCollapsed).toBe(false);
+    });
+    test("show already un collapsed comment", async () => {
+      commentServiceInstance.updateOne = jest.fn().mockImplementationOnce((filter, update) => {
+        comments.forEach((element, index) => {
+          if (element._id == filter._id)
+            comments[index].isCollapsed = update.isCollapsed;
+        });
+      });
+
+      commentServiceInstance.showComment('123');
+      expect(comments[0].isCollapsed).toBe(false);
+    });
+
+  });
+});
+
+
+
+
+
+
+describe("testing approve comment service in comment service class", () => {
+  describe("given a comment", () => {
+    let comments = [
+      Comment({
+        _id: "123",
+        isDeleted: true,
+        spams: [
+          'heat speech'
+        ],
+        spamCount: 40,
+      }),
+      Comment({
+        _id: "456",
+        isDeleted: false,
+        spams: [],
+        spamCount: 0,
+      })
+    ];
+    test("approve un deleted comment", async () => {
+      Comment.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      commentServiceInstance.approveComment(comments[1]);
+      expect(comments[1].isDeleted).toBe(false);
+      expect(comments[1].spams.length).toBe(0);
+      expect(comments[1].spamCount).toBe(0);
+    });
+    test("approve un deleted comment", async () => {
+      Comment.prototype.save = jest.fn().mockImplementationOnce(() => { });
+      commentServiceInstance.approveComment(comments[0]);
+      expect(comments[0].isDeleted).toBe(false);
+      expect(comments[0].spams.length).toBe(0);
+      expect(comments[0].spamCount).toBe(0);
+    });
+  });
+});

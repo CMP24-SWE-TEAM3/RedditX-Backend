@@ -460,6 +460,11 @@ const subscribe = async (req, res) => {
   }
 };
 
+/**
+ * do friend request 
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
 const friendRequest = catchAsync(async (req, res) => {
   if (req.body.type === "friend") {
     userServiceInstance.addFriend(req.username, req.body.userID);
@@ -512,7 +517,11 @@ const friendRequest = catchAsync(async (req, res) => {
     status: "succeeded",
   });
 });
-
+/**
+ * unfriend request to remove friendship or moderator_deInvite
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
 const unFriendRequest = catchAsync(async (req, res) => {
   if (req.body.type === "friend") {
     userServiceInstance.deleteFriend(req.username, req.body.userID);
@@ -565,7 +574,11 @@ const unFriendRequest = catchAsync(async (req, res) => {
     status: "succeeded",
   });
 });
-
+/**
+ * get all friends of user 
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
 const getAllFriends = catchAsync(async (req, res) => {
   const friends = await userServiceInstance.getOne({
     _id: req.username,
@@ -580,7 +593,11 @@ const getAllFriends = catchAsync(async (req, res) => {
     friends,
   });
 });
-
+/**
+ * accept moderator invite 
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
 const acceptModeratorInvite = catchAsync(async (req, res) => {
   //[1]-> check existence of subreddit
   var subredditReturned = await communityServiceInstance.availableSubreddit(
@@ -618,7 +635,11 @@ const acceptModeratorInvite = catchAsync(async (req, res) => {
     status: "success",
   });
 });
-
+/**
+ * update certain fields to user 
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
 const updateInfo = catchAsync(async (req, res) => {
   const type = req.body.type;
   const permittedChangedVariables = [
@@ -642,7 +663,11 @@ const updateInfo = catchAsync(async (req, res) => {
     status: "succeeded",
   });
 });
-
+/**
+ * leave moderator of subreddit 
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
 const leaveModeratorOfSubredddit = catchAsync(async (req, res) => {
   //[1]-> check the existence of the moderator
   const subreddit = await communityServiceInstance.availableSubreddit(
@@ -687,7 +712,11 @@ const leaveModeratorOfSubredddit = catchAsync(async (req, res) => {
     status: "succeded",
   });
 });
-
+/**
+ * get user information 
+ * @param {function} (req,res)
+ * @returns {object} res
+ */
 const getUserInfo = catchAsync(async (req, res) => {
   const user = await userServiceInstance.getOne({
     _id: req.params.username,
