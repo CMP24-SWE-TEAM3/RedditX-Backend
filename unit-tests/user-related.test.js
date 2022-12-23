@@ -2,6 +2,7 @@
 const User = require("../models/user-model");
 const UserService = require("../services/user-service");
 const Email = require("./../utils/email");
+const Post = require("../models/post-model");
 
 const userServiceInstance = new UserService(User);
 
@@ -352,4 +353,291 @@ describe("testing resetForgottenPassword service in user service class", () => {
       ).rejects.toThrowError();
     });
   });
+});
+//////////////////////////////////////
+describe("testing resetPassword service in auth service class", () => {
+  describe("given a username,currentPassword,newPassword, confirmedNewPassword", () => {
+    test("should not throw an error", async () => {
+      const currentPassword = "oldpass";
+      const newPassword = "moaz42hassan";
+      const confirmedNewPassword = "moaz42hassan";
+      const user = new User({
+        _id: "t2_moazMohamed",
+        email: "moaz25jan2015@gmail.com",
+      });
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      const data = await userServiceInstance.resetPassword(
+        user,
+        currentPassword,
+        newPassword,
+        confirmedNewPassword
+      );
+      expect(data.id).toBe("t2_moazMohamed");
+    });
+  });
+  describe("given a currentPassword, newPassword, confirmedNewPassword, but invalid user", () => {
+    test("should throw an error", async () => {
+      const currentPassword = "oldpass";
+      const newPassword = "moaz42hassan";
+      const confirmedNewPassword = "moaz42hassan";
+      const user = undefined;
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        userServiceInstance.resetPassword(
+          user,
+          currentPassword,
+          newPassword,
+          confirmedNewPassword
+        )
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a a username,currentPassword, newPassword, confirmedNewPassword!=newPassword", () => {
+    test("should not throw an error", async () => {
+      const currentPassword = "oldpass";
+      const newPassword = "moaz42hassan";
+      const confirmedNewPassword = "moaz42haan";
+      const user = new User({
+        _id: "t2_moazMohamed",
+        email: "moaz25jan2015@gmail.com",
+      });
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        userServiceInstance.resetPassword(
+          user,
+          currentPassword,
+          newPassword,
+          confirmedNewPassword
+        )
+      ).rejects.toThrowError();
+    });
+  });
+});
+///////////////////////////////////////////////////////////////////////
+describe("testing userSubmittedPosts service in user service class", () => {
+   var user = new User({
+    _id: "t2_moazMohamed",
+    hasPost: [
+      {
+        type: "4564"
+      },
+    ],
+  });
+  describe("given a user", () => {
+    test("should not throw an error", async () => {
+      userServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce([user]);
+      const posts = await userServiceInstance.userSubmittedPosts(
+        user
+      );
+      expect(posts.hasPost[0].type).toBe("4564");
+    });
+  });
+  describe("given an undefined user", () => {
+    test("should not throw an error", async () => {
+      userServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce([undefined]);
+      expect(
+        userServiceInstance.userSubmittedPosts(undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+//////////////////////////////////
+describe("testing userSubmittedComments service in user service class", () => {
+  var user = new User({
+   _id: "t2_moazMohamed",
+   hasComment: [
+     {
+       type: "4564"
+     },
+   ],
+ });
+ describe("given a user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([user]);
+     const comments = await userServiceInstance.userSubmittedComments(
+       user
+     );
+     expect(comments.hasComment[0].type).toBe("4564");
+   });
+ });
+ describe("given an undefined user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([undefined]);
+     expect(
+       userServiceInstance.userSubmittedComments(undefined)
+     ).rejects.toThrowError();
+   });
+ });
+});
+//////////////////////////////////
+describe("testing userSubmittedReplies service in user service class", () => {
+  var user = new User({
+   _id: "t2_moazMohamed",
+   hasReply: [
+     {
+       type: "4564"
+     },
+   ],
+ });
+ describe("given a user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([user]);
+     const replies = await userServiceInstance.userSubmittedReplies(
+       user
+     );
+     expect(replies.hasReply[0].type).toBe("4564");
+   });
+ });
+ describe("given an undefined user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([undefined]);
+     expect(
+       userServiceInstance.userSubmittedReplies(undefined)
+     ).rejects.toThrowError();
+   });
+ });
+});
+//////////////////////////////////
+describe("testing userDownVoted service in user service class", () => {
+  var user = new User({
+   _id: "t2_moazMohamed",
+   hasVote: [
+     {
+       type: "4564"
+     },
+   ],
+ });
+ describe("given a user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([user]);
+     const downVotes = await userServiceInstance.userDownVoted(
+       user
+     );
+     expect(downVotes.hasVote[0].type).toBe("4564");
+   });
+ });
+ describe("given an undefined user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([undefined]);
+     expect(
+       userServiceInstance.userDownVoted(undefined)
+     ).rejects.toThrowError();
+   });
+ });
+});
+//////////////////////////////////
+describe("testing userUpVoted service in user service class", () => {
+  var user = new User({
+   _id: "t2_moazMohamed",
+   hasVote: [
+     {
+       type: "4564"
+     },
+   ],
+ });
+ describe("given a user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([user]);
+     const upVotes = await userServiceInstance.userUpVoted(
+       user
+     );
+     expect(upVotes.hasVote[0].type).toBe("4564");
+   });
+ });
+ describe("given an undefined user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([undefined]);
+     expect(
+       userServiceInstance.userUpVoted(undefined)
+     ).rejects.toThrowError();
+   });
+ });
+});
+//////////////////////////////////
+describe("testing userMentions service in user service class", () => {
+  var user = new User({
+   _id: "t2_moazMohamed",
+   mentionedInPosts: [
+     {
+       type: "4564"
+     },
+   ],
+ });
+ describe("given a user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([user]);
+     const posts = await userServiceInstance.userMentions(
+       user
+     );
+     expect(posts.mentionedInPosts[0].type).toBe("4564");
+   });
+ });
+ describe("given an undefined user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([undefined]);
+     expect(
+       userServiceInstance.userMentions(undefined)
+     ).rejects.toThrowError();
+   });
+ });
+});
+//////////////////////////////////
+describe("testing userSavedPosts service in user service class", () => {
+  var user = new User({
+   _id: "t2_moazMohamed",
+   savedPosts: [
+     {
+       type: "4564"
+     },
+   ],
+ });
+ describe("given a user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([user]);
+     const posts = await userServiceInstance.userSavedPosts(
+       user
+     );
+     expect(posts.savedPosts[0].type).toBe("4564");
+   });
+ });
+ describe("given an undefined user", () => {
+   test("should not throw an error", async () => {
+     userServiceInstance.findById = jest
+     .fn()
+     .mockReturnValueOnce([undefined]);
+     expect(
+       userServiceInstance.userSavedPosts(undefined)
+     ).rejects.toThrowError();
+   });
+ });
 });

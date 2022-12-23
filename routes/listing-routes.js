@@ -24,8 +24,6 @@ router.post("/:subreddit/lock", authCheck, listingController.markLocked);
 router.post("/:subreddit/unlock", authCheck, listingController.markUnLocked);
 router.post("/del", authCheck, listingController.deleteLink);
 router.post("/vote", authCheck, listingController.vote);
-router.get("/get-post-replies", listingController.getUserSelfReply);
-router.get("/get-comment-replies", listingController.getUserCommentReplies);
 router.post(
   "/submit",
   authCheck,

@@ -175,8 +175,7 @@ unhide = async (linkID, user) => {
   if (!linkID) throw new AppError("No linkID is provided!", 400);
   if (!user) throw new AppError("This user doesn't exist!", 404);
   user.hiddenPosts.splice(
-    user.hiddenPosts.findIndex((el) => el === linkID.slice(3)),
-    1
+    user.hiddenPosts.findIndex((el) => el === linkID.slice(3)),1
   );
   await user.save();
 };

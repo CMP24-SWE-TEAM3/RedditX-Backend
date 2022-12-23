@@ -164,3 +164,32 @@ describe("testing getNotifications service in notification service class", () =>
     });
   });
 });
+/////////////////////////////////////////////////////
+describe("testing deletePost service in notification service class", () => {
+  describe("given a notification", () => {
+    test("should not throw an error", async () => {
+      const notification = new Notification({
+        createdAt: "2022-11-22T15:08:49.960Z",
+        _id: "6373e63c1673969ef16dbbeb",
+        communityIcon: "photo.jpg",
+        title: "Unmute",
+        type: "unmute",
+        text: "imagePro235 has unmuted you",
+        sourceThing: "t5_imagePro235",
+      });
+      Notification.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        notificationServiceInstance.deleteNotification(notification)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an invalid linkID", () => {
+    test("should throw an error", async () => {
+      Notification.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        notificationServiceInstance.deleteNotification(undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+///////////////////////////////////////////////////

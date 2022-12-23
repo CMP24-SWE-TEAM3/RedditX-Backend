@@ -11,10 +11,7 @@ const Community = require("../models/community-model");
 const AuthService = require("./../services/auth-service");
 var authServiceInstance = new AuthService(User);
 const CommunityService = require("./../services/community-service");
-
 const { doc } = require("prettier");
-const { query } = require("express");
-
 var communityServiceInstance = new CommunityService(Community);
 
 /**
@@ -41,25 +38,23 @@ class UserService extends Service {
     );
   };
 
-  /**
+ /**
    *  Get followers of me
    * @param {String} username my username .
    * @returns {Boolean} (state)
    * @function
    */
-  getFollowers = async (username) => {
-    const followers_user = await this.getOne({ _id: username }).select(
-      "followers"
-    );
-    const followersIds = followers_user.followers;
-
-    const followers = await this.find({
+  getFollowers=async(username)=>{
+    const followers_user=await this.getOne({_id:username}).select("followers");
+    const followersIds=followers_user.followers;
+    
+    const followers=await this.find({
       _id: { $in: followersIds },
     }).select("about avatar _id");
 
     return {
-      status: true,
-      followers: followers,
+      status:true,
+      followers:followers
     };
   };
   /**
@@ -68,19 +63,21 @@ class UserService extends Service {
    * @returns {Boolean} (state)
    * @function
    */
-  getInterests = async (username) => {
+  getInterests=async(username)=>{
     var categories_user;
-    try {
-      categories_user = await this.getOne({ _id: username });
-    } catch {
+    try{
+       
+      categories_user=await this.getOne({_id:username});
+    }
+    catch{
       return {
-        status: false,
+        status:false
       };
     }
-    const categories = categories_user.categories;
+    const categories=categories_user.categories;
     return {
-      status: true,
-      categories: categories,
+      status:true,
+      categories:categories
     };
   };
 
@@ -90,22 +87,21 @@ class UserService extends Service {
    * @returns {Boolean} (state)
    * @function
    */
-  addInterests = async (username, categories) => {
+  addInterests=async(username,categories)=>{
     var categories_user;
-    try {
-      categories_user = await this.updateOne(
-        { _id: username },
-        { categories: categories }
-      );
-    } catch {
+    try{
+      
+      categories_user=await this.updateOne({_id:username},{categories:categories});
+    }
+    catch{
       return {
-        status: false,
+        status:false
       };
     }
     console.log(categories_user);
     return {
-      status: true,
-    };
+      status:true,
+     };
   };
 
   /**
@@ -443,9 +439,13 @@ class UserService extends Service {
    * @returns {Array} Comments
    * @function
    */
-  userComments = async (username) => {
+  userComments = async (username, query) => {
     const user = await this.findById(username, "hasComment");
     if (!user) throw new AppError("This user doesn't exist!", 404);
+    /*if the request didn't contain limit in its query then will add it to the query with 10 at default */
+    if (!query.limit) {
+      query.limit = "10";
+    }
     var comments = [];
     user.hasComment.forEach((el) => {
       comments.push(el);
@@ -536,7 +536,7 @@ class UserService extends Service {
    * @returns {object} downVotes
    * @function
    */
-  userDownVoted = async (username,query) => {
+  userDownVoted = async (username) => {
     const user = await this.findById(username, "hasVote");
     if (!user) throw new AppError("This user doesn't exist!", 404);
     var downVotes = [];
@@ -545,9 +545,9 @@ class UserService extends Service {
         downVotes.push(el.postID);
       }
     });
-    const cursor = postSe.getAll({
-      _id: { $in: downVotes }
-    },query);
+    const cursor = Post.find({
+      _id: { $in: downVotes },
+    });
     var returnPosts = [];
     for await (const doc of cursor) {
       returnPosts.push(doc);
@@ -605,46 +605,6 @@ class UserService extends Service {
       returnPosts.push(doc);
     }
     return returnPosts;
-  };
-  /**
-   * Add user to community
-   * @param {String} (username)
-   * @param {String} (communityID)
-   * @returns {object} mentions
-   * @function
-   */
-  addUserToComm = async (user, communityID) => {
-    const userModerator = {
-      communityId: communityID,
-      role: "creator",
-    };
-    const userMember = {
-      communityId: communityID,
-      isMuted: {
-        value:false,
-      },
-      isBanned:{
-        value:false,
-      },
-    };
-    const modarr=user.moderators;
-    modarr.push(userModerator);
-    const memarr=user.member;
-    memarr.push(userMember);
-    try{
-      const x=await this.updateOne({_id:user._id},{moderators:modarr,member:memarr});
-     console.log(x);
-     }
-     catch{
-      console.log("dd");
-       return {
-         status: false,
-         error: "operation failed",
-       };
-     }
-     return {
-      status: true,
-      };
   };
   /**
    * Get posts where is saved by the user in from database
@@ -744,14 +704,14 @@ userMe=async(username)=>{
 };
   return {
     user: obj,
-    };
-  else {
-       return {
-           user: null,
-         };
-       }
   };
-
+}
+else {
+  return {
+    user: null,
+  };
+}
+  };
   /**
  * Get user prefs from database
  * @param {String} (username)
@@ -763,17 +723,16 @@ userPrefs=async(username)=>{
   const prefs=await this.getOne({_id:username}).select("prefs");
   if (prefs) {
     return {
-
       userPrefs: prefs,
     };
   }
   else {
     return {
-
       userPrefs: null,
     };
   }
 };
+ 
   /**
    * Resets user password and returns a new token
    * @param {string} token
@@ -804,24 +763,41 @@ userPrefs=async(username)=>{
   };
 
   isParticipantInSubreddit = async (subreddit, user) => {
-    let subreddits = (await this.getOne({ _id: user, select: "member" }))
-      .member;
-    subreddits = subreddits.map((el) => el.communityId);
+    let subreddits = (await this.getOne({ "_id": user, "select": 'member' })).member;
+    subreddits = subreddits.map(el => el.communityId);
     return subreddits.includes(subreddit);
-  };
+  }
 
   isModeratorInSubreddit = async (subreddit, user) => {
-    let subreddits = (await this.getOne({ _id: user, select: "moderators" }))
-      .moderators;
-    subreddits = subreddits.map((el) => el.communityId);
+    let subreddits = (await this.getOne({ "_id": user, "select": 'moderators' })).moderators;
+    console.log(subreddits);
+    subreddits = subreddits.map(el => el.communityId);
     return subreddits.includes(subreddit);
-  };
+  }
+
+  muteOrBanUserInSubreddit = async (subreddit, user, type) => {
+    if (type == 'ban') {
+      this.updateOne({ _id: user, 'member.communityId': subreddit }, { 'member.$.isBanned': true });
+    }
+    else if (type == 'mute') {
+      this.updateOne({ _id: user, 'member.communityId': subreddit }, { 'member.$.isMuted': true });
+    }
+  }
 
   addSubredditModeration = async (subreddit, user) => {
-    if (!user.moderators.find((el) => el.communityId === subreddit)) {
-      user.moderators.push({ communityId: subreddit, role: "moderator" });
-      await user.save();
-    }
-  };
+    await this.updateOne({ _id: user }, {
+      $addToSet: {
+        moderators: {
+          $each: [
+            {
+              communityId: subreddit,
+              role: 'moderator',
+            }
+          ]
+        }
+      }
+    });
+
+  }
 }
 module.exports = UserService;

@@ -370,7 +370,7 @@ describe("testing deletePost service in post service class", () => {
   });
   describe("given an invalid linkID", () => {
     test("should throw an error", async () => {
-      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
       expect(
         postServiceInstance.deletePost(undefined)
       ).rejects.toThrowError();

@@ -7,6 +7,12 @@ const CommunityService = require("../services/community-service");
 
 const communityServiceInstance = new CommunityService(Community);
 
+
+
+const PostService = require("../services/post-service");
+const postServiceInstance = new PostService(Post);
+
+
 describe("testing uploadCommunityPhoto service in community service class", () => {
   describe("given a file, username, community, type=icon", () => {
     test("should not throw an error", async () => {
@@ -1193,51 +1199,783 @@ describe("testing getStats service in community service class", () => {
     });
   });
 });
-////////////////////////////////////////////////
+///////////////////////////////////////////////////
 describe("testing markAsSpoiler service in community service class", () => {
-  describe("given a subreddit", () => {
+  describe("given a subreddit, moderator, link", () => {
     test("should not throw an error", async () => {
       const community = new Community({
         _id: "t5_imagePro235",
-        members: [
+        moderators: [
           {
             userID: "t2_hamada",
-            isBanned: {
-              value: true,
-              date: "2022-12-09T19:16:16.443Z",
-            },
-            isMuted: {
-              value: false,
-            },
+            role: "moderator",
           },
-          {
-            userID: "t2_moazMohamed",
-            isBanned: {
-              value: false,
-            },
-            isMuted: {
-              value: false,
-            },
-          },
-        ],
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        spoiler:false
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
       });
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
-      const { memberIDs, isBannedAndMuted } =
-        await communityServiceInstance.getMembers(community);
-      expect(memberIDs[0]).toBe("t2_hamada");
-      expect(isBannedAndMuted[0].isBanned.value).toBe(true);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsSpoiler(
+            community,
+            user,
+            link)
+        ).resolves.not.toThrowError();
+      expect(link.spoiler).toBe(true);
     });
   });
-  describe("given an undefined subreddit", () => {
+  describe("given an undefined subreddit, moderator, link", () => {
     test("should throw an error", async () => {
-      const community = undefined;
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        spoiler:false
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(undefined);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+        Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsSpoiler(
+            undefined,
+            user,
+            link)
+        ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, not a moderator, link", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        spoiler:false
+       
+      });
+      const user = new User({
+        _id: "t2_moazMohamed",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsSpoiler(
+          community,
+          user,
+          link)
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, moderator, link that is not in this subreddit", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_Pro235",
+        spoiler:false
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+    communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsSpoiler(
+          community,
+          user,
+          link)
+      ).rejects.toThrowError();
+    });
+  });
+});
+////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////
+describe("testing markAsUnSpoiler service in community service class", () => {
+  describe("given a subreddit, moderator, link", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        spoiler:true
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
       communityServiceInstance.getOne = jest
         .fn()
         .mockReturnValueOnce(community);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsUnSpoiler(
+            community,
+            user,
+            link)
+        ).resolves.not.toThrowError();
+      expect(link.spoiler).toBe(false);
+    });
+  });
+  describe("given an undefined subreddit, moderator, link", () => {
+    test("should throw an error", async () => {
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        spoiler:true
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(undefined);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+        Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsUnSpoiler(
+            undefined,
+            user,
+            link)
+        ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, not a moderator, link", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        spoiler:true
+       
+      });
+      const user = new User({
+        _id: "t2_moazMohamed",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
       expect(
-        communityServiceInstance.getMembers(community)
+        communityServiceInstance.markAsUnSpoiler(
+          community,
+          user,
+          link)
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, moderator, link that is not in this subreddit", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_Pro235",
+        spoiler:true
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+    communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsUnSpoiler(
+          community,
+          user,
+          link)
+      ).rejects.toThrowError();
+    });
+  });
+});
+///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////
+describe("testing markAsNsfw service in community service class", () => {
+  describe("given a subreddit, moderator, link,action=mark", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        nsfw:false
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsNsfw(
+            community,
+            user,
+            link,
+            "mark")
+        ).resolves.not.toThrowError();
+      expect(link.nsfw).toBe(true);
+    });
+  });
+  describe("given a subreddit, moderator, link,action=unmark", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        nsfw:true
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsNsfw(
+            community,
+            user,
+            link,
+          "unmark")
+        ).resolves.not.toThrowError();
+      expect(link.nsfw).toBe(false);
+    });
+  });
+  describe("given an undefined subreddit, moderator, link,action=mark", () => {
+    test("should throw an error", async () => {
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        nsfw:false
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(undefined);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+        Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsNsfw(
+            undefined,
+            user,
+            link,
+            "mark")
+        ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, not a moderator, link,,action=mark", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        nsfw:false
+       
+      });
+      const user = new User({
+        _id: "t2_moazMohamed",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsNsfw(
+          community,
+          user,
+          link,
+          "mark")
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, moderator, link that is not in this subreddit,action=mark", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_Pro235",
+        nsfw:false
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+    communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsNsfw(
+          community,
+          user,
+          link,
+          "mark")
+      ).rejects.toThrowError();
+    });
+  });
+});
+///////////////////////////////////////////////////
+describe("testing markAsUnLocked service in community service class", () => {
+  describe("given a subreddit, moderator, link", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        locked:true
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsUnLocked(
+            community,
+            user,
+            link)
+        ).resolves.not.toThrowError();
+      expect(link.locked).toBe(false);
+    });
+  });
+  describe("given an undefined subreddit, moderator, link", () => {
+    test("should throw an error", async () => {
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        locked:true
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(undefined);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+        Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsUnLocked(
+            undefined,
+            user,
+            link)
+        ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, not a moderator, link", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        locked:true
+       
+      });
+      const user = new User({
+        _id: "t2_moazMohamed",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsUnLocked(
+          community,
+          user,
+          link)
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, moderator, link that is not in this subreddit", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_Pro235",
+        locked:true
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+    communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsUnLocked(
+          community,
+          user,
+          link)
+      ).rejects.toThrowError();
+    });
+  });
+});
+///////////////////////////////////////////////////
+describe("testing markAsLocked service in community service class", () => {
+  describe("given a subreddit, moderator, link", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        locked:false
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsLocked(
+            community,
+            user,
+            link)
+        ).resolves.not.toThrowError();
+      expect(link.locked).toBe(true);
+    });
+  });
+  describe("given an undefined subreddit, moderator, link", () => {
+    test("should throw an error", async () => {
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        locked:false
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(undefined);
+      postServiceInstance.findById = jest
+        .fn()
+        .mockReturnValueOnce(link);
+        Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsLocked(
+            undefined,
+            user,
+            link)
+        ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, not a moderator, link", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        locked:false
+       
+      });
+      const user = new User({
+        _id: "t2_moazMohamed",
+        email: "moaz25jan2015@gmail.com",
+      });
+      communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsLocked(
+          community,
+          user,
+          link)
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, moderator, link that is not in this subreddit", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_Pro235",
+        locked:false
+       
+      });
+      const user = new User({
+        _id: "t2_hamada",
+        email: "moaz25jan2015@gmail.com",
+      });
+    communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+    postServiceInstance.findById = jest
+      .fn()
+      .mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsLocked(
+          community,
+          user,
+          link)
       ).rejects.toThrowError();
     });
   });
