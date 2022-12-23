@@ -307,3 +307,146 @@ console.log(result);
 expect(result.state).toBe(false);
 });
 });
+
+////////////////////////////////////////////
+describe("testing deleteComment service in comment service class", () => {
+  describe("given a comment", () => {
+    test("should not throw an error", async () => {
+      const comment = new Comment({
+        _id: "4564",
+        text: "hdfhdfh",
+      });
+      commentServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(comment);
+      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        commentServiceInstance.deleteComment(comment)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an invalid linkID", () => {
+    test("should throw an error", async () => {
+      Comment.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        commentServiceInstance.deleteComment(undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+////////////////////////////////////////////////
+describe("testing addComment service in comment service class", () => {
+  describe("given a data and user", () => {
+    test("should respond with a valid comment object", async () => {
+      const data = {
+        postID: "637becd453fc9fc3d423a1d4",
+        textHTML: "This is a comment textHTML",
+        textJSON: "This is a comment textJSON",
+      };
+      const user = new User({
+        _id: "t2_moazMohamed",
+      });
+      const post = new Post({
+        _id: "637becd453fc9fc3d423a1d4",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+      });
+      jest.spyOn(User, "findOne").mockImplementation(() => {
+        return user;
+      });
+      jest.spyOn(Post, "findOne").mockImplementation(() => {
+        return post;
+      });
+      Comment.prototype.save = jest
+        .fn()
+        .mockReturnValueOnce({
+          postID: "637becd453fc9fc3d423a1d4",
+          textHTML: "This is a comment textHTML",
+          textJSON: "This is a comment textJSON",
+          isRoot: true,
+          authorId: "t2_moazMohamed",
+          replyingTo: "637becd453fc9fc3d423a1d4",
+          communityID: "t5_imagePro235",
+          voters: [{ userID: "t2_moazMohamed", voteType: 1 }],
+        });
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      const newComment = await commentServiceInstance.addComment(
+        data,
+        "t2_moazMohamed"
+      );
+      expect(newComment.textHTML).toBe("This is a comment textHTML");
+    });
+  });
+  describe("given invalid user & data", () => {
+    test("should respond with an error", async () => {
+      userServiceInstance.findById = jest
+       .fn()
+       .mockReturnValueOnce(undefined);
+       postServiceInstance.findById = jest
+       .fn()
+       .mockReturnValueOnce(undefined);
+      expect(
+        commentServiceInstance.addComment(undefined, undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
+// describe("testing addReply service in comment service class", () => {
+//   describe("given a data and user", () => {
+//     test("should respond with a valid reply object", async () => {
+//       const data = {
+//         postID: "637becd453fc9fc3d423a1d4",
+//         textHTML: "This is a reply textHTML",
+//         textJSON: "This is a reply textJSON",
+//       };
+//       const user = new User({
+//         _id: "t2_moazMohamed",
+//       });
+//       const comment = new Comment({
+//         _id: "637becd453fc9fc3d423a1d4",
+//         text: "hdfhdfh"
+//       });
+//       jest.spyOn(User, "findOne").mockImplementation(() => {
+//         return user;
+//       });
+//       jest.spyOn(Comment, "findOne").mockImplementation(() => {
+//         return comment;
+//       });
+//       Comment.prototype.save = jest
+//         .fn()
+//         .mockReturnValueOnce({
+//           postID: "637becd453fc9fc3d423a1d4",
+//           textHTML: "This is a reply textHTML",
+//           textJSON: "This is a reply textJSON",
+//           isRoot: false,
+//           authorId: "t2_moazMohamed",
+//           replyingTo: "637becd453fc9fc3d423a1d4",
+//           communityID: "t5_imagePro235",
+//           voters: [{ userID: "t2_moazMohamed", voteType: 1 }],
+//         });
+//       User.prototype.save = jest.fn().mockImplementation(() => {});
+//       Comment.prototype.save = jest.fn().mockImplementation(() => {});
+//       const newReply = await commentServiceInstance.addReply(
+//         data,
+//         "t2_moazMohamed"
+//       );
+//       expect(newReply.textHTML).toBe("This is a reply textHTML");
+//     });
+//   });
+//   describe("given invalid & data", () => {
+//     test("should respond with an error", async () => {
+//       userServiceInstance.findById = jest
+//        .fn()
+//        .mockReturnValueOnce(undefined);
+//        commentServiceInstance.findById = jest
+//        .fn()
+//        .mockReturnValueOnce(undefined);
+//       expect(
+//         commentServiceInstance.addReply(undefined, undefined)
+//       ).rejects.toThrowError();
+//     });
+//   });
+// });

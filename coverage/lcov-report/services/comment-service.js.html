@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">68.02% </span>
+                <span class="strong">71.06% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>134/197</span>
+                <span class='fraction'>140/197</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">64.58% </span>
+                <span class="strong">65.97% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>93/144</span>
+                <span class='fraction'>95/144</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">37.5% </span>
+                <span class="strong">43.75% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>6/16</span>
+                <span class='fraction'>7/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">70.05% </span>
+                <span class="strong">72.72% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>131/187</span>
+                <span class='fraction'>136/187</span>
             </div>
         
             
@@ -594,18 +594,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -613,13 +611,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -933,10 +933,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1053,7 +1053,7 @@ class CommentService extends Service {
     try {
       post = await postServiceInstance.findById({ _id: data.postID });
     } catch {
-<span class="cstat-no" title="statement not covered" >      throw new AppError("invalid postID!", 400);</span>
+      throw new AppError("invalid postID!", 400);
     }
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!post) <span class="cstat-no" title="statement not covered" >throw new AppError("This post doesn't exist!", 404);</span>
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) <span class="cstat-no" title="statement not covered" >throw new AppError("This user doesn't exist!", 404);</span>
@@ -1386,11 +1386,11 @@ class CommentService extends Service {
    * @param {string} linkID
    * @function
    */
-  deleteComment = <span class="fstat-no" title="function not covered" >as</span>ync (linkID) =&gt; {
-    const comment = <span class="cstat-no" title="statement not covered" >await this.getOne({ _id: linkID });</span>
-<span class="cstat-no" title="statement not covered" >    if (!comment) <span class="cstat-no" title="statement not covered" >throw new AppError("linkID doesn't exist!", 404);</span></span>
-<span class="cstat-no" title="statement not covered" >    comment.isDeleted = true;</span>
-<span class="cstat-no" title="statement not covered" >    await comment.save();</span>
+  deleteComment = async (linkID) =&gt; {
+    const comment = await this.getOne({ _id: linkID });
+    if (!comment) throw new AppError("linkID doesn't exist!", 404);
+    comment.isDeleted = true;
+    await comment.save();
   };
 &nbsp;
   checkUser = <span class="fstat-no" title="function not covered" >as</span>ync (user, comment) =&gt; {
@@ -1432,7 +1432,7 @@ module.exports = CommentService;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2022-12-23T19:11:54.411Z
+                at 2022-12-23T21:06:55.645Z
             </div>
         <script src="../prettify.js"></script>
         <script>

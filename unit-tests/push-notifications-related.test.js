@@ -1,6 +1,8 @@
 
+/* eslint-disable */
 const PushNotificationService=require("../services/push-notifications-service");
 const pushNotificationServiceInstance=new PushNotificationService();
+
 
 
 describe("Test Send notifications using FCM",()=>{

@@ -326,3 +326,112 @@ describe("Test follow post",()=>{
   });
 });
 
+////////////////////////////////////
+describe("testing hide service in post service class", () => {
+  describe("given a linkID & a user", () => {
+    test("should not throw an error", async () => {
+      const user = new User({
+        _id: "t2_moazMohamed",
+        hiddenPosts: [new ObjectID()],
+      });
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        postServiceInstance.hide("637becd453fc9fc3d423a1d4", user)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given a previosly hidden linkID & a user", () => {
+    test("should not throw an error", async () => {
+      const user = new User({
+        _id: "t2_moazMohamed",
+        hiddenPosts: [new ObjectID("637becd453fc9fc3d423a1d4")],
+      });
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        postServiceInstance.hide("637becd453fc9fc3d423a1d4", user)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an invalid linkID & a valid user", () => {
+    test("should throw an error", async () => {
+      const user = new User({
+        _id: "t2_moazMohamed",
+        hiddenPosts: [new ObjectID()],
+      });
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(postServiceInstance.hide(undefined, user)).rejects.toThrowError();
+    });
+  });
+  describe("given a linkID & an invalid user", () => {
+    test("should throw an error", async () => {
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        postServiceInstance.hide("637becd453fc9fc3d423a1d4", undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
+describe("testing unhide service in post service class", () => {
+  describe("given a linkID & a user", () => {
+    test("should not throw an error", async () => {
+      const user = new User({
+        _id: "t2_moazMohamed",
+        hiddenPosts: [new ObjectID()],
+      });
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        postServiceInstance.unhide("637becd453fc9fc3d423a1d4", user)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an invalid linkID & a valid user", () => {
+    test("should throw an error", async () => {
+      const user = new User({
+        _id: "t2_moazMohamed",
+        hiddenPosts: [new ObjectID()],
+      });
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        postServiceInstance.unhide(undefined, user)
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a linkID & an invalid user", () => {
+    test("should throw an error", async () => {
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        postServiceInstance.unhide("637becd453fc9fc3d423a1d4", undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+/////////////////////////////////////////////////////
+describe("testing deletePost service in post service class", () => {
+  describe("given a post", () => {
+    test("should not throw an error", async () => {
+      const post = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+      });
+      postServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(post);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+         postServiceInstance.deletePost(post)
+      ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an invalid linkID", () => {
+    test("should throw an error", async () => {
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        postServiceInstance.deletePost(undefined)
+      ).rejects.toThrowError();
+    });
+  });
+});
+
+
