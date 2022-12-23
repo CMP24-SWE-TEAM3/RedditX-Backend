@@ -10,6 +10,12 @@ var FCM = new fcm(certPath);
  */
 class PushNotificationsService {
   constructor() {}
+  /**
+   * Send message using firebase
+   * @param {Object} message message content.
+   * @returns {Object} {status: boolean,message:string}.
+   * @function
+   */
   sendNotification = async (message) => {
     FCM.send(message, function (err) {
       if (err) {
@@ -29,6 +35,13 @@ class PushNotificationsService {
       message: "notification sent",
     };
   };
+  /**
+   * Send new follower notification using firebase
+   * @param {String} receiverFcmToken notification receiver firebase token.
+   * @param {String} followerUsername follower username.
+   * @returns {Boolean} status.
+   * @function
+   */
   newFollowerNotification = async (receiverFcmToken, followerUsername) => {
     try {
       let message = {
@@ -56,6 +69,13 @@ class PushNotificationsService {
       console.log(err);
     }
   };
+  /**
+   * Send upvote to post notification using firebase
+   * @param {String} receiverFcmToken notification receiver firebase token.
+   * @param {String} upvotedUsername upvoted username.
+   * @returns {Boolean} status.
+   * @function
+   */
   upvotePostNotification = async (
     receiverFcmToken,
     upvotedUsername,
@@ -87,6 +107,15 @@ class PushNotificationsService {
       console.log(err);
     }
   };
+  /**
+   * Send upvote to comment notification using firebase
+   * @param {String} receiverFcmToken notification receiver firebase token.
+   * @param {String} upvotedUsername upvoted username.
+   * @param {String} commentID upvoted comment.
+   * @param {String} postID post id of upvoted comment.
+   * @returns {Boolean} status.
+   * @function
+   */
   upvoteCommentNotification = async (
     receiverFcmToken,
     upvotedUsername,
@@ -122,7 +151,14 @@ class PushNotificationsService {
       console.log(err);
     }
   };
-
+   /**
+   * Send mention notification using firebase
+   * @param {String} receiverFcmToken notification receiver firebase token.
+   * @param {String} actionUsername username of the user who mention.
+   * @param {String} commentID upvoted comment.
+   * @returns {Boolean} status.
+   * @function
+   */
   mentionNotification = async (receiverFcmToken, actionUsername, commentID) => {
     try {
       let message = {
@@ -149,6 +185,15 @@ class PushNotificationsService {
       console.log(err);
     }
   };
+     /**
+   * Send reply to post notification using firebase
+   * @param {String} receiverFcmToken notification receiver firebase token.
+   * @param {String} actionUsername username of the user who mention.
+   * @param {String} commentID created comment id.
+   * @param {String} postID post id of created comment.
+   * @returns {Boolean} status.
+   * @function
+   */
   replytoPostNotification = async (
     receiverFcmToken,
     actionUsername,
@@ -182,6 +227,15 @@ class PushNotificationsService {
       console.log(err);
     }
   };
+     /**
+   * Send reply to comment notification using firebase
+   * @param {String} receiverFcmToken notification receiver firebase token.
+   * @param {String} actionUsername username of the user who mention.
+   * @param {String} commentID  comment of created reply.
+   * @param {String} replyID created reply id.
+   * @returns {Boolean} status.
+   * @function
+   */
   replytoCommentNotification = async (
     receiverFcmToken,
     actionUsername,
