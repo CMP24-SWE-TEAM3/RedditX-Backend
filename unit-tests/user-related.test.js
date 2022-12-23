@@ -1200,59 +1200,6 @@ describe("given an undefined user", () => {
   });
 });
 });
-
-// describe("testing userPrefs service in user service class", () => {
-//   const user={
-// "prefs":{"commentsNum":"23",
-// "threadedMessages":false,
-// "countryCode":"PS",
-// "langauge":false,
-// "over18":false,
-// "defaultCommentSort":"new",
-// "showLocationBasedRecommendations":false,
-// "searchInclude18":false,
-// "publicVotes":false,
-// "enableFollwers":false,
-// "liveOrangereds":false,
-// "labelNSFW":false,
-// "showPostInNewWindow":false,
-// "emailPrivateMessage":false,
-// "emailPostReply":false,
-// "emailMessages":false,
-// "emailCommentReply":false,
-// "highLightNewcomments":false,
-// "emailUpVoteComment":false,
-// "emailUpVote":false,
-// "markMessagesRead":false,
-// "emailUnsubscripeAll":false,
-// "emailUpvoteComment":false,
-// "showLinkFlair":false}
-// };
-//  describe("given a user", () => {
-//    test("should not throw an error", async () => {
-//      userServiceInstance.findById = jest
-//      .fn()
-//      .mockReturnValueOnce(user);
-//      userServiceInstance.getOne = jest
-//         .fn()
-//         .mockReturnValueOnce(user);
-//      const meInfo = await userServiceInstance.userPrefs(
-//        user
-//      );
-//      expect(meInfo.user.prefs.commentsNum).toBe("23");
-//    });
-//  });
-//  describe("given an undefined user", () => {
-//    test("should not throw an error", async () => {
-//      userServiceInstance.findById = jest
-//      .fn()
-//      .mockReturnValueOnce(undefined);
-//      expect(
-//        userServiceInstance.userPrefs(undefined)
-//      ).rejects.toThrowError();
-//    });
-//  });
-// });
 describe("testing resetPassword service in auth service class", () => {
  describe("given a username,currentPassword,newPassword, confirmedNewPassword", () => {
    test("should not throw an error", async () => {
@@ -1600,3 +1547,60 @@ describe("testing getSearchResults ", () => {
     });
   });
 });
+
+
+describe("testing resetPassword service in auth service class", () => {
+  describe("given a username,currentPassword,newPassword, confirmedNewPassword", () => {
+    test("should not throw an error", async () => {
+      const user = new User({
+        _id: "t2_moazMohamed",
+        email: "moaz25jan2015@gmail.com",
+      });
+      bcrypt.compare=jest.fn().mockReturnValueOnce(true);
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        authServiceInstance.resetPassword(
+          "user",
+          "oldpass",
+          "moaz42hassan",
+          "moaz42hassan"
+        )
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a currentPassword, newPassword, confirmedNewPassword, but invalid user", () => {
+    test("should throw an error", async () => {
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(undefined);
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        authServiceInstance.resetPassword(
+          undefined,
+          "oldpass",
+          "moaz42hassan",
+          "moaz42hassan"
+        )
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a a username,currentPassword, newPassword, confirmedNewPassword!=newPassword", () => {
+    test("should throw an error", async () => {
+      const user = new User({
+        _id: "t2_moazMohamed",
+        email: "moaz25jan2015@gmail.com",
+      });
+      userServiceInstance.getOne = jest.fn().mockReturnValueOnce(user);
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      User.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        authServiceInstance.resetPassword(
+          "user",
+        "oldpass",
+        "moaz42hassan",
+        "moaz4assan"
+        )
+      ).rejects.toThrowError();
+    });
+  });
+});
+

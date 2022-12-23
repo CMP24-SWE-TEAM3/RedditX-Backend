@@ -2211,7 +2211,7 @@ describe("testing getSearchResults of community Service", () => {
     });
   });
 });
-/*
+
 describe("testing markAsSpoiler service in community service class", () => {
   describe("given a subreddit, moderator, link", () => {
     test("should not throw an error", async () => {
@@ -2300,39 +2300,8 @@ describe("testing markAsSpoiler service in community service class", () => {
       ).rejects.toThrowError();
     });
   });
-  describe("given a subreddit, moderator, link that is not in this subreddit", () => {
-    test("should throw an error", async () => {
-      const community = new Community({
-        _id: "t5_imagePro235",
-        moderators: [
-          {
-            userID: "t2_hamada",
-            role: "moderator",
-          },
-        ]
-      });
-      const link = new Post({
-        _id: "4564",
-        title: "mnlknn",
-        text: "hdfhdfh",
-        communityID: "t5_Pro235",
-        spoiler:false
-       
-      });
-    communityServiceInstance.getOne = jest
-      .fn()
-      .mockReturnValueOnce(community);
-      jest.spyOn(Post, "findOne").mockReturnValueOnce(link);
-      Post.prototype.save = jest.fn().mockImplementation(() => {});
-      expect(
-        communityServiceInstance.markAsSpoiler(
-          "t5_imagePro235",
-            "t2_hamada",
-            "456")
-      ).rejects.toThrowError();
-    });
-  });
-});*/
+});
+
 describe("Test add community rules",()=>{
   test("test community is not found", async () => {
     const body={

@@ -865,6 +865,7 @@ class UserService extends Service {
  * get if participant in subreddit
  * @param {String} (subreddit)
  * @param {String} (user)
+ * @function
  */
   isParticipantInSubreddit = async (subreddit, user) => {
     let subreddits = (await this.getOne({ _id: user, select: "member" }))
@@ -876,6 +877,7 @@ class UserService extends Service {
  * isModeratorInSubreddit
  * @param {String} (subreddit)
  * @param {String} (user)
+ * @function
  */
   isModeratorInSubreddit = async (subreddit, user) => {
     let subreddits = (await this.getOne({ _id: user, select: "moderators" }))
@@ -887,6 +889,7 @@ class UserService extends Service {
  * addSubredditModeration
  * @param {String} (subreddit)
  * @param {String} (user)
+ * @function
  */
   addSubredditModeration = async (subreddit, user) => {
     if (!user.moderators.find((el) => el.communityId === subreddit)) {
@@ -899,6 +902,7 @@ class UserService extends Service {
  * add friend of user
  * @param {String} (username)
  * @param {String} (friend)
+ * @function
  */
   addFriend = async (username, friend) => {
     await this.updateOne(
@@ -923,6 +927,7 @@ class UserService extends Service {
    * delete friend of user 
    * @param {String} (username)
    * @param {String} (friend)
+   * @function
    */
   deleteFriend = async (username, friend) => {
     await this.updateOne(
@@ -938,6 +943,7 @@ class UserService extends Service {
    * get if the user is creator of the subreddit
    * @param {String} (subreddit)
    * @param {String} (user)
+   * @function
    */
   isCreatorInSubreddit = async (subreddit, user) => {
     let subreddits = (await this.getOne({ _id: user, select: "moderators" }))
@@ -952,6 +958,7 @@ class UserService extends Service {
    * kick moderator of subreddit
    * @param {String} (subreddit)
    * @param {String} (user)
+   * @function
    */
   kickModerator = async (subreddit, user) => {
     let doc = await this.getOne({ _id: user });
