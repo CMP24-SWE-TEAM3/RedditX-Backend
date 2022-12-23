@@ -5,7 +5,6 @@ const Community = require("../models/community-model");
 const User = require("../models/user-model");
 const PostService = require("../services/post-service");
 var ObjectID = require("bson").ObjectID;
-const mockingoose = require('mockingoose');
 const postServiceInstance = new PostService(Post);
 jest.setTimeout(1000000);
 describe("testing submit service in post service class", () => {

@@ -9,6 +9,8 @@ const PostService = require("../services/post-service");
 const communityServiceInstance = new CommunityService(Community);
 const postServiceInstance = new PostService(Post);
 
+
+
 describe("testing uploadCommunityPhoto service in community service class", () => {
   describe("given a file, username, community, type=icon", () => {
     test("should not throw an error", async () => {
@@ -2207,5 +2209,276 @@ describe("testing getSearchResults of community Service", () => {
       communityServiceInstance.getAll = jest.fn().mockReturnValueOnce(communities[0]);
       expect(communityServiceInstance.getSearchResults({ q: 'image' })).toBe(communities[0]);
     });
+  });
+});
+/*
+describe("testing markAsSpoiler service in community service class", () => {
+  describe("given a subreddit, moderator, link", () => {
+    test("should not throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        spoiler:false
+       
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(community);
+      jest.spyOn(Post, "findOne").mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsSpoiler(
+            "t5_imagePro235",
+            "t2_hamada",
+            "4564")
+        ).resolves.not.toThrowError();
+    });
+  });
+  describe("given an undefined subreddit, moderator, link", () => {
+    test("should throw an error", async () => {
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        spoiler:false
+       
+      });
+      communityServiceInstance.getOne = jest
+        .fn()
+        .mockReturnValueOnce(undefined);
+        jest.spyOn(Post, "findOne").mockReturnValueOnce(link);
+        Post.prototype.save = jest.fn().mockImplementation(() => {});
+        expect(
+          communityServiceInstance.markAsSpoiler(
+            undefined,
+            "t2_hamada",
+            "4564")
+        ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, not a moderator, link", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_imagePro235",
+        spoiler:false
+       
+      });
+      communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+      jest.spyOn(Post, "findOne").mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsSpoiler(
+          "t5_imagePro235",
+            "t2_sherry",
+            "4564")
+      ).rejects.toThrowError();
+    });
+  });
+  describe("given a subreddit, moderator, link that is not in this subreddit", () => {
+    test("should throw an error", async () => {
+      const community = new Community({
+        _id: "t5_imagePro235",
+        moderators: [
+          {
+            userID: "t2_hamada",
+            role: "moderator",
+          },
+        ]
+      });
+      const link = new Post({
+        _id: "4564",
+        title: "mnlknn",
+        text: "hdfhdfh",
+        communityID: "t5_Pro235",
+        spoiler:false
+       
+      });
+    communityServiceInstance.getOne = jest
+      .fn()
+      .mockReturnValueOnce(community);
+      jest.spyOn(Post, "findOne").mockReturnValueOnce(link);
+      Post.prototype.save = jest.fn().mockImplementation(() => {});
+      expect(
+        communityServiceInstance.markAsSpoiler(
+          "t5_imagePro235",
+            "t2_hamada",
+            "456")
+      ).rejects.toThrowError();
+    });
+  });
+});*/
+describe("Test add community rules",()=>{
+  test("test community is not found", async () => {
+    const body={
+      "srName":"t5_imagePro",
+      "rule":{
+        "title":"asd",
+        "description":"sada",
+        "reason":"saddd"
+
+      }
+    };
+    communityServiceInstance.availableSubreddit= jest.fn().mockReturnValueOnce({"state":true,"subreddit":null});
+    const result= await communityServiceInstance.addCommunityRule(body,{"_id":"t2_nabil"});
+    expect(result.status).toBe(false);
+  });
+  test("test community is not found", async () => {
+    const body={
+      "srName":"t5_imagePro",
+      "rule":{
+        "title":"asd",
+        "description":"sada",
+        "reason":"saddd"
+
+      }
+    };
+    const subreddit={
+      "_id":"tt5_imagePro",
+      "moderators":[{"userID":"t2_nabil","role":"moderator"}]
+    };
+   // jest.spyOn(Community,"findOne").mockReturnValueOnce(subreddit);
+    communityServiceInstance.availableSubreddit= jest.fn().mockReturnValueOnce({"state":false,"subreddit":subreddit});
+    const result= await communityServiceInstance.addCommunityRule(body,{"_id":"t2_nabil"});
+    expect(result.status).toBe(false);
+    expect(result.error).toBe("you aren't a creator to this subreddit");
+
+  });
+  test("test user is not creator", async () => {
+    const body={
+      "srName":"t5_imagePro",
+      "rule":{
+        "title":"asd",
+        "description":"sada",
+        "reason":"saddd"
+
+      }
+    };
+    const subreddit={
+      "_id":"tt5_imagePro",
+      "moderators":[{"userID":"t2_nabil","role":"creator"}]
+    };
+   // jest.spyOn(Community,"findOne").mockReturnValueOnce(subreddit);
+    communityServiceInstance.availableSubreddit= jest.fn().mockReturnValueOnce({"state":false,"subreddit":subreddit});
+    communityServiceInstance.updateOne=jest.fn().mockReturnValueOnce({});
+    const result= await communityServiceInstance.addCommunityRule(body,{"_id":"t2_nabil"});
+    expect(result.status).toBe(true);
+
+  });
+  test("test failed to add rule", async () => {
+    const body={
+      "srName":"t5_imagePro",
+      "rule":{
+        "title":"asd",
+        "description":"sada",
+        "reason":"saddd"
+
+      }
+    };
+    const subreddit={
+      "_id":"tt5_imagePro",
+      "moderators":[{"userID":"t2_nabil","role":"creator"}]
+    };
+   // jest.spyOn(Community,"findOne").mockReturnValueOnce(subreddit);
+    communityServiceInstance.availableSubreddit= jest.fn().mockReturnValueOnce({"state":false,"subreddit":subreddit});
+    communityServiceInstance.updateOne=jest.fn().mockRejectedValueOnce();
+    const result= await communityServiceInstance.addCommunityRule(body,{"_id":"t2_nabil"});
+    expect(result.status).toBe(false);
+
+  });
+});
+
+describe("Test edit community rules",()=>{
+  test("test community is not found", async () => {
+    const body={
+      "srName":"t5_imagePro",
+      "rule":{
+        "title":"asd",
+        "description":"sada",
+        "reason":"saddd",
+        "id":"23423234"
+
+      }
+    };
+    communityServiceInstance.availableSubreddit= jest.fn().mockReturnValueOnce({"state":true,"subreddit":null});
+    const result= await communityServiceInstance.editCommunityRule(body,{"_id":"t2_nabil"});
+    expect(result.status).toBe(false);
+  });
+  test("test user is not creator", async () => {
+    const body={
+      "srName":"t5_imagePro",
+      "rule":{
+        "title":"asd",
+        "description":"sada",
+        "reason":"saddd",
+        "id":"23423234"
+
+      }
+    };
+    const subreddit={
+      "_id":"t5_imagePro",
+      "moderators":[{"userID":"t2_nabil","role":"moderator"}]
+    ,communityRules:[
+      {"_id":"23423234"}
+    ]
+    };
+   // jest.spyOn(Community,"findOne").mockReturnValueOnce(subreddit);
+    communityServiceInstance.availableSubreddit= jest.fn().mockReturnValueOnce({"state":false,"subreddit":subreddit});
+    const result= await communityServiceInstance.editCommunityRule(body,{"_id":"t2_nabil"});
+    expect(result.status).toBe(false);
+    expect(result.error).toBe("you aren't a creator to this subreddit");
+
+  });
+  
+  test("test failed to update rule", async () => {
+    const body={
+      "srName":"t5_imagePro",
+      "rule":{
+        "title":"asd",
+        "description":"sada",
+        "reason":"saddd",
+        "id":"23423234"
+
+
+      }
+    };
+    const subreddit={
+      "_id":"t5_imagePro",
+      "moderators":[{"userID":"t2_nabil","role":"moderator"}]
+    ,communityRules:[
+      {"_id":"23423234"}
+    ]
+    };
+   // jest.spyOn(Community,"findOne").mockReturnValueOnce(subreddit);
+    communityServiceInstance.availableSubreddit= jest.fn().mockReturnValueOnce({"state":false,"subreddit":subreddit});
+    communityServiceInstance.updateOne=jest.fn().mockRejectedValueOnce();
+    const result= await communityServiceInstance.editCommunityRule(body,{"_id":"t2_nabil"});
+    expect(result.status).toBe(false);
+
   });
 });
