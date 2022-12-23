@@ -5,7 +5,7 @@ pipeline {
         stage('Pre-Build Setup') {
             steps {
                 sh 'pwd'
-                pwd 'whoami'
+                sh 'whoami'
                 sh 'cp /home/waleeddevops/api.env ./.env'
                 sh 'mv Dockerfile.prod Dockerfile'
             }
