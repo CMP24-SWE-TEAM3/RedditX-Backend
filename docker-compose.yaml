@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  api:
+    build: ./
+    container_name: api_container
+    ports:
+      - '7000:8000'
+    restart: always
+    volumes:
+      - /var/lib/jenkins/workspace/api-public:/app/public
+    deploy:
+      mode: replicated
+      replicas: 6
