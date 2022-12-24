@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'cypress/base:latest'
-        }
-    }
+    agent any
 
     stages {
         stage('Pre-Build Setup') {
@@ -22,6 +18,16 @@ pipeline {
         stage('Post-Build Cleanup') {
             steps {
                 sh 'yes y | docker system prune'
+            }
+        }
+        stage('E2E Test') {
+            agent {
+                docker {
+                    image 'cypress/base:latest'
+                }
+            }
+            steps {
+                sh 'pwd'
             }
         }
     }
