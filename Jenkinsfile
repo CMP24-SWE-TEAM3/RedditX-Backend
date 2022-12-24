@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'cypress/base:latest'
+        }
+    }
 
     stages {
         stage('Pre-Build Setup') {
