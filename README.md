@@ -4,7 +4,7 @@
 
 <hr>
 
-![alt text](./Images/reddit.png)
+<img src="./images/reddit.png">
 
 <hr>
 
@@ -52,19 +52,13 @@
   </li>
   <li><strong><em>Fill ".env" file with these data</em></strong>
     <div>
-        <code>
-            <blockquote> 
-                <p> 
-                    NODE_ENV=development <br>
-                    PORT=[PORT YOU WANT] <br>
-                    DATABASE=[CONNECTION STRING OF YOUR DATABASE] <br>
-                    DATABASE_PASSWORD=[YOUR DATABASE PASSWORD] <br>
-                    EMAIL_USERNAME=[YOUR EMAIL USERNAME] <br>
-                    EMAIL_PASSWORD=[EMAIL PASSWORD] <br>
-                    EMAIL_FROM=[YOUR EMAIL USERNAME] <br>
-                </p> 
-            </blockquote>
-        </code>
+        <code><blockquote> <p> NODE_ENV=development <br>
+        PORT=[PORT YOU WANT] <br>
+        DATABASE=[CONNECTION STRING OF YOUR DATABASE] <br>
+        DATABASE_PASSWORD=[YOUR DATABASE PASSWORD] <br>
+        EMAIL_USERNAME=[YOUR EMAIL USERNAME] <br>
+        EMAIL_PASSWORD=[EMAIL PASSWORD] <br>
+        EMAIL_FROM=[YOUR EMAIL USERNAME] <br></p> </blockquote></code>
     </div>
   </li>
   <li><strong><em>Install Node js and NPM</em></strong>
@@ -79,8 +73,7 @@
   </li>
   <li><strong><em>Start the application</em></strong>
     <div>
-        <code>$ npm start
-        </code>
+        <code>$ npm start</code>
     </div>
   </li>
 
