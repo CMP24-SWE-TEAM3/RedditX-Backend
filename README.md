@@ -51,8 +51,8 @@
     </div>
   </li>
   <li><strong><em>Fill ".env" file with these data</em></strong>
-    <div>
-        <code><blockquote> <p> NODE_ENV=development <br>
+    <div><code><blockquote> <p> 
+        NODE_ENV=development <br>
         PORT=[PORT YOU WANT] <br>
         DATABASE=[CONNECTION STRING OF YOUR DATABASE] <br>
         DATABASE_PASSWORD=[YOUR DATABASE PASSWORD] <br>
