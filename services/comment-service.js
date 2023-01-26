@@ -20,7 +20,7 @@ class CommentService extends Service {
   /**
    * Spams a comment
    * @param {object} query
-   * @returns {Promise} comments 
+   * @returns {Promise} comments
    * @function
    */
   getSearchResults = async (query) => {
@@ -124,6 +124,9 @@ class CommentService extends Service {
     const comment = await Comment.findById({ _id: data.commentID });
     if (!comment) throw new AppError("This comment doesn't exist!", 404);
     if (!user) throw new AppError("This user doesn't exist!", 404);
+    const commentCommunityID = comment.communityID
+      ? comment.communityID._id
+      : undefined;
     const newReply = new Comment({
       textHTML: data.textHTML,
       textJSON: data.textJSON,
@@ -131,7 +134,7 @@ class CommentService extends Service {
       authorId: username,
       replyingTo: data.commentID,
       postID: comment.postID,
-      communityID: comment.communityID._id,
+      communityID: commentCommunityID,
       voters: [{ userID: username, voteType: 1 }],
     });
     const result = await newReply.save();
@@ -398,7 +401,7 @@ class CommentService extends Service {
           { _id: postIdCasted },
           { $set: { votesCount: votesCount + operation, voters: voters } },
           { new: true },
-          () => { }
+          () => {}
         ).clone();
 
         return {
@@ -434,7 +437,7 @@ class CommentService extends Service {
   };
 
   /**
-   * show certain comment 
+   * show certain comment
    * @param {string} comment
    * @function
    */
