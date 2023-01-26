@@ -51,14 +51,14 @@
     </div>
   </li>
   <li><strong><em>Fill ".env" file with these data</em></strong>
-    <div><code><blockquote> <p> 
+    <div><blockquote> <p> 
         NODE_ENV=development <br>
         PORT=[PORT YOU WANT] <br>
         DATABASE=[CONNECTION STRING OF YOUR DATABASE] <br>
         DATABASE_PASSWORD=[YOUR DATABASE PASSWORD] <br>
         EMAIL_USERNAME=[YOUR EMAIL USERNAME] <br>
         EMAIL_PASSWORD=[EMAIL PASSWORD] <br>
-        EMAIL_FROM=[YOUR EMAIL USERNAME] <br></p> </blockquote></code>
+        EMAIL_FROM=[YOUR EMAIL USERNAME] <br></p> </blockquote>
     </div>
   </li>
   <li><strong><em>Install Node js and NPM</em></strong>
