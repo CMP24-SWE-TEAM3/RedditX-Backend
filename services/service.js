@@ -2,7 +2,7 @@ const APIfeatures = require("./../utils/api-features");
 
 /**
  * Service class to handle common database queries.
- * @class CommentService
+ * @class Service
  */
 class Service {
   constructor(model) {
